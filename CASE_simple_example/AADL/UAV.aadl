@@ -10,7 +10,7 @@ public
 	system FlightPlanner
 		features
 			recv_map: in event data port;
-			flight_plan: out event data port;
+			flight_plan: out data port;
 			position_status: in event data port;
 	end FlightPlanner;
 
@@ -24,7 +24,7 @@ public
 
 	system WaypointManager
 		features
-			flight_plan: in event data port;
+			flight_plan: in data port;
 			waypoint: out event data port;
 			position_status: in event data port;
 	end WaypointManager;
