@@ -1,0 +1,89 @@
+package UAV
+public
+	
+	system GroundStation
+		features
+			send_map: out event data port;
+			recv_status: in event data port;
+	end GroundStation;
+
+	system FlightPlanner
+		features
+			recv_map: in event data port;
+			flight_plan: out event data port;
+			position_status: in event data port;
+	end FlightPlanner;
+
+	system RadioDriver
+		features
+			recv_r_msg: in event data port;
+			send_r_msg: out event data port;
+			r_msg_in: out event data port;
+			r_msg_out: in event data port;
+	end RadioDriver;
+
+	system WaypointManager
+		features
+			flight_plan: in event data port;
+			waypoint: out event data port;
+			position_status: in event data port;
+	end WaypointManager;
+	
+	system UARTDriver
+		features
+			recv_s_msg: in event data port;
+			send_s_msg: out event data port;
+			s_msg_in: out event data port;
+			s_msg_out: in event data port;
+	end UARTDriver;
+
+	system FlightController
+		features
+			waypoint: in event data port;
+			position_status: out event data port;
+	end FlightController;
+
+	system MissionComputer
+		features
+			recv_map: in event data port;
+			position_status: in event data port;
+			waypoint: out event data port;
+			send_status: out event data port;
+	end MissionComputer;
+	
+	system implementation MissionComputer.impl
+		subcomponents
+			RADIO: system RadioDriver;
+			FPLN: system FlightPlanner;
+			WPM: system WaypointManager;
+			UART: system UARTDriver;
+		connections
+			c1: port recv_map -> RADIO.recv_r_msg;
+			c2: port RADIO.send_r_msg -> send_status;
+			c3: port RADIO.r_msg_in -> FPLN.recv_map;
+			c4: port FPLN.flight_plan -> WPM.flight_plan;
+			c5: port WPM.waypoint -> UART.s_msg_out;
+			c6: port UART.s_msg_in -> WPM.position_status;
+			c7: port UART.s_msg_in -> FPLN.position_status;
+			c8: port UART.s_msg_in -> RADIO.r_msg_out;
+			c9: port UART.send_s_msg -> waypoint;
+			c10: port position_status -> UART.recv_s_msg;
+
+	end MissionComputer.impl;
+
+	system uav
+	end uav;
+
+	system implementation uav.impl
+		subcomponents
+			GND: system GroundStation;
+			MCMP: system MissionComputer;
+			FCTL: system FlightController;
+		connections
+			c1: port GND.send_map -> MCMP.recv_map;
+			c2: port MCMP.send_status -> GND.recv_status;
+			c3: port MCMP.waypoint -> FCTL.waypoint;
+			c4: port FCTL.position_status -> MCMP.position_status;
+	end uav.impl;
+
+end UAV;
