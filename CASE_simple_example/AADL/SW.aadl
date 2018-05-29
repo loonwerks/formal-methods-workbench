@@ -1,0 +1,63 @@
+package SW
+public
+	
+	thread FlightPlanner
+		features
+			recv_map: in event data port;
+			flight_plan: out data port;
+			position_status: in event data port;
+	end FlightPlanner;
+
+	thread RadioDriver
+		features
+			recv_map_in: in event data port;
+			send_status_out: out event data port;
+			send_status_in: in event data port;
+			recv_map_out: out event data port;
+	end RadioDriver;
+
+	thread WaypointManager
+		features
+			flight_plan: in data port;
+			waypoint: out event data port;
+			position_status: in event data port;
+	end WaypointManager;
+	
+	thread UARTDriver
+		features
+			position_status_in: in event data port;
+			waypoint_out: out event data port;
+			position_status_out: out event data port;
+			waypoint_in: in event data port;
+	end UARTDriver;
+
+	process MC_SW
+		features
+			recv_map: in event data port;
+			send_status: out event data port;
+			waypoint: out event data port;
+			position_status: in event data port;
+	end MC_SW;
+
+	process implementation MC_SW.impl
+		subcomponents
+			RADIO: thread RadioDriver;
+			FPLN: thread FlightPlanner;
+			WPM: thread WaypointManager;
+			UART: thread UARTDriver;
+		connections
+			c1: port recv_map -> RADIO.recv_map_in;
+			c2: port RADIO.send_status_out -> send_status;
+			c3: port RADIO.recv_map_out -> FPLN.recv_map;
+			c4: port FPLN.flight_plan -> WPM.flight_plan;
+			c5: port WPM.waypoint -> UART.waypoint_in;
+			c6: port UART.position_status_out -> WPM.position_status;
+			c7: port UART.position_status_out -> FPLN.position_status;
+			c8: port UART.position_status_out -> RADIO.send_status_in;
+			c9: port UART.waypoint_out -> waypoint;
+			c10: port position_status -> UART.position_status_in;
+
+	end MC_SW.impl;	
+	
+	
+end SW;
