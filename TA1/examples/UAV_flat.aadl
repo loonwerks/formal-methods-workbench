@@ -1,0 +1,209 @@
+package UAV_flat
+public
+	
+	with CASETA1;
+	
+	bus Serial
+	end Serial;
+	
+	system UAV
+		features
+			recv_map: in event data port;
+			send_status: out event data port;
+			RFA: requires bus access RF;
+	end UAV;
+	
+	device Radio
+		features
+			MCA: requires bus access MC_Bus;
+			RFA: requires bus access RF;
+			recv_map_in: in event data port;
+			recv_map_out: out event data port;
+			send_status_in: in event data port;
+			send_status_out: out event data port;
+			
+		properties
+			CASETA1::COTS=>true;
+	end Radio;
+
+	device UART
+		features
+			MCA: requires bus access MC_Bus;
+			UARTA: requires bus access Serial;
+			waypoint_in: in event data port;
+			waypoint_out: out event data port;
+			position_status_in: in event data port;
+			position_status_out: out event data port;
+	end UART;
+
+	processor MC_Proc
+		features
+			MCA: requires bus access MC_Bus;			
+	end MC_Proc;
+	
+	memory MC_Mem
+		features
+			MCA: requires bus access MC_Bus;		
+	end MC_Mem;
+	
+	bus MC_Bus
+	end MC_Bus;
+
+	bus RF
+		properties
+			CASETA1::wifi=>true;
+	end RF;
+
+	system UAS
+	end UAS;
+
+	system GroundStation
+		features
+			send_map: out event data port;
+			recv_status: in event data port;
+			RFA: requires bus access RF;
+			
+		properties
+			CASETA1::COTS=>true;
+	end GroundStation;
+
+	system FlightController
+		features
+			waypoint: in event data port;
+			position_status: out event data port;
+			UARTA: requires bus access Serial;
+			
+		properties
+			CASETA1::COTS=>true;
+	end FlightController;
+
+	thread FlightPlanner
+		features
+			recv_map: in event data port;
+			flight_plan: out data port;
+			position_status: in event data port;
+	end FlightPlanner;
+
+	thread RadioDriver
+		features
+			recv_map_in: in event data port;
+			send_status_out: out event data port;
+			send_status_in: in event data port;
+			recv_map_out: out event data port;
+	end RadioDriver;
+
+	thread WaypointManager
+		features
+			flight_plan: in data port;
+			waypoint: out event data port;
+			position_status: in event data port;
+	end WaypointManager;
+	
+	thread UARTDriver
+		features
+			position_status_in: in event data port;
+			waypoint_out: out event data port;
+			position_status_out: out event data port;
+			waypoint_in: in event data port;
+	end UARTDriver;
+
+	process MC_SW
+		features
+			recv_map: in event data port;
+			send_status: out event data port;
+			waypoint: out event data port;
+			position_status: in event data port;
+			
+		properties
+			CASETA1::accessesSensitiveData=>true;
+	end MC_SW;
+
+	system MissionComputer
+		features
+			recv_map: in event data port;
+			position_status: in event data port;
+			waypoint: out event data port;
+			send_status: out event data port;
+			UARTA: requires bus access Serial;
+			RFA: requires bus access RF;
+	end MissionComputer;
+	
+	process implementation MC_SW.impl
+		subcomponents
+			RADIO: thread RadioDriver;
+			FPLN: thread FlightPlanner;
+			WPM: thread WaypointManager;
+			UART: thread UARTDriver;
+		connections
+			c1: port recv_map -> RADIO.recv_map_in;
+			c2: port RADIO.send_status_out -> send_status;
+			c3: port RADIO.recv_map_out -> FPLN.recv_map;
+			c4: port FPLN.flight_plan -> WPM.flight_plan;
+			c5: port WPM.waypoint -> UART.waypoint_in;
+			c6: port UART.position_status_out -> WPM.position_status;
+			c7: port UART.position_status_out -> FPLN.position_status;
+			c8: port UART.position_status_out -> RADIO.send_status_in;
+			c9: port UART.waypoint_out -> waypoint;
+			c10: port position_status -> UART.position_status_in;
+
+	end MC_SW.impl;	
+
+	system implementation MissionComputer.impl
+		
+		subcomponents
+			RADIO_HW: device Radio;
+			UART_HW: device UART;
+			PROC_HW: processor MC_Proc;
+			MEM_HW: memory MC_Mem;
+			BUS_HW: bus MC_Bus;
+			PROC_SW: process MC_SW;
+			
+		connections
+			bac1: bus access RADIO_HW.MCA <-> BUS_HW;
+			bac2: bus access UART_HW.MCA <-> BUS_HW;
+			bac3: bus access PROC_HW.MCA <-> BUS_HW;
+			bac4: bus access MEM_HW.MCA <-> BUS_HW;
+			bac5: bus access RADIO_HW.RFA <-> RFA;
+			bac6: bus access UART_HW.UARTA <-> UARTA;
+			c1: port recv_map -> RADIO_HW.recv_map_in;
+			c2: port RADIO_HW.recv_map_out -> PROC_SW.recv_map;
+			c3: port PROC_SW.send_status -> RADIO_HW.send_status_in;
+			c4: port RADIO_HW.send_status_out -> send_status;
+			c5: port PROC_SW.waypoint -> UART_HW.waypoint_in;
+			c6: port UART_HW.waypoint_out -> waypoint;
+			c7: port position_status -> UART_HW.position_status_in;
+			c8: port UART_HW.position_status_out -> PROC_SW.position_status;
+		
+	end MissionComputer.impl;
+	
+	system implementation UAV.impl
+		subcomponents
+			MCMP: system MissionComputer;
+			FCTL: system FlightController;
+			SBUS: bus Serial;
+			
+		connections
+			bac1: bus access SBUS <-> MCMP.UARTA;
+			bac2: bus access SBUS <-> FCTL.UARTA;
+			bac3: bus access RFA -> MCMP.RFA;
+			c1: port recv_map -> MCMP.recv_map;
+			c2: port MCMP.send_status -> send_status;
+			c3: port MCMP.waypoint -> FCTL.waypoint;
+			c4: port FCTL.position_status -> MCMP.position_status;
+			
+	end UAV.impl;
+	
+	system implementation UAS.impl
+		subcomponents
+			GND: system GroundStation;
+			UAV: system UAV;
+			RFB: bus RF;
+		connections
+			c1: port GND.send_map -> UAV.recv_map;
+			c2: port UAV.send_status -> GND.recv_status;
+			bac1: bus access RFB <-> GND.RFA;
+			bac2: bus access RFB <-> UAV.RFA;
+
+	end UAS.impl;	
+	
+end UAV_flat;

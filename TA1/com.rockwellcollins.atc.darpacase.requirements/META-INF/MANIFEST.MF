@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Requirements2
+Bundle-SymbolicName: com.rockwellcollins.atc.darpacase.requirements;singleton:=true
+Bundle-Version: 0.0.0
+Bundle-Vendor: Rockwell Collins
+Automatic-Module-Name: com.rockwellcollins.atc.darpacase.requirements2
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.jface,
+ org.osate.aadl2,
+ org.eclipse.xtext.ui,
+ org.eclipse.emf.common
+Import-Package: org.eclipse.ui
+Bundle-ClassPath: dependencies/gson-2.8.5.jar,
+ .
