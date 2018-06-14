@@ -101,7 +101,7 @@ public class Translate extends Aadl2Switch<Value> {
 
 	@Override
 	public Value caseEventDataPort(EventDataPort port) {
-		return buildPort(port.getName(), "eventdata", port.isIn(), port.isOut());
+		return buildPort(port.getName(), "event data", port.isIn(), port.isOut());
 	}
 
 	@Override

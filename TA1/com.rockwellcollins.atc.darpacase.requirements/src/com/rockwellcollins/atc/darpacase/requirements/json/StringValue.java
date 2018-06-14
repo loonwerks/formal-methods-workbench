@@ -14,6 +14,6 @@ public class StringValue extends Value {
 
 	@Override
 	public String toString() {
-		return value;
+		return quoted(value);
 	}
 }

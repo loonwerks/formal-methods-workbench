@@ -20,6 +20,6 @@ public class Pair {
 
 	@Override
 	public String toString() {
-		return string + " : " + value.toString();
+		return Value.quoted(string) + " : " + value.toString();
 	}
 }
