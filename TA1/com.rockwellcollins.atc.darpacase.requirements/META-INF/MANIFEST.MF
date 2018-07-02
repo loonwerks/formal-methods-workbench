@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,
  org.eclipse.xtext.ui,
  org.eclipse.emf.common
-Import-Package: org.eclipse.ui
+Import-Package: com.rockwellcollins.atc.agree.agree,
+ org.eclipse.ui
 Bundle-ClassPath: dependencies/gson-2.8.5.jar,
  .
