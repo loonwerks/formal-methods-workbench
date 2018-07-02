@@ -10,7 +10,7 @@ public class RequirementsAPI {
 		System.out.println(api.sandboxing("p1", "uav.impl"));
 		System.out.println(api.stackCanary("p1", "uav.impl"));
 		System.out.println(api.integrity("flight_plan", "uav.impl"));
-		//
+		System.out.println(api.useLayeredProtection("p1", "p2", "uav.impl"));
 		System.out.println(api.controlAccess("flight_plan", "waypoint_manager", "uav.impl"));
 		System.out.println(api.confidentiality("c1", "uav.impl"));
 	}
@@ -179,8 +179,21 @@ public class RequirementsAPI {
 	/*
 	 * addresses: protocol weakness
 	 */
-	public String useLayeredProtection() {
-		return null;
+	public String useLayeredProtection(String process, String protocol, String context) {
+		refreshBuilder();
+		println("Context: " + context);
+		println();
+		tabs++;
+		println("layeredProtection(" + process + "," + protocol + ")");
+		println();
+		println(layeredProtectionClaim());
+		return get();
+	}
+
+	private String layeredProtectionClaim() {
+		return "layeredProtection(p1 : process, p2 : protocol) <= " + System.lineSeparator()
+				+ "** \"process p1 enforces multiple layers of protection " + System.lineSeparator()
+				+ "when employing protocol p2\" **" + System.lineSeparator() + "true";
 	}
 
 	/*
