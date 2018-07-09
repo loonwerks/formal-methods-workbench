@@ -6,6 +6,11 @@ public
 			recv_map: in event data port;
 			flight_plan: out data port;
 			position_status: in event data port;
+			
+			annex Resolute {**
+				prove (well_formed(this, GS::GroundStation))
+			**};
+			
 	end FlightPlanner;
 
 	thread RadioDriver

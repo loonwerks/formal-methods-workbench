@@ -1,0 +1,41 @@
+package claim
+  public 
+    with UAV;
+    
+    annex resolute {**
+   	-- What if there are multiple filters, properties, etc.?
+    	
+    well_formed(x : component, y : component) <=
+    ** x " only receives well-formed messages from " y **
+    filter_component() and not_bypassed() and filter_prop_checked() and system_prop_checked()
+    
+    filter_component() <=
+    ** "filter component added to system" **
+    -- Need to define the set of filters
+    --exists (c : component). property(c : CASE::COMP_TYPE) = FILTER
+    true
+    
+    not_bypassed() <=
+    ** "filter component cannot be bypassed" **
+    true
+    
+    filter_prop_checked() <=
+    ** "filter property implemented by CakeML" **
+    -- This should connect to some evidence that the filter was correctly generated
+    -- and that the proof was emitted and checked
+    --forall (c : component). property(c, CASE::COMP_TYPE) = "FILTER"
+    --   => property(c, CASE::COMP_IMPL) = "CAKEML"
+    true
+    
+    system_prop_checked() <=
+    ** "system property checked by AGREE" **
+    -- This should either run AGREE on the system property or connect to evidence
+    -- that AGREE was previously run on the current version of the design
+    -- Need to be able to refer to "well-formed" AGREE property, at least by name
+    true
+    
+    **};
+    
+end claim;
+    
+
