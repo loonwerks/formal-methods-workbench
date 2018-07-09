@@ -35,10 +35,8 @@ public class RequirementsAPI {
 			return;
 		}
 
-		String replacement = s.replaceAll("\\R", System.lineSeparator() + getTabs());
-
 		build.append(getTabs());
-		build.append(replacement);
+		build.append(s.replaceAll("\\R", System.lineSeparator() + getTabs()));
 		println();
 	}
 
@@ -63,6 +61,10 @@ public class RequirementsAPI {
 
 	public RequirementsAPI() {
 		tabSpaces = 3;
+	}
+
+	public RequirementsAPI(int spacesPerTab) {
+		tabSpaces = spacesPerTab;
 	}
 
 	/*
