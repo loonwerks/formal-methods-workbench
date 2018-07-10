@@ -19,7 +19,7 @@
       <bendpoints>
         <point x="628.0" y="387.0"/>
       </bendpoints>
-      <primaryLabelPosition x="10.0" y="36.33333333333337"/>
+      <primaryLabelPosition x="10.0" y="36.0"/>
     </element>
     <element id="44" autoContentsFilter="allow_fundamental">
       <element id="45" autoContentsFilter="allow_fundamental">
@@ -218,7 +218,7 @@
       <seg>uav.impl</seg>
     </bo>
     <position x="10.0" y="10.0"/>
-    <size width="1291.0" height="559.0"/>
+    <size width="1111.0" height="559.0"/>
   </element>
   <config>
     <enabledAadlProperties/>

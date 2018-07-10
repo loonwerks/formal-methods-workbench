@@ -10,8 +10,8 @@ public
 			MCA: requires bus access MC_Bus;
 			RFA: requires bus access UAS::RF;
 			recv_map_in: in event data port;
-			recv_map_out: out event data port;
-			send_status_in: in event data port;
+			recv_map_out: out event data port SW::Command.Impl;
+			send_status_in: in event data port SW::Coordinate.Impl;
 			send_status_out: out event data port;
 	end Radio;
 
@@ -19,10 +19,10 @@ public
 		features
 			MCA: requires bus access MC_Bus;
 			UARTA: requires bus access UAV::Serial;
-			waypoint_in: in event data port;
+			waypoint_in: in event data port SW::MissionWindow.Impl;
 			waypoint_out: out event data port;
 			position_status_in: in event data port;
-			position_status_out: out event data port;
+			position_status_out: out event data port SW::Coordinate.Impl;
 	end UART;
 
 	processor MC_Proc
@@ -46,6 +46,7 @@ public
 			send_status: out event data port;
 			UARTA: requires bus access UAV::Serial;
 			RFA: requires bus access UAS::RF;
+
 	end MissionComputer;
 	
 	system implementation MissionComputer.impl
