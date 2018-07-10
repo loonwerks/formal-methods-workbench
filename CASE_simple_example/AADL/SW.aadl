@@ -1,8 +1,8 @@
 package SW
 public
 	
-with Data_Model;
-with Base_Types;
+	with Data_Model;
+	with Base_Types;
 
 	annex agree {**
 		-- These functions check the well-formedness of message structures
@@ -184,6 +184,10 @@ with Base_Types;
 --			assume "Well-formed command from the Ground Station" : SW.good_gs_command(recv_map);
 			guarantee "The Flight Planner shall generate a valid mission" : SW.good_mission(flight_plan);
 
+		**};
+		
+		annex Resolute {**
+			prove (well_formed(this, GS::GroundStation))
 		**};
 			
 	end FlightPlanner;
