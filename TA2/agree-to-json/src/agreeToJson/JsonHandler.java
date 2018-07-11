@@ -18,6 +18,7 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ModelUnit;
+import org.osate.aadl2.PropertySet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,17 +45,21 @@ public class JsonHandler extends AbstractHandler {
 		EObject original = xtextEditor.getDocument().readOnly(resource -> resource.getContents().get(0));
 		ModelUnit model = (ModelUnit) EcoreUtil.copy(original);
 
-		AadlPackage pkg = null;
+
+
+		AadlTranslate aadlTranslate = new AadlTranslate();
+
+		Value jsonValue = null;
 		if (model instanceof AadlPackage) {
-			pkg = (AadlPackage) model;
+			jsonValue = aadlTranslate.doSwitch(model);
+		} else if (model instanceof PropertySet) {
+			jsonValue = aadlTranslate.doSwitch(model);
 		} else {
-			MessageDialog.openError(window.getShell(), "Expecting AADL Package",
-					"A AADL package must be the entry point for generating JSON.");
+			MessageDialog.openError(window.getShell(), "Expecting AADL Package or Property Set",
+					"A AADL package or property set must be the entry point for generating JSON.");
 			return null;
 		}
 
-		AadlTranslate aadlTranslate = new AadlTranslate();
-		Value jsonValue = aadlTranslate.doSwitch(pkg);
 		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();
 		JsonElement je = jp.parse(jsonValue.toString());

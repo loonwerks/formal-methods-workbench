@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AadlString;
 import org.osate.aadl2.BusAccess;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation;
@@ -12,6 +13,7 @@ import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataPort;
+import org.osate.aadl2.EnumerationType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
@@ -19,11 +21,11 @@ import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.ListValueImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
-import org.osate.aadl2.impl.PropertyImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.aadl2.util.Aadl2Switch;
 
@@ -54,6 +56,22 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	}
 
 	@Override
+	public Value casePropertySet(PropertySet ps) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "propertySet"));
+		pairList.add(Pair.build("name", ps.getName()));
+		ArrayList<Value> properties = new ArrayList<Value>();
+		for (Property p : ps.getOwnedProperties()) {
+			properties.add(doSwitch(p));
+		}
+		for (PropertyAssociation pa : ps.getOwnedPropertyAssociations()) {
+			properties.add(doSwitch(pa));
+		}
+		pairList.add(Pair.build("properties", ArrayValue.build(properties)));
+		return ObjectValue.build(pairList);
+	}
+
+	@Override
 	public Value caseComponentType(ComponentType ty) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", ty.getName()));
@@ -67,10 +85,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 
 		ArrayList<Value> properties = new ArrayList<Value>();
 		for (PropertyAssociation pa : ty.getOwnedPropertyAssociations()) {
-			Property p = pa.getProperty();
-			PropertyImpl pi = ((PropertyImpl) p);
 			properties.add(doSwitch(pa));
-
 		}
 		pairList.add(Pair.build("properties", ArrayValue.build(properties)));
 		pairList.add(Pair.build("agree", agreeTranslate.genComponentClassifier(ty)));
@@ -105,9 +120,6 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		pairList.add(Pair.build("destination", getName(c.getDestination())));
 		return ObjectValue.build(pairList);
 	}
-
-	// DataTypeImpl
-	// DataImplementationImpl
 
 
 	/* Begin: Subcomponents */
@@ -183,14 +195,9 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 
 	private Value getListValueImpl(ListValueImpl lv) {
 		ArrayList<Value> vsJson = new ArrayList<Value>();
-
-		// vsJson.add(StringValue.build(lv.getOwnedListElements().size() + ""));
 		for (PropertyExpression pe : lv.getOwnedListElements()) {
 			vsJson.add(genPropertyExpression(pe));
 		}
-
-		// ArrayValue x = ArrayValue.build(vsJson);
-		// System.out.println("x: " + (x == null ? "null" : x.toString()));
 		return ArrayValue.build(vsJson);
 	}
 
@@ -222,6 +229,34 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public Value caseModalPropertyValue(ModalPropertyValue v) {
 		return genPropertyExpression(v.getOwnedValue());
+	}
+
+	@Override
+	public Value caseProperty(Property p) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("propertyType", doSwitch(p.getPropertyType())));
+		return ObjectValue.build(pairList);
+	}
+
+	@Override
+	public Value caseEnumerationType(EnumerationType et) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "enumType"));
+
+		ArrayList<Value> enumList = new ArrayList<Value>();
+		for (org.osate.aadl2.EnumerationLiteral l : et.getOwnedLiterals()) {
+			enumList.add(StringValue.build(l.getName()));
+		}
+		pairList.add(Pair.build("enums", ArrayValue.build(enumList)));
+		return ObjectValue.build(pairList);
+	}
+
+	@Override
+	public Value caseAadlString(AadlString s) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "string"));
+		return ObjectValue.build(pairList);
 	}
 
 
