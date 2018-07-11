@@ -46,6 +46,20 @@
         <filter>calledSubprogram</filter>
       </contentFilters>
     </element>
+    <element id="56">
+      <element id="57">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c11</seg>
+      </bo>
+      <contentFilters/>
+    </element>
     <element id="44">
       <element id="45">
         <bo>
@@ -296,6 +310,37 @@
         <filter>generalizations</filter>
         <filter>subprogramCallOrders</filter>
         <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="58">
+      <element id="60" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>filtered_command</seg>
+        </bo>
+        <position y="60.0"/>
+        <contentFilters/>
+      </element>
+      <element id="59" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>gs_command</seg>
+        </bo>
+        <position y="10.0"/>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>flt</seg>
+      </bo>
+      <position/>
+      <size width="352.0" height="110.0"/>
+      <contentFilters>
+        <filter>features</filter>
+        <filter>internalFeatures</filter>
+        <filter>processorFeatures</filter>
+        <filter>connections</filter>
+        <filter>flowSpecifications</filter>
       </contentFilters>
     </element>
     <element id="6">

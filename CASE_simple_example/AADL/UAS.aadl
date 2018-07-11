@@ -12,7 +12,7 @@ public
 
 	system implementation UAS.impl
 		subcomponents
-			GND: system GS::GroundStation;
+			GND: device GS::GroundStation;
 			UAV: system UAV::UAV;
 			RFB: bus RF;
 		connections
