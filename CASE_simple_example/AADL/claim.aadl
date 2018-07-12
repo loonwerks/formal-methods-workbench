@@ -2,116 +2,55 @@ package claim
   public 
   	
   	with CASE;
+  	with SW;
     
     annex resolute {**
-   	-- What if there are multiple filters, properties, etc.?
     	
-    well_formed(x : component, y : component) <=
-    ** x " only receives well-formed messages from " y **
-    filter_component(x, y) and not_bypassed(x, y) and filter_prop_checked() and system_prop_checked()
-
+    well_formed(x : component, prop : string) <=
+    	** x " only receives well-formed messages" **
+		filter_exists(x) and not_bypassed(x) and filter_prop_checked() and system_prop_checked(x, prop)
     
-    filter_component(x : component, y : component) <=
-    ** "filter component between " y " and " x **
-    -- Need to define the set of filters
-    -- For now we will assume any type of filter will reject malformed messages
-    forall (t : thread). (has_property(t, CASE::COMP_TYPE) and property(t, CASE::COMP_TYPE) = "FILTER")
- --   	=> exists (d: reach(c, false)). d = y and exists(f : reach(x, false)). f = c
- => exists (d: all_reachable_components(t)). d = x --and exists(f : all_reachable_components(y)). f = c
 
+	-- Ideally, we would want to check that there's a filter anywhere between
+	-- pairs of components (such as the ground station and flight planner).
+	-- However, there's a bug in Resolute that prevents us from doing that.
+	-- So for now, we just check to see if there is a filter immediately before 
+	-- the component on the communication pathway.
+	-- For now we will assume any type of filter will reject malformed messages.
+	filter_exists(c : component) <=
+		** "A filter exists on the communication pathway immediately before " c **
+		-- get incoming connections
+		let in_conns : {connection} = {conn for (conn : connections(c)) | destination_component(conn) = c};
+		exists(conn : in_conns). is_filter(source_component(conn))
 
-    not_bypassed(x : component, y : component) <=
-    ** "filter component cannot be bypassed" **
-    -- For now we will assume any type of filter will reject malformed messages
---    not exists (c : reach(x, true)). c = y
-true  
-    
-    filter_prop_checked() <=
-    ** "filter property implemented by CakeML" **
+	-- Make sure there is no communication pathway that avoids the filter
+	-- For now we will assume any type of filter will reject malformed messages
+    not_bypassed(c : component) <=
+	    ** "Filter cannot be bypassed" **
+		-- get incoming connections of type Command
+		let cmd_conns : {connection} = {conn for (conn : connections(c)) | 
+										destination_component(conn) = x and has_type(conn) and type(conn) = SW::Command};
+		-- show that all of these connections come from a filter
+		forall(conn : cmd_conns). is_filter(source_component(conn))
+
     -- This should connect to some evidence that the filter was correctly generated
-    -- and that the proof was emitted and checked
-    forall (c : component). has_property(c, CASE::COMP_TYPE) and property(c, CASE::COMP_TYPE) = "FILTER"
-       => has_property(c, CASE::COMP_IMPL) and property(c, CASE::COMP_IMPL) = "CAKEML"
+    -- and that the proof was emitted and checked.
+    -- However, this funcionality has not yet been implemented
+    filter_prop_checked() <=
+	    ** "Filter property implemented by CakeML" **
+	    forall (c : component). has_property(c, CASE::COMP_TYPE) and property(c, CASE::COMP_TYPE) = "FILTER"
+	       => has_property(c, CASE::COMP_IMPL) and property(c, CASE::COMP_IMPL) = "CAKEML"
 
-    
-    system_prop_checked() <=
-    ** "system property checked by AGREE" **
     -- This should either run AGREE on the system property or connect to evidence
-    -- that AGREE was previously run on the current version of the design
-    -- Need to be able to refer to "well-formed" AGREE property, at least by name
-    true
+    -- that AGREE was previously run on the current version of the design.
+    -- Because this functionality isn't currently implemented in AGREE or RESOLUTE, 
+    -- we assume that AGREE will assign the property name to the "AGREE_PROPERTIES_PASSED" 
+    -- property for each component that contains AGREE contracts when those checks pass
+    system_prop_checked(c : component, prop : string) <=
+    	** "AGREE property passed: [ " prop " ]" **
+    	has_property(c, CASE::AGREE_PROPERTIES_PASSED) and length(intersect(property(c, CASE::AGREE_PROPERTIES_PASSED), {prop})) = 1
 
-
-
-
-
-
--- return set of reachable components that have no outgoing connections.
-reachable_endpoints(c : component) : {component} =
-	let outconns: {connection} = outgoing_component_connections(c);
-	if outconns = {} then 
-		{c}
-	else
-		{c2 for (conn : outconns) (c2 : reachable_endpoints(destination_component(conn)))}
-
--- all components that are reachable via port or data access connections from the given component
--- we consider direct and indirect reachability
--- the use of a set ensures that we do not recurse forever
-all_reachable_components(c : component) : {component} = 
-	recusive_reach({c})
-		
--- support method to expand on a set of reachable components by the next directly rachable components
--- the use of a set ensures that we do not recurse forever
-recusive_reach(curr : {component}) : {component} =
-	let next_ones : {component} = {y for (x : curr) (y : directly_reachable_components(x))};
-	let next_new_ones : {component} = {ele for (ele : next_ones) | (not(member(ele, curr)) and is_thread(ele))};
-	if (next_new_ones = {}) then
-		curr
-	else
-		union(curr, recusive_reach(next_new_ones))
-		
--- return set of components that are directly reachable via outgoing connections.
-directly_reachable_components(comp : component) : {component} =
-	let outconns : {connection} = outgoing_component_connections(comp);
-	{otherend for (conn : outconns) (otherend : other_connection_end(conn, comp))}
-	
--- return all outgoing connections
--- in the case of data access conneciton we need to consider access rights to determine the direction 
--- in the case of port connecitons we need to filter out in/out ports with incoming connections.
-outgoing_component_connections(comp : component) : {connection} =
-	{conn for (conn : connections(comp)) |
---		if (is_access_connection(conn)) then
---			-- access feature has write access
---			source(conn) instanceof access and has_write_access(source(conn)) or
---			destination(conn) instanceof access and has_write_access(destination(conn))
---		else
-			-- we have a directed feature connection
-			-- it is not an incoming connection with the source an out only feature
-			not(destination_component(conn) = comp and direction((feature)source(conn)) = "out")	
-	}
-	
--- For a given connection and a given component return the component on the other end of the connection
--- This funciton is useful to deal with access connections or bi-directional port connections
--- where the source could be either end.
-other_connection_end(conn : connection, comp : component) : component =
-	if (destination_component(conn) = comp) then
-		source_component(conn)
-	else
-		destination_component(conn)
-
-
-
-
-	has_write_access(a : aadl) : bool =
-		has_property(a, Memory_Properties::Access_Right) and
-		(property(a, Memory_Properties::Access_Right) = "write_only" or
-		property(a, Memory_Properties::Access_Right) = "read_write")
-	
---	has_read_access(a : aadl) : bool =
---		has_property(a, Memory_Properties::Access_Right) and
---		(property(a, Memory_Properties::Access_Right) = "read_only" or
---		property(a, Memory_Properties::Access_Right) = "read_write")
-		
+	-- Checks if the specified component is a filter
 	is_filter(c : component) : bool =
 		has_property(c, COMP_TYPE) and property(c, COMP_TYPE) = "FILTER"
     
