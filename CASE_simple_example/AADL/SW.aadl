@@ -199,8 +199,8 @@ public
 			position_status: in event data port Coordinate.Impl;
 			
 		annex agree {**
-			assume "Well-formed mission" : SW.good_mission(flight_plan);
-			guarantee "The Waypoint Manager shall always output a well-formed mission window." : SW.good_mission_window(waypoint);
+			assume "The Waypoint Manager shall receive a well-formed mission" : SW.good_mission(flight_plan);
+			guarantee "The Waypoint Manager shall output a well-formed mission window." : SW.good_mission_window(waypoint);
 		**};
 			
 	end WaypointManager;
@@ -228,8 +228,8 @@ public
 
 		annex agree {**
 			-- we abstract away the authentication and just assume the message has undergone authenticity verification
-			assume "Authenticated command from the Ground Station" : recv_map.HMAC = True;
-			guarantee "The Software shall output a valid mission window to the Flight Controller" : waypoint.crc = True;
+			assume "The Mission Computer shall only accept authenticated commands from the Ground Station" : recv_map.HMAC = True;
+			guarantee "The Mission Computer shall output a valid mission window to the Flight Controller" : waypoint.crc = True;
 		**};
 			
 	end MC_SW;
