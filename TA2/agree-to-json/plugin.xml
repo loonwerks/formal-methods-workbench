@@ -11,7 +11,7 @@
       <command
             categoryId="agreeToJson.commands.category"
             id="agreeToJson.commands.jsonCommand"
-            name="Generate JSON">
+            name="Run HOL Proof of Filter">
       </command>
    </extension>
 

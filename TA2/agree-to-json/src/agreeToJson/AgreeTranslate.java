@@ -316,13 +316,9 @@ public class AgreeTranslate {
 
 		ArrayList<Value> components = new ArrayList<Value>();
 
-
-
 		List<AnnexLibrary> annexLibraries = AnnexUtil.getAllActualAnnexLibraries(pkg,
 				AgreePackage.eINSTANCE.getAgreeContractLibrary());
 
-
-		components.add(StringValue.build("size-" + annexLibraries.size()));
 		for (AnnexLibrary anl : annexLibraries) {
 			if (anl instanceof AgreeContractLibrary) {
 				AgreeContract contr = (AgreeContract) ((AgreeContractLibrary) anl).getContract();
