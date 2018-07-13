@@ -91,6 +91,13 @@ public class JsonHandler extends AbstractHandler {
 			String fullpath = jsonURI.path().replaceFirst("^/resource", projectContainerPath);
 
 
+
+
+
+			MessageDialog.openInformation(window.getShell(), "Transfer to HOL",
+					"Running HOL proof of Filter Properties.\n" + "File: " + fullpath + "\n"
+							+ "See output in console.");
+
 			Runtime rt = Runtime.getRuntime();
 			String[] commands = { "/home/case/regexp_toolchain/json2hol", fullpath };
 
@@ -98,9 +105,6 @@ public class JsonHandler extends AbstractHandler {
 
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 			System.out.println("Here is the standard output of the command:\n");
-
-			MessageDialog.openInformation(window.getShell(), "Transfer to HOL",
-					"Running HOL proof of Filter Properties.\n" + "See output in console.");
 
 			MessageConsole console = findConsole("HOL Proof of Filter Claims");
 			MessageConsoleStream out = console.newMessageStream();
