@@ -9,7 +9,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,
  org.eclipse.xtext.ui,
- org.eclipse.emf.common
+ org.eclipse.emf.common,
+ org.eclipse.ui.console
 Import-Package: com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.agree.impl,
  com.rockwellcollins.atc.agree.agree.util,
