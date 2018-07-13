@@ -8,11 +8,9 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -83,15 +81,20 @@ public class JsonHandler extends AbstractHandler {
 			URI jsonURI = makeJsonFile(xtextEditor);
 			printJson(jsonURI, gson.toJson(je));
 
-			 IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			 IWorkspaceRoot root = workspace.getRoot();
-			 IPath location = root.getLocation();
-			 String projectContainerPath = location.toPortableString();
+			String fullpath = "";
+			XtextResource resource = xtextEditor.getDocument().readOnly(r -> r);
 
-			String fullpath = jsonURI.path().replaceFirst("^/resource", projectContainerPath);
+			IFile file = ResourcesPlugin.getWorkspace().getRoot()
+					.getFile(new Path(resource.getURI().toPlatformString(true)));
+			fullpath = file.getRawLocation().toOSString();
 
-
-
+// Isaac suggests getting the file the following way.
+// IWorkbenchPart workbenchPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+//		.getActivePart();
+//		IFile file = workbenchPart.getSite().getPage().getActiveEditor().getEditorInput().getAdapter(IFile.class);
+//		if (file != null) {
+//		System.out.println(file.getRawLocation().toString());
+//		}
 
 
 			MessageDialog.openInformation(window.getShell(), "Transfer to HOL",
