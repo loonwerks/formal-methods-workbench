@@ -79,11 +79,11 @@ public class JsonHandler extends AbstractHandler {
 			URI jsonURI = makeJsonFile(xtextEditor);
 			printJson(jsonURI, gson.toJson(je));
 			Runtime rt = Runtime.getRuntime();
-			String[] commands = { "C:\\WINDOWS\\system32\\cmd.exe", "/c", "echo", jsonURI.path() };
+			String[] commands = { "/home/case/regexp_toolchain/json2hol", jsonURI.path() };
 
 			Process proc = rt.exec(commands);
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 			System.out.println("Here is the standard output of the command:\n");
 
 			MessageDialog.openInformation(window.getShell(), "Transfer to HOL",
@@ -97,7 +97,7 @@ public class JsonHandler extends AbstractHandler {
 			view.display(console);
 
 			String s = null;
-			while ((s = stdInput.readLine()) != null) {
+			while ((s = stdErr.readLine()) != null) {
 				out.println(s);
 			}
 			out.println("Done with HOL proof of filter properties.");
