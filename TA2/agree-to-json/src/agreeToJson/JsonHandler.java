@@ -8,7 +8,11 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -78,8 +82,17 @@ public class JsonHandler extends AbstractHandler {
 
 			URI jsonURI = makeJsonFile(xtextEditor);
 			printJson(jsonURI, gson.toJson(je));
+
+			 IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			 IWorkspaceRoot root = workspace.getRoot();
+			 IPath location = root.getLocation();
+			 String projectContainerPath = location.toPortableString();
+
+			String fullpath = jsonURI.path().replaceFirst("^/resource", projectContainerPath);
+
+
 			Runtime rt = Runtime.getRuntime();
-			String[] commands = { "/home/case/regexp_toolchain/json2hol", jsonURI.path() };
+			String[] commands = { "/home/case/regexp_toolchain/json2hol", fullpath };
 
 			Process proc = rt.exec(commands);
 
@@ -125,6 +138,7 @@ public class JsonHandler extends AbstractHandler {
 		conMan.addConsoles(new IConsole[] { myConsole });
 		return myConsole;
 	}
+
 
 	private URI makeJsonFile(XtextEditor state) throws CoreException, IOException {
 		XtextResource resource = state.getDocument().readOnly(r -> r);
