@@ -81,12 +81,9 @@ public class JsonHandler extends AbstractHandler {
 			URI jsonURI = makeJsonFile(xtextEditor);
 			printJson(jsonURI, gson.toJson(je));
 
-			String fullpath = "";
-			XtextResource resource = xtextEditor.getDocument().readOnly(r -> r);
-
 			IFile file = ResourcesPlugin.getWorkspace().getRoot()
-					.getFile(new Path(resource.getURI().toPlatformString(true)));
-			fullpath = file.getRawLocation().toOSString();
+					.getFile(new Path(jsonURI.toPlatformString(true)));
+			String fullpath = file.getRawLocation().toOSString();
 
 // Isaac suggests getting the file the following way.
 // IWorkbenchPart workbenchPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
