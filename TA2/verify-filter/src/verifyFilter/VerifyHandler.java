@@ -70,8 +70,14 @@ public class VerifyHandler extends AbstractHandler {
 					"Running HOL proof of Filter Properties.\n" + "File: " + fullpath + "\n"
 							+ "See output in console.");
 
+
+			String json2holPath = ResourcesPlugin.getWorkspace().getRoot()
+					.getFile(new Path("dependencies/json2hol")).getRawLocation().toOSString();
+
+			System.out.println("json2holPath: " + json2holPath);
+
 			Runtime rt = Runtime.getRuntime();
-			String[] commands = { "/home/case/regexp_toolchain/json2hol", fullpath };
+			String[] commands = { json2holPath, fullpath };
 
 			Process proc = rt.exec(commands);
 
