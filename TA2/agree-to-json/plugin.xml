@@ -2,46 +2,4 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            id="agreeToJson.commands.category"
-            name="CASE TA6 Commands">
-      </category>
-      <command
-            categoryId="agreeToJson.commands.category"
-            id="agreeToJson.commands.jsonCommand"
-            name="Run HOL Proof of Filter">
-      </command>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="agreeToJson.JsonHandler"
-            commandId="agreeToJson.commands.jsonCommand">
-         <enabledWhen>
-            <reference
-                  definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
-            </reference>
-         </enabledWhen>
-      </handler>      
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="toolbar:org.eclipse.ui.main.toolbar">
-         <toolbar
-               id="agreeToJson.toolbar">
-            <command
-                  commandId="agreeToJson.commands.jsonCommand"
-                  icon="icons/gears.png"
-                  label="Output JSON">
-            </command>           
-         </toolbar>
-      </menuContribution>
-   </extension>
-
 </plugin>

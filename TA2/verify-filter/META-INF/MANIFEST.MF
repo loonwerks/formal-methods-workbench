@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Requirements2
-Bundle-SymbolicName: agreeToJson;singleton:=true
+Bundle-SymbolicName: verifyFilter;singleton:=true
 Bundle-Version: 0.0.0
 Bundle-Vendor: Rockwell Collins
 Automatic-Module-Name: com.rockwellcollins.atc.darpacase.requirements2
@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,
  org.eclipse.xtext.ui,
  org.eclipse.emf.common,
- org.eclipse.ui.console
+ org.eclipse.ui.console,
+ agreeToJson
 Import-Package: com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.agree.impl,
  com.rockwellcollins.atc.agree.agree.util,
@@ -21,6 +22,4 @@ Import-Package: com.rockwellcollins.atc.agree.agree,
  org.eclipse.ui.console,
  org.osate.aadl2.instantiation,
  org.osate.annexsupport
-Bundle-ClassPath: dependencies/gson-2.8.5.jar,
- .
-Export-Package: agreeToJson
+Bundle-ClassPath: .
