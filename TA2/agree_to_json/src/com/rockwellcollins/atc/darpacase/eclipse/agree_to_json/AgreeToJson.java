@@ -23,7 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.rockwellcollins.atc.darpacase.eclipse.agree_to_json.json.Value;
-import com.rockwellcollins.atc.darpacase.eclipse.utils.Filesystem;
+import com.rockwellcollins.atc.darpacase.eclipse.util.Filesystem;
 
 public class AgreeToJson {
 

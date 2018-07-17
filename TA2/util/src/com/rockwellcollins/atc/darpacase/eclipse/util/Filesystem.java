@@ -1,4 +1,4 @@
-package com.rockwellcollins.atc.darpacase.eclipse.utils;
+package com.rockwellcollins.atc.darpacase.eclipse.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: utils
-Bundle-SymbolicName: com.rockwellcollins.atc.darpacase.eclipse.utils;singleton:=true
+Bundle-SymbolicName: com.rockwellcollins.atc.darpacase.eclipse.util;singleton:=true
 Bundle-Version: 0.0.0
 Bundle-Vendor: Rockwell Collins
 Automatic-Module-Name: com.rockwellcollins.atc.darpacase.eclipse.utils
@@ -17,4 +17,4 @@ Import-Package: org.eclipse.debug.ui.console,
  org.osate.aadl2.instantiation,
  org.osate.annexsupport
 Bundle-ClassPath: .
-Export-Package: com.rockwellcollins.atc.darpacase.eclipse.utils
+Export-Package: com.rockwellcollins.atc.darpacase.eclipse.util

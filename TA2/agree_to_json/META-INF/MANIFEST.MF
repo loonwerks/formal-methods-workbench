@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.xtext.ui,
  org.eclipse.emf.common,
  org.eclipse.ui.console,
- com.rockwellcollins.atc.darpacase.eclipse.utils
+ com.rockwellcollins.atc.darpacase.eclipse.util
 Import-Package: com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.agree.impl,
  com.rockwellcollins.atc.agree.agree.util,
