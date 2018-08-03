@@ -38,7 +38,7 @@ package claim
     -- However, this funcionality has not yet been implemented
     filter_prop_checked() <=
 	    ** "Filter property implemented by CakeML" **
-	    forall (c : component). has_property(c, CASE::COMP_TYPE) and property(c, CASE::COMP_TYPE) = "FILTER"
+	    forall (c : component). is_filter(c)
 	       => has_property(c, CASE::COMP_IMPL) and property(c, CASE::COMP_IMPL) = "CAKEML"
 
     -- This should either run AGREE on the system property or connect to evidence
@@ -48,7 +48,9 @@ package claim
     -- property for each component that contains AGREE contracts when those checks pass
     system_prop_checked(c : component, prop : string) <=
     	** "AGREE property passed: [ " prop " ]" **
-    	has_property(c, CASE::AGREE_PROPERTIES_PASSED) and length(intersect(property(c, CASE::AGREE_PROPERTIES_PASSED), {prop})) = 1
+    	has_property(c, CASE::AGREE_PROPERTIES_PASSED) and 
+    	member(prop, property(c, CASE::AGREE_PROPERTIES_PASSED))
+    	--length(intersect(property(c, CASE::AGREE_PROPERTIES_PASSED), {prop})) = 1
 
 	-- Checks if the specified component is a filter
 	is_filter(c : component) : bool =

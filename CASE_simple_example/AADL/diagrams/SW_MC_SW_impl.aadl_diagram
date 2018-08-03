@@ -106,29 +106,6 @@
         <filter>calledSubprogram</filter>
       </contentFilters>
     </element>
-    <element id="22">
-      <element id="23">
-        <bo>
-          <seg>tag</seg>
-          <seg>unidirectional</seg>
-        </bo>
-        <contentFilters>
-          <filter>generalizations</filter>
-          <filter>subprogramCallOrders</filter>
-          <filter>calledSubprogram</filter>
-        </contentFilters>
-      </element>
-      <bo>
-        <seg>connection</seg>
-        <seg>c4</seg>
-      </bo>
-      <primaryLabelPosition x="-14.0" y="3.0"/>
-      <contentFilters>
-        <filter>generalizations</filter>
-        <filter>subprogramCallOrders</filter>
-        <filter>calledSubprogram</filter>
-      </contentFilters>
-    </element>
     <element id="38">
       <element id="39">
         <bo>
@@ -145,9 +122,6 @@
         <seg>connection</seg>
         <seg>c5</seg>
       </bo>
-      <bendpoints>
-        <point x="917.0" y="208.0"/>
-      </bendpoints>
       <primaryLabelPosition x="14.0" y="-29.0"/>
       <contentFilters>
         <filter>generalizations</filter>
@@ -172,7 +146,7 @@
         <seg>c6</seg>
       </bo>
       <bendpoints>
-        <point x="891.0" y="407.0"/>
+        <point x="940.0" y="256.0"/>
       </bendpoints>
       <primaryLabelPosition x="-29.0" y="11.0"/>
       <contentFilters>
@@ -198,8 +172,7 @@
         <seg>c7</seg>
       </bo>
       <bendpoints>
-        <point x="649.0" y="393.0"/>
-        <point x="649.0" y="266.0"/>
+        <point x="910.0" y="426.0"/>
       </bendpoints>
       <primaryLabelPosition x="6.0" y="14.0"/>
       <contentFilters>
@@ -310,37 +283,6 @@
         <filter>generalizations</filter>
         <filter>subprogramCallOrders</filter>
         <filter>calledSubprogram</filter>
-      </contentFilters>
-    </element>
-    <element id="58">
-      <element id="60" dockArea="left">
-        <bo>
-          <seg>feature</seg>
-          <seg>filtered_command</seg>
-        </bo>
-        <position y="60.0"/>
-        <contentFilters/>
-      </element>
-      <element id="59" dockArea="left">
-        <bo>
-          <seg>feature</seg>
-          <seg>gs_command</seg>
-        </bo>
-        <position y="10.0"/>
-        <contentFilters/>
-      </element>
-      <bo>
-        <seg>subcomponent</seg>
-        <seg>flt</seg>
-      </bo>
-      <position/>
-      <size width="352.0" height="110.0"/>
-      <contentFilters>
-        <filter>features</filter>
-        <filter>internalFeatures</filter>
-        <filter>processorFeatures</filter>
-        <filter>connections</filter>
-        <filter>flowSpecifications</filter>
       </contentFilters>
     </element>
     <element id="6">

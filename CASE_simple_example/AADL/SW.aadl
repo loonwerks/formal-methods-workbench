@@ -3,51 +3,7 @@ public
 	
 	with Data_Model;
 	with Base_Types;
-	with CASE;
 	with claim;
-
-	annex agree {**
-			
-		-- These functions check the well-formedness of message structures
-		fun good_coordinate(coord : SW::Coordinate.Impl) : bool =	coord.lat >= -90 and 
-																	coord.lat <= 90 and 
-																	coord.long >= -180 and 
-																	coord.long <= 180 and 
-																	coord.alt >= 0 and 
-																	coord.alt <= 15000;
-																	
-		fun good_map(map : SW::Map.Impl) : bool =	good_coordinate(map.wp1) and 
-													good_coordinate(map.wp2) and 
-													good_coordinate(map.wp3) and 
-													good_coordinate(map.wp4);
-													
-		fun good_pattern(pattern : SW::FlightPattern) : bool =	(pattern = enum(SW::FlightPattern, ZigZag)) or 
-																(pattern = enum(SW::FlightPattern, StraightLine)) or 
-																(pattern = enum(SW::FlightPattern, Perimeter));
-																
-		fun good_HMAC(hmac : bool) : bool = (hmac = True) or (hmac = False);
-		
-		fun good_gs_command(cmd : SW::Command.Impl) : bool =	good_map(cmd.Map) and 
-																good_pattern(cmd.Pattern) and 
-																good_HMAC(cmd.HMAC);
-																
-		fun good_mission(mission : SW::Mission.Impl) : bool =	good_coordinate(mission.wp1) and 
-																good_coordinate(mission.wp2) and 
-																good_coordinate(mission.wp3) and 
-																good_coordinate(mission.wp4) and 
-																good_coordinate(mission.wp5) and 
-																good_coordinate(mission.wp6) and 
-																good_coordinate(mission.wp7) and 
-																good_coordinate(mission.wp8) and 
-																good_coordinate(mission.wp9) and 
-																good_coordinate(mission.wp10);
-																
-		fun good_mission_window(win : SW::MissionWindow.Impl) : bool =	good_coordinate(win.wp1) and 
-																		good_coordinate(win.wp2) and 
-																		good_coordinate(win.wp3) and 
-																		good_coordinate(win.wp4);
-																										
-	**};
 
 
 	-- This is the structure to hold the lat/long/alt values of a coordinate
@@ -148,32 +104,10 @@ public
 	end RadioDriver;
 	
 	
-	
---	thread Filter
---		features
---			gs_command: in event data port Command.Impl;
---			filtered_command: out event data port Command.Impl;
---		properties
---			CASE::COMP_TYPE => FILTER;
---			CASE::COMP_IMPL => "CAKEML";
---			CASE::COMP_SPEC => "(\\i{-90,90}\\i{-180,180}\\i{0,15000}){4}(Z|S|P)(T|F)";
---			
---		annex agree {**
---
---			guarantee "The Flight Planner shall receive an authenticated command from the Ground Station" : filtered_command.HMAC = True;
---			guarantee "The Flight Planner shall receive a well-formed command from the Ground Station" : SW.good_gs_command(filtered_command);
---
---		**};
---
---	end Filter;
-	
-	
-	
-	
 	thread FlightPlanner
 		features
-			recv_map: in event data port Command.Impl;
 			flight_plan: out data port Mission.Impl;
+			recv_map: in event data port Command.Impl;
 			position_status: in event data port Coordinate.Impl;
 
 --		properties
@@ -181,13 +115,13 @@ public
 
 		annex agree {**
 			assume "The Flight Planner shall receive an authenticated command from the Ground Station" : recv_map.HMAC = True;
---			assume "The Flight Planner shall receive a well-formed command from the Ground Station" : SW.good_gs_command(recv_map);
+			assume "The Flight Planner shall receive a well-formed command from the Ground Station" : SW.good_gs_command(recv_map);
 			guarantee "The Flight Planner shall generate a valid mission" : SW.good_mission(flight_plan);
 		**};
 		
---		annex Resolute {**
---			prove (well_formed(this, "good_gs_command"))
---		**};
+		annex Resolute {**
+			prove (well_formed(this, "good_gs_command"))
+		**};
 			
 	end FlightPlanner;
 	
@@ -237,18 +171,13 @@ public
 	process implementation MC_SW.Impl
 		subcomponents
 			RADIO: thread RadioDriver;
---			FLT: thread Filter;
 			FPLN: thread FlightPlanner;
 			WPM: thread WaypointManager;
 			UART: thread UARTDriver;
 		connections
 			c1: port recv_map -> RADIO.recv_map_in;
 			c2: port RADIO.send_status_out -> send_status;
-			
 			c3: port RADIO.recv_map_out -> FPLN.recv_map;
---			c3: port RADIO.recv_map_out -> FLT.gs_command;
---			c4: port FLT.filtered_command -> FPLN.recv_map;
-
 			c5: port FPLN.flight_plan -> WPM.flight_plan;
 			c6: port WPM.waypoint -> UART.waypoint_in;
 			c7: port UART.position_status_out -> WPM.position_status;
@@ -257,6 +186,50 @@ public
 			c10: port UART.waypoint_out -> waypoint;
 			c11: port position_status -> UART.position_status_in;
 			
-	end MC_SW.Impl;	
+	end MC_SW.Impl;
+	
+	
+	annex agree {**
+			
+		-- These functions check the well-formedness of message structures
+		fun good_coordinate(coord : SW::Coordinate.Impl) : bool =	coord.lat >= -90 and 
+																	coord.lat <= 90 and 
+																	coord.long >= -180 and 
+																	coord.long <= 180 and 
+																	coord.alt >= 0 and 
+																	coord.alt <= 15000;
+																	
+		fun good_map(map : SW::Map.Impl) : bool =	good_coordinate(map.wp1) and 
+													good_coordinate(map.wp2) and 
+													good_coordinate(map.wp3) and 
+													good_coordinate(map.wp4);
+													
+		fun good_pattern(pattern : SW::FlightPattern) : bool =	(pattern = enum(SW::FlightPattern, ZigZag)) or 
+																(pattern = enum(SW::FlightPattern, StraightLine)) or 
+																(pattern = enum(SW::FlightPattern, Perimeter));
+																
+		fun good_HMAC(hmac : bool) : bool = (hmac = True) or (hmac = False);
+		
+		fun good_gs_command(cmd : SW::Command.Impl) : bool =	good_map(cmd.Map) and 
+																good_pattern(cmd.Pattern) and 
+																good_HMAC(cmd.HMAC);
+																
+		fun good_mission(mission : SW::Mission.Impl) : bool =	good_coordinate(mission.wp1) and 
+																good_coordinate(mission.wp2) and 
+																good_coordinate(mission.wp3) and 
+																good_coordinate(mission.wp4) and 
+																good_coordinate(mission.wp5) and 
+																good_coordinate(mission.wp6) and 
+																good_coordinate(mission.wp7) and 
+																good_coordinate(mission.wp8) and 
+																good_coordinate(mission.wp9) and 
+																good_coordinate(mission.wp10);
+																
+		fun good_mission_window(win : SW::MissionWindow.Impl) : bool =	good_coordinate(win.wp1) and 
+																		good_coordinate(win.wp2) and 
+																		good_coordinate(win.wp3) and 
+																		good_coordinate(win.wp4);
+																										
+	**};
 	
 end SW;
