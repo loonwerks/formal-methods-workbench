@@ -110,9 +110,6 @@ public
 			recv_map: in event data port Command.Impl;
 			position_status: in event data port Coordinate.Impl;
 
---		properties
---			CASE::AGREE_PROPERTIES_PASSED => ("good_gs_command");
-
 		annex agree {**
 			assume "The Flight Planner shall receive an authenticated command from the Ground Station" : recv_map.HMAC = True;
 			assume "The Flight Planner shall receive a well-formed command from the Ground Station" : SW.good_gs_command(recv_map);
@@ -120,7 +117,7 @@ public
 		**};
 		
 		annex Resolute {**
-			prove (well_formed(this, "good_gs_command"))
+			prove (well_formed(this))
 		**};
 			
 	end FlightPlanner;

@@ -6,9 +6,9 @@ package claim
     
     annex resolute {**
     	
-    well_formed(x : component, prop : string) <=
+    well_formed(x : component) <=
     	** x " only receives well-formed messages" **
-		filter_exists(x) and not_bypassed(x) and filter_prop_checked() and system_prop_checked(x, prop)
+		filter_exists(x) and not_bypassed(x) and filter_prop_checked() and system_prop_checked()
     
 
 	-- Ideally, we would want to check that there's a filter anywhere between
@@ -41,16 +41,10 @@ package claim
 	    forall (c : component). is_filter(c)
 	       => has_property(c, CASE::COMP_IMPL) and property(c, CASE::COMP_IMPL) = "CAKEML"
 
-    -- This should either run AGREE on the system property or connect to evidence
-    -- that AGREE was previously run on the current version of the design.
-    -- Because this functionality isn't currently implemented in AGREE or RESOLUTE, 
-    -- we assume that AGREE will assign the property name to the "AGREE_PROPERTIES_PASSED" 
-    -- property for each component that contains AGREE contracts when those checks pass
-    system_prop_checked(c : component, prop : string) <=
-    	** "AGREE property passed: [ " prop " ]" **
-    	has_property(c, CASE::AGREE_PROPERTIES_PASSED) and 
-    	member(prop, property(c, CASE::AGREE_PROPERTIES_PASSED))
-    	--length(intersect(property(c, CASE::AGREE_PROPERTIES_PASSED), {prop})) = 1
+    -- This connect to evidence that AGREE was previously run on the current version of the design.
+    system_prop_checked() <=
+    	** "AGREE properties passed" **
+    	analysis("AgreeCheck")
 
 	-- Checks if the specified component is a filter
 	is_filter(c : component) : bool =
