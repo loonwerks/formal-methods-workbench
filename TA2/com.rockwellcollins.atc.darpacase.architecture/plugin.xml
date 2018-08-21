@@ -7,18 +7,45 @@
             locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
          <menu
                label="CASE">
-            <command
-                  commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                  id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                  label="Add Filter..."
-                  style="push">
-            </command>
-            <command
-                  commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                  id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                  label="Add Monitor..."
-                  style="push">
-            </command>
+            <menu
+                  label="GearCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.GenerateRequirements"
+                     label="Generate Requirements"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  label="StairCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                     label="Add Filter..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                     label="Add Monitor..."
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  label="SuitCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
+                     label="Verify Legacy Implementation"
+                     style="push">
+               </command>
+            </menu>
          </menu>
       </menuContribution>
       <menuContribution
@@ -26,18 +53,45 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                label="CASE">
-            <command
-                  commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                  id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                  label="Add Filter..."
-                  style="push">
-            </command>
-            <command
-                  commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                  id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                  label="Add Monitor..."
-                  style="push">
-            </command>
+            <menu
+                  label="GearCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.GenerateRequirements"
+                     label="Generate Requirements"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  label="StairCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                     label="Add Filter..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                     label="Add Monitor..."
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  label="SuitCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
+                     label="Verify Legacy Implementation"
+                     style="push">
+               </command>
+            </menu>
          </menu>
       </menuContribution>
       <!--
@@ -65,18 +119,45 @@
             locationURI="popup:#TextEditorContext?after=additions">
          <menu
                label="CASE">
-            <command
-                  commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                  id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                  label="Add Filter..."
-                  style="push">
-            </command>
-            <command
-                  commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                  id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                  label="Add Monitor..."
-                  style="push">
-            </command>
+            <menu
+                  label="GearCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.GenerateRequirements"
+                     label="Generate Requirements"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  label="StairCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                     label="Add Filter..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                     label="Add Monitor..."
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  label="SuitCASE">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
+                     label="Verify Legacy Implementation"
+                     style="push">
+               </command>
+            </menu>
          </menu>
       </menuContribution>
    </extension>
@@ -90,6 +171,18 @@
             id="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
             name="Add Monitor">
       </command>
+      <command
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
+            name="Select Implementation">
+      </command>
+      <command
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
+            name="Verify Implementation">
+      </command>
+      <command
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+            name="Generate Requirements">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -98,7 +191,12 @@
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter">
       </handler>
       <handler
-            commandId="com.rockwellcollins.atc.darpacase.architecture.CheckSysProp">
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.SelectImplementation"
+            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation">
+      </handler>
+      <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.VerifyLegacyImplementation"
+            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation">
       </handler>
    </extension>
    <extension
