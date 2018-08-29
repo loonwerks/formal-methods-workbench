@@ -10,6 +10,10 @@ package claim
     	** x " only receives well-formed messages" **
 		filter_exists(x) and not_bypassed(x) and filter_prop_checked() and system_prop_checked()
     
+    LegacyComponentVerificationCheck(c : component) <=
+    	** c " legacy component has been verified" **
+    	true
+
 
 	-- Ideally, we would want to check that there's a filter anywhere between
 	-- pairs of components (such as the ground station and flight planner).

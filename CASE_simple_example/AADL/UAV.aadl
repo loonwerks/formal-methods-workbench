@@ -15,9 +15,9 @@ public
 			RFA: requires bus access UAS::RF;
 	end UAV;
 	
-	system implementation UAV.impl
+	system implementation UAV.Impl
 		subcomponents
-			MCMP: system MC::MissionComputer;
+			MCMP: system MC::MissionComputer.Impl;
 			FCTL: system FC::FlightController;
 			SBUS: bus Serial;
 			
@@ -30,6 +30,9 @@ public
 			c3: port MCMP.waypoint -> FCTL.waypoint;
 			c4: port FCTL.position_status -> MCMP.position_status;
 			
-	end UAV.impl;
+		properties
+			Actual_Connection_Binding => (reference (SBUS)) applies to c3, c4;
+			
+	end UAV.Impl;
 	
 end UAV;

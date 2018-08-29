@@ -10,17 +10,18 @@ public
 	system UAS
 	end UAS;
 
-	system implementation UAS.impl
+	system implementation UAS.Impl
 		subcomponents
 			GND: device GS::GroundStation;
-			UAV: system UAV::UAV;
+			UAV: system UAV::UAV.Impl;
 			RFB: bus RF;
 		connections
 			c1: port GND.send_map -> UAV.recv_map;
 			c2: port UAV.send_status -> GND.recv_status;
 			bac1: bus access RFB <-> GND.RFA;
 			bac2: bus access RFB <-> UAV.RFA;
-
-	end UAS.impl;
+		properties
+			Actual_Connection_Binding => (reference (RFB)) applies to c1, c2;
+	end UAS.Impl;
 
 end UAS;

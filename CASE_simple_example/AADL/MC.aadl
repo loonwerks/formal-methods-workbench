@@ -49,7 +49,7 @@ public
 
 	end MissionComputer;
 	
-	system implementation MissionComputer.impl
+	system implementation MissionComputer.Impl
 		
 		subcomponents
 			RADIO_HW: device Radio;
@@ -57,7 +57,7 @@ public
 			PROC_HW: processor MC_Proc;
 			MEM_HW: memory MC_Mem;
 			BUS_HW: bus MC_Bus;
-			PROC_SW: process SW::MC_SW;
+			PROC_SW: process SW::MC_SW.Impl;
 			
 		connections
 			bac1: bus access RADIO_HW.MCA <-> BUS_HW;
@@ -75,6 +75,11 @@ public
 			c7: port position_status -> UART_HW.position_status_in;
 			c8: port UART_HW.position_status_out -> PROC_SW.position_status;
 		
-	end MissionComputer.impl;
+		properties
+			Actual_Processor_Binding => (reference (PROC_HW)) applies to PROC_SW;
+			Actual_Memory_Binding => (reference (MEM_HW)) applies to PROC_SW;
+			Actual_Connection_Binding => (reference (BUS_HW)) applies to c2, c3, c5, c8;
+		
+	end MissionComputer.Impl;
 	
 end MC;

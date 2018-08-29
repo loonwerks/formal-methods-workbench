@@ -5,6 +5,8 @@ public
 	with Base_Types;
 	with claim;
 
+	with CASE;
+
 
 	-- This is the structure to hold the lat/long/alt values of a coordinate
 	data Coordinate
@@ -104,6 +106,23 @@ public
 	end RadioDriver;
 	
 	
+	thread Filter
+		features
+			filter_in: in event data port Command.Impl;
+			filter_out: out event data port Command.Impl;
+		properties
+			CASE::COMP_TYPE => FILTER;
+			CASE::COMP_IMPL => "CAKEML";
+			CASE::COMP_SPEC => "(\\i{-90,90}\\i{-180,180}\\i{0,15000}){4}(Z|S|P)(T|F)";
+			
+		annex agree {**
+			guarantee "The Flight Planner shall receive an authenticated command from the Ground Station" : filter_out.HMAC = True;
+			guarantee "The Flight Planner shall receive a well-formed command from the Ground Station" : SW.good_gs_command(filter_out);
+		**};
+			
+	end Filter;
+	
+	
 	thread FlightPlanner
 		features
 			flight_plan: out data port Mission.Impl;
@@ -128,7 +147,9 @@ public
 			flight_plan: in data port Mission.Impl;
 			waypoint: out event data port MissionWindow.Impl;
 			position_status: in event data port Coordinate.Impl;
-			
+		properties
+			Programming_Properties::Source_Text => ("test.o");
+		
 		annex agree {**
 			assume "The Waypoint Manager shall receive a well-formed mission" : SW.good_mission(flight_plan);
 			guarantee "The Waypoint Manager shall output a well-formed mission window." : SW.good_mission_window(waypoint);
@@ -168,13 +189,15 @@ public
 	process implementation MC_SW.Impl
 		subcomponents
 			RADIO: thread RadioDriver;
+			FLT: thread Filter;
 			FPLN: thread FlightPlanner;
 			WPM: thread WaypointManager;
 			UART: thread UARTDriver;
 		connections
 			c1: port recv_map -> RADIO.recv_map_in;
 			c2: port RADIO.send_status_out -> send_status;
-			c3: port RADIO.recv_map_out -> FPLN.recv_map;
+			c3: port RADIO.recv_map_out -> FLT.filter_in;
+			c4: port FLT.filter_out -> FPLN.recv_map;
 			c5: port FPLN.flight_plan -> WPM.flight_plan;
 			c6: port WPM.waypoint -> UART.waypoint_in;
 			c7: port UART.position_status_out -> WPM.position_status;
@@ -228,5 +251,7 @@ public
 																		good_coordinate(win.wp4);
 																										
 	**};
+
+
 	
 end SW;
