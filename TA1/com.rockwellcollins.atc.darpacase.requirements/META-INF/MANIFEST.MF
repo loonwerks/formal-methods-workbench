@@ -9,8 +9,11 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,
  org.eclipse.xtext.ui,
- org.eclipse.emf.common
+ org.eclipse.emf.common,
+ com.rockwellcollins.atc.resolute.analysis
 Import-Package: com.rockwellcollins.atc.agree.agree,
- org.eclipse.ui
+ org.eclipse.ui,
+ org.osate.aadl2.instantiation,
+ org.osate.aadl2.modelsupport.util
 Bundle-ClassPath: dependencies/gson-2.8.5.jar,
  .

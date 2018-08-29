@@ -1,29 +1,26 @@
 package com.rockwellcollins.atc.darpacase.requirements.fromTA6;
 
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ModelUnit;
+import org.osate.aadl2.PropertyAssociation;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.rockwellcollins.atc.darpacase.requirements.json.Value;
+import com.rockwellcollins.atc.darpacase.requirements.api.InteractionAPI;
 
 public class JsonHandler extends AbstractHandler {
 
@@ -52,34 +49,48 @@ public class JsonHandler extends AbstractHandler {
 			return null;
 		}
 
-		// create the IR
-		Translate translate = new Translate();
-		Value v = translate.doSwitch(pkg);
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		JsonParser jp = new JsonParser();
-		JsonElement je = jp.parse(v.toString());
+		InteractionAPI api = new InteractionAPI(pkg);
+		List<ComponentImplementation> components = api.getImplementations();
 
-		try {
-			printJson(xtextEditor, gson.toJson(je));
-		} catch (CoreException | IOException e) {
-			System.err.println("Trouble writing Json representation to filesystem.");
-			e.printStackTrace();
+		Map<ComponentImplementation, ComponentType> map = new HashMap<>();
+		Map<ComponentImplementation, List<PropertyAssociation>> properties = new HashMap<>();
+
+		for (ComponentImplementation ci : components) {
+			map.put(ci, InteractionAPI.getComponentType(ci));
+			properties.put(ci, api.getComponentTA1Properties(ci));
 		}
+
+		ComponentType ct = InteractionAPI.getComponentType(components.get(0));
+		List<ComponentImplementation> prototypes = api.getImplementations(ct);
+
+		// create the IR
+//		Translate translate = new Translate();
+//		Value v = translate.doSwitch(pkg);
+//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//		JsonParser jp = new JsonParser();
+//		JsonElement je = jp.parse(v.toString());
+//
+//		try {
+//			printJson(xtextEditor, gson.toJson(je));
+//		} catch (CoreException | IOException e) {
+//			System.err.println("Trouble writing Json representation to filesystem.");
+//			e.printStackTrace();
+//		}
 
 		return null;
 	}
 
-	private void printJson(XtextEditor state, String whatToPrint) throws CoreException, IOException {
-		XtextResource resource = state.getDocument().readOnly(r -> r);
-
-		URI dan = resource.getURI();
-		URI folder = dan.trimSegments(1);
-		String base = FilesystemUtils.getBase(dan);
-
-		URI writeFolder = FilesystemUtils.createFolder(folder, new String[] { "json-generated" });
-		URI json = writeFolder.appendSegment(base).appendFileExtension("json");
-
-		IFile print = FilesystemUtils.getFile(json);
-		FilesystemUtils.writeFile(print, whatToPrint.getBytes());
-	}
+//	private void printJson(XtextEditor state, String whatToPrint) throws CoreException, IOException {
+//		XtextResource resource = state.getDocument().readOnly(r -> r);
+//
+//		URI dan = resource.getURI();
+//		URI folder = dan.trimSegments(1);
+//		String base = FilesystemUtils.getBase(dan);
+//
+//		URI writeFolder = FilesystemUtils.createFolder(folder, new String[] { "json-generated" });
+//		URI json = writeFolder.appendSegment(base).appendFileExtension("json");
+//
+//		IFile print = FilesystemUtils.getFile(json);
+//		FilesystemUtils.writeFile(print, whatToPrint.getBytes());
+//	}
 }
