@@ -30,20 +30,21 @@ import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.ui.dialogs.Dialog;
 
-import com.rockwellcollins.atc.darpacase.architecture.dialogs.AddFilterDialog;
+import com.rockwellcollins.atc.darpacase.architecture.dialogs.AddMonitorDialog;
 
-public class AddFilter extends AadlHandler {
+public class AddMonitor extends AadlHandler {
 
-	static final String FILTER_COMP_BASE_NAME = "Filter";
-	static final String FILTER_PORT_IN_NAME = "filter_in";
-	static final String FILTER_PORT_OUT_NAME = "filter_out";
-	static final String FILTER_IMPL_BASE_NAME = "FLT";
+	static final String MONITOR_COMP_BASE_NAME = "Monitor";
+	static final String MONITOR_PORT_IN_NAME = "monitor_in";
+	static final String MONITOR_PORT_OUT_NAME = "monitor_out";
+	static final String MONITOR_ALERT_PORT_NAME = "monitor_event";
+	static final String MONITOR_IMPL_BASE_NAME = "MON";
 	static final String CONNECTION_IMPL_BASE_NAME = "c";
 
-	private String filterImplementationLanguage;
-	private String filterRegularExpression;
-	private String filterTypeName;
-	private String filterImplName;
+	private String monitorImplementationLanguage;
+//	private String monitorRegularExpression;
+	private String monitorTypeName;
+	private String monitorImplName;
 
 	@Override
 	protected void runCommand(URI uri) {
@@ -52,43 +53,42 @@ public class AddFilter extends AadlHandler {
 		final EObject eObj = getEObject(uri);
 		if (!(eObj instanceof PortConnection)) {
 			Dialog.showError("No connection is selected",
-					"A connection between two components must be selected to add a filter.");
+					"A connection between two components must be selected to add a monitor.");
 			return;
 		}
 
-		// Open wizard to enter filter info
-		AddFilterDialog wizard = new AddFilterDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		// Open wizard to enter monitor info
+		AddMonitorDialog wizard = new AddMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		wizard.create();
 		if (wizard.open() == Window.OK) {
-			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
-			filterRegularExpression = wizard.getFilterRegularExpression();
-			filterTypeName = wizard.getFilterTypeName();
-			filterImplName = wizard.getFilterImplName();
-			if (filterTypeName == "") {
-				filterTypeName = FILTER_COMP_BASE_NAME;
+			monitorImplementationLanguage = wizard.getMonitorImplementationLanguage();
+//			monitorRegularExpression = wizard.getMonitorRegularExpression();
+			monitorTypeName = wizard.getMonitorTypeName();
+			monitorImplName = wizard.getMonitorImplName();
+			if (monitorTypeName == "") {
+				monitorTypeName = MONITOR_COMP_BASE_NAME;
 			}
-			if (filterImplName == "") {
-				filterImplName = FILTER_IMPL_BASE_NAME;
+			if (monitorImplName == "") {
+				monitorImplName = MONITOR_IMPL_BASE_NAME;
 			}
-		}
-		else {
+		} else {
 			return;
 		}
 
-		// Insert the filter component
-		insertFilterComponent(uri);
+		// Insert the monitor component
+		insertMonitorComponent(uri);
 
 		return;
 
 	}
 
 	/**
-	 * Inserts a filter component into the model, including filter type definition
-	 * and implementation (including correct wiring).  The filter is inserted at
-	 * the location of the selected connection
+	 * Inserts a monitor component into the model, including monitor type definition
+	 * and implementation (including correct wiring for monitored signal).
+	 * The monitor is inserted at the location of the selected connection
 	 * @param uri - The URI of the selected connection
 	 */
-	public void insertFilterComponent(URI uri) {
+	private void insertMonitorComponent(URI uri) {
 
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
@@ -145,30 +145,30 @@ public class AddFilter extends AadlHandler {
 					pkgSection.getImportedUnits().add(casePropSet);
 				}
 
-				// Create Filter thread type
-				final ThreadType filterThreadType = (ThreadType) pkgSection
+				// Create Monitor thread type
+				final ThreadType monitorThreadType = (ThreadType) pkgSection
 						.createOwnedClassifier(Aadl2Package.eINSTANCE.getThreadType());
 				// Give it a unique name
-				filterThreadType.setName(getUniqueName(filterTypeName, true, pkgSection.getOwnedClassifiers()));
+				monitorThreadType.setName(getUniqueName(monitorTypeName, true, pkgSection.getOwnedClassifiers()));
 
-				// Create filter ports
+				// Create monitor ports
 				final PortImpl portImpl = (PortImpl) selectedConnection.getDestination().getConnectionEnd();
 				Port portIn = null;
 				Port portOut = null;
 				if (portImpl instanceof EventDataPort) {
-					portIn = filterThreadType.createOwnedEventDataPort();
+					portIn = monitorThreadType.createOwnedEventDataPort();
 					((EventDataPort) portIn)
 							.setDataFeatureClassifier(((EventDataPort) portImpl).getDataFeatureClassifier());
-					portOut = filterThreadType.createOwnedEventDataPort();
+					portOut = monitorThreadType.createOwnedEventDataPort();
 					((EventDataPort) portOut)
 							.setDataFeatureClassifier(((EventDataPort) portImpl).getDataFeatureClassifier());
 				} else if (portImpl instanceof EventPort) {
-					portIn = filterThreadType.createOwnedEventPort();
-					portOut = filterThreadType.createOwnedEventPort();
+					portIn = monitorThreadType.createOwnedEventPort();
+					portOut = monitorThreadType.createOwnedEventPort();
 				} else if (portImpl instanceof DataPort) {
-					portIn = filterThreadType.createOwnedDataPort();
+					portIn = monitorThreadType.createOwnedDataPort();
 					((DataPort) portIn).setDataFeatureClassifier(((DataPort) portImpl).getDataFeatureClassifier());
-					portOut = filterThreadType.createOwnedDataPort();
+					portOut = monitorThreadType.createOwnedDataPort();
 					((DataPort) portOut).setDataFeatureClassifier(((DataPort) portImpl).getDataFeatureClassifier());
 				} else {
 					Dialog.showError("Undetermined port type",
@@ -177,79 +177,85 @@ public class AddFilter extends AadlHandler {
 				}
 
 				portIn.setIn(true);
-				portIn.setName(FILTER_PORT_IN_NAME);
-//				final EventDataPort eventDataPortIn = filterThreadType.createOwnedEventDataPort();
+				portIn.setName(MONITOR_PORT_IN_NAME);
+//				final EventDataPort eventDataPortIn = monitorThreadType.createOwnedEventDataPort();
 //				eventDataPortIn.setIn(true);
-//				eventDataPortIn.setName(FILTER_PORT_IN_NAME);
+//				eventDataPortIn.setName(MONITOR_PORT_IN_NAME);
 //				final EventDataPortImpl eventDataPortImpl = (EventDataPortImpl) selectedConnection.getDestination()
 //						.getConnectionEnd();
 //				eventDataPortIn.setDataFeatureClassifier(eventDataPortImpl.getDataFeatureClassifier());
 
 				portOut.setOut(true);
-				portOut.setName(FILTER_PORT_OUT_NAME);
-//				final EventDataPort eventDataPortOut = filterThreadType.createOwnedEventDataPort();
+				portOut.setName(MONITOR_PORT_OUT_NAME);
+//				final EventDataPort eventDataPortOut = monitorThreadType.createOwnedEventDataPort();
 //				eventDataPortOut.setOut(true);
-//				eventDataPortOut.setName(FILTER_PORT_OUT_NAME);
+//				eventDataPortOut.setName(MONITOR_PORT_OUT_NAME);
 //				eventDataPortOut.setDataFeatureClassifier(eventDataPortImpl.getDataFeatureClassifier());
 
-				// Add filter properties
+				// Create the threshold exceeded event port
+				// TODO: Should this be an event data port?
+				final EventPort alertPort = monitorThreadType.createOwnedEventPort();
+				alertPort.setOut(true);
+				alertPort.setName(MONITOR_ALERT_PORT_NAME);
+
+				// Add monitor properties
 				// CASE::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "FILTER", filterThreadType, casePropSet)) {
+				if (!addPropertyAssociation("COMP_TYPE", "MONITOR", monitorThreadType, casePropSet)) {
 //					return;
 				}
 				// CASE::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterThreadType, casePropSet)) {
+				if (!addPropertyAssociation("COMP_IMPL", monitorImplementationLanguage, monitorThreadType,
+						casePropSet)) {
 //					return;
 				}
 				// CASE::COMP_SPEC property
-				if (!addPropertyAssociation("COMP_SPEC", filterRegularExpression, filterThreadType, casePropSet)) {
-//					return;
-				}
+//				if (!addPropertyAssociation("COMP_SPEC", monitorRegularExpression, monitorThreadType, casePropSet)) {
+////					return;
+//				}
 
-				// Move filter to proper location
+				// Move monitor to proper location
 				// (just before component it connects to on communication pathway)
 				final Context context = selectedConnection.getDestination().getContext();
 				String destName = ((SubcomponentImpl) context).getSubcomponentType().getName();
 				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
 
-				// Insert filter feature in process component implementation
+				// Insert monitor feature in process component implementation
 				final ProcessImplementationImpl procImpl = (ProcessImplementationImpl) selectedConnection
 						.getContainingComponentImpl();
-				final ThreadSubcomponent filterThreadSubComp = procImpl.createOwnedThreadSubcomponent();
+				final ThreadSubcomponent monitorThreadSubComp = procImpl.createOwnedThreadSubcomponent();
 
 				// Give it a unique name
-				filterThreadSubComp
-						.setName(getUniqueName(filterImplName, true, procImpl.getOwnedSubcomponents()));
-				filterThreadSubComp.setThreadSubcomponentType(filterThreadType);
+				monitorThreadSubComp.setName(getUniqueName(monitorImplName, true, procImpl.getOwnedSubcomponents()));
+				monitorThreadSubComp.setThreadSubcomponentType(monitorThreadType);
 
 				// Put it in the right place
 				destName = selectedConnection.getDestination().getContext().getName();
 				procImpl.getOwnedThreadSubcomponents().move(getIndex(destName, procImpl.getOwnedThreadSubcomponents()),
 						procImpl.getOwnedThreadSubcomponents().size() - 1);
 
-				// Create connection from filter to connection destination
+				// Create connection from monitor to connection destination
 				final PortConnection portConnOut = procImpl.createOwnedPortConnection();
 				// Give it a unique name
 				portConnOut
 						.setName(getUniqueName(CONNECTION_IMPL_BASE_NAME, false, procImpl.getOwnedPortConnections()));
 				portConnOut.setBidirectional(false);
-				final ConnectedElement filterOutSrc = portConnOut.createSource();
-				filterOutSrc.setContext(filterThreadSubComp);
-//				filterOutSrc.setConnectionEnd(eventDataPortOut);
-				filterOutSrc.setConnectionEnd(portOut);
-				final ConnectedElement filterOutDst = portConnOut.createDestination();
-				filterOutDst.setContext(selectedConnection.getDestination().getContext());
-				filterOutDst.setConnectionEnd(selectedConnection.getDestination().getConnectionEnd());
+				final ConnectedElement monitorOutSrc = portConnOut.createSource();
+				monitorOutSrc.setContext(monitorThreadSubComp);
+//				monitorOutSrc.setConnectionEnd(eventDataPortOut);
+				monitorOutSrc.setConnectionEnd(portOut);
+				final ConnectedElement monitorOutDst = portConnOut.createDestination();
+				monitorOutDst.setContext(selectedConnection.getDestination().getContext());
+				monitorOutDst.setConnectionEnd(selectedConnection.getDestination().getConnectionEnd());
 
 				// Put portConnOut in right place (after portConnIn)
 				destName = selectedConnection.getName();
 				procImpl.getOwnedPortConnections().move(getIndex(destName, procImpl.getOwnedPortConnections()) + 1,
 						procImpl.getOwnedPortConnections().size() - 1);
 
-				// Rewire selected connection so the filter is the destination
+				// Rewire selected connection so the monitor is the destination
 				final PortConnection portConnIn = selectedConnection;
-				portConnIn.getDestination().setContext(filterThreadSubComp);
+				portConnIn.getDestination().setContext(monitorThreadSubComp);
 //				portConnIn.getDestination().setConnectionEnd(eventDataPortIn);
 				portConnIn.getDestination().setConnectionEnd(portIn);
 

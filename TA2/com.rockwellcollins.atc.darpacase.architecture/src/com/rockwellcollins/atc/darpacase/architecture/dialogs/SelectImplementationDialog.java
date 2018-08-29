@@ -23,13 +23,17 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SelectImplementationDialog extends TitleAreaDialog {
 
-	String implementationType;
+//	String implementationType;
 	String implementationLocation;
-	Button rdoImplementationTypeBinary;
-	Button rdoImplementationTypeSource;
+	String implementationEntryFunction;
+//	String implementationFunctionAddress;
+//	Button rdoImplementationTypeBinary;
+//	Button rdoImplementationTypeSource;
 	Text txtImplementationLocation;
 	Button btnImplementationLocation;
 	FileDialog dlgImplementationLocation;
+	Text txtImplementationEntryFunction;
+//	Text txtImplementationFunctionAddress;
 
 	public SelectImplementationDialog(Shell parentShell) {
 		super(parentShell);
@@ -50,12 +54,14 @@ public class SelectImplementationDialog extends TitleAreaDialog {
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		GridLayout layout = new GridLayout(3, false);
+		GridLayout layout = new GridLayout(2, false);
 		container.setLayout(layout);
 
 		// Add implementation information fields
-		createImplementationTypeField(container);
+//		createImplementationTypeField(container);
 		createImplementationLocationField(container);
+		createImplementationEntryFunctionField(container);
+//		createImplementationFunctionAddressField(container);
 
 		return area;
 	}
@@ -65,22 +71,22 @@ public class SelectImplementationDialog extends TitleAreaDialog {
 	 * (source code / binary)
 	 * @param container
 	 */
-	private void createImplementationTypeField(Composite container) {
-		Label lblImplementationTypeField = new Label(container, SWT.NONE);
-		lblImplementationTypeField.setText("Implementation type:");
-
-		GridData dataInfoField = new GridData();
-		dataInfoField.grabExcessHorizontalSpace = true;
-		dataInfoField.horizontalAlignment = GridData.FILL;
-		rdoImplementationTypeBinary = new Button(container, SWT.RADIO);
-		rdoImplementationTypeBinary.setText("Binary");
-		rdoImplementationTypeBinary.setSelection(true);
-		rdoImplementationTypeBinary.setLayoutData(dataInfoField);
-		rdoImplementationTypeSource = new Button(container, SWT.RADIO);
-		rdoImplementationTypeSource.setText("Source code");
-		rdoImplementationTypeSource.setLayoutData(dataInfoField);
-
-	}
+//	private void createImplementationTypeField(Composite container) {
+//		Label lblImplementationTypeField = new Label(container, SWT.NONE);
+//		lblImplementationTypeField.setText("Implementation type:");
+//
+//		GridData dataInfoField = new GridData();
+//		dataInfoField.grabExcessHorizontalSpace = true;
+//		dataInfoField.horizontalAlignment = GridData.FILL;
+//		rdoImplementationTypeBinary = new Button(container, SWT.RADIO);
+//		rdoImplementationTypeBinary.setText("Binary");
+//		rdoImplementationTypeBinary.setSelection(true);
+//		rdoImplementationTypeBinary.setLayoutData(dataInfoField);
+//		rdoImplementationTypeSource = new Button(container, SWT.RADIO);
+//		rdoImplementationTypeSource.setText("Source code");
+//		rdoImplementationTypeSource.setLayoutData(dataInfoField);
+//
+//	}
 
 	/**
 	 * Creates the open file dialog for selecting the implementation
@@ -93,9 +99,15 @@ public class SelectImplementationDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		txtImplementationLocation = new Text(container, SWT.BORDER);
+
+		Composite dialogField = new Composite(container, SWT.NONE);
+		dialogField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		GridLayout layout = new GridLayout(2, false);
+		dialogField.setLayout(layout);
+
+		txtImplementationLocation = new Text(dialogField, SWT.BORDER);
 		txtImplementationLocation.setLayoutData(dataInfoField);
-		btnImplementationLocation = new Button(container, SWT.PUSH);
+		btnImplementationLocation = new Button(dialogField, SWT.PUSH);
 		btnImplementationLocation.setLayoutData(dataInfoField);
 		btnImplementationLocation.setText("Browse...");
 		btnImplementationLocation.addSelectionListener(new SelectionAdapter() {
@@ -117,19 +129,51 @@ public class SelectImplementationDialog extends TitleAreaDialog {
 	}
 
 	/**
+	 * Creates the text box for specifying the implementation entry function
+	 * @param container
+	 */
+	private void createImplementationEntryFunctionField(Composite container) {
+		Label lblImplementationEntryFunctionField = new Label(container, SWT.NONE);
+		lblImplementationEntryFunctionField.setText("Implementation Entry Function:");
+
+		GridData dataInfoField = new GridData();
+		dataInfoField.grabExcessHorizontalSpace = true;
+		dataInfoField.horizontalAlignment = GridData.FILL;
+		txtImplementationEntryFunction = new Text(container, SWT.BORDER);
+		txtImplementationEntryFunction.setLayoutData(dataInfoField);
+	}
+
+	/**
+	 * Creates the text box for specifying the implementation entry function address
+	 * @param container
+	 */
+//	private void createImplementationFunctionAddressField(Composite container) {
+//		Label lblImplementationFunctionAddressField = new Label(container, SWT.NONE);
+//		lblImplementationFunctionAddressField.setText("Implementation Entry Function Address:");
+//
+//		GridData dataInfoField = new GridData();
+//		dataInfoField.grabExcessHorizontalSpace = true;
+//		dataInfoField.horizontalAlignment = GridData.FILL;
+//		txtImplementationFunctionAddress = new Text(container, SWT.BORDER);
+//		txtImplementationFunctionAddress.setLayoutData(dataInfoField);
+//	}
+
+	/**
 	 * Saves information entered into the wizard.  This is needed because the
 	 * input fields are disposed when the dialog closes.
 	 * @param container
 	 */
 	private void saveInput() {
-		if (rdoImplementationTypeSource.getSelection()) {
-			implementationType = "SOURCE_CODE";
-		} else if (rdoImplementationTypeBinary.getSelection()) {
-			implementationType = "BINARY";
-		} else {
-			implementationType = "NO_IMPL";
-		}
+//		if (rdoImplementationTypeSource.getSelection()) {
+//			implementationType = "SOURCE_CODE";
+//		} else if (rdoImplementationTypeBinary.getSelection()) {
+//			implementationType = "BINARY";
+//		} else {
+//			implementationType = "NO_IMPL";
+//		}
 		implementationLocation = txtImplementationLocation.getText();
+		implementationEntryFunction = txtImplementationEntryFunction.getText();
+//		implementationFunctionAddress = txtImplementationFunctionAddress.getText();
 	}
 
 	@Override
@@ -138,12 +182,20 @@ public class SelectImplementationDialog extends TitleAreaDialog {
 		super.okPressed();
 	}
 
-	public String getImplementationType() {
-		return implementationType;
-	}
+//	public String getImplementationType() {
+//		return implementationType;
+//	}
 
 	public String getImplementationLocation() {
 		return implementationLocation;
 	}
+
+	public String getImplementationEntryFunction() {
+		return implementationEntryFunction;
+	}
+
+//	public String getImplementationFunctionAddress() {
+//		return implementationFunctionAddress;
+//	}
 
 }

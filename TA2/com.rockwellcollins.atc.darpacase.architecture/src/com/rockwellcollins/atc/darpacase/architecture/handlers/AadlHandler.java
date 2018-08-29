@@ -2,6 +2,7 @@ package com.rockwellcollins.atc.darpacase.architecture.handlers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -27,6 +28,8 @@ import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.impl.AadlStringImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.EnumerationTypeImpl;
+import org.osate.aadl2.impl.ListTypeImpl;
+import org.osate.aadl2.impl.ListValueImpl;
 import org.osate.aadl2.impl.ModalPropertyValueImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.PropertyAssociationImpl;
@@ -123,7 +126,7 @@ public abstract class AadlHandler extends AbstractHandler {
 			final EObject eObj = r.getContents().get(0);
 			if (eObj instanceof PropertySetImpl) {
 				PropertySetImpl propSetImpl = (PropertySetImpl) eObj;
-				if (propSetImpl.getName().equalsIgnoreCase(propSetName)) {
+				if (propSetImpl.getName().equals(propSetName)) {
 					propSet = propSetImpl;
 					break;
 				}
@@ -139,7 +142,7 @@ public abstract class AadlHandler extends AbstractHandler {
 			final List<URI> contributedAadl = PluginSupportUtil.getContributedAadl();
 			URI uri = null;
 			for (URI u : contributedAadl) {
-				if (u.lastSegment().equalsIgnoreCase(CASE_PROPSET_FILE)) {
+				if (u.lastSegment().equals(propSetFile)) {
 					uri = u;
 					break;
 				}
@@ -184,8 +187,11 @@ public abstract class AadlHandler extends AbstractHandler {
 		}
 
 		if (propAssocImpl == null) {
+
+			// Property is not already present in the component. Need to create a new property association
 			propAssocImpl = (PropertyAssociationImpl) componentType.createOwnedPropertyAssociation();
 
+			// Find the property in the specified property set
 			for (Property p : propSet.getOwnedProperties()) {
 				if (p.getName().equals(propName)) {
 					prop = (PropertyImpl) p;
@@ -204,7 +210,9 @@ public abstract class AadlHandler extends AbstractHandler {
 
 		}
 		else {
+			// Property is already present in the component.
 			prop = (PropertyImpl) propAssocImpl.getProperty();
+			// Clear the current value. We write the new value below.
 			propAssocImpl.getOwnedValues().clear();
 		}
 
@@ -223,7 +231,17 @@ public abstract class AadlHandler extends AbstractHandler {
 			final StringLiteralImpl stringVal = (StringLiteralImpl) modalPropVal
 					.createOwnedValue(Aadl2Package.eINSTANCE.getStringLiteral());
 			stringVal.setValue(propVal);
+		} else if (prop.getOwnedPropertyType() instanceof ListTypeImpl) {
+			final ListValueImpl listVal = (ListValueImpl) modalPropVal
+					.createOwnedValue(Aadl2Package.eINSTANCE.getListValue());
+			String[] elements = propVal.split(",");
+			for (String element : elements) {
+				StringLiteralImpl stringVal = (StringLiteralImpl) listVal
+						.createOwnedListElement(Aadl2Package.eINSTANCE.getStringLiteral());
+				stringVal.setValue(element);
+			}
 		} else {
+			// TODO: Add other property types
 			// Couldn't figure it out
 			Dialog.showError(CASE_PROPSET_NAME + " Properties",
 					"Could not determine property type of " + propName + ".");
@@ -250,6 +268,41 @@ public abstract class AadlHandler extends AbstractHandler {
 			}
 		}
 		return idx;
+	}
+
+	/**
+	 * Builds an identifier using the specified base name that doesn't conflict with identifiers in the specified element list.
+	 * @param baseIdentifier - Name
+	 * @param startWithBase - If true, the baseIdentifier is the only one of its kind,
+	 * it will be returned as 'baseIdentifier' rather than 'baseIdentifier1'
+	 * @param elements - Collection of names which cannot match base name
+	 * @return An identifier that is unique in the specified list
+	 */
+	protected String getUniqueName(String baseIdentifier, boolean startWithBase,
+			final Collection<? extends NamedElement> elements) {
+
+		// Sort names list alphabetically
+		TreeSet<String> names = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+		elements.forEach(n -> {
+			if (n.getName() != null) {
+				names.add(n.getName());
+			}
+		});
+
+		// Resolve naming conflicts
+		String newIdentifier = baseIdentifier + (startWithBase ? "" : "1");
+		boolean done = false;
+		int num = (startWithBase ? 0 : 1);
+		do {
+			if (names.contains(newIdentifier)) {
+				num++;
+				newIdentifier = baseIdentifier + num;
+			} else {
+				done = true;
+			}
+		} while (!done);
+
+		return newIdentifier;
 	}
 
 }

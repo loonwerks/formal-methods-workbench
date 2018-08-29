@@ -20,4 +20,5 @@ Import-Package: com.rockwellcollins.atc.agree.agree.impl,
  org.osate.ge.internal.services.impl,
  org.osate.pluginsupport,
  org.osate.ui.dialogs,
- org.osate.ui.navigator
+ org.osate.ui.navigator,
+ org.osate.ui.utils

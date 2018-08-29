@@ -10,7 +10,6 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.AadlPackageImpl;
@@ -26,8 +25,10 @@ import com.rockwellcollins.atc.darpacase.architecture.dialogs.SelectImplementati
 
 public class SelectImplementation extends AadlHandler {
 
-	private String legacyComponentImplementationType;
+//	private String legacyComponentImplementationType;
 	private String legacyComponentImplementationLocation;
+	private String legacyComponentImplementationEntryFunction;
+//	private String legacyComponentImplementationFunctionAddress;
 
 	static final String RESOLUTE_CLAUSE = "prove (LegacyComponentVerificationCheck(this))";
 
@@ -49,11 +50,13 @@ public class SelectImplementation extends AadlHandler {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		wizard.create();
 		if (wizard.open() == Window.OK) {
-			legacyComponentImplementationType = wizard.getImplementationType();
+//			legacyComponentImplementationType = wizard.getImplementationType();
 			legacyComponentImplementationLocation = wizard.getImplementationLocation();
 			// AADL doesn't like backslashes
 			// We can replace with forward slashes
 			legacyComponentImplementationLocation = legacyComponentImplementationLocation.replace("\\", "/");
+			legacyComponentImplementationEntryFunction = wizard.getImplementationEntryFunction();
+//			legacyComponentImplementationFunctionAddress = wizard.getImplementationFunctionAddress();
 		} else {
 			return;
 		}
@@ -107,46 +110,52 @@ public class SelectImplementation extends AadlHandler {
 
 				// CASE Property file
 				// First check if CASE Property file has already been imported in the model
-				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySetImpl casePropSet = null;
-				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySetImpl) {
-						if (modelUnit.getName().equalsIgnoreCase(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySetImpl) modelUnit;
-							break;
-						}
-					}
-				}
-
-				if (casePropSet == null) {
-					// Try importing the resource
-					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-					if (casePropSet == null) {
-						return;
-					}
-					// Add as "importedUnit" to package section
-					pkgSection.getImportedUnits().add(casePropSet);
-				}
+//				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
+//				PropertySetImpl casePropSet = null;
+//				for (ModelUnit modelUnit : importedUnits) {
+//					if (modelUnit instanceof PropertySetImpl) {
+//						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
+//							casePropSet = (PropertySetImpl) modelUnit;
+//							break;
+//						}
+//					}
+//				}
+//				if (casePropSet == null) {
+//					// Try importing the resource
+//					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
+//					if (casePropSet == null) {
+//						return;
+//					}
+//					// Add as "importedUnit" to package section
+//					pkgSection.getImportedUnits().add(casePropSet);
+//				}
 
 				// Add legacy component implementation properties
 				// CASE::IMPL_TYPE property
-				if (!addPropertyAssociation("IMPL_TYPE", legacyComponentImplementationType, selectedComponent,
-						casePropSet)) {
-//					return;
-				}
-				// CASE::IMPL_FILE property
-				if (!addPropertyAssociation("IMPL_FILE", legacyComponentImplementationLocation, selectedComponent,
-						casePropSet)) {
-//					return;
-				}
-
-//				PropertySetImpl propSet = getPropertySet("Programming_Properties", "Programming_Properties.aadl", resource.getResourceSet());
-//				if (propSet == null) {
-//					return;
-//				}
-//				if (!addPropertyAssociation("Source_Text", legacyComponentImplementationLocation, selectedComponent, propSet)) {
+//				if (!addPropertyAssociation("IMPL_TYPE", legacyComponentImplementationType, selectedComponent,
+//						casePropSet)) {
 ////					return;
 //				}
+				// CASE::IMPL_FILE property
+//				if (!addPropertyAssociation("IMPL_FILE", legacyComponentImplementationLocation, selectedComponent,
+//						casePropSet)) {
+////					return;
+//				}
+
+				PropertySetImpl propSet = getPropertySet("Programming_Properties", "Programming_Properties.aadl",
+						resource.getResourceSet());
+				if (propSet == null) {
+					return;
+				}
+				if (!addPropertyAssociation("Source_Text", legacyComponentImplementationLocation, selectedComponent,
+						propSet)) {
+//					return;
+				}
+				if (!addPropertyAssociation("Compute_Entrypoint_Source_Text",
+						legacyComponentImplementationEntryFunction,
+						selectedComponent, propSet)) {
+//					return;
+				}
 
 				// Add Resolute check clause
 				EList<AnnexSubclause> annexSubclauses = selectedComponent.getOwnedAnnexSubclauses();

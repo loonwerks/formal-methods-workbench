@@ -126,14 +126,14 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		URI uri = resource.getURI();
 		IFile file = workspaceRoot.getFile(new Path(uri.toPlatformString(true)));
-		if (!file.isAccessible()) {
-			throw new ResoluteFailException("Unable to access file " + file.getName() + ".",
-					evalContext.getThisInstance());
-		}
+
 		if (uri.segment(0).equals("plugin")) {
 			// plugin resources won't have timestamps,
 			// so just set it to zero (otherwise it will be IResource.NULL_STAMP)
 			resourceTimestamps.put(file.getName(), 0L);
+		} else if (!file.isAccessible()) {
+			throw new ResoluteFailException("Unable to access file " + file.getName() + ".",
+					evalContext.getThisInstance());
 		} else if (file.getLocalTimeStamp() == IResource.NULL_STAMP) {
 			throw new ResoluteFailException(file.getName() + " does not have a valid modification timestamp.",
 					evalContext.getThisInstance());
