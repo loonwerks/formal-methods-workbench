@@ -21,14 +21,18 @@ import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.osate.ui.dialogs.Dialog;
 
-public class DockerDaemon extends Job {
+public class DockerClient extends Job {
 
 	private String dockerImage = null;
+	private String dockerContainerPort = null;
+	private String dockerContainerName = null;
 	private boolean isStarted = false;
 
-	public DockerDaemon(String dockerImage) {
-		super("Docker Daemon");
+	public DockerClient(String dockerImage, String dockerContainerPort, String dockerContainerName) {
+		super("Docker Client");
 		this.dockerImage = dockerImage;
+		this.dockerContainerPort = dockerContainerPort;
+		this.dockerContainerName = dockerContainerName;
 	}
 
 	public boolean isStarted() {
@@ -39,7 +43,7 @@ public class DockerDaemon extends Job {
 	protected IStatus run(IProgressMonitor monitor) {
 
 		// TODO: Load Image
-		monitor.beginTask("Docker Daemon", IProgressMonitor.UNKNOWN);
+		monitor.beginTask("Docker Client", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Load Image");
 		if (!loadDockerImage(monitor)) {
 			Dialog.showError("Docker error", "No Docker image has been loaded.");
@@ -65,7 +69,7 @@ public class DockerDaemon extends Job {
 		try {
 			loadImage = Runtime.getRuntime().exec(loadString);
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(loadImage.getErrorStream()));
-			MessageConsole console = findConsole("Docker Daemon");
+			MessageConsole console = findConsole("Docker Client");
 			MessageConsoleStream out = console.newMessageStream();
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			IWorkbenchPage page = window.getActivePage();
@@ -96,24 +100,24 @@ public class DockerDaemon extends Job {
 
 	private IStatus runDockerContainer(IProgressMonitor monitor) {
 
-		Process dockerDaemonProcess = null;
-		String loadString = "docker run --rm -p 127.0.0.1:5000:5000 baggage-server";
+		Process dockerClientProcess = null;
+		String loadString = "docker run --rm -p " + dockerContainerPort + " " + dockerContainerName;
 		try {
-			dockerDaemonProcess = Runtime.getRuntime().exec(loadString);
+			dockerClientProcess = Runtime.getRuntime().exec(loadString);
 			isStarted = true;
-			BufferedReader stdErr = new BufferedReader(new InputStreamReader(dockerDaemonProcess.getErrorStream()));
-			MessageConsole console = findConsole("Docker Daemon");
+			BufferedReader stdErr = new BufferedReader(new InputStreamReader(dockerClientProcess.getErrorStream()));
+			MessageConsole console = findConsole("Docker Client");
 			MessageConsoleStream out = console.newMessageStream();
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			IWorkbenchPage page = window.getActivePage();
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;
 			IConsoleView view = (IConsoleView) page.showView(id);
 			view.display(console);
-			String daemonOutput = null;
-			while (dockerDaemonProcess.isAlive() && !monitor.isCanceled()) {
+			String clientOutput = null;
+			while (dockerClientProcess.isAlive() && !monitor.isCanceled()) {
 				// Display output
-				while ((daemonOutput = stdErr.readLine()) != null) {
-					out.println(daemonOutput);
+				while ((clientOutput = stdErr.readLine()) != null) {
+					out.println(clientOutput);
 				}
 
 			}
@@ -124,7 +128,7 @@ public class DockerDaemon extends Job {
 			Dialog.showError("Docker error", "Could not initialize console to display output.");
 			return Status.CANCEL_STATUS;
 		} finally {
-			dockerDaemonProcess.destroy();
+			dockerClientProcess.destroy();
 		}
 
 		return Status.OK_STATUS;

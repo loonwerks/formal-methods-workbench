@@ -19,6 +19,7 @@ import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.impl.ComponentImplementationImpl;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.impl.ComponentInstanceImpl;
@@ -27,12 +28,11 @@ import org.osate.ui.dialogs.Dialog;
 
 import com.rockwellcollins.atc.agree.agree.impl.AssumeStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.GuaranteeStatementImpl;
-import com.rockwellcollins.atc.darpacase.architecture.tools.DockerDaemon;
+import com.rockwellcollins.atc.darpacase.architecture.Activator;
+import com.rockwellcollins.atc.darpacase.architecture.preferences.CasePreferenceConstants;
+import com.rockwellcollins.atc.darpacase.architecture.tools.DockerClient;
 
 public class VerifyLegacyImplementation extends AadlHandler {
-
-	// This should be retrieved from preferences
-	private String dockerImage = "docker-image-baggage-server.tar.gz";
 
 	@Override
 	public void runCommand(URI uri) {
@@ -53,11 +53,21 @@ public class VerifyLegacyImplementation extends AadlHandler {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
-				// Start Docker Daemon
-				DockerDaemon dockerDaemon = new DockerDaemon(dockerImage);
+				// Start Docker Client
+				final String dockerImage = Activator.getDefault().getPreferenceStore()
+						.getString(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_FILENAME);
+				final String dockerContainerPort = Activator.getDefault().getPreferenceStore()
+						.getString(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_PORT);
+				final String dockerContainerName = Activator.getDefault().getPreferenceStore()
+						.getString(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_NAME);
+				if (dockerImage.isEmpty() || dockerContainerPort.isEmpty() || dockerContainerName.isEmpty()) {
+					Dialog.showError("Baggage Server", "Baggage Server details are missing in CASE preferences.");
+					return Status.CANCEL_STATUS;
+				}
+				DockerClient dockerClient = new DockerClient(dockerImage, dockerContainerPort, dockerContainerName);
 
 				try {
-					dockerDaemon.schedule();
+					dockerClient.schedule();
 
 					// Get components to verify
 					Set<ComponentType> components = getLegacyComponents(eObj);
@@ -69,10 +79,10 @@ public class VerifyLegacyImplementation extends AadlHandler {
 						return Status.CANCEL_STATUS;
 					}
 
-					// Wait until Docker Daemon is started
-					while (!dockerDaemon.isStarted() && !monitor.isCanceled()) {
-						if (dockerDaemon.getResult() != null) {
-							// Could not launch daemon for some reason
+					// Wait until Docker Client is started
+					while (!dockerClient.isStarted() && !monitor.isCanceled()) {
+						if (dockerClient.getResult() != null) {
+							// Could not launch docker client for some reason
 							return Status.CANCEL_STATUS;
 						}
 					}
@@ -104,8 +114,8 @@ public class VerifyLegacyImplementation extends AadlHandler {
 
 					}
 				} finally {
-					// Stop docker daemon when complete
-					dockerDaemon.cancel();
+					// Stop docker client when complete
+					dockerClient.cancel();
 				}
 
 				return Status.OK_STATUS;
@@ -127,7 +137,7 @@ public class VerifyLegacyImplementation extends AadlHandler {
 			if (component.getPropertyValues("Programming_Properties", "Source_Text").size() > 0) {
 				components.add((ComponentType) eObj);
 			}
-		} else if (eObj instanceof ComponentImplementation) {
+		} else if (eObj instanceof ComponentImplementationImpl) {
 			// Generate system instance
 			SystemInstance si;
 			ComponentImplementation compImpl = (ComponentImplementation) eObj;

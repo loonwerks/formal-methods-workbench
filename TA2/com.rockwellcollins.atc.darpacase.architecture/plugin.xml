@@ -235,12 +235,15 @@
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter">
       </handler>
       <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddRouter"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter">
       </handler>
       <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddMonitor"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor">
       </handler>
       <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddIsolator"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator">
       </handler>
       <handler
@@ -258,6 +261,20 @@
             file="resources/CASE.aadl"
             id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution">
       </aadlcontribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.rockwellcollins.atc.darpacase.architecture.preferences.CasePreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.rockwellcollins.atc.darpacase.architecture.preferences.CasePreferencePage"
+            id="com.rockwellcollins.atc.darpacase.architecture.preferences.CasePreferencePage"
+            name="CASE">
+      </page>
    </extension>
 
 </plugin>

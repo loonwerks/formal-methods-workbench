@@ -36,7 +36,6 @@ public class SelectImplementation extends AadlHandler {
 	public void runCommand(URI uri) {
 
 		// Make sure selection is a process or thread
-		// Check if it is a connection
 		final EObject eObj = getEObject(uri);
 		if (!(eObj instanceof ProcessType) && !(eObj instanceof ThreadType)) {
 			Dialog.showError("No software component is selected",

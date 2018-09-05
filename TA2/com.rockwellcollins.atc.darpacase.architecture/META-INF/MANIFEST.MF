@@ -22,3 +22,5 @@ Import-Package: com.rockwellcollins.atc.agree.agree.impl,
  org.osate.ui.dialogs,
  org.osate.ui.navigator,
  org.osate.ui.utils
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.rockwellcollins.atc.darpacase.architecture.Activator

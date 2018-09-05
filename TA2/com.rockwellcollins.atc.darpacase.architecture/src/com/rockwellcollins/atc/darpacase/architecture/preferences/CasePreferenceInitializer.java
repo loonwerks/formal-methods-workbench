@@ -1,0 +1,21 @@
+package com.rockwellcollins.atc.darpacase.architecture.preferences;
+
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
+
+import com.rockwellcollins.atc.darpacase.architecture.Activator;
+
+/**
+ * Class used to initialize default preference values.
+ */
+public class CasePreferenceInitializer extends AbstractPreferenceInitializer {
+	@Override
+	public void initializeDefaultPreferences() {
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		store.setDefault(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_NAME, "baggage-server");
+		store.setDefault(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_PORT, "127.0.0.1:5000:5000");
+		store.setDefault(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_FILENAME,
+				"docker-image-baggage-server.tar.gz");
+		store.setDefault(CasePreferenceConstants.CASE_PREF_DEBUG, false);
+	}
+}
