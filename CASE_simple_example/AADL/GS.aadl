@@ -4,7 +4,7 @@ public
 	
 	with UAS;
 	
-	system GroundStation
+	device GroundStation
 		features
 			send_map: out event data port;
 			recv_status: in event data port;
