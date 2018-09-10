@@ -1,123 +1,92 @@
 package com.rockwellcollins.atc.darpacase.requirements.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.EcoreUtil2;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.ModelUnit;
+import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertySet;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
+import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance;
+import org.osate.aadl2.instance.SystemInstance;
 
 public class InteractionAPI {
 
-	private static final Object TA1PROPERTYSETNAME = "CASETA1";
-
-	public static ComponentType getComponentType(ComponentImplementation ci) {
-		return ci.getOwnedRealization().getImplemented();
-	}
+	public static final String TA1_PROPERTY_SET_NAME = "CASETA1";
+	public final SystemInstance instance;
 
 	/*******************************************************************
 	 * Constructor and functions to help create the API
 	 ******************************************************************/
-	private AadlPackage rootPackage;
-	private Set<AadlPackage> packages;
-	private Set<PropertySet> propertySets;
 
-	public InteractionAPI(AadlPackage pkg) {
-		rootPackage = pkg;
-		packages = new HashSet<>();
-		propertySets = new HashSet<>();
-
-		processPackage(rootPackage);
+	public InteractionAPI(SystemInstance instance) {
+		this.instance = instance;
 	}
 
-	public void processPackage(AadlPackage pkg) {
-		if (packages.contains(pkg)) {
-			return;
+	/******************************* Connectedness ************************************/
+	private Set<ComponentInstance> recurse(ComponentInstance top, ComponentInstance src) {
+		Set<ComponentInstance> set = new HashSet<>();
+		ComponentInstance curr = src;
+		while (curr != top) {
+			set.add(curr);
+			curr = curr.getContainingComponentInstance();
 		}
+		return set;
+	}
 
-		packages.add(pkg);
+	private Set<ComponentInstance> getConnectedComponents(ComponentInstance component, ConnectionInstance connection) {
+		Set<ComponentInstance> current = new HashSet<>();
+		current.addAll(recurse(component, connection.getSource().getComponentInstance()));
+		current.addAll(recurse(component, connection.getDestination().getComponentInstance()));
+		current.remove(component);
+		return current;
+	}
 
-		if (pkg.getPrivateSection() != null) {
-			for (ModelUnit mu : pkg.getPrivateSection().getImportedUnits()) {
-				if (mu instanceof AadlPackage) {
-					AadlPackage importedPkg = (AadlPackage) mu;
-					processPackage(importedPkg);
-				} else if (mu instanceof PropertySet) {
-					PropertySet pset = (PropertySet) mu;
-					processPropertySet(pset);
-				}
+	public Map<ConnectionInstance, Set<ComponentInstance>> getConnectedComponents(ComponentInstance component) {
+		Map<ConnectionInstance, Set<ComponentInstance>> connectedMap = new HashMap<>();
+		for (ConnectionInstance connection : component.getConnectionInstances()) {
+			Set<ComponentInstance> current = getConnectedComponents(component, connection);
+			connectedMap.put(connection, current);
+		}
+		return connectedMap;
+	}
+
+	/**************************************************************************************/
+	public List<ComponentInstance> getSoftwareComponents(SystemInstance si) {
+		List<ComponentInstance> software = new ArrayList<>();
+		software.addAll(si.getAllComponentInstances(ComponentCategory.SUBPROGRAM));
+		software.addAll(si.getAllComponentInstances(ComponentCategory.SUBPROGRAM_GROUP));
+		software.addAll(si.getAllComponentInstances(ComponentCategory.THREAD));
+		software.addAll(si.getAllComponentInstances(ComponentCategory.THREAD_GROUP));
+		software.addAll(si.getAllComponentInstances(ComponentCategory.PROCESS));
+
+		return software;
+	}
+
+	/**************************************************************************************/
+
+	public List<Property> getAppliedProperties(ComponentInstance ci) {
+		return ci.getOwnedPropertyAssociations().stream().map(pa -> pa.getProperty()).collect(Collectors.toList());
+	}
+
+	public static boolean isTA1Property(PropertyAssociation pa) {
+		return isTA1Property(pa.getProperty());
+	}
+
+	public static boolean isTA1Property(Property p) {
+		if (p.eContainer() instanceof PropertySet) {
+			PropertySet pset = (PropertySet) p.eContainer();
+			if (pset.getName().equals(TA1_PROPERTY_SET_NAME)) {
+				return true;
 			}
 		}
+		return false;
 	}
 
-	private void processPropertySet(PropertySet pset) {
-		if (propertySets.contains(pset)) {
-			return;
-		}
-
-		propertySets.add(pset);
-		for (ModelUnit mu : pset.getImportedUnits()) {
-			PropertySet imported = (PropertySet) mu;
-			processPropertySet(imported);
-		}
-	}
-
-	public List<PropertyAssociation> getTA1Properties() {
-		List<PropertyAssociation> ta1 = new ArrayList<>();
-		for (AadlPackage pkg : packages) {
-			ta1.addAll(getTA1Properties(pkg));
-		}
-		return ta1;
-	}
-
-	/*******************************************************************
-	 * TA1 Property functions
-	 ******************************************************************/
-	private List<PropertyAssociation> getTA1Properties(EObject eo) {
-		List<PropertyAssociation> ta1 = new ArrayList<>();
-		for (PropertyAssociation pa : EcoreUtil2.getAllContentsOfType(eo, PropertyAssociation.class)) {
-			PropertySet set = EcoreUtil2.getContainerOfType(pa.getProperty(), PropertySet.class);
-			if (set.getName().equals(TA1PROPERTYSETNAME)) {
-				ta1.add(pa);
-			}
-		}
-		return ta1;
-	}
-
-	public List<PropertyAssociation> getComponentTA1Properties(ComponentImplementation ci) {
-		ComponentType ct = getComponentType(ci);
-		List<PropertyAssociation> props = new ArrayList<>();
-		props.addAll(getTA1Properties(ci));
-		props.addAll(getTA1Properties(ct));
-		return props;
-	}
-
-	/*******************************************************************
-	 * Getting implementations
-	 ******************************************************************/
-	public List<ComponentImplementation> getImplementations() {
-		List<ComponentImplementation> componentImpls = new ArrayList<>();
-		for (AadlPackage pkg : packages) {
-			componentImpls.addAll(AadlUtil.getAllComponentImpl(pkg));
-		}
-		return componentImpls;
-	}
-
-	public List<ComponentImplementation> getImplementations(ComponentType ct) {
-		List<ComponentImplementation> impls = getImplementations();
-		return impls.stream().filter(ci -> getComponentType(ci).equals(ct)).collect(Collectors.toList());
-	}
-
-	/*******************************************************************
-	 * Connectedness
-	 *******************************************************************/
 }
