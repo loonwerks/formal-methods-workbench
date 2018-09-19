@@ -55,16 +55,17 @@ public class VerifyLegacyImplementation extends AadlHandler {
 
 				// Start Docker Client
 				final String dockerImage = Activator.getDefault().getPreferenceStore()
-						.getString(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_FILENAME);
+						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_FILENAME);
 				final String dockerContainerPort = Activator.getDefault().getPreferenceStore()
-						.getString(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_PORT);
+						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_PORT);
 				final String dockerContainerName = Activator.getDefault().getPreferenceStore()
-						.getString(CasePreferenceConstants.CASE_PREF_BAGGAGE_SERVER_NAME);
+						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_NAME);
 				if (dockerImage.isEmpty() || dockerContainerPort.isEmpty() || dockerContainerName.isEmpty()) {
 					Dialog.showError("Baggage Server", "Baggage Server details are missing in CASE preferences.");
 					return Status.CANCEL_STATUS;
 				}
-				DockerClient dockerClient = new DockerClient(dockerImage, dockerContainerPort, dockerContainerName);
+				DockerClient dockerClient = new DockerClient(dockerImage, dockerContainerPort, dockerContainerName,
+						executionEvent);
 
 				try {
 					dockerClient.schedule();

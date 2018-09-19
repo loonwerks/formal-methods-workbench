@@ -6,55 +6,85 @@
       <menuContribution
             locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
          <menu
+               id="com.rockwellcollins.atc.darpacase.menus.outline.main"
                label="CASE">
             <menu
-                  label="GearCASE">
+                  id="com.rockwellcollins.atc.darpacase.menus.outline.requirements"
+                  label="Cyber Requirements">
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.GenerateRequirements"
-                     label="Generate Requirements"
+                     id="com.rockwellcollins.atc.darpacase.requirements.menus.gearcase"
+                     label="GearCASE"
                      style="push">
                </command>
             </menu>
             <menu
-                  label="StairCASE">
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                     label="Add Filter..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
-                     label="Add Router..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                     label="Add Monitor..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
-                     label="Add Isolator..."
-                     style="push">
-               </command>
+                  id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency"
+                  label="Cyber Resiliency">
+               <menu
+                     id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase"
+                     label="StairCASE">
+                  <menu
+                        id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase.transformations"
+                        label="Model Transformations">
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                           label="Add Filter..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
+                           label="Add Router..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                           label="Add Monitor..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
+                           label="Add Isolator..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRemoteAttestation"
+                           label="Add Remote Attestation..."
+                           style="push">
+                     </command>
+                  </menu>
+                  <menu
+                        id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase.proofs"
+                        label="Proofs">
+                  </menu>
+               </menu>
             </menu>
             <menu
-                  label="SuitCASE">
+                  id="com.rockwellcollins.atc.darpacase.menus.outline.component"
+                  label="Component Analysis">
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.SelectImplementation"
+                     id="com.rockwellcollins.atc.darpacase.component.menus.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
-                     label="Verify Legacy Implementation"
+                     label="SuitCASE"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.rockwellcollins.atc.darpacase.menus.outline.build"
+                  label="Trusted Build">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.build.commands.TrustedBuild"
+                     label="Build..."
                      style="push">
                </command>
             </menu>
@@ -64,45 +94,67 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
+               id="com.rockwellcollins.atc.darpacase.menus.menubar.main"
                label="CASE">
             <menu
-                  label="GearCASE">
+                  id="com.rockwellcollins.atc.darpacase.menus.menubar.requirements"
+                  label="Cyber Requirements">
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.GenerateRequirements"
-                     label="Generate Requirements"
+                     id="com.rockwellcollins.atc.darpacase.menus.menubar.requirements.gearcase"
+                     label="GearCASE"
                      style="push">
                </command>
             </menu>
             <menu
-                  label="StairCASE">
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                     label="Add Filter..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
-                     label="Add Router..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                     label="Add Monitor..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
-                     label="Add Isolator..."
-                     style="push">
-               </command>
+                  id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency"
+                  label="Cyber Resiliency">
+               <menu
+                     id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase"
+                     label="StairCASE">
+                  <menu
+                        id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase.transformations"
+                        label="Model Transformations">
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                           label="Add Filter..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
+                           label="Add Router..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                           label="Add Monitor..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
+                           label="Add Isolator..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRemoteAttestation"
+                           label="Add Remote Attestation..."
+                           style="push">
+                     </command>
+                  </menu>
+                  <menu
+                        id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase.proofs"
+                        label="Proofs">
+                  </menu>
+               </menu>
             </menu>
             <menu
-                  label="SuitCASE">
+                  id="com.rockwellcollins.atc.darpacase.menus.menubar.component"
+                  label="Component Analysis">
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
                      id="com.rockwellcollins.atc.darpacase.architecture.menus.SelectImplementation"
@@ -112,7 +164,16 @@
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
                      id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
-                     label="Verify Legacy Implementation"
+                     label="SuitCASE"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.rockwellcollins.atc.darpacase.menus.menubar.build"
+                  label="Trusted Build">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.build.commands.TrustedBuild"
+                     label="Build..."
                      style="push">
                </command>
             </menu>
@@ -142,55 +203,85 @@
             allPopups="false"
             locationURI="popup:#TextEditorContext?after=additions">
          <menu
+               id="com.rockwellcollins.atc.darpacase.menus.editor.main"
                label="CASE">
             <menu
-                  label="GearCASE">
+                  id="com.rockwellcollins.atc.darpacase.menus.editor.requirements"
+                  label="Cyber Requirements">
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.GenerateRequirements"
-                     label="Generate Requirements"
+                     id="com.rockwellcollins.atc.darpacase.requirements.menus.gearcase"
+                     label="GearCASE"
                      style="push">
                </command>
             </menu>
             <menu
-                  label="StairCASE">
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                     label="Add Filter..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
-                     label="Add Router..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                     label="Add Monitor..."
-                     style="push">
-               </command>
-               <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
-                     label="Add Isolator..."
-                     style="push">
-               </command>
+                  id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency"
+                  label="Cyber Resiliency">
+               <menu
+                     id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase"
+                     label="StairCASE">
+                  <menu
+                        id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase.transformations"
+                        label="Model Transformations">
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                           label="Add Filter..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
+                           label="Add Router..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                           label="Add Monitor..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
+                           label="Add Isolator..."
+                           style="push">
+                     </command>
+                     <command
+                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
+                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRemoteAttestation"
+                           label="Add Remote Attestation..."
+                           style="push">
+                     </command>
+                  </menu>
+                  <menu
+                        id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase.proofs"
+                        label="Proofs">
+                  </menu>
+               </menu>
             </menu>
             <menu
-                  label="SuitCASE">
+                  id="com.rockwellcollins.atc.darpacase.menus.editor.component"
+                  label="Component Analysis">
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.SelectImplementation"
+                     id="com.rockwellcollins.atc.darpacase.component.menus.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
-                     id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
-                     label="Verify Legacy Implementation"
+                     label="SuitCASE"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.rockwellcollins.atc.darpacase.menus.editor.build"
+                  label="Trusted Build">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.build.commands.TrustedBuild"
+                     label="Build..."
                      style="push">
                </command>
             </menu>
@@ -227,6 +318,14 @@
             id="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
             name="Verify Implementation">
       </command>
+      <command
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.FilterChecker"
+            name="Filter Checker">
+      </command>
+      <command
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
+            name="Add Remote Attestation">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -259,7 +358,11 @@
          point="org.osate.pluginsupport.aadlcontribution">
       <aadlcontribution
             file="resources/CASE.aadl"
-            id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution">
+            id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution.casepropset">
+      </aadlcontribution>
+      <aadlcontribution
+            file="resources/Model_Transformations.aadl"
+            id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution.modeltransformations">
       </aadlcontribution>
    </extension>
    <extension
