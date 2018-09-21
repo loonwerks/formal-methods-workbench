@@ -51,7 +51,8 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		}
 
 		// Get the tool output file
-		String outputFileName = Activator.getDefault().getPreferenceStore()
+		String outputFileName = com.rockwellcollins.atc.darpacase.architecture.Activator.getDefault()
+				.getPreferenceStore()
 				.getString(arg.getString().toLowerCase() + "OutputFileName");
 		if (outputFileName.isEmpty()) {
 			throw new ResoluteFailException("Resolute ToolCheck could not determine the output file name of the "

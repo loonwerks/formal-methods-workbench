@@ -15,7 +15,8 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.rockwellcollins.atc.resolute.toolcheck
 Bundle-ActivationPolicy: lazy
-Import-Package: com.rockwellcollins.atc.darpacase.architecture.preferences,
+Import-Package: com.rockwellcollins.atc.darpacase.architecture,
+ com.rockwellcollins.atc.darpacase.architecture.preferences,
  com.rockwellcollins.atc.resolute.analysis.external,
  com.rockwellcollins.atc.resolute.validation,
  jkind.api.results,
