@@ -39,6 +39,7 @@ import org.osate.ui.dialogs.Dialog;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.impl.AgreeContractSubclauseImpl;
 import com.rockwellcollins.atc.agree.unparsing.AgreeAnnexUnparser;
+import com.rockwellcollins.atc.darpacase.architecture.CaseClaimsManager;
 import com.rockwellcollins.atc.darpacase.architecture.dialogs.AddFilterDialog;
 import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
@@ -289,6 +290,7 @@ public class AddFilter extends AadlHandler {
 					// Add add_filter claims to *_CASE_Claims file
 					// If the prove statement exists, the *_CASE_Claims file should also already
 					// exist, but double check just to be sure, and create it if it doesn't
+					CaseClaimsManager.getInstance().addFilter(filterResoluteClause);
 
 				}
 
@@ -318,6 +320,7 @@ public class AddFilter extends AadlHandler {
 					annexSubclauseImpl.setName("agree");
 					annexSubclauseImpl.setSourceText(agreeClauses);
 				}
+
 
 			}
 		});

@@ -13,6 +13,7 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
 Import-Package: com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.agree.impl,
  com.rockwellcollins.atc.agree.unparsing,
+ com.rockwellcollins.atc.darpacase.eclipse.util,
  com.rockwellcollins.atc.resolute.resolute,
  com.rockwellcollins.atc.resolute.resolute.impl,
  org.eclipse.ui,
@@ -28,4 +29,5 @@ Import-Package: com.rockwellcollins.atc.agree.agree,
  org.osate.ui.utils
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.rockwellcollins.atc.darpacase.architecture.Activator
-Export-Package: com.rockwellcollins.atc.darpacase.architecture.preferences
+Export-Package: com.rockwellcollins.atc.darpacase.architecture,
+ com.rockwellcollins.atc.darpacase.architecture.preferences

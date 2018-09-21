@@ -12,7 +12,7 @@
                   id="com.rockwellcollins.atc.darpacase.menus.outline.requirements"
                   label="Cyber Requirements">
                <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement"
                      id="com.rockwellcollins.atc.darpacase.requirements.menus.gearcase"
                      label="GearCASE"
                      style="push">
@@ -100,7 +100,7 @@
                   id="com.rockwellcollins.atc.darpacase.menus.menubar.requirements"
                   label="Cyber Requirements">
                <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement"
                      id="com.rockwellcollins.atc.darpacase.menus.menubar.requirements.gearcase"
                      label="GearCASE"
                      style="push">
@@ -209,7 +209,7 @@
                   id="com.rockwellcollins.atc.darpacase.menus.editor.requirements"
                   label="Cyber Requirements">
                <command
-                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.GenerateRequirements"
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement"
                      id="com.rockwellcollins.atc.darpacase.requirements.menus.gearcase"
                      label="GearCASE"
                      style="push">
@@ -352,6 +352,10 @@
       <handler
             class="com.rockwellcollins.atc.darpacase.architecture.handlers.VerifyLegacyImplementation"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation">
+      </handler>
+      <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddRequirement"
+            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement">
       </handler>
    </extension>
    <extension

@@ -1,6 +1,7 @@
 package com.rockwellcollins.atc.darpacase.architecture.handlers;
 
-import org.eclipse.emf.common.util.EList;
+import java.util.Iterator;
+
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.window.Window;
@@ -10,10 +11,10 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.AadlPackageImpl;
-import org.osate.aadl2.impl.ComponentTypeImpl;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
 import org.osate.aadl2.impl.PackageSectionImpl;
 import org.osate.aadl2.impl.PrivatePackageSectionImpl;
@@ -84,7 +85,7 @@ public class SelectImplementation extends AadlHandler {
 			public void process(final XtextResource resource) throws Exception {
 
 				// Retrieve the model object to modify
-				final ComponentTypeImpl selectedComponent = (ComponentTypeImpl) resource.getEObject(uri.fragment());
+				final ThreadType selectedComponent = (ThreadType) resource.getEObject(uri.fragment());
 				final AadlPackageImpl aadlPkg = (AadlPackageImpl) resource.getContents().get(0);
 				PackageSectionImpl pkgSection = null;
 				// Figure out if the selected component is in the public or private section
@@ -157,29 +158,38 @@ public class SelectImplementation extends AadlHandler {
 				}
 
 				// Add Resolute check clause
-				EList<AnnexSubclause> annexSubclauses = selectedComponent.getOwnedAnnexSubclauses();
+//				EList<AnnexSubclause> annexSubclauses = selectedComponent.getOwnedAnnexSubclauses();
+				Iterator<AnnexSubclause> subclause = selectedComponent.getOwnedAnnexSubclauses().iterator();
 				DefaultAnnexSubclauseImpl annexSubclause = null;
-				for (AnnexSubclause subclause : annexSubclauses) {
-					if (subclause.getName().equals("Resolute")) {
-						annexSubclause = (DefaultAnnexSubclauseImpl) subclause;
-						break;
+				String sourceText = "";
+//				for (AnnexSubclause subclause : annexSubclauses) {
+				while (subclause.hasNext()) {
+					annexSubclause = (DefaultAnnexSubclauseImpl) subclause.next();
+					if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
+//						annexSubclause = (DefaultAnnexSubclauseImpl) subclause;
+						sourceText = annexSubclause.getSourceText();
+						subclause.remove();
+//						break;
 					}
 				}
 				// If any Resolute annex clause does not exist for this component, create it
-				if (annexSubclause == null) {
+//				if (annexSubclause == null) {
 					annexSubclause = (DefaultAnnexSubclauseImpl) selectedComponent.createOwnedAnnexSubclause();
-					annexSubclause.setName("Resolute");
-					annexSubclause.setSourceText(formatResoluteClause(""));
-				} else {
-					// otherwise add the legacy check resolute statement to the existing clause
-					annexSubclause.setSourceText(formatResoluteClause(annexSubclause.getSourceText()));
-				}
+				annexSubclause.setName("resolute");
+//					annexSubclause.setSourceText(formatResoluteClause(""));
+				annexSubclause.setSourceText(formatResoluteClause(sourceText));
+//				} else {
+//					// otherwise add the legacy check resolute statement to the existing clause
+//					annexSubclause.setSourceText(formatResoluteClause(annexSubclause.getSourceText()));
+//				}
 
 				// Delete and re-insert this component from package section
 				// This seems to be the only way to get the formatting (mostly) correct
 				int idx = getIndex(selectedComponent.getName(), pkgSection.getOwnedClassifiers());
+				Classifier classifier = pkgSection.getOwnedClassifiers().get(idx);
 				pkgSection.getOwnedClassifiers().remove(idx);
-				pkgSection.getOwnedClassifiers().add(idx, selectedComponent);
+//				pkgSection.getOwnedClassifiers().add(idx, selectedComponent);
+				pkgSection.getOwnedClassifiers().add(idx, classifier);
 
 			}
 		});
