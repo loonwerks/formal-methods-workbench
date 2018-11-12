@@ -7,36 +7,65 @@ public
 
 	device Radio
 		features
-			MCA: requires bus access MC_Bus;
-			RFA: requires bus access UAS::RF;
+			MCA: requires bus access MC_Bus.Impl;
+			RFA: requires bus access UAS::RF.Impl;
 			recv_map_in: in event data port;
 			recv_map_out: out event data port SW::Command.Impl;
 			send_status_in: in event data port SW::Coordinate.Impl;
 			send_status_out: out event data port;
 	end Radio;
+	
+	
+	device implementation Radio.Impl
+		
+	end Radio.Impl;
+
 
 	device UART
 		features
-			MCA: requires bus access MC_Bus;
-			UARTA: requires bus access UAV::Serial;
+			MCA: requires bus access MC_Bus.Impl;
+			UARTA: requires bus access UAV::Serial.Impl;
 			waypoint_in: in event data port SW::MissionWindow.Impl;
 			waypoint_out: out event data port;
 			position_status_in: in event data port;
 			position_status_out: out event data port SW::Coordinate.Impl;
 	end UART;
+	
+	device implementation UART.Impl
+		
+	end UART.Impl;
+
 
 	processor MC_Proc
 		features
-			MCA: requires bus access MC_Bus;			
+			MCA: requires bus access MC_Bus.Impl;			
 	end MC_Proc;
+	
+	
+	processor implementation MC_Proc.Impl
+			
+	end MC_Proc.Impl;
+	
 	
 	memory MC_Mem
 		features
-			MCA: requires bus access MC_Bus;		
+			MCA: requires bus access MC_Bus.Impl;		
 	end MC_Mem;
+	
+	
+	memory implementation MC_Mem.Impl
+		
+	end MC_Mem.Impl;
+	
 	
 	bus MC_Bus
 	end MC_Bus;
+	
+	
+	bus implementation MC_Bus.Impl
+		
+	end MC_Bus.Impl;
+
 
 	system MissionComputer
 		features
@@ -44,19 +73,20 @@ public
 			position_status: in event data port;
 			waypoint: out event data port;
 			send_status: out event data port;
-			UARTA: requires bus access UAV::Serial;
-			RFA: requires bus access UAS::RF;
+			UARTA: requires bus access UAV::Serial.Impl;
+			RFA: requires bus access UAS::RF.Impl;
 
 	end MissionComputer;
+	
 	
 	system implementation MissionComputer.Impl
 		
 		subcomponents
-			RADIO_HW: device Radio;
-			UART_HW: device UART;
-			PROC_HW: processor MC_Proc;
-			MEM_HW: memory MC_Mem;
-			BUS_HW: bus MC_Bus;
+			RADIO_HW: device Radio.Impl;
+			UART_HW: device UART.Impl;
+			PROC_HW: processor MC_Proc.Impl;
+			MEM_HW: memory MC_Mem.Impl;
+			BUS_HW: bus MC_Bus.Impl;
 			PROC_SW: process SW::MC_SW.Impl;
 			
 		connections

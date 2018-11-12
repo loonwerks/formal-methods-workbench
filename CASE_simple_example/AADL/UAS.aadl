@@ -5,16 +5,25 @@ public
 	with UAV;
 
 	bus RF
+		
 	end RF;
+	
+	
+	bus implementation RF.Impl
+		
+	end RF.Impl;
+
 
 	system UAS
+		
 	end UAS;
+
 
 	system implementation UAS.Impl
 		subcomponents
-			GND: device GS::GroundStation;
+			GND: system GS::GroundStation.Impl;
 			UAV: system UAV::UAV.Impl;
-			RFB: bus RF;
+			RFB: bus RF.Impl;
 		connections
 			c1: port GND.send_map -> UAV.recv_map;
 			c2: port UAV.send_status -> GND.recv_status;
