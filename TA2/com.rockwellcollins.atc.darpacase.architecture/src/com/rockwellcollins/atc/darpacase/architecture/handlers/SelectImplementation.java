@@ -22,6 +22,7 @@ import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.PublicPackageSectionImpl;
 import org.osate.ui.dialogs.Dialog;
 
+import com.rockwellcollins.atc.darpacase.architecture.CaseClaimsManager;
 import com.rockwellcollins.atc.darpacase.architecture.dialogs.SelectImplementationDialog;
 
 public class SelectImplementation extends AadlHandler {
@@ -182,6 +183,9 @@ public class SelectImplementation extends AadlHandler {
 //					// otherwise add the legacy check resolute statement to the existing clause
 //					annexSubclause.setSourceText(formatResoluteClause(annexSubclause.getSourceText()));
 //				}
+
+				// Add the corresponding resolute claim in the _CASE_Claims file
+				CaseClaimsManager.getInstance().addLegacyComponentVerification();
 
 				// Delete and re-insert this component from package section
 				// This seems to be the only way to get the formatting (mostly) correct

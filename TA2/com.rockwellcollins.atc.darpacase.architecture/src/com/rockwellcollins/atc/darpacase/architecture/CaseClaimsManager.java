@@ -135,6 +135,42 @@ public class CaseClaimsManager {
 
 	}
 
+	public void addLegacyComponentVerification() {
+
+		Resource claimResource = getResource();
+
+		IFile file = Filesystem.getFile(claimResource.getURI());
+
+		// Read in the claims file
+		String annex = "";
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getContents()));
+			String line = null;
+
+			while ((line = bufferedReader.readLine()) != null) {
+				annex = annex + line + System.lineSeparator();
+			}
+			bufferedReader.close();
+		} catch (IOException | CoreException e) {
+			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+		}
+
+		String funDef = "\t\tLegacyComponentVerificationCheck(c : component) <=" + System.lineSeparator()
+				+ "\t\t\t** c \" legacy component has been verified\" **" + System.lineSeparator()
+				+ "\t\t\tanalysis(\"ToolCheck\", \"SuitCASE\")" + System.lineSeparator();
+		annex = annex.replace("\t**};", funDef + System.lineSeparator() + "\t**};");
+
+		// Write back to file
+		// The contents of the file will be overwritten
+		try {
+			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
+			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
+		} catch (CoreException e) {
+			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+		}
+
+	}
+
 	private void addToResoluteAnnex(String clause) {
 
 		Resource claimResource = getResource();
@@ -156,7 +192,7 @@ public class CaseClaimsManager {
 		}
 
 		// Add clause to end of annex
-		annex = annex.replace("**}", clause + System.lineSeparator() + "\t**}");
+		annex = annex.replace("**};", clause + System.lineSeparator() + "\t**};");
 
 		// Write back to file
 		// The contents of the file will be overwritten

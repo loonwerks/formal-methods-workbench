@@ -16,6 +16,7 @@ public class CasePreferencePage extends FieldEditorPreferencePage implements IWo
 	private StringFieldEditor baggageServerNameFieldEditor;
 	private StringFieldEditor baggageServerPortFieldEditor;
 	private FileFieldEditor baggageServerFileFieldEditor;
+	private FileFieldEditor suitCaseOutputFileFieldEditor;
 
 	public CasePreferencePage() {
 		super(GRID);
@@ -97,6 +98,40 @@ public class CasePreferencePage extends FieldEditorPreferencePage implements IWo
 
 		};
 		addField(baggageServerFileFieldEditor);
+
+		suitCaseOutputFileFieldEditor = new FileFieldEditor(CasePreferenceConstants.CASE_SUITCASE_OUTPUT_FILENAME,
+				"SuitCASE output filename:", true, getFieldEditorParent()) {
+
+			@Override
+			protected String changePressed() {
+
+				FileDialog dlgSaveAs = new FileDialog(getShell(), SWT.SAVE | SWT.SHEET);
+				dlgSaveAs.setText("SuitCASE output file name");
+				if (!getTextControl().getText().isEmpty()) {
+					dlgSaveAs.setFileName(getTextControl().getText());
+				} else {
+					dlgSaveAs.setFileName("");
+				}
+				dlgSaveAs.setOverwrite(false);
+				dlgSaveAs.setFilterExtensions(new String[] { "*.out", "*.*" });
+				String fileName = dlgSaveAs.open();
+				if (fileName == null) {
+					return null;
+				} else {
+					fileName = fileName.trim();
+				}
+
+				return fileName;
+			}
+
+			@Override
+			protected boolean checkState() {
+				// Don't want to enforce proper path/filenaming
+				clearErrorMessage();
+				return true;
+			}
+		};
+		addField(suitCaseOutputFileFieldEditor);
 
 	}
 

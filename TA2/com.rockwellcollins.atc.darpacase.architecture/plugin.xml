@@ -357,6 +357,10 @@
             class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddRequirement"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement">
       </handler>
+      <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.JsonHandler"
+            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.test">
+      </handler>
    </extension>
    <extension
          point="org.osate.pluginsupport.aadlcontribution">

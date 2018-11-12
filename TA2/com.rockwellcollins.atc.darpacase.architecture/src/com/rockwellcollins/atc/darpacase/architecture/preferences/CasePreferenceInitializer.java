@@ -17,6 +17,7 @@ public class CasePreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(CasePreferenceConstants.CASE_BAGGAGE_SERVER_PORT, "127.0.0.1:5000:5000");
 		store.setDefault(CasePreferenceConstants.CASE_BAGGAGE_SERVER_FILENAME,
 				"docker-image-baggage-server.tar.gz");
+		store.setDefault(CasePreferenceConstants.CASE_SUITCASE_OUTPUT_FILENAME, "suitCase.out");
 		store.setDefault(CasePreferenceConstants.CASE_DEBUG, false);
 	}
 }
