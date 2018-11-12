@@ -192,15 +192,13 @@ public
 	process implementation MC_SW.Impl
 		subcomponents
 			RADIO: thread RadioDriver.Impl;
-			FLT: thread Filter.Impl;
 			FPLN: thread FlightPlanner.Impl;
 			WPM: thread WaypointManager.Impl;
 			UART: thread UARTDriver.Impl;
 		connections
 			c1: port recv_map -> RADIO.recv_map_in;
 			c2: port RADIO.send_status_out -> send_status;
-			c3: port RADIO.recv_map_out -> FLT.filter_in;
-			c4: port FLT.filter_out -> FPLN.recv_map;
+			c3: port RADIO.recv_map_out -> FPLN.recv_map;
 			c5: port FPLN.flight_plan -> WPM.flight_plan;
 			c6: port WPM.waypoint -> UART.waypoint_in;
 			c7: port UART.position_status_out -> WPM.position_status;
@@ -208,9 +206,7 @@ public
 			c9: port UART.position_status_out -> RADIO.send_status_in;
 			c10: port UART.waypoint_out -> waypoint;
 			c11: port position_status -> UART.position_status_in;
-			annex resolute {**
-				prove(agree_prop_checked(this))
-			**};
+
 	end MC_SW.Impl;
 
 
