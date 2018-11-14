@@ -36,6 +36,7 @@ import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordType;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
+import com.rockwellcollins.atc.agree.agree.TypeID;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.darpacase.eclipse.agree_to_json.json.ArrayValue;
 import com.rockwellcollins.atc.darpacase.eclipse.agree_to_json.json.ObjectValue;
@@ -197,10 +198,19 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
+	private Value genTypeID(TypeID typeID) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "typeId"));
+		String id = typeID.getBase().getName();
+		pairList.add(Pair.build("name", id));
+		return ObjectValue.build(pairList);
+
+	}
+
 	private Value genRecordType(RecordType type) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "recordType"));
-		pairList.add(Pair.build("recordType", genNestedDotID(type.getRecord())));
+		pairList.add(Pair.build("recordType", genTypeID(type.getRecord())));
 		return ObjectValue.build(pairList);
 	}
 
