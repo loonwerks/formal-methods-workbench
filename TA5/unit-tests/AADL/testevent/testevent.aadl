@@ -1,0 +1,54 @@
+package testevent
+public
+	
+	thread emitter
+		features
+			e: out event port;
+	end emitter;
+	
+	thread implementation emitter.impl
+	end emitter.impl;
+	
+	
+	
+	
+	thread consumer
+		features
+			s: in event port;
+	end consumer;
+	
+	thread implementation consumer.impl
+	end consumer.impl;
+	
+	
+	
+	
+	processor proc
+	end proc;
+	processor implementation proc.impl
+	end proc.impl;
+	process top_process
+	end top_process;
+	process implementation top_process.impl
+		subcomponents
+			src: thread emitter.impl;
+			snk: thread consumer.impl;
+		connections
+			conn1: port src.e -> snk.s;		
+	end top_process.impl;
+	
+	
+	
+	system top
+	end top;
+	
+	system implementation top.impl
+		subcomponents
+			proc: processor proc.impl;
+			testevent: process top_process.impl;
+		properties
+			Actual_Processor_Binding => (reference (proc)) applies to testevent; 
+	end top.impl;
+	
+	
+end testevent;

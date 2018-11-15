@@ -1,0 +1,49 @@
+package testshare
+public
+	data Thing_t
+	end Thing_t;
+	data implementation Thing_t.impl
+	end Thing_t.impl;
+	
+	thread publisher
+		features
+			b1: provides data access Thing_t;
+	end publisher;
+	thread implementation publisher.impl
+	end publisher.impl;
+	
+	thread subscriber
+		features
+			b2: requires data access Thing_t;
+	end subscriber;
+	thread implementation subscriber.impl
+	end subscriber.impl;
+	
+	
+	processor proc
+	end proc;
+	processor implementation proc.impl
+	end proc.impl;
+	process top_process
+	end top_process;
+	process implementation top_process.impl
+		subcomponents
+			publisher_inst: thread publisher.impl;
+			subscriber_inst: thread subscriber.impl;
+		connections
+			conn1: data access publisher_inst.b1 -> subscriber_inst.b2;
+	end top_process.impl;
+	
+	
+	
+	system top
+	end top;
+	
+	system implementation top.impl
+		subcomponents
+			proc: processor proc.impl;
+			testshare: process top_process.impl;
+		properties
+			Actual_Processor_Binding => (reference (proc)) applies to testshare; 
+	end top.impl;	
+end testshare;

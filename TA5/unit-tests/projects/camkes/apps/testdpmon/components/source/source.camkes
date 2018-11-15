@@ -1,0 +1,11 @@
+/* testpdmon/components/source/source.camkes */
+
+// import "monitor.idl4";
+
+/* active */
+component source {
+    control;
+    uses  monitor enq;
+}
+
+

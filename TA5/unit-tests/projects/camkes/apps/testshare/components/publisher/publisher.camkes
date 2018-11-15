@@ -1,0 +1,7 @@
+/*  publisher.camkes */
+
+component publisher {
+    include "testshare_types.h";
+    control;
+    dataport thing_t b1;
+}
