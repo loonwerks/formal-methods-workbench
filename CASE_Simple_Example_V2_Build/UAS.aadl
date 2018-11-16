@@ -1,0 +1,20 @@
+package UAS
+public
+	
+	with GS;
+	with UAV;
+
+	-- UAS
+	system UAS
+	end UAS;
+
+	system implementation UAS.Impl
+		subcomponents
+			GND: system GS::GroundStation.Impl;
+			UAV: system UAV::UAV.Impl;
+		connections
+			c1: port GND.send_map -> UAV.recv_map;
+			c2: port UAV.send_status -> GND.recv_status;
+	end UAS.Impl;
+
+end UAS;
