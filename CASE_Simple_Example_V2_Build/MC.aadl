@@ -5,23 +5,13 @@ public
 	with TB_SYS;
 	with Base_Types;
 	
-	
-	data MISSING_TYPE
-	end MISSING_TYPE;
-	
-	data implementation MISSING_TYPE.Impl
-		subcomponents
-			MISSING: data Base_Types::Integer_32;
-	end MISSING_TYPE.Impl;
-
-	
 	-- The radio communication hardware
 	device Radio
 		features
-			recv_map_in: in event data port MISSING_TYPE.Impl;
+			recv_map_in: in event data port SW::MISSING_TYPE.Impl;
 			recv_map_out: out event data port SW::Command.Impl;
 			send_status_in: in event data port SW::Coordinate.Impl;
-			send_status_out: out event data port MISSING_TYPE.Impl;
+			send_status_out: out event data port SW::MISSING_TYPE.Impl;
 	end Radio;
 	
 	device implementation Radio.Impl	
@@ -32,8 +22,8 @@ public
 	device UART
 		features
 			waypoint_in: in event data port SW::MissionWindow.Impl;
-			waypoint_out: out event data port MISSING_TYPE.Impl;
-			position_status_in: in event data port MISSING_TYPE.Impl;
+			waypoint_out: out event data port SW::MISSING_TYPE.Impl;
+			position_status_in: in event data port SW::MISSING_TYPE.Impl;
 			position_status_out: out event data port SW::Coordinate.Impl;
 	end UART;
 	
@@ -44,8 +34,8 @@ public
 	-- The Wifi communication hardware
 	device Wifi
 		features
-			gimbal_command_in: in event data port MISSING_TYPE.Impl;
-			gimbal_command_out: out event data port MISSING_TYPE.Impl;
+			gimbal_command_in: in event data port SW::MISSING_TYPE.Impl;
+			gimbal_command_out: out event data port SW::MISSING_TYPE.Impl;
 	end Wifi;
 	
 	device implementation Wifi.Impl
@@ -76,11 +66,11 @@ public
 	system MissionComputer
 		
 		features
-			recv_map: in event data port MISSING_TYPE.Impl;
-			position_status: in event data port MISSING_TYPE.Impl;
-			waypoint: out event data port MISSING_TYPE.Impl;
-			send_status: out event data port MISSING_TYPE.Impl;
-			gimbal_command: out event data port MISSING_TYPE.Impl;
+			recv_map: in event data port SW::MISSING_TYPE.Impl;
+			position_status: in event data port SW::MISSING_TYPE.Impl;
+			waypoint: out event data port SW::MISSING_TYPE.Impl;
+			send_status: out event data port SW::MISSING_TYPE.Impl;
+			gimbal_command: out event data port SW::MISSING_TYPE.Impl;
 
 	end MissionComputer;
 	

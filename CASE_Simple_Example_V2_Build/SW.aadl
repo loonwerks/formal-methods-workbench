@@ -5,6 +5,15 @@ public
 	with TB_SYS;
 	
 
+  data MISSING_TYPE
+  end MISSING_TYPE;
+  
+  data implementation MISSING_TYPE.Impl
+    subcomponents
+      MISSING: data Base_Types::Integer_32;
+  end MISSING_TYPE.Impl;
+  
+  
 	-- This is the structure to hold the lat/long/alt values of a coordinate
 	data Coordinate
 	end Coordinate;
@@ -12,7 +21,7 @@ public
 	data implementation Coordinate.Impl
 		subcomponents
 			lat: data Base_Types::Integer_32;
-			long: data Base_Types::Integer_32;
+			longitude: data Base_Types::Integer_32;
 			alt: data Base_Types::Integer_32;
 	end Coordinate.Impl;
 	
@@ -116,8 +125,8 @@ public
 	-- The WifiDriver is the software that enables other SW components to communicate to other systems over WiFi
 	thread WifiDriver
 		features
-			gimbal_command_in: in event data port;
-			gimbal_command_out: out event data port;
+			gimbal_command_in: in event data port MISSING_TYPE.Impl;
+			gimbal_command_out: out event data port MISSING_TYPE.Impl;
 		properties
 			Dispatch_Protocol => Sporadic;
 			Priority => 200;
@@ -235,7 +244,7 @@ public
 		features
 			flight_plan: in data port Mission.Impl;
 			position_status: in event data port Coordinate.Impl;
-			gimbal_command: out event data port;
+			gimbal_command: out event data port MISSING_TYPE.Impl;
 		properties
 			Dispatch_Protocol => Sporadic;
 			Priority => 200;
@@ -280,7 +289,7 @@ public
 			send_status: out event data port Coordinate.Impl;
 			waypoint: out event data port MissionWindow.Impl;
 			position_status: in event data port Coordinate.Impl;
-			gimbal_command: out event data port;
+			gimbal_command: out event data port MISSING_TYPE.Impl;
 		annex agree {**
 			assume Req001_MC_SW "The Mission Computer shall only accept authenticated commands from the Ground Station" : recv_map.HMAC = True;
 			assume Req002_MC_SW "The Mission Computer shall only accept authenticated commands from the Ground Station" : recv_map.HMAC = True;
@@ -320,8 +329,8 @@ public
 		-- These functions check the well-formedness of message structures
 		fun good_coordinate(coord : Coordinate.Impl) : bool =	coord.lat >= -90 and 
 																	coord.lat <= 90 and 
-																	coord.long >= -180 and 
-																	coord.long <= 180 and 
+																	coord.longitude >= -180 and 
+																	coord.longitude <= 180 and 
 																	coord.alt >= 0 and 
 																	coord.alt <= 15000;
 																	
