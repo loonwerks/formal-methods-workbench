@@ -1,0 +1,11 @@
+import "../../interfaces/tb_Monitor_SW__Coordinate_Impl_1.idl4";
+import "../../interfaces/tb_Monitor_SW__Command_Impl_1.idl4";
+
+component RadioDriver_Impl {
+  include <tb_PROC_HW_types.h>;
+  control;
+  uses tb_Monitor_SW__Coordinate_Impl_1 tb_send_status_in;
+  uses tb_Monitor_SW__Command_Impl_1 tb_recv_map_out0;
+  consumes QueuedData tb_send_status_in_notification;
+  has binary_semaphore tb_dispatch_sem;
+}

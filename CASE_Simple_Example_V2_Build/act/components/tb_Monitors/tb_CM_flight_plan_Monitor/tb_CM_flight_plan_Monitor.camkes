@@ -1,0 +1,7 @@
+import "../../../interfaces/tb_Monitor_SW__Mission_Impl.idl4";
+
+component tb_CM_flight_plan_Monitor {
+
+  provides tb_Monitor_SW__Mission_Impl mon;
+  emits DataportWrite monsig;
+}

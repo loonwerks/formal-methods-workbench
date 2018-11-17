@@ -1,0 +1,14 @@
+import "../../interfaces/tb_Monitor_SW__Mission_Impl.idl4";
+import "../../interfaces/tb_Monitor_SW__MissionWindow_Impl_1.idl4";
+import "../../interfaces/tb_Monitor_SW__Coordinate_Impl_1.idl4";
+
+component WaypointManager_Impl {
+  include <tb_PROC_HW_types.h>;
+  control;
+  uses tb_Monitor_SW__Mission_Impl tb_flight_plan;
+  uses tb_Monitor_SW__MissionWindow_Impl_1 tb_waypoint0;
+  uses tb_Monitor_SW__Coordinate_Impl_1 tb_position_status;
+  consumes DataportWrite tb_flight_plan_notification;
+  consumes QueuedData tb_position_status_notification;
+  has binary_semaphore tb_dispatch_sem;
+}

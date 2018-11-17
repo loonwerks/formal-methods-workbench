@@ -1,0 +1,9 @@
+import "../../interfaces/tb_Monitor_SW__MISSING_TYPE_Impl_1.idl4";
+
+component WifiDriver_Impl {
+  include <tb_PROC_HW_types.h>;
+  control;
+  uses tb_Monitor_SW__MISSING_TYPE_Impl_1 tb_gimbal_command_in;
+  consumes QueuedData tb_gimbal_command_in_notification;
+  has binary_semaphore tb_dispatch_sem;
+}

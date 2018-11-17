@@ -1,0 +1,11 @@
+import "../../interfaces/tb_Monitor_SW__Map_Impl_1.idl4";
+import "../../interfaces/tb_Monitor_SW__MapArray_Impl_1.idl4";
+
+component NoFlyZoneDatabase_Impl {
+  include <tb_PROC_HW_types.h>;
+  control;
+  uses tb_Monitor_SW__Map_Impl_1 tb_map;
+  uses tb_Monitor_SW__MapArray_Impl_1 tb_zones0;
+  consumes QueuedData tb_map_notification;
+  has binary_semaphore tb_dispatch_sem;
+}
