@@ -1,0 +1,129 @@
+package MC
+public
+	
+	with SW;
+	with UAV;
+	with UAS;
+	with TB_SYS;
+	
+	with Base_Types;
+
+  data MISSING_TYPE
+  end MISSING_TYPE;
+  
+  data implementation MISSING_TYPE.Impl
+  	subcomponents
+  		MISSING: data Base_Types::Integer_32;
+  end MISSING_TYPE.Impl;
+  
+	device Radio
+		features
+			MCA: requires bus access MC_Bus.Impl;
+			RFA: requires bus access UAS::RF.Impl;
+			recv_map_in: in event data port MISSING_TYPE.Impl;
+			recv_map_out: out event data port SW::Command.Impl;
+			send_status_in: in event data port SW::Coordinate.Impl;
+			send_status_out: out event data port MISSING_TYPE.Impl;
+	end Radio;
+
+	
+	device implementation Radio.Impl
+		
+	end Radio.Impl;
+
+
+	device UART
+		features
+			MCA: requires bus access MC_Bus.Impl;
+			UARTA: requires bus access UAV::Serial.Impl;
+			waypoint_in: in event data port SW::MissionWindow.Impl;
+			waypoint_out: out event data port MISSING_TYPE.Impl;
+			position_status_in: in event data port MISSING_TYPE.Impl;
+			position_status_out: out event data port SW::Coordinate.Impl;
+	end UART;
+	
+	device implementation UART.Impl
+		
+	end UART.Impl;
+
+
+	processor MC_Proc
+		features
+			MCA: requires bus access MC_Bus.Impl;			
+	end MC_Proc;
+
+		
+	processor implementation MC_Proc.Impl
+		properties
+		TB_SYS::OS => CAmkES;
+		TB_SYS::HW => TK1;
+		TB_SYS::Add_Dummy_Arg_To_Void_Fns => True;      
+	end MC_Proc.Impl;
+  
+  
+	memory MC_Mem
+		features
+			MCA: requires bus access MC_Bus.Impl;		
+	end MC_Mem;
+	
+	
+	memory implementation MC_Mem.Impl
+		
+	end MC_Mem.Impl;
+	
+		
+	bus MC_Bus
+	end MC_Bus;
+	
+	
+	bus implementation MC_Bus.Impl
+		
+	end MC_Bus.Impl;
+	
+	
+	system MissionComputer
+		features
+			recv_map: in event data port MISSING_TYPE.Impl;
+			position_status: in event data port MISSING_TYPE.Impl;
+			waypoint: out event data port MISSING_TYPE.Impl;
+			send_status: out event data port MISSING_TYPE.Impl;
+			UARTA: requires bus access UAV::Serial.Impl;
+			RFA: requires bus access UAS::RF.Impl;
+
+	end MissionComputer;
+
+	
+	system implementation MissionComputer.Impl
+		
+		subcomponents
+			RADIO_HW: device Radio.Impl;
+			UART_HW: device UART.Impl;
+			PROC_HW: processor MC_Proc.Impl;
+			MEM_HW: memory MC_Mem.Impl;
+			BUS_HW: bus MC_Bus.Impl;
+			PROC_SW: process SW::MC_SW.Impl;
+			
+		connections
+			bac1: bus access RADIO_HW.MCA <-> BUS_HW;
+			bac2: bus access UART_HW.MCA <-> BUS_HW;
+			bac3: bus access PROC_HW.MCA <-> BUS_HW;
+			bac4: bus access MEM_HW.MCA <-> BUS_HW;
+			bac5: bus access RADIO_HW.RFA <-> RFA;
+			bac6: bus access UART_HW.UARTA <-> UARTA;
+			c1: port recv_map -> RADIO_HW.recv_map_in;
+			c2: port RADIO_HW.recv_map_out -> PROC_SW.recv_map;
+			c3: port PROC_SW.send_status -> RADIO_HW.send_status_in;
+			c4: port RADIO_HW.send_status_out -> send_status;
+			c5: port PROC_SW.waypoint -> UART_HW.waypoint_in;
+			c6: port UART_HW.waypoint_out -> waypoint;
+			c7: port position_status -> UART_HW.position_status_in;
+			c8: port UART_HW.position_status_out -> PROC_SW.position_status;
+		
+		properties
+			Actual_Processor_Binding => (reference (PROC_HW)) applies to PROC_SW;
+			Actual_Memory_Binding => (reference (MEM_HW)) applies to PROC_SW;
+			Actual_Connection_Binding => (reference (BUS_HW)) applies to c2, c3, c5, c8;
+		
+	end MissionComputer.Impl;
+	
+end MC;

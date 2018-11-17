@@ -1,0 +1,4 @@
+procedure SW__Mission_Impl_writer {
+  include <tb_PROC_HW_types.h>;
+  bool write_SW__Mission_Impl(refin SW__Mission_Impl arg);
+};

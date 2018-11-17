@@ -1,0 +1,5 @@
+procedure tb_Monitor_SW__MissionWindow_Impl_1 {
+  include <tb_PROC_HW_types.h>;
+  bool enqueue(refin SW__MissionWindow_Impl m);
+  bool dequeue(out SW__MissionWindow_Impl m);
+};

@@ -1,0 +1,50 @@
+import <std_connector.camkes>;
+
+import "components/RadioDriver_Impl/RadioDriver_Impl.camkes";
+import "components/FlightPlanner_Impl/FlightPlanner_Impl.camkes";
+import "components/WaypointManager_Impl/WaypointManager_Impl.camkes";
+import "components/UARTDriver_Impl/UARTDriver_Impl.camkes";
+import "components/tb_Monitors/tb_FPLN_recv_map_Monitor/tb_FPLN_recv_map_Monitor.camkes";
+import "components/tb_Monitors/tb_WPM_flight_plan_Monitor/tb_WPM_flight_plan_Monitor.camkes";
+import "components/tb_Monitors/tb_UART_waypoint_in_Monitor/tb_UART_waypoint_in_Monitor.camkes";
+import "components/tb_Monitors/tb_FPLN_position_status_Monitor/tb_FPLN_position_status_Monitor.camkes";
+import "components/tb_Monitors/tb_WPM_position_status_Monitor/tb_WPM_position_status_Monitor.camkes";
+import "components/tb_Monitors/tb_RADIO_send_status_in_Monitor/tb_RADIO_send_status_in_Monitor.camkes";
+
+assembly {
+  composition {
+    component RadioDriver_Impl RADIO;
+    component FlightPlanner_Impl FPLN;
+    component WaypointManager_Impl WPM;
+    component UARTDriver_Impl UART;
+    component tb_FPLN_recv_map_Monitor tb_fpln_recv_map_monitor;
+    component tb_WPM_flight_plan_Monitor tb_wpm_flight_plan_monitor;
+    component tb_UART_waypoint_in_Monitor tb_uart_waypoint_in_monitor;
+    component tb_FPLN_position_status_Monitor tb_fpln_position_status_monitor;
+    component tb_WPM_position_status_Monitor tb_wpm_position_status_monitor;
+    component tb_RADIO_send_status_in_Monitor tb_radio_send_status_in_monitor;
+
+    connection seL4RPCCall conn1(from RADIO.tb_recv_map_out0, to tb_fpln_recv_map_monitor.mon);
+    connection seL4RPCCall conn2(from FPLN.tb_recv_map, to tb_fpln_recv_map_monitor.mon);
+    connection seL4Notification conn3(from tb_fpln_recv_map_monitor.monsig, to FPLN.tb_recv_map_notification);
+    connection seL4RPCCall conn4(from FPLN.tb_flight_plan0, to tb_wpm_flight_plan_monitor.mon);
+    connection seL4RPCCall conn5(from WPM.tb_flight_plan, to tb_wpm_flight_plan_monitor.mon);
+    connection seL4Notification conn6(from tb_wpm_flight_plan_monitor.monsig, to WPM.tb_flight_plan_notification);
+    connection seL4RPCCall conn7(from WPM.tb_waypoint0, to tb_uart_waypoint_in_monitor.mon);
+    connection seL4RPCCall conn8(from UART.tb_waypoint_in, to tb_uart_waypoint_in_monitor.mon);
+    connection seL4Notification conn9(from tb_uart_waypoint_in_monitor.monsig, to UART.tb_waypoint_in_notification);
+    connection seL4RPCCall conn10(from UART.tb_position_status_out0, to tb_wpm_position_status_monitor.mon);
+    connection seL4RPCCall conn11(from WPM.tb_position_status, to tb_wpm_position_status_monitor.mon);
+    connection seL4Notification conn12(from tb_wpm_position_status_monitor.monsig, to WPM.tb_position_status_notification);
+    connection seL4RPCCall conn13(from UART.tb_position_status_out1, to tb_fpln_position_status_monitor.mon);
+    connection seL4RPCCall conn14(from FPLN.tb_position_status, to tb_fpln_position_status_monitor.mon);
+    connection seL4Notification conn15(from tb_fpln_position_status_monitor.monsig, to FPLN.tb_position_status_notification);
+    connection seL4RPCCall conn16(from UART.tb_position_status_out2, to tb_radio_send_status_in_monitor.mon);
+    connection seL4RPCCall conn17(from RADIO.tb_send_status_in, to tb_radio_send_status_in_monitor.mon);
+    connection seL4Notification conn18(from tb_radio_send_status_in_monitor.monsig, to RADIO.tb_send_status_in_notification);
+  }
+
+  configuration {
+
+  }
+}

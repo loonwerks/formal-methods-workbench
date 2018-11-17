@@ -1,0 +1,4 @@
+#ifdef __tb_RADIO_send_status_in_Monitor_H__
+#define __tb_RADIO_send_status_in_Monitor_H__
+
+#endif // __tb_RADIO_send_status_in_Monitor_H__

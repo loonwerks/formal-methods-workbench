@@ -1,0 +1,7 @@
+import "../../../interfaces/tb_Monitor_SW__Command_Impl_1.idl4";
+
+component tb_FLT_filter_in_Monitor {
+
+  provides tb_Monitor_SW__Command_Impl_1 mon;
+  emits QueuedData monsig;
+}
