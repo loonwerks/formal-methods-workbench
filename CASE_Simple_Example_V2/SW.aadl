@@ -2,7 +2,6 @@ package SW
 public
 	with Data_Model;
 	with Base_Types;
-	with CASE_Prop;
 	
 
 	-- This is the structure to hold the lat/long/alt values of a coordinate
@@ -11,9 +10,9 @@ public
 
 	data implementation Coordinate.Impl
 		subcomponents
-			lat: data Base_Types::Integer;
-			long: data Base_Types::Integer;
-			alt: data Base_Types::Integer;
+			latitude: data Base_Types::Integer;
+			longitude: data Base_Types::Integer;
+			altitude: data Base_Types::Integer;
 	end Coordinate.Impl;
 	
 
@@ -270,12 +269,12 @@ public
 	annex agree {**
 			
 		-- These functions check the well-formedness of message structures
-		fun good_coordinate(coord : Coordinate.Impl) : bool =	coord.lat >= -90 and 
-																	coord.lat <= 90 and 
-																	coord.long >= -180 and 
-																	coord.long <= 180 and 
-																	coord.alt >= 0 and 
-																	coord.alt <= 15000;
+		fun good_coordinate(coord : Coordinate.Impl) : bool =	coord.latitude >= -90 and 
+																	coord.latitude <= 90 and 
+																	coord.longitude >= -180 and 
+																	coord.longitude <= 180 and 
+																	coord.altitude >= 0 and 
+																	coord.altitude <= 15000;
 																	
 		fun good_map(map : Map.Impl) : bool =	good_coordinate(map.wp1) and 
 													good_coordinate(map.wp2) and 

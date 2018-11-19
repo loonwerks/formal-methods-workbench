@@ -43,6 +43,8 @@ public
 			recv_map: in event data port;
 			send_status: out event data port;
 			RFA: requires bus access UAS::RF.Impl;
+		properties
+			CASE_Prop::PHYSICAL_BOUNDARY => True;
 	end UAV;
 	
 	system implementation UAV.Impl
