@@ -1,0 +1,13 @@
+package SW_CASE_Claims
+public
+
+	with CASE_Model_Transformations;
+
+	annex resolute {**
+
+		well_formed(c : component, property_id : string, msg_type : data) <=
+			** "Req001_FlightPlanner: The FlightPlanner shall receive a well-formed command from the GroundStation" **
+			agree_prop_checked(c, property_id) and add_filter(c, msg_type)
+
+	**};
+end SW_CASE_Claims;

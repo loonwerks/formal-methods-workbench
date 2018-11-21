@@ -1,11 +1,14 @@
 property set CASE_Prop is
 
-	-- CASE COMPONENT TYPE
+	-- CASE MODEL TRANSFORMATION TYPE
 	COMP_TYPE: enumeration (FILTER, MONITOR, ROUTER, ISOLATOR) applies to (system, process, thread, device, abstract);
 	-- IMPLEMENTATION LANGUAGE OF THIS COMPONENT (eg CakeML)
 	COMP_IMPL: aadlstring applies to (thread);
 	-- ID OF THE AGREE CONTRACT THAT SPECIFIES THIS COMPONENT
 	COMP_SPEC: aadlstring applies to (thread);
+	
+	-- REMOTE ATTESTATION
+	CACHE_TIMEOUT: aadlinteger applies to (system, process, thread, device, abstract);
 	
 	-- BOUNDARY
 	TRUSTED_BOUNDARY: aadlboolean applies to (system, process, thread, device, abstract);
