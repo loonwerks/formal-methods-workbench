@@ -42,7 +42,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public ObjectValue caseAadlPackage(AadlPackage pkg) {
 		ArrayList<Pair> pkgBuilder = new ArrayList<Pair>();
-		pkgBuilder.add(Pair.build("package", pkg.getName()));
+		pkgBuilder.add(Pair.build("kind", "package"));
+		pkgBuilder.add(Pair.build("name", pkg.getName()));
 
 		ArrayList<Value> components = new ArrayList<Value>();
 		for (Classifier classifier : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {

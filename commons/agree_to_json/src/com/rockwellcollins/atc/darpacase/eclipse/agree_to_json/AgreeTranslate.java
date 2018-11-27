@@ -154,6 +154,7 @@ public class AgreeTranslate {
 	private Value genAssertStatement(AssertStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "assert"));
+		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("label", stmt.getStr()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
@@ -163,6 +164,7 @@ public class AgreeTranslate {
 	private Value genAssumeStatement(AssumeStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "assume"));
+		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("label", stmt.getStr()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
@@ -178,6 +180,7 @@ public class AgreeTranslate {
 	private Value genGuaranteeStatement(GuaranteeStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "guarantee"));
+		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("label", stmt.getStr()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
