@@ -1,7 +1,7 @@
 package Model_Transformations
 public
 	
-	with CASE;
+	with CASE_Properties;
 	
 	annex Resolute {**
 		
@@ -11,34 +11,38 @@ public
 		
 		-- Top-level claim for proper insertion of a filter
 		add_filter(c : component, message_type : data) <=
-		** "Filter inserted before " c **
-		filter_exists(c) and not_bypassed(c, message_type) and filter_prop_checked()
+			** "Filter inserted before " c **
+			filter_exists(c) and not_bypassed(c, message_type) and filter_prop_checked()
 		
 		-- Top-level claim for proper insertion of a router
 		add_router(c : component) <=
-		** "Router inserted after " c **
-		true
+			** "Router inserted after " c **
+			true
 	
 		-- Top-level claim for proper insertion of a monitor
 		add_monitor(c : component) <=
-		** "Monitor inserted on " c **
-		true
+			** "Monitor inserted on " c **
+			true
 		
 		-- Top-level claim for proper insertion of an isolator
 		add_isolator(c : component) <=
-		** "Isolator added to " c **
-		true
+			** "Isolator added to " c **
+			true
 		
 		-- Top-level claim for proper insertion of remote attestation
 		add_remote_attestation(c : component) <=
-		** "Remote Attestation added at " c **
-		true
+			** "Remote Attestation added at " c **
+			true
 		
 		
 		----------------
 		-- SUB CLAIMS --
 		----------------
-		
+	
+		-- This connects to evidence that AGREE was previously run on the current version of the design.
+		agree_prop_checked(c : component, property_id : string) <=
+			** "AGREE properties passed" **
+			AgreeLib.hasAgreeProperty(c, property_id) and analysis("AgreeCheck")	
 		
 		-- Ideally, we want to check that there's a filter anywhere between
 		-- pairs of components (such as the ground station and flight planner).

@@ -31,12 +31,16 @@ public class CaseClaimsManager {
 		if (instance == null) {
 			instance = new CaseClaimsManager();
 		}
+		// Make sure the resource is current
+		updateResource();
 		return instance;
 	}
 
-	private Resource getResource() {
+	private static void updateResource() {
 
-		if (caseClaimsResource == null) {
+		if (caseClaimsResource == null || !caseClaimsResource.isLoaded()) {
+
+			caseClaimsResource = null;
 
 			XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 			XtextResource modelResource = xtextEditor.getDocument().readOnly(r -> r);
@@ -59,7 +63,9 @@ public class CaseClaimsManager {
 				if (!file.exists()) {
 					// Create it
 					String pkg = "package " + claimFileName + System.lineSeparator() + "public" + System.lineSeparator()
-							+ "\tannex resolute {**" + System.lineSeparator() + System.lineSeparator() + "\t**};"
+							+ System.lineSeparator() + "\twith Model_Transformations;" + System.lineSeparator()
+							+ System.lineSeparator() + "\tannex resolute {**" + System.lineSeparator()
+							+ System.lineSeparator() + "\t**};"
 							+ System.lineSeparator() + "end " + claimFileName + ";";
 					try {
 						file.create(new ByteArrayInputStream(pkg.getBytes()), true, new NullProgressMonitor());
@@ -77,23 +83,15 @@ public class CaseClaimsManager {
 			}
 		}
 
-		return caseClaimsResource;
-
 	}
 
 
-	public void addFunctionDefinition(String reqName, String reqText) {
-
-		// Add agree_prop_checked
-		String clause = "\t-- This connects to evidence that AGREE was previously run on the current version of the design."
-				+ System.lineSeparator() + "\t\tagree_prop_checked() <=" + System.lineSeparator()
-				+ "\t\t\t** \"AGREE properties passed\" **" + System.lineSeparator() + "\t\t\tanalysis(\"AgreeCheck\")"
-				+ System.lineSeparator() + System.lineSeparator();
-//		addToResoluteAnnex(clause);
+	public void addFunctionDefinition(String reqName, String reqID, String reqText) {
 
 		// Add basic function body to resolute annex
-		clause = clause + "\t\t" + reqName + "() <=" + System.lineSeparator() + "\t\t\t** \"" + reqText + "\" **"
-				+ System.lineSeparator() + "\t\t\tagree_prop_checked()" + System.lineSeparator();
+		String clause = "\t\t" + reqName + "(c : component, property_id : string) <=" + System.lineSeparator()
+				+ "\t\t\t** \"" + reqID + ": " + reqText + "\" **" + System.lineSeparator()
+				+ "\t\t\tagree_prop_checked(c, property_id)" + System.lineSeparator();
 
 		addToResoluteAnnex(clause);
 
@@ -101,9 +99,7 @@ public class CaseClaimsManager {
 
 	public void addFilter(String reqName) {
 
-		Resource claimResource = getResource();
-
-		IFile file = Filesystem.getFile(claimResource.getURI());
+		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
 
 		// Read in the claims file
 		String annex = "";
@@ -119,10 +115,19 @@ public class CaseClaimsManager {
 			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
 		}
 
-		String funSig = reqName + "(c : component, msg_type : data) <=";
-		String funDef = "agree_prop_checked() and add_filter(c, msg_type)" + System.lineSeparator();
-		annex = annex.replace(reqName + "() <=", funSig);
-		annex = annex.replace("agree_prop_checked()" + System.lineSeparator(), funDef);
+		int startIdx = annex.indexOf("**", annex.indexOf(reqName + "("));
+		String descriptor = "\t\t\t" + annex.substring(startIdx, annex.indexOf("**", startIdx + 2) + 2)
+				+ System.lineSeparator();
+		String basic = reqName + "(c : component, property_id : string) <=" + System.lineSeparator()
+				+ descriptor + "\t\t\tagree_prop_checked(c, property_id)";
+		String funSig = reqName + "(c : component, property_id : string, msg_type : data) <=" + System.lineSeparator();
+		String funDef = "\t\t\tagree_prop_checked(c, property_id) and add_filter(c, msg_type)";
+		if (annex.contains(basic)) {
+			annex = annex.replace(basic, funSig + descriptor + funDef);
+		} else {
+			annex = annex.replace("\t**};",
+					"\t\t" + funSig + funDef + System.lineSeparator() + "\t**};");
+		}
 
 		// Write back to file
 		// The contents of the file will be overwritten
@@ -137,9 +142,7 @@ public class CaseClaimsManager {
 
 	public void addLegacyComponentVerification() {
 
-		Resource claimResource = getResource();
-
-		IFile file = Filesystem.getFile(claimResource.getURI());
+		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
 
 		// Read in the claims file
 		String annex = "";
@@ -173,9 +176,7 @@ public class CaseClaimsManager {
 
 	private void addToResoluteAnnex(String clause) {
 
-		Resource claimResource = getResource();
-
-		IFile file = Filesystem.getFile(claimResource.getURI());
+		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
 
 		// Read in the claims file
 		String annex = "";
@@ -192,7 +193,7 @@ public class CaseClaimsManager {
 		}
 
 		// Add clause to end of annex
-		annex = annex.replace("**};", clause + System.lineSeparator() + "\t**};");
+		annex = annex.replace("\t**};", clause + System.lineSeparator() + "\t**};");
 
 		// Write back to file
 		// The contents of the file will be overwritten

@@ -22,20 +22,19 @@ import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.EnumerationType;
+import org.osate.aadl2.ListType;
+import org.osate.aadl2.ListValue;
+import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
+import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.impl.AadlStringImpl;
-import org.osate.aadl2.impl.EnumerationLiteralImpl;
-import org.osate.aadl2.impl.EnumerationTypeImpl;
-import org.osate.aadl2.impl.ListTypeImpl;
-import org.osate.aadl2.impl.ListValueImpl;
-import org.osate.aadl2.impl.ModalPropertyValueImpl;
-import org.osate.aadl2.impl.NamedValueImpl;
-import org.osate.aadl2.impl.PropertyAssociationImpl;
-import org.osate.aadl2.impl.PropertyImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
-import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.ui.dialogs.Dialog;
 
@@ -43,8 +42,8 @@ public abstract class AadlHandler extends AbstractHandler {
 
 	abstract protected void runCommand(URI uri);
 
-	static final String CASE_PROPSET_NAME = "CASE";
-	static final String CASE_PROPSET_FILE = "CASE.aadl";
+	static final String CASE_PROPSET_NAME = "CASE_Properties";
+	static final String CASE_PROPSET_FILE = "CASE_Properties.aadl";
 	protected ExecutionEvent executionEvent;
 
 	@Override
@@ -126,7 +125,7 @@ public abstract class AadlHandler extends AbstractHandler {
 			final EObject eObj = r.getContents().get(0);
 			if (eObj instanceof PropertySetImpl) {
 				PropertySetImpl propSetImpl = (PropertySetImpl) eObj;
-				if (propSetImpl.getName().equals(propSetName)) {
+				if (propSetImpl.getName().equalsIgnoreCase(propSetName)) {
 					propSet = propSetImpl;
 					break;
 				}
@@ -142,7 +141,7 @@ public abstract class AadlHandler extends AbstractHandler {
 			final List<URI> contributedAadl = PluginSupportUtil.getContributedAadl();
 			URI uri = null;
 			for (URI u : contributedAadl) {
-				if (u.lastSegment().equals(propSetFile)) {
+				if (u.lastSegment().equalsIgnoreCase(propSetFile)) {
 					uri = u;
 					break;
 				}
@@ -171,17 +170,17 @@ public abstract class AadlHandler extends AbstractHandler {
 	 * @return A boolean indicating success
 	 */
 	protected boolean addPropertyAssociation(String propName, String propVal, ComponentType componentType,
-			PropertySetImpl propSet) {
+			PropertySet propSet) {
 
-		PropertyAssociationImpl propAssocImpl = null;
-		PropertyImpl prop = null;
+		PropertyAssociation propAssocImpl = null;
+		Property prop = null;
 
 		// Check if the property is already present in the component.
 		// If so, we don't need to create a new property association, just overwrite the existing one
 		EList<PropertyAssociation> propAssociations = componentType.getOwnedPropertyAssociations();
 		for (PropertyAssociation propAssoc : propAssociations) {
-			if (propAssoc.getProperty().getName().equals(propName)) {
-				propAssocImpl = (PropertyAssociationImpl) propAssoc;
+			if (propAssoc.getProperty().getName().equalsIgnoreCase(propName)) {
+				propAssocImpl = propAssoc;
 				break;
 			}
 		}
@@ -189,12 +188,12 @@ public abstract class AadlHandler extends AbstractHandler {
 		if (propAssocImpl == null) {
 
 			// Property is not already present in the component. Need to create a new property association
-			propAssocImpl = (PropertyAssociationImpl) componentType.createOwnedPropertyAssociation();
+			propAssocImpl = componentType.createOwnedPropertyAssociation();
 
 			// Find the property in the specified property set
 			for (Property p : propSet.getOwnedProperties()) {
-				if (p.getName().equals(propName)) {
-					prop = (PropertyImpl) p;
+				if (p.getName().equalsIgnoreCase(propName)) {
+					prop = p;
 					break;
 				}
 			}
@@ -211,32 +210,32 @@ public abstract class AadlHandler extends AbstractHandler {
 		}
 		else {
 			// Property is already present in the component.
-			prop = (PropertyImpl) propAssocImpl.getProperty();
+			prop = propAssocImpl.getProperty();
 			// Clear the current value. We write the new value below.
 			propAssocImpl.getOwnedValues().clear();
 		}
 
 		// Add property value
-		final ModalPropertyValueImpl modalPropVal = (ModalPropertyValueImpl) propAssocImpl.createOwnedValue();
+		final ModalPropertyValue modalPropVal = propAssocImpl.createOwnedValue();
 
 		// Figure out what type the property value is
-		if (prop.getOwnedPropertyType() instanceof EnumerationTypeImpl) {
-			final NamedValueImpl namedVal = (NamedValueImpl) modalPropVal
+		if (prop.getOwnedPropertyType() instanceof EnumerationType) {
+			final NamedValue namedVal = (NamedValue) modalPropVal
 					.createOwnedValue(Aadl2Package.eINSTANCE.getNamedValue());
-			final EnumerationLiteralImpl enumLiteralCompType = (EnumerationLiteralImpl) EcoreUtil
+			final EnumerationLiteral enumLiteralCompType = (EnumerationLiteral) EcoreUtil
 					.create(Aadl2Package.eINSTANCE.getEnumerationLiteral());
 			enumLiteralCompType.setName(propVal);
 			namedVal.setNamedValue(enumLiteralCompType);
 		} else if (prop.getOwnedPropertyType() instanceof AadlStringImpl) {
-			final StringLiteralImpl stringVal = (StringLiteralImpl) modalPropVal
+			final StringLiteral stringVal = (StringLiteral) modalPropVal
 					.createOwnedValue(Aadl2Package.eINSTANCE.getStringLiteral());
 			stringVal.setValue(propVal);
-		} else if (prop.getOwnedPropertyType() instanceof ListTypeImpl) {
-			final ListValueImpl listVal = (ListValueImpl) modalPropVal
+		} else if (prop.getOwnedPropertyType() instanceof ListType) {
+			final ListValue listVal = (ListValue) modalPropVal
 					.createOwnedValue(Aadl2Package.eINSTANCE.getListValue());
 			String[] elements = propVal.split(",");
 			for (String element : elements) {
-				StringLiteralImpl stringVal = (StringLiteralImpl) listVal
+				StringLiteral stringVal = (StringLiteral) listVal
 						.createOwnedListElement(Aadl2Package.eINSTANCE.getStringLiteral());
 				stringVal.setValue(element);
 			}
@@ -253,6 +252,7 @@ public abstract class AadlHandler extends AbstractHandler {
 
 	/**
 	 * Returns the index of a component with the specified name in the specified element list.
+	 * TODO: What if the name isn't in the list?
 	 * @param compName - Component name
 	 * @param elements - Collection of elements
 	 * @return An identifier that is unique in the specified list

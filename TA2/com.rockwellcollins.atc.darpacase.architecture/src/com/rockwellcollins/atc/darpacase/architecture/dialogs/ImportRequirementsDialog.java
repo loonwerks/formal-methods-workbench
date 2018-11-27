@@ -16,13 +16,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.ui.dialogs.Dialog;
 
 public class ImportRequirementsDialog extends TitleAreaDialog {
 
 	List<Button> btnReqs = new ArrayList<>();
 	List<String> lblReqTexts = new ArrayList<>();
+	List<Text> txtIDs = new ArrayList<>();
 	List<String> lblComponents = new ArrayList<>();
 	List<Text> txtRationales = new ArrayList<>();
+	List<String> strReqIDs = new ArrayList<>();
 	List<String> strRationales = new ArrayList<>();
 	List<String> strReqNames = new ArrayList<>();
 	List<String> strReqTexts = new ArrayList<>();
@@ -47,7 +50,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		GridLayout layout = new GridLayout(4, false);
+		GridLayout layout = new GridLayout(5, false);
 		container.setLayout(layout);
 
 		// Add filter information fields
@@ -69,6 +72,9 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		lblHeaderField.setFont(font);
 		lblHeaderField.setText("Requirement");
 		lblHeaderField = new Label(container, SWT.NONE);
+		lblHeaderField.setText("ID");
+		lblHeaderField.setFont(font);
+		lblHeaderField = new Label(container, SWT.NONE);
 		lblHeaderField.setText("Text");
 		lblHeaderField.setFont(font);
 		lblHeaderField = new Label(container, SWT.NONE);
@@ -86,10 +92,15 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
+		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Add requirements
 		addRequirement("well_formed", "The FlightPlanner shall receive a well-formed command from the GroundStation",
 				"FlightPlanner", container);
+		addRequirement("remote_attestation",
+				"The FlightPlanner shall only receive messages from a trusted GroundStation", "FlightPlanner",
+				container);
 		addRequirement("not_hackable", "The WaypointManager shall never be hackable by anyone ever", "WaypointManager",
 				container);
 
@@ -107,6 +118,11 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		});
 		btnReqs.add(btnReq);
 
+		Text txtID = new Text(container, SWT.BORDER);
+		GridData reqIDInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
+		txtID.setLayoutData(reqIDInfoField);
+		txtIDs.add(txtID);
+
 		Label lblReqText = new Label(container, SWT.NONE);
 		lblReqText.setText(reqText);
 		lblReqTexts.add(reqText);
@@ -121,6 +137,8 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		txtRationales.add(txtRationale);
 
 		Label separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
+		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -144,7 +162,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	 * text fields are disposed when the dialog closes.
 	 * @param container
 	 */
-	private void saveInput() {
+	private boolean saveInput() {
 
 		strReqNames.clear();
 		strReqTexts.clear();
@@ -153,18 +171,26 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		for (int i = 0; i < btnReqs.size(); i++) {
 			if (btnReqs.get(i).getSelection()) {
 				strReqNames.add(btnReqs.get(i).getText());
+				if (txtIDs.get(i).getText().isEmpty()) {
+					Dialog.showError("Missing requirement ID", btnReqs.get(i).getText()
+							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.");
+					return false;
+				}
+				strReqIDs.add(txtIDs.get(i).getText());
 				strReqTexts.add(lblReqTexts.get(i));
 				strComponents.add(lblComponents.get(i));
 			} else {
 				strRationales.add(txtRationales.get(i).getText());
 			}
 		}
+		return true;
 	}
 
 	@Override
 	protected void okPressed() {
-		saveInput();
-		super.okPressed();
+		if (saveInput()) {
+			super.okPressed();
+		}
 	}
 
 	public List<String> getReqNames() {
@@ -181,6 +207,10 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 
 	public List<String> getRationales() {
 		return strRationales;
+	}
+
+	public List<String> getReqIDs() {
+		return strReqIDs;
 	}
 
 }

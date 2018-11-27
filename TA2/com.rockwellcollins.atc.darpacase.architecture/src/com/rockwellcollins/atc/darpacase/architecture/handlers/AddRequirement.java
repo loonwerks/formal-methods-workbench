@@ -30,12 +30,9 @@ public class AddRequirement extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-//		final String componentName = "FlightPlanner";
-//		final String reqName = "well_formed";
-//		final String reqText = "The Flight Planner shall receive a well-formed command from the Ground Station";
-
 		// TODO: These should all be in a single class
 		List<String> reqNames = null;
+		List<String> reqIDs = null;
 		List<String> reqTexts = null;
 		List<String> reqComps = null;
 
@@ -45,21 +42,22 @@ public class AddRequirement extends AbstractHandler {
 		wizard.create();
 		if (wizard.open() == Window.OK) {
 			reqNames = wizard.getReqNames();
+			reqIDs = wizard.getReqIDs();
 			reqTexts = wizard.getReqTexts();
 			reqComps = wizard.getComponents();
 		}
 
 		for (int i = 0; i < reqNames.size(); i++) {
 			// Insert requirements into model
-			addRequirement(reqComps.get(i), reqNames.get(i), reqTexts.get(i));
+			addRequirement(reqComps.get(i), reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
 			// Add corresponding resolute clauses to *_CASE_Claims.aadl
-			addClaims(reqNames.get(i), reqTexts.get(i));
+			addClaims(reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
 		}
 
 		return null;
 	}
 
-	private void addRequirement(String componentName, String reqName, String reqText) {
+	private void addRequirement(String componentName, String reqName, String reqID, String reqText) {
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
@@ -75,8 +73,10 @@ public class AddRequirement extends AbstractHandler {
 
 				ThreadType threadType = (ThreadType) classifier;
 				EList<AnnexSubclause> annexSubclauses = threadType.getOwnedAnnexSubclauses();
-				String assumeStatement = "{**" + System.lineSeparator() + "\t\t\tassume \"" + reqText + "\" : FALSE;";
-				String proveStatement = "{**" + System.lineSeparator() + "\t\t\tprove (" + reqName + "())";
+				String assumeStatement = "{**" + System.lineSeparator() + "\t\t\tassume " + reqID + " \"" + reqText
+						+ "\" : FALSE;";
+				String proveStatement = "{**" + System.lineSeparator() + "\t\t\tprove(" + reqName + "(this, \"" + reqID
+						+ "\"))";
 
 				Iterator<AnnexSubclause> annexSubclause = annexSubclauses.iterator();
 				while (annexSubclause.hasNext()) {
@@ -123,13 +123,10 @@ public class AddRequirement extends AbstractHandler {
 		});
 	}
 
-	private void addClaims(String reqName, String reqText) {
-
-		// TODO: Get *_CASE_Claims.aadl resource in working directory
-		// TODO: If it doesn't exist, create it
+	private void addClaims(String reqName, String reqID, String reqText) {
 
 		// Add requirement
-		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqText);
+		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqID, reqText);
 	}
 
 	/**
