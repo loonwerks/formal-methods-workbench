@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: utils
 Bundle-SymbolicName: com.rockwellcollins.atc.darpacase.eclipse.util;singleton:=true
-Bundle-Version: 0.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Rockwell Collins
 Automatic-Module-Name: com.rockwellcollins.atc.darpacase.eclipse.utils
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

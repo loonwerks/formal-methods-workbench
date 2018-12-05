@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.osate</groupId>
+    <artifactId>darpacase.parent</artifactId>
+    <version>2.4.0-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+	<groupId>org.osate</groupId>
+	<artifactId>darpacase.modules</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>..</module>
+		<module>../../../commons/agree_to_json</module>
+		<module>../../../commons/util</module>
+		<module>../../../TA1/com.rockwellcollins.atc.darpacase.requirements</module>
+		<module>../../../TA2/filter_checker</module>
+		<module>../../../TA2/com.rockwellcollins.atc.darpacase.architecture</module>
+		<module>../../../TA2/com.rockwellcollins.atc.resolute.toolcheck</module>
+		<module>../../../com.rockwellcollins.atc.darpacase.feature</module>
+		
+		<module>../../darpacase.repository</module>
+	</modules>
+
+</project>

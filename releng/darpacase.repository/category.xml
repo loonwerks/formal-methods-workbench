@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="com.rockwellcollins.atc.darpacase.feature">
+      <category name="darpacase"/>
+   </feature>
+   <category-def name="darpacase" label="DARPA CASE (by Collins Aerospace)"/>
+</site>
