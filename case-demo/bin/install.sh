@@ -20,8 +20,12 @@ sudo apt-get install libssl-dev libclang-dev libcunit1-dev libsqlite3-dev
 sudo apt-get install qemu-kvm
 
 sudo apt-get install libwww-perl libxml2-dev libxslt-dev
-sudo apt-get install mlton rsync
+sudo apt-get install rsync
 sudo apt-get install texlive-fonts-recommended texlive-latex-extra texlive-metapost texlive-bibtex-extra
+
+#polyml
+sudo apt-get install polyml
+sudo apt-get install libpolyml-dev
 
 
 #Python package install
@@ -101,35 +105,26 @@ sudo make install
 cd $DIR
 
 
-#PolyML config 
-cd $DIR/..
-git clone https://github.com/polyml/polyml.git
-POLYDIR=$DIR/../polyml
-cd $POLYDIR
-./configure --prefix=/usr
-sudo make
-sudo make compiler
-sudo make install
-cd $DIR
-
 
 #HOL install
 cd $DIR/..
 git clone git://github.com/HOL-Theorem-Prover/HOL.git
-git checkout 7f7650b1f7
 HOLDIR=$DIR/../HOL
 cd $HOLDIR
-sudo poly < tools/smart-configure.sml
-sudo bin/build
+git checkout 7f7650b1f7
+echo 'val polymllibdir = "/usr/lib/x86_64-linux-gnu";' > tools-poly/poly-includes.ML
+poly < tools/smart-configure.sml
+bin/build
 cd $DIR 
 PATH=$PATH:$HOLDIR/bin
 
 
 #CakeML install
 cd $DIR/..
+CAKEDIR=$DIR/../cakeml
+cd $DIR
 git clone https://github.com/CakeML/cakeml.git
 git checkout 59886cd0205
-CAKEDIR=$DIR/../cakeml
 cd $DIR
 
 
@@ -139,8 +134,14 @@ mkdir -p $FILT; mkdir -p $FILT/build
 cd $FILT && repo init -u https://github.com/seL4/camkes-manifest.git && repo sync
 cd $DIR
 
+#ACT system-build install
+cd $DIR/..
+git clone git://github.com/chaosape/ACT_Demo_Dec2018.git
+ACT=$DIR/../ACT_Demo_Dec2018
+cd $DIR
 
-#bash config
+
+#bash
 export PATH
 bash
 
