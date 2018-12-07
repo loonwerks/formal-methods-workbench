@@ -1,0 +1,47 @@
+CASE Tool Assessment #2 Delivery Questionnaire - TA2 Collins
+
+Introduction
+
+The goal of this delivery questionnaire for CASE Tool Assessment #2 is to 
+provide TA7 Provatek guidance on where to find inputs in the delivery, how to 
+run the prototype tools, and how to interpret their results.  Please include 
+this completed questionnaire with your Tool Assessment #2 delivery.
+
+This questionnaire is organized with respect to the “CASE Tool Assessment #2 
+Plan” document. Before answering each question, please review the corresponding 
+step from the plan for further details. A short answer may suffice if it 
+references specific sections and/or pages of documentation to provide further 
+information.
+
+Questions
+
+Step 1 – Inputs
+    a. What are the cyber resilience requirements and how are these encoded as 
+       inputs?
+
+    b. Where is the location and what is the format of Model A in the 
+       deliverable?
+
+    c. What is the description of the runtime mechanism added by the tool to 
+       fix problems in Model A (Explanation of AB Fixes)?
+
+
+Step 2 – Run tool on Model A
+    a. How does one run the TA2 Collins prototype on Model A?
+
+    b. How does one interpret the prototype output to determine that Model A 
+       does not meet the cyber resiliency requirement(s)?
+
+    c. What is the location of Model B that the prototype outputs?
+
+
+Step 3 – Run tool on Model B
+    a. How does one run the TA2 Collins prototype on Model B?
+
+    b. How does one interpret the prototype output to determine that Model B 
+       does meet the cyber resiliency requirement(s)?
+
+
+Step 4
+    (no questions)
+
