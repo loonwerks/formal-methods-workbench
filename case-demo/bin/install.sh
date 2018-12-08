@@ -56,9 +56,9 @@ PATH=$PATH:$REPODIR
 
 
 #HOL install
+HOLDIR=$DIR/../HOL
 cd $DIR/..
 git clone git://github.com/HOL-Theorem-Prover/HOL.git
-HOLDIR=$DIR/../HOL
 cd $HOLDIR
 git checkout 7f7650b1f7
 echo 'val polymllibdir = "/usr/lib/x86_64-linux-gnu";' > tools-poly/poly-includes.ML
@@ -70,9 +70,9 @@ PATH=$PATH:$HOLDIR/bin
 
 
 #CakeML install
+CAKEDIR=$DIR/../cakeml
 cd $DIR/..
 git clone https://github.com/CakeML/cakeml.git
-CAKEDIR=$DIR/../cakeml
 cd $CAKEDIR
 git checkout 59886cd0205
 cd $DIR
