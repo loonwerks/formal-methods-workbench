@@ -4,11 +4,17 @@
 #Ubuntu package install 
 sudo apt-get update
 sudo apt-get install build-essential
+sudo apt-get install ninja-build
 
+sudo apt-get install git-repo
+sudo apt-get install cmake
+sudo apt-get isntall haskell-stack
 sudo apt-get install ccache
 sudo apt-get install python-dev python-pip python3-dev python3-pip
 sudo apt-get install libxml2-utils ncurses-dev
 sudo apt-get install curl git doxygen
+
+sudo curl -sSL https://get.haskellstack.org/ | sh
 
 sudo apt-get install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
 sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
@@ -23,6 +29,7 @@ sudo apt-get install libwww-perl libxml2-dev libxslt-dev
 sudo apt-get install rsync
 sudo apt-get install texlive-fonts-recommended texlive-latex-extra texlive-metapost texlive-bibtex-extra
 
+
 #polyml
 sudo apt-get install polyml
 sudo apt-get install libpolyml-dev
@@ -34,76 +41,18 @@ pip install --user sel4-deps
 pip install --user camkes-deps
 
 
-
 #this script's dir
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 PATH=$PATH:$DIR
 
-
-#ninja
-cd $DIR
-wget https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip
-unzip ninja-linux.zip
-rm ninja-linux.zip
-sudo cp ninja /usr/bin/ninja
-
-
-#cmake install
-cd $DIR/..
-CMAKEDIR=$DIR/../cmake
-wget https://github.com/Kitware/CMake/releases/download/v3.13.1/cmake-3.13.1.tar.gz
-mv cmake* "$CMAKEDIR.tar.gz"
-tar xf "$CMAKEDIR.tar.gz"
-rm "$CMAKEDIR.tar.gz"
-mv cmake* "$CMAKEDIR"
-cd $CMAKEDIR
-./bootstrap
-sudo make
-sudo make install
-cd $DIR
-
-#haskell-stack
-cd $DIR/..
-wget https://github.com/commercialhaskell/stack/releases/download/v1.9.3/stack-1.9.3-linux-x86_64.tar.gz
-STACKDIR=$DIR/../stack
-mv stack* "$STACKDIR.tar.gz"
-tar xf "$STACKDIR.tar.gz"
-rm "$STACKDIR.tar.gz"
-mv stack* $STACKDIR
-cd $STACKDIR
-stack upgrade
-PATH=$PATH:$STACKDIR
-cd $DIR
 
 #Repo Tool
 cd $DIR/..
 git clone https://gerrit.googlesource.com/git-repo
 REPODIR=$DIR/../git-repo
 cd $REPODIR
+sudo cp $REPODIR/repo /usr/bin
 PATH=$PATH:$REPODIR
-
-
-#ghc install
-cd $DIR/..
-wget https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-deb8-linux.tar.xz
-GHCDIR=$DIR/../ghc
-mv ghc* "$GHCDIR.tar.gz"
-tar xf "$GHCDIR.tar.gz"
-rm "$GHCDIR.tar.gz"
-mv ghc* "$GHCDIR"
-cd $GHCDIR
-./configure
-sudo make install
-cd $DIR
-
-#ghc install
-GHCDIR=$DIR/../ghc
-unzip "$GHCDIR.zip"
-cd $GHCDIR
-./configure
-sudo make install
-cd $DIR
-
 
 
 #HOL install
@@ -116,14 +65,15 @@ echo 'val polymllibdir = "/usr/lib/x86_64-linux-gnu";' > tools-poly/poly-include
 poly < tools/smart-configure.sml
 bin/build
 cd $DIR 
+sudo cp $HOLDIR/bin/Holmake /usr/bin
 PATH=$PATH:$HOLDIR/bin
 
 
 #CakeML install
 cd $DIR/..
-CAKEDIR=$DIR/../cakeml
-cd $DIR
 git clone https://github.com/CakeML/cakeml.git
+CAKEDIR=$DIR/../cakeml
+cd $CAKEDIR
 git checkout 59886cd0205
 cd $DIR
 
