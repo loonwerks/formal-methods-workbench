@@ -90,6 +90,9 @@ git clone git://github.com/chaosape/ACT_Demo_Dec2018.git
 ACT=$DIR/../ACT_Demo_Dec2018
 cd $DIR
 
+#cake compiler
+sudo cp cake /usr/bin
+
 
 #bash
 export PATH
