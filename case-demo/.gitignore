@@ -4,4 +4,4 @@ cakeml-regex-filter/
 cakeml/
 git-repo/
 bin/ninja
-
+osate*
