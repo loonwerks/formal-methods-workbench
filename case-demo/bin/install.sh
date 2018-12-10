@@ -15,6 +15,7 @@ sudo apt-get install libxml2-utils ncurses-dev
 sudo apt-get install curl git doxygen
 
 sudo curl -sSL https://get.haskellstack.org/ | sh
+sudo apt install libgmp-dev
 
 sudo apt-get install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
 sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
@@ -56,9 +57,9 @@ PATH=$PATH:$REPODIR
 
 
 #HOL install
+HOLDIR=$DIR/../HOL
 cd $DIR/..
 git clone git://github.com/HOL-Theorem-Prover/HOL.git
-HOLDIR=$DIR/../HOL
 cd $HOLDIR
 git checkout 7f7650b1f7
 echo 'val polymllibdir = "/usr/lib/x86_64-linux-gnu";' > tools-poly/poly-includes.ML
@@ -70,9 +71,9 @@ PATH=$PATH:$HOLDIR/bin
 
 
 #CakeML install
+CAKEDIR=$DIR/../cakeml
 cd $DIR/..
 git clone https://github.com/CakeML/cakeml.git
-CAKEDIR=$DIR/../cakeml
 cd $CAKEDIR
 git checkout 59886cd0205
 cd $DIR

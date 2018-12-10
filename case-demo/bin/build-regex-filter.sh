@@ -7,15 +7,26 @@ HOLDIR=$DIR/../HOL
 
 
 
-REGEX=`</dev/stdin`
+REGEX=$1
 
-cd $FILT/build
-echo "Building filter for '$REGEX'"
-../init-build.sh -DCAKEMLDIR=$CAKEDIR -DCAMKES_APP=cakeml_regex -DFilterRegex="$REGEX"
-ninja
-echo "Completed filter and with example producer, consumer."
-echo "Try it out: $FILT/build/simulate"
+if [ -z "$REGEX" ]
+then
+
+  echo "usage: build-regex-filter <regex>"
+
+else
+  mkdir -p $FILT/build
+  rm -r $FILT/build/*
+  cd $FILT/build
+  rm -r *
+  echo "Building filter for '$REGEX'"
+  ../init-build.sh -DCAKEMLDIR=$CAKEDIR -DCAMKES_APP=cakeml_regex -DFilterRegex="$REGEX"
+  ninja
+
+  echo "Try it out: $FILT/build/simulate"
 
 cd $DIR
+
+fi
 
 
