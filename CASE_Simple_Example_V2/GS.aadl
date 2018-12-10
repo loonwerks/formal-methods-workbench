@@ -10,10 +10,10 @@ public
 		features
 			GSA: requires bus access GS_Bus.Impl;
 			RFA: requires bus access UAS::RF.Impl;
-			send_map_in: in event data port;
-			send_map_out: out event data port;
-			recv_status_in: in event data port;
-			recv_status_out: out event data port;
+			recv_data_in: in event data port;
+			recv_data_out: out event data port;
+			send_data_in: in event data port;
+			send_data_out: out event data port;
 	end Radio;
 	
 	device implementation Radio.Impl	
@@ -51,8 +51,8 @@ public
 	-- Ground Station communication SW
 	process GS_SW
 		features
-			send_map: out event data port;
-			recv_status: in event data port;
+			recv_data: in event data port;
+			send_data: out event data port;
 	end GS_SW;
 	
 	process implementation GS_SW.Impl
@@ -62,8 +62,8 @@ public
 	-- The Ground Station communication system
 	system GroundStation
 		features
-			send_map: out event data port;
-			recv_status: in event data port;
+			radio_recv: in event data port;
+			radio_send: out event data port;
 			RFA: requires bus access UAS::RF.Impl;
 		properties
 			CASE_Prop::PHYSICAL_BOUNDARY => True;
@@ -81,11 +81,10 @@ public
 			bac3: bus access PROC_HW.GSA <-> BUS_HW;
 			bac4: bus access MEM_HW.GSA <-> BUS_HW;
 			bac6: bus access RADIO_HW.RFA <-> RFA;
-			c1: port PROC_SW.send_map -> RADIO_HW.send_map_in;
-			c2: port RADIO_HW.send_map_out -> send_map;
-			c3: port recv_status -> RADIO_HW.recv_status_in;
-			c4: port RADIO_HW.recv_status_out -> PROC_SW.recv_status;
-		
+			c1: port PROC_SW.send_data -> RADIO_HW.send_data_in;
+			c2: port RADIO_HW.send_data_out -> radio_send;
+			c3: port radio_recv -> RADIO_HW.recv_data_in;
+			c4: port RADIO_HW.recv_data_out -> PROC_SW.recv_data;
 		properties
 			Actual_Processor_Binding => (reference (PROC_HW)) applies to PROC_SW;
 			Actual_Memory_Binding => (reference (MEM_HW)) applies to PROC_SW;

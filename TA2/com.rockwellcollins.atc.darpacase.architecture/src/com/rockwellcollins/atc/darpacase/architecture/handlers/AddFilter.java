@@ -18,7 +18,6 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ConnectedElement;
-import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
@@ -68,6 +67,7 @@ public class AddFilter extends AadlHandler {
 	protected void runCommand(URI uri) {
 
 		// Check if it is a connection
+		// TODO: if user selects system implementation, allow the user to specify connection in the wizard
 		final EObject eObj = getEObject(uri);
 		if (!(eObj instanceof PortConnection)) {
 			Dialog.showError("No connection is selected",
@@ -76,7 +76,8 @@ public class AddFilter extends AadlHandler {
 		}
 
 		// Open wizard to enter filter info
-		AddFilterDialog wizard = new AddFilterDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		final AddFilterDialog wizard = new AddFilterDialog(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 //		wizard.setFilterComponentTypeInfo(getDestinationType(uri), getParentType(uri));
 		wizard.setGuaranteeList(getSourceName(uri), getSourceGuarantees(uri));
 		List<String> resoluteClauses = getResoluteClauses(uri);
@@ -167,6 +168,8 @@ public class AddFilter extends AadlHandler {
 					// Try importing the resource
 					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
 					if (casePropSet == null) {
+						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
+								"Property set " + CASE_PROPSET_NAME + " could not be found.");
 						return;
 					}
 					// Add as "importedUnit" to package section
@@ -217,7 +220,7 @@ public class AddFilter extends AadlHandler {
 					((EventDataPort) portOut).setDataFeatureClassifier(dataFeatureClassifier);
 				} else if (port instanceof DataPort) {
 					portIn = filterThreadType.createOwnedDataPort();
-					dataFeatureClassifier = ((EventDataPort) port).getDataFeatureClassifier();
+					dataFeatureClassifier = ((DataPort) port).getDataFeatureClassifier();
 //					((DataPort) portIn).setDataFeatureClassifier(((DataPort) portImpl).getDataFeatureClassifier());
 					((DataPort) portIn).setDataFeatureClassifier(dataFeatureClassifier);
 					portOut = filterThreadType.createOwnedDataPort();
@@ -252,15 +255,20 @@ public class AddFilter extends AadlHandler {
 				}
 				// CASE::COMP_SPEC property
 				// Parse the ID from the Filter AGREE property
-				String filterPropId = filterAgreeProperty
-						.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+				String filterPropId = "";
+				try {
+					filterPropId = filterAgreeProperty
+							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
 								filterAgreeProperty.indexOf("\""))
 						.trim();
-				if (filterPropId.length() > 0) {
-					if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterThreadType, casePropSet)) {
-//						return;
-					}
+
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed, so leave blank
 				}
+				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterThreadType, casePropSet)) {
+//					return;
+				}
+
 //				if (!addPropertyAssociation("COMP_SPEC", filterAgreeSpecIDs, filterThreadType, casePropSet)) {
 //					return;
 //				}
@@ -284,7 +292,7 @@ public class AddFilter extends AadlHandler {
 				final ThreadImplementation filterThreadImpl = (ThreadImplementation) pkgSection
 						.createOwnedClassifier(Aadl2Package.eINSTANCE.getThreadImplementation());
 				filterThreadImpl.setName(filterThreadType.getName() + ".Impl");
-				Realization r = filterThreadImpl.createOwnedRealization();
+				final Realization r = filterThreadImpl.createOwnedRealization();
 				r.setImplemented(filterThreadType);
 
 				// Add it to proper place
@@ -294,13 +302,13 @@ public class AddFilter extends AadlHandler {
 				// Make a copy of the process component implementation
 				final ProcessImplementation procImpl = (ProcessImplementation) selectedConnection
 						.getContainingComponentImpl();
-				ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
+				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
 				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
 
 				// Change selectedConnection to refer to the connection on the new implementation
-				for (Connection c : newImpl.getAllConnections()) {
+				for (PortConnection c : newImpl.getOwnedPortConnections()) {
 					if (c.getName().equalsIgnoreCase(selectedConnection.getName())) {
-						selectedConnection = (PortConnection) c;
+						selectedConnection = c;
 						break;
 					}
 				}
@@ -336,7 +344,7 @@ public class AddFilter extends AadlHandler {
 				newImpl.getOwnedPortConnections().move(getIndex(destName, newImpl.getOwnedPortConnections()) + 1,
 						newImpl.getOwnedPortConnections().size() - 1);
 
-				// Add new implementation to package and place immediately below original implementation
+				// Add new implementation to package and place immediately above original implementation
 				pkgSection.getOwnedClassifiers().add(newImpl);
 				pkgSection.getOwnedClassifiers().move(
 						getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
@@ -345,7 +353,7 @@ public class AddFilter extends AadlHandler {
 				// Add add_filter claims to resolute prove statement, if applicable
 				if (!filterResoluteClause.isEmpty()) {
 					// Add arguments to prove statement in destination component
-					ThreadType clauseThread = (ThreadType) selectedConnection.getDestination().getConnectionEnd()
+					final ThreadType clauseThread = (ThreadType) selectedConnection.getDestination().getConnectionEnd()
 							.getContainingClassifier();
 					EList<AnnexSubclause> annexSubclauses = clauseThread.getOwnedAnnexSubclauses();
 					for (AnnexSubclause annexSubclause : annexSubclauses) {
@@ -382,6 +390,14 @@ public class AddFilter extends AadlHandler {
 				if (filterAgreeProperty.length() > 0 || propagatedGuarantees.size() > 0) {
 					String agreeClauses = "{**" + System.lineSeparator();
 
+					for (String guarantee : propagatedGuarantees) {
+						agreeClauses = agreeClauses + "\t\t\t" + guarantee + System.lineSeparator();
+					}
+
+					// replace source out port name with filter out port name
+					agreeClauses = agreeClauses.replace(selectedConnection.getSource().getConnectionEnd().getName(),
+							FILTER_PORT_OUT_NAME);
+
 					if (!filterAgreeProperty.isEmpty()) {
 						agreeClauses = agreeClauses + "\t\t\t" + filterAgreeProperty + System.lineSeparator();
 //						for (String clause : filterAgreeProperty.split(System.lineSeparator())) {
@@ -389,14 +405,9 @@ public class AddFilter extends AadlHandler {
 //						}
 					}
 
-					for (String guarantee : propagatedGuarantees) {
-						agreeClauses = agreeClauses + "\t\t\t" + guarantee + System.lineSeparator();
-					}
 					agreeClauses = agreeClauses + "\t\t**}";
-					// replace source out port name with filter out port name
-					agreeClauses = agreeClauses.replace(selectedConnection.getSource().getConnectionEnd().getName(),
-							FILTER_PORT_OUT_NAME);
-					DefaultAnnexSubclause annexSubclauseImpl = filterThreadType
+
+					final DefaultAnnexSubclause annexSubclauseImpl = filterThreadType
 							.createOwnedAnnexSubclause();
 					annexSubclauseImpl.setName("agree");
 					annexSubclauseImpl.setSourceText(agreeClauses);

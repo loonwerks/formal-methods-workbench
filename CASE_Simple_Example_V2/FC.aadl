@@ -2,7 +2,7 @@ package FC
 public
 	
 	with UAV;
-	with CASE_Prop;
+	with CASE_Properties;
 	
 	-- GPS receiver hardware
 	-- We are not yet modeling incoming satellite signals here
@@ -18,12 +18,12 @@ public
 	-- Flight controller
 	system FlightController
 		features
-			waypoint: in event data port;
-			position_status: out event data port;
+			uart_recv: in event data port;
+			uart_send: out event data port;
 			UARTA: requires bus access UAV::Serial.Impl;
 		properties
-			CASE_Prop::PHYSICAL_BOUNDARY => True;
-			CASE_Prop::TRUSTED_BOUNDARY => True;
+			CASE_Properties::PHYSICAL_BOUNDARY => True;
+			CASE_Properties::TRUSTED_BOUNDARY => True;
 	end FlightController;
 	
 	
@@ -31,7 +31,7 @@ public
 		subcomponents
 			GPS: device GPS_Receiver.Impl;
 		connections
-			c1: port GPS.position -> position_status;
+			c1: port GPS.position -> uart_send;
 	end FlightController.Impl;
 	
 end FC;

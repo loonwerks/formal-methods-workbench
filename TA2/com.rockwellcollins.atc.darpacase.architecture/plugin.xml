@@ -14,54 +14,50 @@
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement"
                      id="com.rockwellcollins.atc.darpacase.requirements.menus.gearcase"
-                     label="GearCASE"
+                     label="Run TA1 tool"
                      style="push">
                </command>
             </menu>
             <menu
                   id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency"
                   label="Cyber Resiliency">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.ModelAnnotations"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
                <menu
-                     id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase"
-                     label="StairCASE">
-                  <menu
-                        id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase.transformations"
-                        label="Model Transformations">
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                           label="Add Filter..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
-                           label="Add Router..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                           label="Add Monitor..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
-                           label="Add Isolator..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRemoteAttestation"
-                           label="Add Remote Attestation..."
-                           style="push">
-                     </command>
-                  </menu>
-                  <menu
-                        id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase.proofs"
-                        label="Proofs">
-                  </menu>
+                     id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddAttestationManager"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manger..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.rockwellcollins.atc.darpacase.menus.outline.resiliency.staircase.proofs"
+                     label="Proofs">
                </menu>
             </menu>
             <menu
@@ -75,7 +71,7 @@
                </command>
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
-                     label="SuitCASE"
+                     label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
@@ -102,54 +98,50 @@
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement"
                      id="com.rockwellcollins.atc.darpacase.menus.menubar.requirements.gearcase"
-                     label="GearCASE"
+                     label="Run TA1 tool"
                      style="push">
                </command>
             </menu>
             <menu
                   id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency"
                   label="Cyber Resiliency">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.ModelAnnotations"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
                <menu
-                     id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase"
-                     label="StairCASE">
-                  <menu
-                        id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase.transformations"
-                        label="Model Transformations">
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                           label="Add Filter..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
-                           label="Add Router..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                           label="Add Monitor..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
-                           label="Add Isolator..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRemoteAttestation"
-                           label="Add Remote Attestation..."
-                           style="push">
-                     </command>
-                  </menu>
-                  <menu
-                        id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase.proofs"
-                        label="Proofs">
-                  </menu>
+                     id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddAttestationManager"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.rockwellcollins.atc.darpacase.menus.menubar.resiliency.staircase.proofs"
+                     label="Proofs">
                </menu>
             </menu>
             <menu
@@ -164,7 +156,7 @@
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
                      id="com.rockwellcollins.atc.darpacase.architecture.menus.VerifyImplementation"
-                     label="SuitCASE"
+                     label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
@@ -211,54 +203,50 @@
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRequirement"
                      id="com.rockwellcollins.atc.darpacase.requirements.menus.gearcase"
-                     label="GearCASE"
+                     label="Run TA1 tool"
                      style="push">
                </command>
             </menu>
             <menu
                   id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency"
                   label="Cyber Resiliency">
+               <command
+                     commandId="com.rockwellcollins.atc.darpacase.architecture.commands.ModelAnnotations"
+                     id="com.rockwellcollins.atc.darpacase.architecture.menus.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
                <menu
-                     id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase"
-                     label="StairCASE">
-                  <menu
-                        id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase.transformations"
-                        label="Model Transformations">
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
-                           label="Add Filter..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
-                           label="Add Router..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
-                           label="Add Monitor..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddIsolator"
-                           label="Add Isolator..."
-                           style="push">
-                     </command>
-                     <command
-                           commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
-                           id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRemoteAttestation"
-                           label="Add Remote Attestation..."
-                           style="push">
-                     </command>
-                  </menu>
-                  <menu
-                        id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase.proofs"
-                        label="Proofs">
-                  </menu>
+                     id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddAttestationManager"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor"
+                        id="com.rockwellcollins.atc.darpacase.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.rockwellcollins.atc.darpacase.menus.editor.resiliency.staircase.proofs"
+                     label="Proofs">
                </menu>
             </menu>
             <menu
@@ -272,7 +260,7 @@
                </command>
                <command
                      commandId="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
-                     label="SuitCASE"
+                     label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
@@ -299,6 +287,10 @@
             name="Add Filter">
       </command>
       <command
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.AddAttestationManager"
+            name="Add Attestation Manager">
+      </command>
+      <command
             id="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter"
             name="Add Router">
       </command>
@@ -307,8 +299,8 @@
             name="Add Monitor">
       </command>
       <command
-            id="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator"
-            name="Add Isolator">
+            id="com.rockwellcollins.atc.darpacase.architecture.commands.ModelAnnotations"
+            name="Model Annotations">
       </command>
       <command
             id="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
@@ -321,10 +313,6 @@
       <command
             id="com.rockwellcollins.atc.darpacase.architecture.commands.FilterChecker"
             name="Filter Checker">
-      </command>
-      <command
-            id="com.rockwellcollins.atc.darpacase.architecture.commands.AddRemoteAttestation"
-            name="Add Remote Attestation">
       </command>
    </extension>
    <extension
@@ -342,8 +330,8 @@
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor">
       </handler>
       <handler
-            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddIsolator"
-            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddIsolator">
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.ModelAnnotations"
+            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.ModelAnnotations">
       </handler>
       <handler
             class="com.rockwellcollins.atc.darpacase.architecture.handlers.SelectImplementation"
@@ -361,16 +349,20 @@
             class="com.rockwellcollins.atc.darpacase.architecture.handlers.JsonHandler"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.test">
       </handler>
+      <handler
+            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddAttestationManager"
+            commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddAttestationManager">
+      </handler>
    </extension>
    <extension
          point="org.osate.pluginsupport.aadlcontribution">
       <aadlcontribution
-            file="resources/CASE.aadl"
+            file="resources/CASE_Properties.aadl"
             id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution.casepropset">
       </aadlcontribution>
       <aadlcontribution
-            file="resources/Model_Transformations.aadl"
-            id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution.modeltransformations">
+            file="resources/CASE_Model_Transformations.aadl"
+            id="com.rockwellcollins.atc.darpacase.architecture.aadlcontribution.casemodeltransformations">
       </aadlcontribution>
    </extension>
    <extension

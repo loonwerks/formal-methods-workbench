@@ -37,6 +37,13 @@ public class VerifyLegacyImplementation extends AadlHandler {
 	@Override
 	public void runCommand(URI uri) {
 
+		boolean NOT_IMPLEMENTED = true;
+		if (NOT_IMPLEMENTED) {
+			Dialog.showError("Functionality not yet implemented",
+					"We're still working on integrating TA3 tools into our framework.  Consequently, legacy component verification cannot be performed at this time.");
+			return;
+		}
+
 		// Make sure selection is either a component or component implementation
 		EObject eObj = getEObject(uri);
 		if (!((eObj instanceof ProcessType) || (eObj instanceof ThreadType) || (eObj instanceof ProcessImplementation)

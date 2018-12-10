@@ -1,5 +1,6 @@
 package com.rockwellcollins.atc.darpacase.architecture.handlers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -14,9 +15,13 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
+import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.AadlPackageImpl;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
@@ -24,34 +29,65 @@ import org.osate.aadl2.impl.PackageSectionImpl;
 
 import com.rockwellcollins.atc.darpacase.architecture.CaseClaimsManager;
 import com.rockwellcollins.atc.darpacase.architecture.dialogs.ImportRequirementsDialog;
+import com.rockwellcollins.atc.resolute.resolute.Expr;
+import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
+import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
+import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 
 public class AddRequirement extends AbstractHandler {
+
+	public static class CASE_Requirement {
+		public String name = "";
+		public String id = "";
+		public String text = "";
+		public String component = "";
+		public String rationale = "";
+
+		public CASE_Requirement(String name, String id, String text, String component, String rationale) {
+			this.name = name;
+			this.id = id;
+			this.text = text;
+			this.component = component;
+			this.rationale = rationale;
+		}
+	}
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		// TODO: These should all be in a single class
-		List<String> reqNames = null;
-		List<String> reqIDs = null;
-		List<String> reqTexts = null;
-		List<String> reqComps = null;
+//		// TODO: These should all be in a single class
+//		List<String> reqNames = null;
+//		List<String> reqIDs = null;
+//		List<String> reqTexts = null;
+//		List<String> reqComps = null;
+		List<CASE_Requirement> importReqs = null;
 
 		// Open wizard to enter filter info
 		ImportRequirementsDialog wizard = new ImportRequirementsDialog(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		wizard.setResoluteClauses(getResoluteClauses());
 		wizard.create();
 		if (wizard.open() == Window.OK) {
-			reqNames = wizard.getReqNames();
-			reqIDs = wizard.getReqIDs();
-			reqTexts = wizard.getReqTexts();
-			reqComps = wizard.getComponents();
-		}
+//			reqNames = wizard.getReqNames();
+//			reqIDs = wizard.getReqIDs();
+//			reqTexts = wizard.getReqTexts();
+//			reqComps = wizard.getComponents();
+			importReqs = wizard.getImportRequirements();
 
-		for (int i = 0; i < reqNames.size(); i++) {
-			// Insert requirements into model
-			addRequirement(reqComps.get(i), reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
-			// Add corresponding resolute clauses to *_CASE_Claims.aadl
-			addClaims(reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
+//			for (int i = 0; i < reqNames.size(); i++) {
+			// Insert selected requirements into model
+			for (CASE_Requirement req : importReqs) {
+//				// Insert requirements into model
+//				addRequirement(reqComps.get(i), reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
+//				// Add corresponding resolute clauses to *_CASE_Claims.aadl
+//				addClaims(reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
+				// Insert requirements into model
+				addRequirement(req.component, req.name, req.id, req.text);
+				// Add corresponding resolute clauses to *_CASE_Claims.aadl
+				addClaims(req.name, req.id, req.text);
+			}
+
+			// TODO: Write omitted requirements to log
 		}
 
 		return null;
@@ -146,6 +182,54 @@ public class AddRequirement extends AbstractHandler {
 			}
 		}
 		return idx;
+	}
+
+	private List<CASE_Requirement> getResoluteClauses() {
+
+		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+
+		return xtextEditor.getDocument().readOnly(resource -> {
+
+
+			List<CASE_Requirement> resoluteClauses = new ArrayList<>();
+
+			// Get the components in the model
+			final AadlPackage aadlPkg = (AadlPackageImpl) resource.getContents().get(0);
+			PublicPackageSection pkgSection = aadlPkg.getOwnedPublicSection();
+			for (Classifier classifier : pkgSection.getOwnedClassifiers()) {
+
+				if (classifier instanceof ComponentType) {
+
+					ComponentType compType = (ComponentType) classifier;
+					final EList<AnnexSubclause> annexSubclauses = compType.getOwnedAnnexSubclauses();
+
+					for (AnnexSubclause annexSubclause : annexSubclauses) {
+						// See if there's a resolute annex
+						if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
+							DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
+							// See if there are any 'prove' clauses
+							ResoluteSubclause resoluteClause = (ResoluteSubclause) annexSubclauseImpl
+									.getParsedAnnexSubclause();
+							EList<ProveStatement> proves = resoluteClause.getProves();
+							for (ProveStatement prove : proves) {
+								Expr expr = prove.getExpr();
+								if (expr instanceof FnCallExpr) {
+									FnCallExpr fnCall = (FnCallExpr) expr;
+									if (fnCall.getFn().getName() != null
+											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
+										resoluteClauses.add(new CASE_Requirement(fnCall.getFn().getName(), "", "",
+												compType.getName(), ""));
+									}
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+
+			return resoluteClauses;
+		});
 	}
 
 }

@@ -20,10 +20,17 @@ import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.Aadl2Package;
+import org.osate.aadl2.AadlBoolean;
+import org.osate.aadl2.AadlInteger;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AadlString;
+import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EnumerationType;
+import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListType;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.ModalPropertyValue;
@@ -32,8 +39,9 @@ import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.PropertyType;
+import org.osate.aadl2.Realization;
 import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.impl.AadlStringImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.ui.dialogs.Dialog;
@@ -44,6 +52,8 @@ public abstract class AadlHandler extends AbstractHandler {
 
 	static final String CASE_PROPSET_NAME = "CASE_Properties";
 	static final String CASE_PROPSET_FILE = "CASE_Properties.aadl";
+	static final String CASE_MODEL_TRANSFORMATIONS_NAME = "CASE_Model_Transformations";
+	static final String CASE_MODEL_TRANSFORMATIONS_FILE = "CASE_Model_Transformations.aadl";
 	protected ExecutionEvent executionEvent;
 
 	@Override
@@ -102,6 +112,9 @@ public abstract class AadlHandler extends AbstractHandler {
 			TextSelection ts = (TextSelection) xtextEditor.getSelectionProvider().getSelection();
 			return xtextEditor.getDocument().readOnly(resource -> {
 				EObject e = new EObjectAtOffsetHelper().resolveContainedElementAt(resource, ts.getOffset());
+				if (e instanceof Realization) {
+					e = e.eContainer();
+				}
 				return EcoreUtil.getURI(e);
 			});
 		}
@@ -111,20 +124,22 @@ public abstract class AadlHandler extends AbstractHandler {
 	/**
 	 * Gets the property set from either the current resource, or
 	 * the specified file, provided as an OSATE plugin.
+	 * @param propSetName - The name of the property set
+	 * @param propSetFile - The file name containing the property set
 	 * @param resourceSet - The ResourceSet that contains all open resources
-	 * @return PropertySetImpl
+	 * @return PropertySet
 	 */
-	protected PropertySetImpl getPropertySet(String propSetName, String propSetFile, ResourceSet resourceSet)
+	protected PropertySet getPropertySet(String propSetName, String propSetFile, ResourceSet resourceSet)
 			throws Exception {
 
-		PropertySetImpl propSet = null;
+		PropertySet propSet = null;
 
 		// Check to see if the property set file resource has already been loaded
 		// but not imported into this model
 		for (Resource r : resourceSet.getResources()) {
 			final EObject eObj = r.getContents().get(0);
 			if (eObj instanceof PropertySetImpl) {
-				PropertySetImpl propSetImpl = (PropertySetImpl) eObj;
+				PropertySet propSetImpl = (PropertySet) eObj;
 				if (propSetImpl.getName().equalsIgnoreCase(propSetName)) {
 					propSet = propSetImpl;
 					break;
@@ -154,10 +169,64 @@ public abstract class AadlHandler extends AbstractHandler {
 			Resource propResource = resourceSet.createResource(uri);
 			propResource.load(null);
 			// Grab the PropertySet specified in the CASE Prop file
-			propSet = (PropertySetImpl) propResource.getContents().get(0);
+			propSet = (PropertySet) propResource.getContents().get(0);
 		}
 
 		return propSet;
+	}
+
+	/**
+	 * Gets the AADL Package from either the current resource, or
+	 * the specified file, provided as an OSATE plugin.
+	 * @param packageName - The name of the AADL package
+	 * @param packageFile - The name of the file containing the AADL package
+	 * @param resourceSet - The ResourceSet that contains all open resources
+	 * @return AadlPackage
+	 */
+	protected AadlPackage getAadlPackage(String packageName, String packageFile, ResourceSet resourceSet)
+			throws Exception {
+
+		AadlPackage aadlPackage = null;
+
+		// Check to see if the package file resource has already been loaded
+		// but not imported into this model
+		for (Resource r : resourceSet.getResources()) {
+			final EObject eObj = r.getContents().get(0);
+			if (eObj instanceof AadlPackage) {
+				AadlPackage tmpPkg = (AadlPackage) eObj;
+				if (tmpPkg.getName().equalsIgnoreCase(packageName)) {
+					aadlPackage = tmpPkg;
+					break;
+				}
+			}
+		}
+
+		// If the logical resource has not been loaded, create it
+		if (aadlPackage == null) {
+
+			// Find the Property Set File
+			// The file is provided as an OSATE Plugin_Contribution,
+			// so retrieve its URI, which has already been created at launch
+			final List<URI> contributedAadl = PluginSupportUtil.getContributedAadl();
+			URI uri = null;
+			for (URI u : contributedAadl) {
+				if (u.lastSegment().equalsIgnoreCase(packageFile)) {
+					uri = u;
+					break;
+				}
+			}
+			if (uri == null) {
+				Dialog.showError(packageName + " Package", "Could not find the " + packageFile + " file.");
+				return null;
+			}
+			// Create a resource for the property set file URI
+			Resource packageResource = resourceSet.createResource(uri);
+			packageResource.load(null);
+			// Grab the PropertySet specified in the CASE Prop file
+			aadlPackage = (AadlPackage) packageResource.getContents().get(0);
+		}
+
+		return aadlPackage;
 	}
 
 	/**
@@ -226,19 +295,57 @@ public abstract class AadlHandler extends AbstractHandler {
 					.create(Aadl2Package.eINSTANCE.getEnumerationLiteral());
 			enumLiteralCompType.setName(propVal);
 			namedVal.setNamedValue(enumLiteralCompType);
-		} else if (prop.getOwnedPropertyType() instanceof AadlStringImpl) {
+		} else if (prop.getOwnedPropertyType() instanceof AadlBoolean) {
+			final BooleanLiteral boolVal = (BooleanLiteral) modalPropVal
+					.createOwnedValue(Aadl2Package.eINSTANCE.getBooleanLiteral());
+			boolVal.setValue(Boolean.parseBoolean(propVal));
+		} else if (prop.getOwnedPropertyType() instanceof AadlInteger) {
+			final IntegerLiteral intVal = (IntegerLiteral) modalPropVal
+					.createOwnedValue(Aadl2Package.eINSTANCE.getIntegerLiteral());
+			try {
+				intVal.setValue(Long.parseLong(propVal));
+			} catch (NumberFormatException e) {
+				Dialog.showError(CASE_PROPSET_NAME + " Properties", "Value for " + propName + " must be a number.");
+				return false;
+			}
+		} else if (prop.getOwnedPropertyType() instanceof AadlString) {
 			final StringLiteral stringVal = (StringLiteral) modalPropVal
 					.createOwnedValue(Aadl2Package.eINSTANCE.getStringLiteral());
 			stringVal.setValue(propVal);
 		} else if (prop.getOwnedPropertyType() instanceof ListType) {
 			final ListValue listVal = (ListValue) modalPropVal
 					.createOwnedValue(Aadl2Package.eINSTANCE.getListValue());
+
 			String[] elements = propVal.split(",");
-			for (String element : elements) {
-				StringLiteral stringVal = (StringLiteral) listVal
-						.createOwnedListElement(Aadl2Package.eINSTANCE.getStringLiteral());
-				stringVal.setValue(element);
+
+			// TODO: This property could be a list of enums, strings, numbers, lists, etc
+			// TODO: This really needs to be set up in a recursive manner
+			// Figure out which
+			ListType listType = (ListType) prop.getOwnedPropertyType();
+			PropertyType listSubType = listType.getOwnedElementType();
+			if (listSubType instanceof AadlString) {
+				for (String element : elements) {
+					StringLiteral stringVal = (StringLiteral) listVal
+							.createOwnedListElement(Aadl2Package.eINSTANCE.getStringLiteral());
+					stringVal.setValue(element);
+				}
+			} else if (listSubType instanceof AadlInteger) {
+
+			} else if (listSubType instanceof AadlBoolean) {
+
+			} else if (listSubType instanceof EnumerationType) {
+				for (String element : elements) {
+					NamedValue namedVal = (NamedValue) listVal
+							.createOwnedListElement(Aadl2Package.eINSTANCE.getNamedValue());
+					EnumerationLiteral enumLiteral = Aadl2Factory.eINSTANCE.createEnumerationLiteral();
+					enumLiteral.setName(element);
+					namedVal.setNamedValue(enumLiteral);
+				}
+			} else {
+
 			}
+
+
 		} else {
 			// TODO: Add other property types
 			// Couldn't figure it out
@@ -273,7 +380,7 @@ public abstract class AadlHandler extends AbstractHandler {
 	/**
 	 * Builds an identifier using the specified base name that doesn't conflict with identifiers in the specified element list.
 	 * @param baseIdentifier - Name
-	 * @param startWithBase - If true, the baseIdentifier is the only one of its kind,
+	 * @param startWithBase - If true, if the baseIdentifier is the only one of its kind,
 	 * it will be returned as 'baseIdentifier' rather than 'baseIdentifier1'
 	 * @param elements - Collection of names which cannot match base name
 	 * @return An identifier that is unique in the specified list
@@ -292,7 +399,15 @@ public abstract class AadlHandler extends AbstractHandler {
 		// Resolve naming conflicts
 		String newIdentifier = baseIdentifier + (startWithBase ? "" : "1");
 		boolean done = false;
-		int num = (startWithBase ? 0 : 1);
+		int num = getLastInt(baseIdentifier);
+		if (num > 0) {
+			// If the baseIdentifier already has a number at the end, start with it
+			baseIdentifier = baseIdentifier.substring(0, baseIdentifier.length() - Integer.toString(num).length());
+		} else if (num == 0 && !startWithBase) {
+			num = 1;
+		}
+//		int num = (startWithBase ? 0 : 1);
+
 		do {
 			if (names.contains(newIdentifier)) {
 				num++;
@@ -303,6 +418,29 @@ public abstract class AadlHandler extends AbstractHandler {
 		} while (!done);
 
 		return newIdentifier;
+	}
+
+	/**
+	 * Helper function for getUniqueName() for extracting a number at the end of a string
+	 * @param name - String
+	 * @return An integer
+	 */
+	private int getLastInt(String name) {
+
+		int offset = name.length();
+		for (int i = name.length() - 1; i >= 0; i--) {
+			char c = name.charAt(i);
+			if (Character.isDigit(c)) {
+				offset--;
+			} else {
+				if (offset == name.length()) {
+					// No int at the end
+					return 0;
+				}
+				return Integer.parseInt(name.substring(offset));
+			}
+		}
+		return Integer.parseInt(name.substring(offset));
 	}
 
 }

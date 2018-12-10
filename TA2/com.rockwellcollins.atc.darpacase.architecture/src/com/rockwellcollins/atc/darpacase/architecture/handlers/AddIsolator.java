@@ -17,6 +17,7 @@ import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.impl.ComponentImplementationImpl;
 import org.osate.aadl2.instance.ComponentInstance;
@@ -43,7 +44,7 @@ public class AddIsolator extends AbstractHandler {
 		}
 
 		EObject eObj = getEObject(uri);
-		if (eObj instanceof ComponentImplementationImpl) {
+		if (eObj instanceof ComponentImplementation) {
 			Set<ComponentType> trustedComponents = getTrustedComponents(eObj);
 			// Do other stuff
 		} else {

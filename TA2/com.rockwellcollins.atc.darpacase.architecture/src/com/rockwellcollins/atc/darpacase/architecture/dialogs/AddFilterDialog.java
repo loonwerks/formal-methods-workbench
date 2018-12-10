@@ -233,10 +233,11 @@ public class AddFilterDialog extends TitleAreaDialog {
 				String formattedGuarantee = guarantee.trim();
 				formattedGuarantee = formattedGuarantee
 						.substring("guarantee ".length(),
-								formattedGuarantee.length() - 1);
+								formattedGuarantee.lastIndexOf(":") - 1);
+//								formattedGuarantee.length() - 1);
 				selectGuarantee.setText(formattedGuarantee);
 				selectGuarantee.setSelection(true);
-				selectGuarantee.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+				selectGuarantee.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 				btnPropagateGuarantees.add(selectGuarantee);
 			}
 

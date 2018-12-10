@@ -10,16 +10,16 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
+import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.PackageSection;
+import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.ProcessType;
+import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.impl.AadlPackageImpl;
-import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
-import org.osate.aadl2.impl.PackageSectionImpl;
-import org.osate.aadl2.impl.PrivatePackageSectionImpl;
-import org.osate.aadl2.impl.PropertySetImpl;
-import org.osate.aadl2.impl.PublicPackageSectionImpl;
 import org.osate.ui.dialogs.Dialog;
 
 import com.rockwellcollins.atc.darpacase.architecture.CaseClaimsManager;
@@ -87,16 +87,16 @@ public class SelectImplementation extends AadlHandler {
 
 				// Retrieve the model object to modify
 				final ThreadType selectedComponent = (ThreadType) resource.getEObject(uri.fragment());
-				final AadlPackageImpl aadlPkg = (AadlPackageImpl) resource.getContents().get(0);
-				PackageSectionImpl pkgSection = null;
+				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
+				PackageSection pkgSection = null;
 				// Figure out if the selected component is in the public or private section
 				EObject eObj = selectedComponent.eContainer();
 				while (eObj != null) {
-					if (eObj instanceof PublicPackageSectionImpl) {
-						pkgSection = (PublicPackageSectionImpl) aadlPkg.getOwnedPublicSection();
+					if (eObj instanceof PublicPackageSection) {
+						pkgSection = aadlPkg.getOwnedPublicSection();
 						break;
-					} else if (eObj instanceof PrivatePackageSectionImpl) {
-						pkgSection = (PrivatePackageSectionImpl) aadlPkg.getOwnedPrivateSection();
+					} else if (eObj instanceof PrivatePackageSection) {
+						pkgSection = aadlPkg.getOwnedPrivateSection();
 						break;
 					} else {
 						eObj = eObj.eContainer();
@@ -143,7 +143,7 @@ public class SelectImplementation extends AadlHandler {
 ////					return;
 //				}
 
-				PropertySetImpl propSet = getPropertySet("Programming_Properties", "Programming_Properties.aadl",
+				PropertySet propSet = getPropertySet("Programming_Properties", "Programming_Properties.aadl",
 						resource.getResourceSet());
 				if (propSet == null) {
 					return;
@@ -161,13 +161,13 @@ public class SelectImplementation extends AadlHandler {
 				// Add Resolute check clause
 //				EList<AnnexSubclause> annexSubclauses = selectedComponent.getOwnedAnnexSubclauses();
 				Iterator<AnnexSubclause> subclause = selectedComponent.getOwnedAnnexSubclauses().iterator();
-				DefaultAnnexSubclauseImpl annexSubclause = null;
+				DefaultAnnexSubclause annexSubclause = null;
 				String sourceText = "";
 //				for (AnnexSubclause subclause : annexSubclauses) {
 				while (subclause.hasNext()) {
-					annexSubclause = (DefaultAnnexSubclauseImpl) subclause.next();
+					annexSubclause = (DefaultAnnexSubclause) subclause.next();
 					if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
-//						annexSubclause = (DefaultAnnexSubclauseImpl) subclause;
+//						annexSubclause = (DefaultAnnexSubclause) subclause;
 						sourceText = annexSubclause.getSourceText();
 						subclause.remove();
 //						break;
@@ -175,7 +175,7 @@ public class SelectImplementation extends AadlHandler {
 				}
 				// If any Resolute annex clause does not exist for this component, create it
 //				if (annexSubclause == null) {
-					annexSubclause = (DefaultAnnexSubclauseImpl) selectedComponent.createOwnedAnnexSubclause();
+				annexSubclause = selectedComponent.createOwnedAnnexSubclause();
 				annexSubclause.setName("resolute");
 //					annexSubclause.setSourceText(formatResoluteClause(""));
 				annexSubclause.setSourceText(formatResoluteClause(sourceText));

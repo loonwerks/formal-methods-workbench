@@ -99,21 +99,23 @@ public class CaseClaimsManager {
 
 	public void addFilter(String reqName) {
 
-		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
+//		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
+//
+//		// Read in the claims file
+//		String annex = "";
+//		try {
+//			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getContents()));
+//			String line = null;
+//
+//			while ((line = bufferedReader.readLine()) != null) {
+//				annex = annex + line + System.lineSeparator();
+//			}
+//			bufferedReader.close();
+//		} catch (IOException | CoreException e) {
+//			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+//		}
 
-		// Read in the claims file
-		String annex = "";
-		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getContents()));
-			String line = null;
-
-			while ((line = bufferedReader.readLine()) != null) {
-				annex = annex + line + System.lineSeparator();
-			}
-			bufferedReader.close();
-		} catch (IOException | CoreException e) {
-			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
-		}
+		String annex = readClaimsFile();
 
 		int startIdx = annex.indexOf("**", annex.indexOf(reqName + "("));
 		String descriptor = "\t\t\t" + annex.substring(startIdx, annex.indexOf("**", startIdx + 2) + 2)
@@ -131,32 +133,57 @@ public class CaseClaimsManager {
 
 		// Write back to file
 		// The contents of the file will be overwritten
-		try {
-			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
-			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
-		} catch (CoreException e) {
-			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+		writeClaimsFile(annex);
+//		try {
+//			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
+//			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
+//		} catch (CoreException e) {
+//			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+//		}
+
+	}
+
+	public void addAttestationManager(String reqName) {
+
+		String annex = readClaimsFile();
+
+		int startIdx = annex.indexOf("**", annex.indexOf(reqName + "("));
+		String descriptor = "\t\t\t" + annex.substring(startIdx, annex.indexOf("**", startIdx + 2) + 2)
+				+ System.lineSeparator();
+		String basic = reqName + "(c : component, property_id : string) <=" + System.lineSeparator() + descriptor
+				+ "\t\t\tagree_prop_checked(c, property_id)";
+		String funSig = reqName
+				+ "(c : component, property_id : string, comm_driver : component, attestation_manager : component) <="
+				+ System.lineSeparator();
+		String funDef = "\t\t\tagree_prop_checked(c, property_id) and add_attestation_manager(comm_driver, attestation_manager)";
+		if (annex.contains(basic)) {
+			annex = annex.replace(basic, funSig + descriptor + funDef);
+		} else {
+			annex = annex.replace("\t**};", "\t\t" + funSig + funDef + System.lineSeparator() + "\t**};");
 		}
 
+		writeClaimsFile(annex);
 	}
 
 	public void addLegacyComponentVerification() {
 
-		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
+//		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
+//
+//		// Read in the claims file
+//		String annex = "";
+//		try {
+//			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getContents()));
+//			String line = null;
+//
+//			while ((line = bufferedReader.readLine()) != null) {
+//				annex = annex + line + System.lineSeparator();
+//			}
+//			bufferedReader.close();
+//		} catch (IOException | CoreException e) {
+//			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+//		}
 
-		// Read in the claims file
-		String annex = "";
-		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getContents()));
-			String line = null;
-
-			while ((line = bufferedReader.readLine()) != null) {
-				annex = annex + line + System.lineSeparator();
-			}
-			bufferedReader.close();
-		} catch (IOException | CoreException e) {
-			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
-		}
+		String annex = readClaimsFile();
 
 		String funDef = "\t\tLegacyComponentVerificationCheck(c : component) <=" + System.lineSeparator()
 				+ "\t\t\t** c \" legacy component has been verified\" **" + System.lineSeparator()
@@ -165,17 +192,52 @@ public class CaseClaimsManager {
 
 		// Write back to file
 		// The contents of the file will be overwritten
-		try {
-			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
-			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
-		} catch (CoreException e) {
-			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
-		}
+		writeClaimsFile(annex);
+//		try {
+//			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
+//			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
+//		} catch (CoreException e) {
+//			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+//		}
 
 	}
 
 	private void addToResoluteAnnex(String clause) {
 
+//		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
+//
+//		// Read in the claims file
+//		String annex = "";
+//		try {
+//			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getContents()));
+//			String line = null;
+//
+//			while ((line = bufferedReader.readLine()) != null) {
+//				annex = annex + line + System.lineSeparator();
+//			}
+//			bufferedReader.close();
+//		} catch (IOException | CoreException e) {
+//			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+//		}
+
+		String annex = readClaimsFile();
+
+		// Add clause to end of annex
+		annex = annex.replace("\t**};", clause + System.lineSeparator() + "\t**};");
+
+		// Write back to file
+		// The contents of the file will be overwritten
+		writeClaimsFile(annex);
+//		try {
+//			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
+//			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
+//		} catch (CoreException e) {
+//			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
+//		}
+
+	}
+
+	private String readClaimsFile() {
 		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
 
 		// Read in the claims file
@@ -191,19 +253,17 @@ public class CaseClaimsManager {
 		} catch (IOException | CoreException e) {
 			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
 		}
+		return annex;
+	}
 
-		// Add clause to end of annex
-		annex = annex.replace("\t**};", clause + System.lineSeparator() + "\t**};");
-
-		// Write back to file
-		// The contents of the file will be overwritten
+	private void writeClaimsFile(String annex) {
+		IFile file = Filesystem.getFile(caseClaimsResource.getURI());
 		try {
 			final ByteArrayInputStream source = new ByteArrayInputStream(annex.getBytes());
 			file.setContents(source, IResource.FORCE, new NullProgressMonitor());
 		} catch (CoreException e) {
 			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
 		}
-
 	}
 
 }

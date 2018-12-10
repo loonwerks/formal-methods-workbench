@@ -4,12 +4,33 @@ public
 	with MC;
 	with FC;
 	with UAS;
-	with CASE_Prop;
+	with Base_Types;
+	with CASE_Properties;
+	
+	-- UART Message structure
+	data UART_Msg
+	end UART_Msg;
+	
+	data implementation UART_Msg.Impl
+		subcomponents
+			crc: data Base_Types::Boolean;
+			message: data Base_Types::String;
+	end UART_Msg.Impl;
+	
+	-- WIFI Message structure
+	data WIFI_Msg
+	end WIFI_Msg;
+	
+	data implementation WIFI_Msg.Impl
+		subcomponents
+			crc: data Base_Types::Boolean;
+			message: data Base_Types::String;
+	end WIFI_Msg.Impl;
 	
 	-- UAV on-board serial bus
 	bus Serial
 		properties
-			CASE_Prop::COMM_MODALITY => SERIAL;
+			CASE_Properties::COMM_MODALITY => SERIAL;
 	end Serial;
 	
 	bus implementation Serial.Impl
@@ -19,7 +40,7 @@ public
 	-- UAV on-board wifi bus
 	bus Wifi
 		properties
-			CASE_Prop::COMM_MODALITY => WIFI;
+			CASE_Properties::COMM_MODALITY => WIFI;
 	end Wifi;
 	
 	bus implementation Wifi.Impl
@@ -29,7 +50,8 @@ public
 	-- UAV on-board camera
 	device Camera
 		features
-			gimbal_command: in event data port;
+			wifi_recv: in event data port;
+			wifi_send: out event data port;
 			WIFIA: requires bus access Wifi.Impl;
 	end Camera;
 	
@@ -40,11 +62,11 @@ public
 	-- UAV
 	system UAV
 		features
-			recv_map: in event data port;
-			send_status: out event data port;
+			radio_recv: in event data port;
+			radio_send: out event data port;
 			RFA: requires bus access UAS::RF.Impl;
 		properties
-			CASE_Prop::PHYSICAL_BOUNDARY => True;
+			CASE_Properties::PHYSICAL_BOUNDARY => True;
 	end UAV;
 	
 	system implementation UAV.Impl
@@ -60,13 +82,15 @@ public
 			bac3: bus access RFA -> MCMP.RFA;
 			bac4: bus access WBUS <-> MCMP.WIFIA;
 			bac5: bus access WBUS <-> CAM.WIFIA;
-			c1: port recv_map -> MCMP.recv_map;
-			c2: port MCMP.send_status -> send_status;
-			c3: port MCMP.waypoint -> FCTL.waypoint;
-			c4: port FCTL.position_status -> MCMP.position_status;
-			c5: port MCMP.gimbal_command -> CAM.gimbal_command;
+			c1: port radio_recv -> MCMP.radio_recv;
+			c2: port MCMP.radio_send -> radio_send;
+			c3: port MCMP.uart_send -> FCTL.uart_recv;
+			c4: port FCTL.uart_send -> MCMP.uart_recv;
+			c5: port MCMP.wifi_send -> CAM.wifi_recv;
+			c6: port CAM.wifi_send -> MCMP.wifi_recv;
 		properties
 			Actual_Connection_Binding => (reference (SBUS)) applies to c3, c4;
+			Actual_Connection_Binding => (reference (WBUS)) applies to c5, c6;
 			
 	end UAV.Impl;
 	

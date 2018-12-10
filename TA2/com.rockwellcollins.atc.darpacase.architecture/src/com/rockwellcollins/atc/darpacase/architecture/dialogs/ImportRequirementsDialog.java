@@ -18,6 +18,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.osate.ui.dialogs.Dialog;
 
+import com.rockwellcollins.atc.darpacase.architecture.handlers.AddRequirement.CASE_Requirement;
+
 public class ImportRequirementsDialog extends TitleAreaDialog {
 
 	List<Button> btnReqs = new ArrayList<>();
@@ -25,11 +27,14 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	List<Text> txtIDs = new ArrayList<>();
 	List<String> lblComponents = new ArrayList<>();
 	List<Text> txtRationales = new ArrayList<>();
-	List<String> strReqIDs = new ArrayList<>();
-	List<String> strRationales = new ArrayList<>();
-	List<String> strReqNames = new ArrayList<>();
-	List<String> strReqTexts = new ArrayList<>();
-	List<String> strComponents = new ArrayList<>();
+//	List<String> strReqIDs = new ArrayList<>();
+//	List<String> strRationales = new ArrayList<>();
+//	List<String> strReqNames = new ArrayList<>();
+//	List<String> strReqTexts = new ArrayList<>();
+//	List<String> strComponents = new ArrayList<>();
+	List<CASE_Requirement> existingRequirements = new ArrayList<>();
+	List<CASE_Requirement> importRequirements = new ArrayList<>();
+	List<CASE_Requirement> omitRequirements = new ArrayList<>();
 
 	public ImportRequirementsDialog(Shell parentShell) {
 		super(parentShell);
@@ -61,11 +66,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 
 	private void createRequirementsSelectionField(Composite container) {
 
-//		Composite headerRow = new Composite(container, SWT.NONE);
-//		GridLayout layout = new GridLayout(4, false);
-//		headerRow.setLayout(layout);
-//		headerRow.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-
 		Label lblHeaderField = new Label(container, SWT.NONE);
 		FontData fontData = lblHeaderField.getFont().getFontData()[0];
 		Font font = new Font(container.getDisplay(), new FontData(fontData.getName(), fontData.getHeight(), SWT.BOLD));
@@ -96,17 +96,24 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Add requirements
+		addRequirement("remote_attestation",
+				"The FlightPlanner shall only accept messages from a trusted GroundStation", "FlightPlanner",
+				container);
 		addRequirement("well_formed", "The FlightPlanner shall receive a well-formed command from the GroundStation",
 				"FlightPlanner", container);
-		addRequirement("remote_attestation",
-				"The FlightPlanner shall only receive messages from a trusted GroundStation", "FlightPlanner",
-				container);
 		addRequirement("not_hackable", "The WaypointManager shall never be hackable by anyone ever", "WaypointManager",
 				container);
 
 	}
 
 	private void addRequirement(String reqName, String reqText, String compName, Composite container) {
+
+		// If requirement has already been imported, ignore
+		for (CASE_Requirement req : existingRequirements) {
+			if (req.name.contentEquals(reqName) && req.component.contentEquals(compName)) {
+				return;
+			}
+		}
 
 		Button btnReq = new Button(container, SWT.CHECK);
 		btnReq.setText(reqName);
@@ -164,24 +171,32 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	 */
 	private boolean saveInput() {
 
-		strReqNames.clear();
-		strReqTexts.clear();
-		strComponents.clear();
-		strRationales.clear();
+//		strReqNames.clear();
+//		strReqTexts.clear();
+//		strComponents.clear();
+//		strRationales.clear();
+		importRequirements.clear();
+		omitRequirements.clear();
 		for (int i = 0; i < btnReqs.size(); i++) {
 			if (btnReqs.get(i).getSelection()) {
-				strReqNames.add(btnReqs.get(i).getText());
+//				strReqNames.add(btnReqs.get(i).getText());
 				if (txtIDs.get(i).getText().isEmpty()) {
 					Dialog.showError("Missing requirement ID", btnReqs.get(i).getText()
 							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.");
 					return false;
 				}
-				strReqIDs.add(txtIDs.get(i).getText());
-				strReqTexts.add(lblReqTexts.get(i));
-				strComponents.add(lblComponents.get(i));
+//				strReqIDs.add(txtIDs.get(i).getText());
+//				strReqTexts.add(lblReqTexts.get(i));
+//				strComponents.add(lblComponents.get(i));
+				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
+						lblReqTexts.get(i), lblComponents.get(i), txtRationales.get(i).getText()));
 			} else {
-				strRationales.add(txtRationales.get(i).getText());
+//				strRationales.add(txtRationales.get(i).getText());
+				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
+						lblReqTexts.get(i), lblComponents.get(i), txtRationales.get(i).getText()));
 			}
+//			requirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(), lblReqTexts.get(i),
+//					lblComponents.get(i), txtRationales.get(i).getText()));
 		}
 		return true;
 	}
@@ -193,24 +208,36 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		}
 	}
 
-	public List<String> getReqNames() {
-		return strReqNames;
+//	public List<String> getReqNames() {
+//		return strReqNames;
+//	}
+//
+//	public List<String> getReqTexts() {
+//		return strReqTexts;
+//	}
+//
+//	public List<String> getComponents() {
+//		return strComponents;
+//	}
+//
+//	public List<String> getRationales() {
+//		return strRationales;
+//	}
+//
+//	public List<String> getReqIDs() {
+//		return strReqIDs;
+//	}
+
+	public List<CASE_Requirement> getImportRequirements() {
+		return importRequirements;
 	}
 
-	public List<String> getReqTexts() {
-		return strReqTexts;
+	public List<CASE_Requirement> getOmitRequirements() {
+		return omitRequirements;
 	}
 
-	public List<String> getComponents() {
-		return strComponents;
-	}
-
-	public List<String> getRationales() {
-		return strRationales;
-	}
-
-	public List<String> getReqIDs() {
-		return strReqIDs;
+	public void setResoluteClauses(List<CASE_Requirement> resoluteClauses) {
+		this.existingRequirements = resoluteClauses;
 	}
 
 }

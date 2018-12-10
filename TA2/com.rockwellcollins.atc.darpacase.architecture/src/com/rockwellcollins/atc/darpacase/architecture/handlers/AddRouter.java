@@ -15,13 +15,13 @@ import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
+import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.AadlPackageImpl;
 import org.osate.aadl2.impl.EventDataPortImpl;
 import org.osate.aadl2.impl.ProcessImplementationImpl;
-import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.ui.dialogs.Dialog;
 
@@ -118,11 +118,11 @@ public class AddRouter extends AadlHandler {
 				// CASE Property file
 				// First check if CASE Property file has already been imported in the model
 				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySetImpl casePropSet = null;
+				PropertySet casePropSet = null;
 				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySetImpl) {
+					if (modelUnit instanceof PropertySet) {
 						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySetImpl) modelUnit;
+							casePropSet = (PropertySet) modelUnit;
 							break;
 						}
 					}
