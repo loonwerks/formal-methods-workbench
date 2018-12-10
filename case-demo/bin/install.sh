@@ -15,6 +15,7 @@ sudo apt-get install libxml2-utils ncurses-dev
 sudo apt-get install curl git doxygen
 
 sudo curl -sSL https://get.haskellstack.org/ | sh
+sudo apt install libgmp-dev
 
 sudo apt-get install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
 sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu

@@ -15,6 +15,8 @@ then
   echo "usage: build-regex-filter <regex>"
 
 else
+  mkdir -p $FILT/build
+  rm -r $FILT/build/*
   cd $FILT/build
   rm -r *
   echo "Building filter for '$REGEX'"
