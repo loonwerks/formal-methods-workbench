@@ -1,6 +1,15 @@
 app load ["AADL"];
 
-open Lib Feedback HolKernel boolLib MiscLib regexpLib AADL splatTheory;
+open Lib Feedback HolKernel boolLib MiscLib regexpLib splatTheory AADL;
+
+val jsonfile = "examples/SW6.json";
+
+val ([jpkg],ss) = Json.fromFile jsonfile
+
+(* OPEN AADL and go through gen_hol *)
+
+val (pkgName,enums,recds,fns,filters) = get_pkg_decls jpkg
+
 
 val int_ss = intLib.int_ss;
 
@@ -10,17 +19,6 @@ fun qspec_arith q th = qspec q th |> SIMP_RULE arith_ss [];
 val var_eq_tac = rpt BasicProvers.VAR_EQ_TAC;
 val decide = bossLib.DECIDE;
 val qdecide = decide o Parse.Term;
-
-val justifyDefault = regexpLib.SML;
-
-val ERR = Feedback.mk_HOL_ERR "splat";
-
-val jsonfile = "examples/SW_v2.json";
-
-val ([jpkg],ss) = Json.fromFile jsonfile
-val (pkgName,enums,recds,fns,filters) = AADL.get_pkg_decls jpkg
-
-(* OPEN AADL and go through gen_hol *)
 
 val [filter_goal as (fname,regexp_tm,encode_def, decode_def, goal_tm)] = filter_goals;
 

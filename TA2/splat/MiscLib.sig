@@ -69,4 +69,6 @@ sig
    val sort_on_int_key : (int * 'a) list -> (int * 'a) list
    val sort_on_string_key : (string * 'a) list -> (string * 'a) list
    val sort_on_qid_key : ((string * string) * 'a) list -> ((string * string) * 'a) list
+
+   val mapfilter : ('a -> 'b) -> 'a list -> 'b list
 end

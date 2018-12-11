@@ -1,0 +1,2376 @@
+{
+  "kind": "package",
+  "name": "SW",
+  "agree": [
+    {
+      "statements": [
+        "new_case/genSpecStatement/com.rockwellcollins.atc.agree.agree.impl.ConstStatementImpl@76563c22 (name: CASE_UAV_ID)",
+        {
+          "kind": "funDef",
+          "name": "VALID_MESSAGE",
+          "params": [
+            {
+              "kind": "param",
+              "name": "msg",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Command.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "CASE_Model_Transformations.NULL_MESSAGE"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "msg.header"
+                }
+              ]
+            },
+            "op": "or",
+            "right": {
+              "kind": "binary",
+              "left": {
+                "kind": "binary",
+                "left": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "nestedDotId",
+                    "name": "msg.header.src"
+                  },
+                  "op": ">",
+                  "right": {
+                    "kind": "intLit",
+                    "value": "0"
+                  }
+                },
+                "op": "and",
+                "right": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "nestedDotId",
+                    "name": "msg.header.dst"
+                  },
+                  "op": "=",
+                  "right": {
+                    "kind": "nestedDotId",
+                    "name": "CASE_UAV_ID"
+                  }
+                }
+              },
+              "op": "and",
+              "right": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "msg.header.HMAC"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "boolLit",
+                  "value": "true"
+                }
+              }
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "TRUSTED_MESSAGE",
+          "params": [
+            {
+              "kind": "param",
+              "name": "msg",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Command.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "CASE_Model_Transformations.NULL_MESSAGE"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "msg.header"
+                }
+              ]
+            },
+            "op": "or",
+            "right": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "CASE_Model_Transformations.TRUSTED"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "msg.header.src"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "WELL_FORMED_MESSAGE",
+          "params": [
+            {
+              "kind": "param",
+              "name": "msg",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Command.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "CASE_Model_Transformations.NULL_MESSAGE"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "msg.header"
+                }
+              ]
+            },
+            "op": "or",
+            "right": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "good_command"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "msg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "good_coordinate",
+          "params": [
+            {
+              "kind": "param",
+              "name": "coord",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Coordinate.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "binary",
+              "left": {
+                "kind": "binary",
+                "left": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "binary",
+                    "left": {
+                      "kind": "binary",
+                      "left": {
+                        "kind": "nestedDotId",
+                        "name": "coord.latitude"
+                      },
+                      "op": ">=",
+                      "right": {
+                        "kind": "unary",
+                        "operand": {
+                          "kind": "intLit",
+                          "value": "90"
+                        },
+                        "op": "-"
+                      }
+                    },
+                    "op": "and",
+                    "right": {
+                      "kind": "binary",
+                      "left": {
+                        "kind": "nestedDotId",
+                        "name": "coord.latitude"
+                      },
+                      "op": "<=",
+                      "right": {
+                        "kind": "intLit",
+                        "value": "90"
+                      }
+                    }
+                  },
+                  "op": "and",
+                  "right": {
+                    "kind": "binary",
+                    "left": {
+                      "kind": "nestedDotId",
+                      "name": "coord.longitude"
+                    },
+                    "op": ">=",
+                    "right": {
+                      "kind": "unary",
+                      "operand": {
+                        "kind": "intLit",
+                        "value": "180"
+                      },
+                      "op": "-"
+                    }
+                  }
+                },
+                "op": "and",
+                "right": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "nestedDotId",
+                    "name": "coord.longitude"
+                  },
+                  "op": "<=",
+                  "right": {
+                    "kind": "intLit",
+                    "value": "180"
+                  }
+                }
+              },
+              "op": "and",
+              "right": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "coord.altitude"
+                },
+                "op": ">=",
+                "right": {
+                  "kind": "intLit",
+                  "value": "0"
+                }
+              }
+            },
+            "op": "and",
+            "right": {
+              "kind": "binary",
+              "left": {
+                "kind": "nestedDotId",
+                "name": "coord.altitude"
+              },
+              "op": "<=",
+              "right": {
+                "kind": "intLit",
+                "value": "15000"
+              }
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "good_map",
+          "params": [
+            {
+              "kind": "param",
+              "name": "map",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Map.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "binary",
+              "left": {
+                "kind": "binary",
+                "left": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "good_coordinate"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "map.wp1"
+                    }
+                  ]
+                },
+                "op": "and",
+                "right": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "good_coordinate"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "map.wp2"
+                    }
+                  ]
+                }
+              },
+              "op": "and",
+              "right": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_coordinate"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "map.wp3"
+                  }
+                ]
+              }
+            },
+            "op": "and",
+            "right": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "good_coordinate"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "map.wp4"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "good_pattern",
+          "params": [
+            {
+              "kind": "param",
+              "name": "pattern",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "FlightPattern.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "binary",
+              "left": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "pattern"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "aadlEnum",
+                  "type": {
+                    "kind": "nestedDotId",
+                    "name": "FlightPattern"
+                  },
+                  "value": "ZigZag"
+                }
+              },
+              "op": "or",
+              "right": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "pattern"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "aadlEnum",
+                  "type": {
+                    "kind": "nestedDotId",
+                    "name": "FlightPattern"
+                  },
+                  "value": "StraightLine"
+                }
+              }
+            },
+            "op": "or",
+            "right": {
+              "kind": "binary",
+              "left": {
+                "kind": "nestedDotId",
+                "name": "pattern"
+              },
+              "op": "=",
+              "right": {
+                "kind": "aadlEnum",
+                "type": {
+                  "kind": "nestedDotId",
+                  "name": "FlightPattern"
+                },
+                "value": "Perimeter"
+              }
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "good_command",
+          "params": [
+            {
+              "kind": "param",
+              "name": "cmd",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Command.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "good_map"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "cmd.map"
+                }
+              ]
+            },
+            "op": "and",
+            "right": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "good_pattern"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "cmd.pattern"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "good_mission",
+          "params": [
+            {
+              "kind": "param",
+              "name": "mission",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "Mission.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "binary",
+              "left": {
+                "kind": "binary",
+                "left": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "binary",
+                    "left": {
+                      "kind": "binary",
+                      "left": {
+                        "kind": "binary",
+                        "left": {
+                          "kind": "binary",
+                          "left": {
+                            "kind": "binary",
+                            "left": {
+                              "kind": "fnCall",
+                              "function": {
+                                "kind": "nestedDotId",
+                                "name": "good_coordinate"
+                              },
+                              "args": [
+                                {
+                                  "kind": "nestedDotId",
+                                  "name": "mission.wp1"
+                                }
+                              ]
+                            },
+                            "op": "and",
+                            "right": {
+                              "kind": "fnCall",
+                              "function": {
+                                "kind": "nestedDotId",
+                                "name": "good_coordinate"
+                              },
+                              "args": [
+                                {
+                                  "kind": "nestedDotId",
+                                  "name": "mission.wp2"
+                                }
+                              ]
+                            }
+                          },
+                          "op": "and",
+                          "right": {
+                            "kind": "fnCall",
+                            "function": {
+                              "kind": "nestedDotId",
+                              "name": "good_coordinate"
+                            },
+                            "args": [
+                              {
+                                "kind": "nestedDotId",
+                                "name": "mission.wp3"
+                              }
+                            ]
+                          }
+                        },
+                        "op": "and",
+                        "right": {
+                          "kind": "fnCall",
+                          "function": {
+                            "kind": "nestedDotId",
+                            "name": "good_coordinate"
+                          },
+                          "args": [
+                            {
+                              "kind": "nestedDotId",
+                              "name": "mission.wp4"
+                            }
+                          ]
+                        }
+                      },
+                      "op": "and",
+                      "right": {
+                        "kind": "fnCall",
+                        "function": {
+                          "kind": "nestedDotId",
+                          "name": "good_coordinate"
+                        },
+                        "args": [
+                          {
+                            "kind": "nestedDotId",
+                            "name": "mission.wp5"
+                          }
+                        ]
+                      }
+                    },
+                    "op": "and",
+                    "right": {
+                      "kind": "fnCall",
+                      "function": {
+                        "kind": "nestedDotId",
+                        "name": "good_coordinate"
+                      },
+                      "args": [
+                        {
+                          "kind": "nestedDotId",
+                          "name": "mission.wp6"
+                        }
+                      ]
+                    }
+                  },
+                  "op": "and",
+                  "right": {
+                    "kind": "fnCall",
+                    "function": {
+                      "kind": "nestedDotId",
+                      "name": "good_coordinate"
+                    },
+                    "args": [
+                      {
+                        "kind": "nestedDotId",
+                        "name": "mission.wp7"
+                      }
+                    ]
+                  }
+                },
+                "op": "and",
+                "right": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "good_coordinate"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "mission.wp8"
+                    }
+                  ]
+                }
+              },
+              "op": "and",
+              "right": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_coordinate"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission.wp9"
+                  }
+                ]
+              }
+            },
+            "op": "and",
+            "right": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "good_coordinate"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "mission.wp10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "funDef",
+          "name": "good_mission_window",
+          "params": [
+            {
+              "kind": "param",
+              "name": "win",
+              "type": {
+                "kind": "type",
+                "type": {
+                  "kind": "recordType",
+                  "recordType": {
+                    "kind": "typeId",
+                    "name": "MissionWindow.Impl"
+                  }
+                }
+              }
+            }
+          ],
+          "expr": {
+            "kind": "binary",
+            "left": {
+              "kind": "binary",
+              "left": {
+                "kind": "binary",
+                "left": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "good_coordinate"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "win.wp1"
+                    }
+                  ]
+                },
+                "op": "and",
+                "right": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "good_coordinate"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "win.wp2"
+                    }
+                  ]
+                }
+              },
+              "op": "and",
+              "right": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_coordinate"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "win.wp3"
+                  }
+                ]
+              }
+            },
+            "op": "and",
+            "right": {
+              "kind": "fnCall",
+              "function": {
+                "kind": "nestedDotId",
+                "name": "good_coordinate"
+              },
+              "args": [
+                {
+                  "kind": "nestedDotId",
+                  "name": "win.wp4"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "name": "CASE_MsgHeader",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "CASE_MsgHeader": "CASE_MsgHeader.Impl",
+      "subcomponents": [
+        {
+          "name": "src",
+          "category": "data",
+          "classifier": "Base_Types::Integer"
+        },
+        {
+          "name": "dst",
+          "category": "data",
+          "classifier": "Base_Types::Integer"
+        },
+        {
+          "name": "HMAC",
+          "category": "data",
+          "classifier": "Base_Types::Boolean"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "Coordinate",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "Coordinate": "Coordinate.Impl",
+      "subcomponents": [
+        {
+          "name": "latitude",
+          "category": "data",
+          "classifier": "Base_Types::Integer"
+        },
+        {
+          "name": "longitude",
+          "category": "data",
+          "classifier": "Base_Types::Integer"
+        },
+        {
+          "name": "altitude",
+          "category": "data",
+          "classifier": "Base_Types::Integer"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "Map",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "Map": "Map.Impl",
+      "subcomponents": [
+        {
+          "name": "wp1",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp2",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp3",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp4",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "MapArray",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "MapArray": "MapArray.Impl",
+      "subcomponents": [
+        {
+          "name": "map1",
+          "category": "data",
+          "classifier": "SW::Map.Impl"
+        },
+        {
+          "name": "map2",
+          "category": "data",
+          "classifier": "SW::Map.Impl"
+        },
+        {
+          "name": "map3",
+          "category": "data",
+          "classifier": "SW::Map.Impl"
+        },
+        {
+          "name": "map4",
+          "category": "data",
+          "classifier": "SW::Map.Impl"
+        },
+        {
+          "name": "map5",
+          "category": "data",
+          "classifier": "SW::Map.Impl"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "FlightPattern",
+      "type": "data",
+      "features": [],
+      "properties": [
+        {
+          "name": "Data_Representation",
+          "value": "Enum"
+        },
+        {
+          "name": "Enumerators",
+          "value": [
+            "ZigZag",
+            "StraightLine",
+            "Perimeter"
+          ]
+        }
+      ],
+      "agree": []
+    },
+    {
+      "FlightPattern": "FlightPattern.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "Command",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "Command": "Command.Impl",
+      "subcomponents": [
+        {
+          "name": "header",
+          "category": "data",
+          "classifier": "CASE_Model_Transformations::CASE_MsgHeader.Impl"
+        },
+        {
+          "name": "map",
+          "category": "data",
+          "classifier": "SW::Map.Impl"
+        },
+        {
+          "name": "pattern",
+          "category": "data",
+          "classifier": "SW::FlightPattern"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "Mission",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "Mission": "Mission.Impl",
+      "subcomponents": [
+        {
+          "name": "wp1",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp2",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp3",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp4",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp5",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp6",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp7",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp8",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp9",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp10",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "MissionWindow",
+      "type": "data",
+      "features": [],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "MissionWindow": "MissionWindow.Impl",
+      "subcomponents": [
+        {
+          "name": "wp1",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp2",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp3",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        },
+        {
+          "name": "wp4",
+          "category": "data",
+          "classifier": "SW::Coordinate.Impl"
+        }
+      ],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "WifiDriver",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "gimbal_command",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "send_data",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "recv_data",
+            "type": "event data",
+            "flow": "in"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "WifiDriver": "WifiDriver.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "RadioDriver",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "recv_data",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "send_data",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "mission_command",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "status",
+            "type": "event data",
+            "flow": "in"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "COMP_TYPE",
+          "value": "COMM_DRIVER"
+        }
+      ],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_RadioDriver",
+              "label": "The message is intended for this UAV",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "recv_data.header.dst"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "nestedDotId",
+                  "name": "CASE_UAV_ID"
+                }
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_RadioDriver",
+              "label": "Only valid messages from the ground station",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "VALID_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission_command"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "RadioDriver": "RadioDriver.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "eq",
+              "expr": {
+                "kind": "unary",
+                "operand": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "CASE_Model_Transformations.NULL_MESSAGE"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "recv_data.header"
+                    }
+                  ]
+                },
+                "op": "not"
+              }
+            },
+            {
+              "kind": "eq",
+              "expr": "new_case/genExpr/com.rockwellcollins.atc.agree.agree.impl.IfThenElseExprImpl@123a318d"
+            },
+            {
+              "kind": "assert",
+              "name": "null",
+              "label": "null",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "mission_command.header"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "nestedDotId",
+                  "name": "mission_command_header"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_RadioDriver",
+              "label": "The message is intended for this UAV",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "recv_data.header.dst"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "nestedDotId",
+                  "name": "CASE_UAV_ID"
+                }
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_RadioDriver",
+              "label": "Only valid messages from the ground station",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "VALID_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission_command"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CASE_Filter",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "filter_in",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "filter_out",
+            "type": "event data",
+            "flow": "out"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "COMP_TYPE",
+          "value": "FILTER"
+        },
+        {
+          "name": "COMP_IMPL",
+          "value": "CakeML"
+        },
+        {
+          "name": "COMP_SPEC",
+          "value": "Req001_Filter"
+        }
+      ],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "guarantee",
+              "name": "Req002_RadioDriver_Filter",
+              "label": "Only valid messages from the ground station",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "VALID_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "filter_out"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req001_Filter",
+              "label": "The Flight Planner shall receive a well-formed command from the Ground Station",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "WELL_FORMED_MESSAGE"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "filter_out"
+                    }
+                  ]
+                },
+                "op": "and",
+                "right": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "fnCall",
+                    "function": {
+                      "kind": "nestedDotId",
+                      "name": "good_command"
+                    },
+                    "args": [
+                      {
+                        "kind": "nestedDotId",
+                        "name": "filter_out"
+                      }
+                    ]
+                  },
+                  "op": "=>",
+                  "right": {
+                    "kind": "binary",
+                    "left": {
+                      "kind": "nestedDotId",
+                      "name": "filter_out"
+                    },
+                    "op": "=",
+                    "right": {
+                      "kind": "nestedDotId",
+                      "name": "filter_in"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "CASE_Filter": "CASE_Filter.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "guarantee",
+              "name": "Req002_RadioDriver_Filter",
+              "label": "Only valid messages from the ground station",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "VALID_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "filter_out"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req001_Filter",
+              "label": "The Flight Planner shall receive a well-formed command from the Ground Station",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "fnCall",
+                  "function": {
+                    "kind": "nestedDotId",
+                    "name": "WELL_FORMED_MESSAGE"
+                  },
+                  "args": [
+                    {
+                      "kind": "nestedDotId",
+                      "name": "filter_out"
+                    }
+                  ]
+                },
+                "op": "and",
+                "right": {
+                  "kind": "binary",
+                  "left": {
+                    "kind": "fnCall",
+                    "function": {
+                      "kind": "nestedDotId",
+                      "name": "good_command"
+                    },
+                    "args": [
+                      {
+                        "kind": "nestedDotId",
+                        "name": "filter_out"
+                      }
+                    ]
+                  },
+                  "op": "=>",
+                  "right": {
+                    "kind": "binary",
+                    "left": {
+                      "kind": "nestedDotId",
+                      "name": "filter_out"
+                    },
+                    "op": "=",
+                    "right": {
+                      "kind": "nestedDotId",
+                      "name": "filter_in"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FlightPlanner",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "flight_plan",
+            "type": "data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "recv_map",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "request_nofly_zones",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "nofly_zones",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "position_status",
+            "type": "event data",
+            "flow": "in"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req003_FlightPlanner",
+              "label": "The FlightPlanner shall receive a well-formed command from the GroundStation",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "WELL_FORMED_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "recv_map"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "assume",
+              "name": "Req001_FlightPlanner",
+              "label": "The Flight Planner shall receive a valid message from the Ground Station",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "VALID_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "recv_map"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_FlightPlanner",
+              "label": "The Flight Planner shall generate a valid mission",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "flight_plan"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "FlightPlanner": "FlightPlanner.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req003_FlightPlanner",
+              "label": "The FlightPlanner shall receive a well-formed command from the GroundStation",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "WELL_FORMED_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "recv_map"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "assume",
+              "name": "Req001_FlightPlanner",
+              "label": "The Flight Planner shall receive a valid message from the Ground Station",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "VALID_MESSAGE"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "recv_map"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_FlightPlanner",
+              "label": "The Flight Planner shall generate a valid mission",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "flight_plan"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NoFlyZoneDatabase",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "map",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "zones",
+            "type": "event data",
+            "flow": "out"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "NoFlyZoneDatabase": "NoFlyZoneDatabase.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "WaypointManager",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "flight_plan",
+            "type": "data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "mission_window",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "position_status",
+            "type": "event data",
+            "flow": "in"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_WaypointManager",
+              "label": "The Waypoint Manager shall receive a well-formed mission",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "flight_plan"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_WaypointManager",
+              "label": "The Waypoint Manager shall output a well-formed mission window",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission_window"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission_window"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "WaypointManager": "WaypointManager.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_WaypointManager",
+              "label": "The Waypoint Manager shall receive a well-formed mission",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "flight_plan"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_WaypointManager",
+              "label": "The Waypoint Manager shall output a well-formed mission window",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission_window"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission_window"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CameraManager",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "flight_plan",
+            "type": "data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "position_status",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "gimbal_command",
+            "type": "event data",
+            "flow": "out"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": []
+    },
+    {
+      "CameraManager": "CameraManager.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": []
+    },
+    {
+      "name": "UARTDriver",
+      "type": "thread",
+      "features": [
+        {
+          "port": {
+            "name": "status",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "mission_window",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "recv_data",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "send_data",
+            "type": "event data",
+            "flow": "out"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_UARTDriver",
+              "label": "Well-formed mission window",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission_window"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission_window"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_UARTDriver",
+              "label": "A CRC shall be appended to the message to determine message correctness",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "send_data.crc"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "boolLit",
+                  "value": "true"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "UARTDriver": "UARTDriver.Impl",
+      "subcomponents": [],
+      "connections": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_UARTDriver",
+              "label": "Well-formed mission window",
+              "expr": {
+                "kind": "fnCall",
+                "function": {
+                  "kind": "nestedDotId",
+                  "name": "good_mission_window"
+                },
+                "args": [
+                  {
+                    "kind": "nestedDotId",
+                    "name": "mission_window"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_UARTDriver",
+              "label": "A CRC shall be appended to the message to determine message correctness",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "send_data.crc"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "boolLit",
+                  "value": "true"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SW",
+      "type": "process",
+      "features": [
+        {
+          "port": {
+            "name": "radio_recv",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "radio_send",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "uart_recv",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "uart_send",
+            "type": "event data",
+            "flow": "out"
+          }
+        },
+        {
+          "port": {
+            "name": "wifi_recv",
+            "type": "event data",
+            "flow": "in"
+          }
+        },
+        {
+          "port": {
+            "name": "wifi_send",
+            "type": "event data",
+            "flow": "out"
+          }
+        }
+      ],
+      "properties": [],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_SW",
+              "label": "The Mission Computer shall only accept commands intended for this UAV",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "radio_recv.header.dst"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "nestedDotId",
+                  "name": "CASE_UAV_ID"
+                }
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_SW",
+              "label": "The Mission Computer shall output a valid mission window to the Flight Controller",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "uart_send.crc"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "boolLit",
+                  "value": "true"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "SW": "SW.Impl1",
+      "subcomponents": [
+        {
+          "name": "RADIO",
+          "category": "thread",
+          "classifier": "SW::RadioDriver.Impl"
+        },
+        {
+          "name": "FLT",
+          "category": "thread",
+          "classifier": "SW::CASE_Filter.Impl"
+        },
+        {
+          "name": "FPLN",
+          "category": "thread",
+          "classifier": "SW::FlightPlanner.Impl"
+        },
+        {
+          "name": "WPM",
+          "category": "thread",
+          "classifier": "SW::WaypointManager.Impl"
+        },
+        {
+          "name": "CM",
+          "category": "thread",
+          "classifier": "SW::CameraManager.Impl"
+        },
+        {
+          "name": "UART",
+          "category": "thread",
+          "classifier": "SW::UARTDriver.Impl"
+        },
+        {
+          "name": "WIFI",
+          "category": "thread",
+          "classifier": "SW::WifiDriver.Impl"
+        },
+        {
+          "name": "NFDB",
+          "category": "thread",
+          "classifier": "SW::NoFlyZoneDatabase.Impl"
+        }
+      ],
+      "connections": [
+        {
+          "name": "c1",
+          "source": "radio_recv",
+          "destination": "RADIO.recv_data"
+        },
+        {
+          "name": "c2",
+          "source": "RADIO.send_data",
+          "destination": "radio_send"
+        },
+        {
+          "name": "c3",
+          "source": "RADIO.mission_command",
+          "destination": "FLT.filter_in"
+        },
+        {
+          "name": "c4",
+          "source": "FLT.filter_out",
+          "destination": "FPLN.recv_map"
+        },
+        {
+          "name": "c5",
+          "source": "FPLN.flight_plan",
+          "destination": "WPM.flight_plan"
+        },
+        {
+          "name": "c6",
+          "source": "FPLN.request_nofly_zones",
+          "destination": "NFDB.map"
+        },
+        {
+          "name": "c7",
+          "source": "NFDB.zones",
+          "destination": "FPLN.nofly_zones"
+        },
+        {
+          "name": "c8",
+          "source": "WPM.mission_window",
+          "destination": "UART.mission_window"
+        },
+        {
+          "name": "c9",
+          "source": "UART.status",
+          "destination": "WPM.position_status"
+        },
+        {
+          "name": "c10",
+          "source": "UART.status",
+          "destination": "FPLN.position_status"
+        },
+        {
+          "name": "c11",
+          "source": "UART.status",
+          "destination": "RADIO.status"
+        },
+        {
+          "name": "c12",
+          "source": "UART.send_data",
+          "destination": "uart_send"
+        },
+        {
+          "name": "c13",
+          "source": "uart_recv",
+          "destination": "UART.recv_data"
+        },
+        {
+          "name": "c14",
+          "source": "FPLN.flight_plan",
+          "destination": "CM.flight_plan"
+        },
+        {
+          "name": "c15",
+          "source": "UART.status",
+          "destination": "CM.position_status"
+        },
+        {
+          "name": "c16",
+          "source": "CM.gimbal_command",
+          "destination": "WIFI.gimbal_command"
+        },
+        {
+          "name": "c17",
+          "source": "WIFI.send_data",
+          "destination": "wifi_send"
+        },
+        {
+          "name": "c18",
+          "source": "wifi_recv",
+          "destination": "WIFI.recv_data"
+        }
+      ],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_SW",
+              "label": "The Mission Computer shall only accept commands intended for this UAV",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "radio_recv.header.dst"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "nestedDotId",
+                  "name": "CASE_UAV_ID"
+                }
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_SW",
+              "label": "The Mission Computer shall output a valid mission window to the Flight Controller",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "uart_send.crc"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "boolLit",
+                  "value": "true"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "SW": "SW.Impl",
+      "subcomponents": [
+        {
+          "name": "RADIO",
+          "category": "thread",
+          "classifier": "SW::RadioDriver.Impl"
+        },
+        {
+          "name": "FPLN",
+          "category": "thread",
+          "classifier": "SW::FlightPlanner.Impl"
+        },
+        {
+          "name": "WPM",
+          "category": "thread",
+          "classifier": "SW::WaypointManager.Impl"
+        },
+        {
+          "name": "CM",
+          "category": "thread",
+          "classifier": "SW::CameraManager.Impl"
+        },
+        {
+          "name": "UART",
+          "category": "thread",
+          "classifier": "SW::UARTDriver.Impl"
+        },
+        {
+          "name": "WIFI",
+          "category": "thread",
+          "classifier": "SW::WifiDriver.Impl"
+        },
+        {
+          "name": "NFDB",
+          "category": "thread",
+          "classifier": "SW::NoFlyZoneDatabase.Impl"
+        }
+      ],
+      "connections": [
+        {
+          "name": "c1",
+          "source": "radio_recv",
+          "destination": "RADIO.recv_data"
+        },
+        {
+          "name": "c2",
+          "source": "RADIO.send_data",
+          "destination": "radio_send"
+        },
+        {
+          "name": "c3",
+          "source": "RADIO.mission_command",
+          "destination": "FPLN.recv_map"
+        },
+        {
+          "name": "c5",
+          "source": "FPLN.flight_plan",
+          "destination": "WPM.flight_plan"
+        },
+        {
+          "name": "c6",
+          "source": "FPLN.request_nofly_zones",
+          "destination": "NFDB.map"
+        },
+        {
+          "name": "c7",
+          "source": "NFDB.zones",
+          "destination": "FPLN.nofly_zones"
+        },
+        {
+          "name": "c8",
+          "source": "WPM.mission_window",
+          "destination": "UART.mission_window"
+        },
+        {
+          "name": "c9",
+          "source": "UART.status",
+          "destination": "WPM.position_status"
+        },
+        {
+          "name": "c10",
+          "source": "UART.status",
+          "destination": "FPLN.position_status"
+        },
+        {
+          "name": "c11",
+          "source": "UART.status",
+          "destination": "RADIO.status"
+        },
+        {
+          "name": "c12",
+          "source": "UART.send_data",
+          "destination": "uart_send"
+        },
+        {
+          "name": "c13",
+          "source": "uart_recv",
+          "destination": "UART.recv_data"
+        },
+        {
+          "name": "c14",
+          "source": "FPLN.flight_plan",
+          "destination": "CM.flight_plan"
+        },
+        {
+          "name": "c15",
+          "source": "UART.status",
+          "destination": "CM.position_status"
+        },
+        {
+          "name": "c16",
+          "source": "CM.gimbal_command",
+          "destination": "WIFI.gimbal_command"
+        },
+        {
+          "name": "c17",
+          "source": "WIFI.send_data",
+          "destination": "wifi_send"
+        },
+        {
+          "name": "c18",
+          "source": "wifi_recv",
+          "destination": "WIFI.recv_data"
+        }
+      ],
+      "agree": [
+        {
+          "statements": [
+            {
+              "kind": "assume",
+              "name": "Req001_SW",
+              "label": "The Mission Computer shall only accept commands intended for this UAV",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "radio_recv.header.dst"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "nestedDotId",
+                  "name": "CASE_UAV_ID"
+                }
+              }
+            },
+            {
+              "kind": "guarantee",
+              "name": "Req002_SW",
+              "label": "The Mission Computer shall output a valid mission window to the Flight Controller",
+              "expr": {
+                "kind": "binary",
+                "left": {
+                  "kind": "nestedDotId",
+                  "name": "uart_send.crc"
+                },
+                "op": "=",
+                "right": {
+                  "kind": "boolLit",
+                  "value": "true"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

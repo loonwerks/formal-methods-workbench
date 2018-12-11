@@ -87,6 +87,7 @@ fun mk_binop (opr,e1,e2) =
          | "<="  => LessEqual
          | ">"   => Greater
          | ">="  => GreaterEqual
+	 | "=>"  => Imp
          | "="   => Equal
          | "and" => And
          | "or"  => Or
@@ -155,18 +156,25 @@ fun build_fndef (fname,params,body) =
  in (fname,params',body')
  end;
 
+fun mangle body =
+ case body 
+  of AList [("kind", _), ("left",_), ("op",_),("right",e)] => e
+   | otherwise => raise ERR "mengle" "unexpected input format"
+			
 fun mk_fun_def json =
  case json
   of AList [("kind", String "funDef"),
             ("name", String fname),
             ("params", List params),
-            ("expr", body)] => build_fndef (fname,params,body)
+            ("expr", body)] => 
+     build_fndef (fname,params,
+      if fname = "WELL_FORMED_MESSAGE" then mangle body else body)
   |  otherwise => raise ERR "mk_fun_def" "unexpected input";
 
 fun get_fndefs elt2 =
  case elt2
   of ("agree",
-      List [AList [("statements", List fundefs)]]) => map mk_fun_def fundefs
+      List [AList [("statements", List fundefs)]]) => mapfilter mk_fun_def fundefs
    |  otherwise => raise ERR "get_fndefs" "unexpected input";
 
 (*---------------------------------------------------------------------------*)
@@ -182,7 +190,10 @@ fun fldty pkgName str =
    | other =>
       let val chunks = String.tokens (fn ch => (ch = #":" orelse ch = #".")) str
           val chunks' = if last chunks = "Impl" then butlast chunks else chunks
-          val chunks'' = if hd chunks' = pkgName then tl chunks' else chunks'
+          val ty_pkgName = 
+              hd chunks' handle _ => raise ERR "fldty" "malformed type"
+	  val chunks'' = tl chunks'
+(*          val chunks'' = if hd chunks' = pkgName then tl chunks' else chunks' *)
       in case chunks''
           of [name] => NamedTy("",name)
            | other => raise ERR "fldty" ("unknown field type"^Lib.quote str)
@@ -194,6 +205,12 @@ fun dest_subcomp pkgName sc =
             ("classifier", String tystr)]
       => (fldname,fldty pkgName tystr)
    | otherwise => raise ERR "dest_subcomp" "expected a record field";
+
+fun is_recd names decl = 
+ case decl
+  of AList ((name, String name_impl)::("subcomponents", List subs)::_)
+      => name^".Impl" = name_impl andalso mem name names
+  |  otherwise => false;
 
 fun recd_decl pkgName names decl =
  case decl
@@ -255,17 +272,18 @@ val [c1, c2, c3, c4, c5, c6, c7, c8, c9,
 *)
 
 
-fun fldty pkgName str =
- case str
+fun fldty pkgName tystr =
+ case tystr
   of "Base_Types::Integer" => BaseTy(IntTy (!defaultNumKind))
    | "Base_Types::Boolean" => BaseTy(BoolTy)
    | other =>
-      let val chunks = String.tokens (fn ch => (ch = #":" orelse ch = #".")) str
+      let val chunks = String.tokens (fn ch => (ch = #":" orelse ch = #".")) tystr
           val chunks' = if last chunks = "Impl" then butlast chunks else chunks
-          val chunks'' = if hd chunks' = pkgName then tl chunks' else chunks'
+          val chunks'' = if length chunks' = 2 then tl chunks' else chunks' 
+(*           val chunks'' = if hd chunks' = pkgName then tl chunks' else chunks' *)
       in case chunks''
           of [name] => NamedTy(pkgName,name)
-           | other => raise ERR "fldty" ("unknown field type"^Lib.quote str)
+           | other => raise ERR "fldty" ("unknown field type"^Lib.quote tystr)
       end;
 
 fun dest_subcomp pkgName subcomp =
@@ -306,8 +324,8 @@ fun get_tydecls pkgName comps =
  let val data_tynames = mapfilter data_decl_name comps
      val recd_decls = mapfilter (recd_decl pkgName data_tynames) comps
      val enum_decls = mapfilter enum_decl comps
- in (recd_decls,
-     enum_decls)
+ in 
+   (recd_decls, enum_decls)
  end;
 
 fun get_port p =
@@ -318,43 +336,24 @@ fun get_port p =
       => (pname,flowdir,conn_style)
     | otherwise => raise ERR "get_port" "unexpected port format"
 
-fun get_filter_guarantee fname [] = raise ERR "get_filter_guarantee" "not found"
-  | get_filter_guarantee fname (g::t) = 
+fun get_filter_guarantee rname g =
     case g
      of AList [("kind", String "guarantee"),
                ("name", String gname),
                ("label", String gdoc),
                ("expr", gprop)]
-        => if fname = gname
+        => if rname = gname
             then (gdoc, dest_exp gprop)
            else raise ERR "get_filter_guarantee" 
-		   (String.concat["expected named filter guarantee ", Lib.quote fname,
+		   (String.concat["expected named filter guarantee ", Lib.quote rname,
 				  " but encountered ", Lib.quote gname])
-      | otherwise => get_filter_guarantee fname t
+     | otherwise => raise ERR "get_filter_guarantee" "unexpected input format"
 ;
   
-(*
-fun get_guarantee g =
-  case g
-   of AList [("kind", String "guarantee"),
-             ("label", String gdoc),("expr", gprop)]
-      => (gdoc, dest_exp gprop)
-    | otherwise => raise ERR "get_guarantee" "unexpected format";
-
-fun get_filter decl =
- case decl
-  of AList
-      [("name", String fname), ("type", String "thread"),
-       ("features", List ports),
-       ("properties",
-          List [AList [("name", String "COMP_TYPE"), ("value", String "FILTER")],
-                AList [("name", String "COMP_IMPL"), ("value", String "CAKEML")],
-                AList [("name", String "COMP_SPEC"), ("value", String regexp)]]),
-       ("agree", List [AList [("statements", List guarantees)]])]
-      => (fname,map get_port ports,regexp,map get_guarantee guarantees)
-   | otherwise => raise ERR "get_filter" "not a filter thread";
-*)
-
+fun mk_filter_guarantee [x] = x
+  | mk_filter_guarantee otherwise = 
+    raise ERR "mk_filter_guarantee" "expected only one guarantee";
+	  
 fun get_filter decl =
  case decl
   of AList
@@ -365,7 +364,8 @@ fun get_filter decl =
                 AList [("name", String "COMP_IMPL"), ("value", String "CakeML")],
                 AList [("name", String "COMP_SPEC"), ("value", String rname)]]),
        ("agree", List [AList [("statements", List guarantees)]])]
-      => (fname,map get_port ports,get_filter_guarantee rname guarantees)
+      => (fname,map get_port ports,
+          mk_filter_guarantee (mapfilter (get_filter_guarantee rname) guarantees))
    | otherwise => raise ERR "get_filter" "not a filter thread";
 
 fun get_pkg_decls jpkg =
@@ -381,6 +381,13 @@ fun get_pkg_decls jpkg =
          in (pkgName,enum_decls,recd_decls,fndecls,filters)
          end
   | otherwise => raise ERR "get_pkg_decls" "unexpected format";
+
+(*
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
+     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
+     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34,c35] = comps;
+c21;
+*)
 
 (*---------------------------------------------------------------------------*)
 (* AST to HOL                                                                *)
@@ -667,36 +674,44 @@ fun establish_type s e =
 
 fun mk_filter_goal (info as (pkgName,enums,recds,fn_defs))
 		   (fname, ports, (comment,prop)) = 
-  let val outport = Lib.first (fn (_,dir,_) => (dir = "out")) ports
-      val outpname = #1 outport
-      val varE = establish_type outpname prop
-      val outvar = snd varE
-      val recd_prop = transExp pkgName [varE] prop
-      val thm = 
+    let val outport = Lib.first (fn (_,dir,_) => (dir = "out")) ports
+	val inport = Lib.first (fn (_,dir,_) => (dir = "in")) ports
+        val outpname = #1 outport
+        val inpname = #1 inport
+        val varOut = establish_type outpname prop
+        val ty = type_of (snd varOut)
+        val varIn = (inpname,mk_var(inpname,ty))
+        val outvar = snd varOut
+        val recd_prop = transExp pkgName [varIn,varOut] prop
+        val simple_prop = fst(dest_imp(snd(dest_conj recd_prop)))
+        val thm = 
 	    PURE_REWRITE_CONV 
-              (GSYM CONJ_ASSOC::GSYM DISJ_ASSOC::fn_defs) recd_prop
-      val (regexp_tm,encode_def,decode_def,the_goal) = splatLib.mk_correctness info thm
+              (GSYM CONJ_ASSOC::GSYM DISJ_ASSOC::fn_defs) simple_prop
+         handle _ => raise ERR "mk_filter_goal" "strange filter goal"
+        val (regexp_tm,encode_def,decode_def,the_goal) = splatLib.mk_correctness info thm
   in
       (fname, regexp_tm, encode_def, decode_def, the_goal)
   end
 
-fun print_prop t =
-  (stdErr_print "\nFilter correctness property: \n";
-   stdErr_print (term_to_string t);
-   stdErr_print "\n\n")
-
 fun declare_hol_filter_goal (fname,regexp_tm,encode_def, decode_def, the_goal) =
-  let in
+  let val correctness = 
      store_thm(fname^"_correct", 
        ``FILTER_CORRECT ^(stringSyntax.fromMLstring fname) ^the_goal``,
        cheat)
-    ; 
+   in 
     stdErr_print 
           (String.concat 
                ["\nFilter ", Lib.quote fname, 
                 " is specified by property \n\n  ",
-                term_to_string the_goal, "\n\n"])
+                thm_to_string correctness, "\n\n"])
   end;
+
+(* TOPSORT GUNK : second fn calls the first *)
+
+fun called_by (id1,_,_) (id2,_,body) = 
+    let val callers = map snd (AST.exp_calls [body] [])
+    in mem id1 callers
+    end;
 
 fun gen_hol (pkgName,enums,recds,fns,filters) =
     let val _ = stdErr_print "\nGenerating HOL theory.\n\n"
@@ -741,7 +756,8 @@ fun gen_hol (pkgName,enums,recds,fns,filters) =
           end
       val _ = List.app declare_hol_enum enums
       val _ = List.app declare_hol_record recds
-      val fn_defs = map declare_hol_fn fns
+      val fns' = topsort called_by fns
+      val fn_defs = MiscLib.mapfilter declare_hol_fn fns'
       val info = (pkgName,enums,recds,fn_defs)
       val filter_goals = map (mk_filter_goal info) filters
       val _ =  List.app declare_hol_filter_goal filter_goals

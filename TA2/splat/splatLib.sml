@@ -543,7 +543,7 @@ fun mk_correctness (info as (pkgName,enums,recds,fn_defs)) thm =
              case s 
               of [v0; v1; v2; v3; v4; v5; v6; v7; v8; v9; v10; v11;
                   v12; v13; v14; v15; v16; v17; v18; v19; v20; v21]
-                  => SOME <| Map := 
+                  => SOME <| map := 
                               <| wp1 := <| latitude := deci 1 [v0]; 
                                            longitude := deci 2 [v1;v2]; 
                                            altitude := deci 2 [v3;v4] |>; 
@@ -556,9 +556,9 @@ fun mk_correctness (info as (pkgName,enums,recds,fn_defs)) thm =
                                  wp4 := <| latitude := deci 1 [v15]; 
                                            longitude := deci 2 [v16;v17]; 
                                            altitude := deci 2 [v18;v19] |>; 
-          		    |>;
-                             Pattern := dec_FlightPattern [v20];
-                             HMAC := dec_bool [v21] |>
+          		       |>;
+                             pattern := dec_FlightPattern [v20]
+                           |>
                 | otherwise => NONE`
  in
      (the_regexp_tm, encodeFn_def, decode_def, the_goal)

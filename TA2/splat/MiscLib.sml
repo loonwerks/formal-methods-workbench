@@ -601,4 +601,14 @@ fun EQT_INTRO_CONV tm =
 
 *)
 
+fun mapfilter f list =
+  let fun mapf [] acc = rev acc
+        | mapf (h::t) acc = 
+             case total f h
+               of NONE => mapf t acc
+               |  SOME h' => mapf t (h'::acc)
+  in 
+   mapf list []
+  end;
+
 end (* MiscLib *)
