@@ -6,7 +6,6 @@ sudo apt-get update
 sudo apt-get install build-essential
 sudo apt-get install ninja-build
 
-sudo apt-get install git-repo
 sudo apt-get install cmake
 sudo apt-get isntall haskell-stack
 sudo apt-get install ccache
