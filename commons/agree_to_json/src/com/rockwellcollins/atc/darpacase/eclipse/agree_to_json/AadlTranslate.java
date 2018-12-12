@@ -24,6 +24,7 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
+import org.osate.aadl2.impl.IntegerLiteralImpl;
 import org.osate.aadl2.impl.ListValueImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
@@ -214,6 +215,10 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		return StringValue.build(v.getValue());
 	}
 
+	private Value getIntegerLiteralImpl(IntegerLiteralImpl v) {
+		return StringValue.build(Long.toString((v.getValue())));
+	}
+
 
 	private Value genPropertyExpression(PropertyExpression v) {
 		if (v instanceof NamedValueImpl) {
@@ -222,6 +227,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 			return getListValueImpl((ListValueImpl) v);
 		} else if (v instanceof StringLiteralImpl) {
 			return getStringLiteralImpl((StringLiteralImpl) v);
+		} else if (v instanceof IntegerLiteralImpl) {
+			return getIntegerLiteralImpl((IntegerLiteralImpl) v);
 		}
 		return StringValue.build("new_case/genPropertyExpression/" + v.toString());
 	}

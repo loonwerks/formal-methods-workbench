@@ -22,17 +22,20 @@ import com.rockwellcollins.atc.agree.agree.AssignStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
+import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.Contract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.FnCallExpr;
 import com.rockwellcollins.atc.agree.agree.FnDefExpr;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
+import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.NestedDotID;
 import com.rockwellcollins.atc.agree.agree.PrimType;
 import com.rockwellcollins.atc.agree.agree.PropertyStatement;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
+import com.rockwellcollins.atc.agree.agree.RecordExpr;
 import com.rockwellcollins.atc.agree.agree.RecordType;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
@@ -118,6 +121,32 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
+	private Value genIfThenElseExpr(IfThenElseExpr expr) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "ifThenElse"));
+		pairList.add(Pair.build("if", genExpr(expr.getA())));
+		pairList.add(Pair.build("then", genExpr(expr.getB())));
+		pairList.add(Pair.build("else", genExpr(expr.getC())));
+		return ObjectValue.build(pairList);
+	}
+
+	private Value genRecordExpr(RecordExpr expr) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+
+		pairList.add(Pair.build("kind", "record"));
+		ArrayList<Pair> fieldList = new ArrayList<Pair>();
+		int sz = expr.getArgs().size();
+		for (int i = 0; i < sz; i++) {
+			String name = expr.getArgs().get(i).getName();
+			Value v = genExpr(expr.getArgExpr().get(i));
+			Pair field = Pair.build(name, v);
+			fieldList.add(field);
+		}
+
+		pairList.add(Pair.build("record", ObjectValue.build(fieldList)));
+		return ObjectValue.build(pairList);
+	}
+
 
 	private Value genExpr(Expr expr) {
 
@@ -137,6 +166,10 @@ public class AgreeTranslate {
 			return genAADLEnumerator((AADLEnumerator) expr);
 		} else if (expr instanceof FnCallExpr) {
 			return genFnCallExpr((FnCallExpr) expr);
+		} else if (expr instanceof IfThenElseExpr) {
+			return genIfThenElseExpr((IfThenElseExpr) expr);
+		} else if (expr instanceof RecordExpr) {
+			return genRecordExpr((RecordExpr) expr);
 		} else {
 			return StringValue.build("new_case/genExpr/" + (expr == null ? "null" : expr.toString()));
 		}
@@ -261,6 +294,14 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
+	private Value genConstStatement(ConstStatement stmt) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "constStatement"));
+		pairList.add(Pair.build("name", stmt.getName()));
+		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
+		return ObjectValue.build(pairList);
+	}
+
 	public Value genSpecStatement(SpecStatement stmt) {
 
 		if (stmt instanceof AssertStatement) {
@@ -277,6 +318,8 @@ public class AgreeTranslate {
 			return genPropertyStatement((PropertyStatement) stmt);
 		} else if (stmt instanceof FnDefExpr) {
 			return genFnDefExpr((FnDefExpr) stmt);
+		} else if (stmt instanceof ConstStatement) {
+			return genConstStatement((ConstStatement) stmt);
 
 		} else {
 			return StringValue.build("new_case/genSpecStatement/" + stmt.toString());
