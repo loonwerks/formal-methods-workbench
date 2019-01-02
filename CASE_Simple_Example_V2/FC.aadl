@@ -22,8 +22,10 @@ public
 			uart_send: out event data port;
 			UARTA: requires bus access UAV::Serial.Impl;
 		properties
-			CASE_Properties::PHYSICAL_BOUNDARY => True;
-			CASE_Properties::TRUSTED_BOUNDARY => True;
+			CASE_Properties::CONFIDENTIALITY => MEDIUM;
+			CASE_Properties::INTEGRITY => MEDIUM;
+			CASE_Properties::AVAILABILITY => HIGH;
+			CASE_Properties::BOUNDARY => (PHYSICAL, TRUSTED);
 	end FlightController;
 	
 	

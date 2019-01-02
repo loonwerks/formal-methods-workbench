@@ -1,22 +1,21 @@
 package UAS
 public
-	
 	with GS;
+
 	with UAV;
+
 	with CASE_Properties;
-	
 
 	-- The RF bus for the UAS
 	bus RF
 		properties
 			CASE_Properties::COMM_MODALITY => RF;
 	end RF;
-	
+
 	bus implementation RF.Impl
 	end RF.Impl;
 
-
-	-- UAS
+		-- UAS
 	system UAS
 	end UAS;
 
