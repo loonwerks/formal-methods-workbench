@@ -15,11 +15,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 	private Text txtMonitorTypeName;
 	private Text txtMonitorImplementationLanguage;
-//	private Text txtMonitorRegularExpression;
 	private Text txtMonitorImplName;
 	private String strMonitorTypeName;
 	private String strMonitorImplementationLanguage;
-//	private String strMonitorRegularExpression;
 	private String strMonitorImplName;
 
 	public AddMonitorDialog(Shell parentShell) {
@@ -47,7 +45,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		// Add filter information fields
 		createMonitorTypeNameField(container);
 		createImplLangField(container);
-//		createRegExField(container);
 		createMonitorImplNameField(container);
 
 		return area;
@@ -100,20 +97,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		txtMonitorImplementationLanguage.setLayoutData(dataInfoField);
 	}
 
-	/**
-	 * Creates the input text field for specifying the monitor regular expression
-	 * @param container
-	 */
-//	private void createRegExField(Composite container) {
-//		Label lblRegExField = new Label(container, SWT.NONE);
-//		lblRegExField.setText("Filter Regular Expression");
-//
-//		GridData dataInfoField = new GridData();
-//		dataInfoField.grabExcessHorizontalSpace = true;
-//		dataInfoField.horizontalAlignment = GridData.FILL;
-//		txtMonitorRegularExpression = new Text(container, SWT.BORDER);
-//		txtMonitorRegularExpression.setLayoutData(dataInfoField);
-//	}
 
 	/**
 	 * Saves information entered into the text fields.  This is needed because the
@@ -123,7 +106,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	private void saveInput() {
 		strMonitorTypeName = txtMonitorTypeName.getText();
 		strMonitorImplementationLanguage = txtMonitorImplementationLanguage.getText();
-//		strMonitorRegularExpression = txtMonitorRegularExpression.getText();
 		strMonitorImplName = txtMonitorImplName.getText();
 	}
 
@@ -140,10 +122,6 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	public String getMonitorImplementationLanguage() {
 		return strMonitorImplementationLanguage;
 	}
-
-//	public String getMonitorRegularExpression() {
-//		return strMonitorRegularExpression;
-//	}
 
 	public String getMonitorImplName() {
 		return strMonitorImplName;

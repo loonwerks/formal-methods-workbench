@@ -29,7 +29,6 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private Text txtImplementationName;
 	private Text txtImplementationLanguage;
 	private Text txtCacheTimeout;
-//	private Text txtCacheSize;
 	private Combo cboCacheSize;
 	private Text txtLogSize;
 	private Combo cboResoluteClause;
@@ -58,7 +57,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		super.create();
 		setTitle("Add Attestation Manager");
 		setMessage(
-				"Enter Attestation Manager details.  You may optionally leave these fields empty and manually edit the AADL attestation manager component once it is added to the model.",
+				"Enter Attestation Manager details.  You may optionally leave these fields empty and manually edit the model.",
 				IMessageProvider.NONE);
 	}
 
@@ -93,7 +92,6 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		container.setLayout(layout);
 
 		// Add attestation manager information fields
-//		createComponentTypeField(container);
 		createCommDriverField(container);
 		createImplementationNameField(container);
 		createImplementationLanguageField(container);
@@ -174,8 +172,6 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = SWT.FILL;
-//		txtCacheSize = new Text(container, SWT.BORDER);
-//		txtCacheSize.setLayoutData(dataInfoField);
 		cboCacheSize = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
 		cboCacheSize.setLayoutData(dataInfoField);
 		for (int i = 1; i <= MAX_CACHE_SIZE; i++) {
@@ -270,7 +266,6 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		implementationName = txtImplementationName.getText();
 		implementationLanguage = txtImplementationLanguage.getText();
 		cacheTimeout = txtCacheTimeout.getText();
-//		cacheSize = txtCacheSize.getText();
 		cacheSize = cboCacheSize.getText();
 		logSize = txtLogSize.getText();
 		resoluteClause = cboResoluteClause.getText();

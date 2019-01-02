@@ -356,11 +356,12 @@ public class AddFilter extends AadlHandler {
 					final ThreadType clauseThread = (ThreadType) selectedConnection.getDestination().getConnectionEnd()
 							.getContainingClassifier();
 					EList<AnnexSubclause> annexSubclauses = clauseThread.getOwnedAnnexSubclauses();
+					String sourceText = "";
 					for (AnnexSubclause annexSubclause : annexSubclauses) {
 						// Get the Resolute clause
 						if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
 							DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
-							String sourceText = annexSubclauseImpl.getSourceText();
+							sourceText = annexSubclauseImpl.getSourceText();
 							if (sourceText.contains(filterResoluteClause + "(")) {
 								// Add arguments
 								int startIdx = sourceText.indexOf(filterResoluteClause + "(")
@@ -375,6 +376,14 @@ public class AddFilter extends AadlHandler {
 							break;
 						}
 					}
+					if (!sourceText.isEmpty()) {
+						clauseThread.getOwnedAnnexSubclauses()
+								.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
+						DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
+						newSubclause.setName("resolute");
+						newSubclause.setSourceText(sourceText);
+					}
+
 					// Add add_filter claims to *_CASE_Claims file
 					// If the prove statement exists, the *_CASE_Claims file should also already
 					// exist, but double check just to be sure, and create it if it doesn't

@@ -27,11 +27,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	List<Text> txtIDs = new ArrayList<>();
 	List<String> lblComponents = new ArrayList<>();
 	List<Text> txtRationales = new ArrayList<>();
-//	List<String> strReqIDs = new ArrayList<>();
-//	List<String> strRationales = new ArrayList<>();
-//	List<String> strReqNames = new ArrayList<>();
-//	List<String> strReqTexts = new ArrayList<>();
-//	List<String> strComponents = new ArrayList<>();
 	List<CASE_Requirement> existingRequirements = new ArrayList<>();
 	List<CASE_Requirement> importRequirements = new ArrayList<>();
 	List<CASE_Requirement> omitRequirements = new ArrayList<>();
@@ -46,7 +41,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		super.create();
 		setTitle("Import Cybersecurity Requirements");
 		setMessage(
-				"Select the cybersecurity requirements you would like to import into the model.",
+				"Select the cybersecurity requirements to be imported into the model.",
 				IMessageProvider.NONE);
 	}
 
@@ -171,32 +166,21 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	 */
 	private boolean saveInput() {
 
-//		strReqNames.clear();
-//		strReqTexts.clear();
-//		strComponents.clear();
-//		strRationales.clear();
 		importRequirements.clear();
 		omitRequirements.clear();
 		for (int i = 0; i < btnReqs.size(); i++) {
 			if (btnReqs.get(i).getSelection()) {
-//				strReqNames.add(btnReqs.get(i).getText());
 				if (txtIDs.get(i).getText().isEmpty()) {
 					Dialog.showError("Missing requirement ID", btnReqs.get(i).getText()
 							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.");
 					return false;
 				}
-//				strReqIDs.add(txtIDs.get(i).getText());
-//				strReqTexts.add(lblReqTexts.get(i));
-//				strComponents.add(lblComponents.get(i));
 				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
 						lblReqTexts.get(i), lblComponents.get(i), txtRationales.get(i).getText()));
 			} else {
-//				strRationales.add(txtRationales.get(i).getText());
 				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
 						lblReqTexts.get(i), lblComponents.get(i), txtRationales.get(i).getText()));
 			}
-//			requirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(), lblReqTexts.get(i),
-//					lblComponents.get(i), txtRationales.get(i).getText()));
 		}
 		return true;
 	}
@@ -207,26 +191,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 			super.okPressed();
 		}
 	}
-
-//	public List<String> getReqNames() {
-//		return strReqNames;
-//	}
-//
-//	public List<String> getReqTexts() {
-//		return strReqTexts;
-//	}
-//
-//	public List<String> getComponents() {
-//		return strComponents;
-//	}
-//
-//	public List<String> getRationales() {
-//		return strRationales;
-//	}
-//
-//	public List<String> getReqIDs() {
-//		return strReqIDs;
-//	}
 
 	public List<CASE_Requirement> getImportRequirements() {
 		return importRequirements;

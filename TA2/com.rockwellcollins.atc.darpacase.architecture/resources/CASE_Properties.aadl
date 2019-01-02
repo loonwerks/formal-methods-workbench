@@ -13,8 +13,6 @@ property set CASE_Properties is
 	LOG_SIZE: aadlinteger applies to (system, process, thread, device, abstract);
 	
 	-- BOUNDARY
-	TRUSTED_BOUNDARY: aadlboolean applies to (system, process, thread, device, abstract);
-	PHYSICAL_BOUNDARY: aadlboolean applies to (system, device, abstract);
 	BOUNDARY: list of enumeration(TRUSTED, PHYSICAL) applies to (system, process, thread, device, abstract);
 	
 	-- CIA

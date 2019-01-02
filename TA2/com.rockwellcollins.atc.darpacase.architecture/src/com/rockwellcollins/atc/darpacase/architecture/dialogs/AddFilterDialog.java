@@ -21,20 +21,16 @@ import org.eclipse.swt.widgets.Text;
  */
 public class AddFilterDialog extends TitleAreaDialog {
 
-//	private Combo cboFilterComponentType;
 	private Text txtFilterImplementationName;
 	private Text txtFilterImplementationLanguage;
 	private Combo cboFilterResoluteClause;
 	private Text txtAgreeProperty;
 	private List<Button> btnPropagateGuarantees = new ArrayList<>();
-//	private String strFilterComponentType = "";
 	private String strFilterImplementationLanguage = "";
 	private String strFilterImplementationName = "";
 	private String strFilterResoluteClause = "";
 	private String strAgreeProperty = "";
 	private String strSourceName = "";
-//	private String strRecommendedType = "";
-//	private String strParentType = "";
 	private List<String> strSourceGuarantees = new ArrayList<>();
 	private List<String> strPropagateGuarantees = new ArrayList<>();
 	private List<String> strResoluteClauses = new ArrayList<>();
@@ -63,7 +59,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 		container.setLayout(layout);
 
 		// Add filter information fields
-//		createFilterComponentTypeField(container);
 		createFilterImplementationNameField(container);
 		createImplementationLanguageField(container);
 		createResoluteField(container);
@@ -186,18 +181,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private void createAgreeField(Composite container) {
 		Label lblAgreeField = new Label(container, SWT.NONE);
 		lblAgreeField.setText("Filter AGREE Contract");
-//		lblAgreeField.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-//
-//		txtAgreeProperty = new Text(container, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-//
-//		GridData dataInfoField = new GridData(SWT.FILL, SWT.TOP, true, false);
-//		dataInfoField.heightHint = 3 * txtAgreeProperty.getLineHeight();
-//
-//		txtAgreeProperty.setLayoutData(dataInfoField);
 
 		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
-//		dataInfoField.grabExcessHorizontalSpace = true;
-//		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtAgreeProperty = new Text(container, SWT.BORDER);
 		txtAgreeProperty.setLayoutData(dataInfoField);
 
@@ -218,11 +203,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 			lblSelectionField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 			GridData selectionFieldLayoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
-//			dataInfoField.grabExcessHorizontalSpace = true;
-//			dataInfoField.horizontalAlignment = SWT.FILL;
 
 			Composite selectionField = new Composite(container, SWT.BORDER);
-//			selectionField.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 			GridLayout layout = new GridLayout(1, true);
 			selectionField.setLayout(layout);
 			selectionField.setLayoutData(selectionFieldLayoutData);
@@ -234,7 +216,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 				formattedGuarantee = formattedGuarantee
 						.substring("guarantee ".length(),
 								formattedGuarantee.lastIndexOf(":") - 1);
-//								formattedGuarantee.length() - 1);
 				selectGuarantee.setText(formattedGuarantee);
 				selectGuarantee.setSelection(true);
 				selectGuarantee.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -250,7 +231,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 * @param container
 	 */
 	private void saveInput() {
-//		strFilterComponentType = cboFilterComponentType.getText();
 		strFilterImplementationLanguage = txtFilterImplementationLanguage.getText();
 		strFilterImplementationName = txtFilterImplementationName.getText();
 		strFilterResoluteClause = cboFilterResoluteClause.getText();

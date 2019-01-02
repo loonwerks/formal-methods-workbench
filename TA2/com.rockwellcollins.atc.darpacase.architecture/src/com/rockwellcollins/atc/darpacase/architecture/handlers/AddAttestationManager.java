@@ -473,7 +473,10 @@ public class AddAttestationManager extends AadlHandler {
 						+ System.lineSeparator();
 				amImplAgree = amImplAgree + "\t\t\tproperty one_incoming_message = (";
 				for (int i = 0; i < amPortNames.size(); i++) {
-					amImplAgree = amImplAgree + "\t\t\t\tMSG_CTR(" + CASE_MODEL_TRANSFORMATIONS_NAME
+					if (i > 0) {
+						amImplAgree = amImplAgree + "\t\t\t\t";
+					}
+					amImplAgree = amImplAgree + "MSG_CTR(" + CASE_MODEL_TRANSFORMATIONS_NAME
 							+ ".NULL_MESSAGE(am_" + amPortNames.get(i) + "_in.header))" + " + "
 							+ System.lineSeparator();
 //					if (i < amPortNames.size() - 1) {
@@ -786,14 +789,13 @@ public class AddAttestationManager extends AadlHandler {
 					// TODO: Make sure they are just the components connected to the selected comm driver
 					for (Subcomponent comp : ci.getOwnedSubcomponents()) {
 						if (comp instanceof ThreadSubcomponent) {
-//							final ThreadType clauseThread = (ThreadType) commDriver.getComponentType();
 							final ThreadType clauseThread = (ThreadType) comp.getComponentType();
-							EList<AnnexSubclause> annexSubclauses = clauseThread.getOwnedAnnexSubclauses();
-							for (AnnexSubclause annexSubclause : annexSubclauses) {
+							String sourceText = "";
+							for (AnnexSubclause annexSubclause : clauseThread.getOwnedAnnexSubclauses()) {
 								// Get the Resolute clause
 								if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
 									DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
-									String sourceText = annexSubclauseImpl.getSourceText();
+									sourceText = annexSubclauseImpl.getSourceText();
 									if (sourceText.contains(attestationResoluteClause + "(")) {
 										// Add arguments
 										int startIdx = sourceText.indexOf(attestationResoluteClause + "(")
@@ -808,6 +810,14 @@ public class AddAttestationManager extends AadlHandler {
 									break;
 								}
 							}
+							if (!sourceText.isEmpty()) {
+								clauseThread.getOwnedAnnexSubclauses()
+										.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
+								DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
+								newSubclause.setName("resolute");
+								newSubclause.setSourceText(sourceText);
+							}
+
 						}
 					}
 

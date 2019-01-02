@@ -109,7 +109,7 @@ public class ModelAnnotationsDialog extends TitleAreaDialog {
 	@Override
 	protected Point getInitialSize() {
 		final Point size = super.getInitialSize();
-		size.x -= convertWidthInCharsToPixels(6);
+//		size.x -= convertWidthInCharsToPixels(6);
 		size.y += convertHeightInCharsToPixels(1);
 
 		return size;
@@ -227,7 +227,6 @@ public class ModelAnnotationsDialog extends TitleAreaDialog {
 
 		// Create a group to contain COMP_TYPE options
 		Group compTypeGroup = new Group(container, SWT.NONE);
-//		compTypeGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 		compTypeGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		compTypeGroup.setLayout(new GridLayout(3, true));
 
@@ -255,7 +254,6 @@ public class ModelAnnotationsDialog extends TitleAreaDialog {
 		// Create a group to contain COMM_MODALITY options
 		Group commModalityGroup = new Group(container, SWT.NONE);
 		commModalityGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-//		commModalityGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 		commModalityGroup.setLayout(new GridLayout(3, true));
 
 		btnCommModality.clear();

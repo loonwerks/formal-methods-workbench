@@ -357,7 +357,8 @@ public
 			
 		-- Checks that a proof has been generated showing the filter regular expression
 		-- matches the AGREE contract
-		filter_proof_checked() : bool =
+		filter_proof_checked() <=
+			** "Filter proof checked" **
 			analysis("ToolCheck", "SPLAT")
 			
 		-- Evidence that an attestation manager component exists for a given communication driver

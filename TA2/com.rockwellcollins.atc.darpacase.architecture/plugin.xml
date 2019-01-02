@@ -299,14 +299,6 @@
             name="Add Monitor">
       </command>
       <command
-            id="com.rockwellcollins.atc.darpacase.architecture.commands.ModelAnnotations"
-            name="Model Annotations">
-      </command>
-      <command
-            id="com.rockwellcollins.atc.darpacase.architecture.commands.SelectImplementation"
-            name="Select Implementation">
-      </command>
-      <command
             id="com.rockwellcollins.atc.darpacase.architecture.commands.VerifyImplementation"
             name="Verify Implementation">
       </command>
@@ -322,11 +314,9 @@
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddFilter">
       </handler>
       <handler
-            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddRouter"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddRouter">
       </handler>
       <handler
-            class="com.rockwellcollins.atc.darpacase.architecture.handlers.AddMonitor"
             commandId="com.rockwellcollins.atc.darpacase.architecture.commands.AddMonitor">
       </handler>
       <handler

@@ -23,17 +23,12 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SelectImplementationDialog extends TitleAreaDialog {
 
-//	String implementationType;
 	String implementationLocation;
 	String implementationEntryFunction;
-//	String implementationFunctionAddress;
-//	Button rdoImplementationTypeBinary;
-//	Button rdoImplementationTypeSource;
 	Text txtImplementationLocation;
 	Button btnImplementationLocation;
 	FileDialog dlgImplementationLocation;
 	Text txtImplementationEntryFunction;
-//	Text txtImplementationFunctionAddress;
 
 	public SelectImplementationDialog(Shell parentShell) {
 		super(parentShell);
@@ -58,10 +53,8 @@ public class SelectImplementationDialog extends TitleAreaDialog {
 		container.setLayout(layout);
 
 		// Add implementation information fields
-//		createImplementationTypeField(container);
 		createImplementationLocationField(container);
 		createImplementationEntryFunctionField(container);
-//		createImplementationFunctionAddressField(container);
 
 		return area;
 	}
