@@ -5,8 +5,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.collins.atc</groupId>
-	<artifactId>com.collins.atc.ace</artifactId>
+	<groupId>com.collins.fmw</groupId>
+	<artifactId>com.collins.fmw</artifactId>
 	<version>0.0.0</version>
 	<packaging>pom</packaging>
 
@@ -23,8 +23,8 @@
 		<module>../osate2/ba/org.osate.ba.edit</module>
 		<module>../osate2/ba/org.osate.utils</module>
 		<module>../osate2/ba/org.osate.utils.feature</module>
-		<module>com.collins.atc.cyres</module>
-		<module>com.collins.atc.ide</module>
+		<module>com.collins.fmw.cyres</module>
+		<module>com.collins.fmw.ide</module>
 	</modules>
 
 
