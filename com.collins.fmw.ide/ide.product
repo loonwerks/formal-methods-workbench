@@ -21,7 +21,7 @@
    <windowImages i16="icons/16aadl.jpg" i32="icons/32aadl.jpg"/>
 
    <splash
-      location="com.collins.fmw.darpacase.ace.ide"
+      location="com.collins.fmw.ide"
       startupProgressRect="5,275,445,15"
       startupMessageRect="7,252,445,20"
       startupForegroundColor="000000" />
