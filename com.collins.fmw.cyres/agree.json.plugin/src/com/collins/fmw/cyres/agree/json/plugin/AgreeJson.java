@@ -18,8 +18,8 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PropertySet;
 
-import com.collins.fmw.json.Value;
 import com.collins.fmw.cyres.util.plugin.Filesystem;
+import com.collins.fmw.json.Value;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;

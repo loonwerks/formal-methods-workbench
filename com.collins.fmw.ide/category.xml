@@ -43,7 +43,7 @@
       <category name="alisa.source"/>
    </feature>
    <feature url="features/com.collins.fmw.cyres.feature_0.0.0.jar" id="com.collins.fmw.cyres.feature" version="0.0.0">
-      <category name="darpacase"/>
+      <category name="cyres"/>
    </feature>
    <feature url="features/com.rockwellcollins.atc.resolute.feature_1.0.0.qualifier.jar" id="com.rockwellcollins.atc.resolute.feature" version="1.0.0.qualifier">
       <category name="fmworkbench"/>

@@ -34,7 +34,7 @@ import com.collins.fmw.cyres.agree.json.plugin.AgreeJson;
 
 public class VerifyHandler extends AbstractHandler {
 
-	static final String bundleId = "com.collins.fmw.darpacase.eclipse.filter_checker";
+	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
 
 	private IWorkbenchWindow window;
 

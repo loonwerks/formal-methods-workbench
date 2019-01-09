@@ -6,80 +6,80 @@
       <menuContribution
             locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
          <menu
-               id="com.collins.fmw.darpacase.menus.outline.main"
+               id="com.collins.fmw.cyres.menus.outline.main"
                label="CASE">
             <menu
-                  id="com.collins.fmw.darpacase.menus.outline.requirements"
+                  id="com.collins.fmw.cyres.menus.outline.requirements"
                   label="Cyber Requirements">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.AddRequirement"
-                     id="com.collins.fmw.darpacase.requirements.menus.gearcase"
+                     commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement"
+                     id="com.collins.fmw.cyres.requirements.menus.gearcase"
                      label="Run TA1 tool"
                      style="push">
                </command>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.outline.resiliency"
+                  id="com.collins.fmw.cyres.menus.outline.resiliency"
                   label="Cyber Resiliency">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.ModelAnnotations"
-                     id="com.collins.fmw.darpacase.architecture.menus.ModelAnnotations"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
+                     id="com.collins.fmw.cyres.architecture.menus.ModelAnnotations"
                      label="Model Annotations..."
                      style="push">
                </command>
                <menu
-                     id="com.collins.fmw.darpacase.menus.outline.resiliency.staircase.transformations"
+                     id="com.collins.fmw.cyres.menus.outline.resiliency.staircase.transformations"
                      label="Model Transformations">
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddFilter"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddFilter"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
+                        id="com.collins.fmw.cyres.architecture.menus.AddFilter"
                         label="Add Filter..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddAttestationManager"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddAttestationManager"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
                         label="Add Attestation Manger..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddRouter"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddRouter"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
+                        id="com.collins.fmw.cyres.architecture.menus.AddRouter"
                         label="Add Router..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddMonitor"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddMonitor"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
                         label="Add Monitor..."
                         style="push">
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.darpacase.menus.outline.resiliency.staircase.proofs"
+                     id="com.collins.fmw.cyres.menus.outline.resiliency.staircase.proofs"
                      label="Proofs">
                </menu>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.outline.component"
+                  id="com.collins.fmw.cyres.menus.outline.component"
                   label="Component Analysis">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.SelectImplementation"
-                     id="com.collins.fmw.darpacase.component.menus.SelectImplementation"
+                     commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
+                     id="com.collins.fmw.cyres.component.menus.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.VerifyImplementation"
+                     commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
                      label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.outline.build"
+                  id="com.collins.fmw.cyres.menus.outline.build"
                   label="Trusted Build">
                <command
-                     commandId="com.collins.fmw.darpacase.build.commands.TrustedBuild"
+                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
                      label="Build..."
                      style="push">
                </command>
@@ -90,81 +90,81 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
-               id="com.collins.fmw.darpacase.menus.menubar.main"
+               id="com.collins.fmw.cyres.menus.menubar.main"
                label="CASE">
             <menu
-                  id="com.collins.fmw.darpacase.menus.menubar.requirements"
+                  id="com.collins.fmw.cyres.menus.menubar.requirements"
                   label="Cyber Requirements">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.AddRequirement"
-                     id="com.collins.fmw.darpacase.menus.menubar.requirements.gearcase"
+                     commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.gearcase"
                      label="Run TA1 tool"
                      style="push">
                </command>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.menubar.resiliency"
+                  id="com.collins.fmw.cyres.menus.menubar.resiliency"
                   label="Cyber Resiliency">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.ModelAnnotations"
-                     id="com.collins.fmw.darpacase.architecture.menus.ModelAnnotations"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
+                     id="com.collins.fmw.cyres.architecture.menus.ModelAnnotations"
                      label="Model Annotations..."
                      style="push">
                </command>
                <menu
-                     id="com.collins.fmw.darpacase.menus.menubar.resiliency.staircase.transformations"
+                     id="com.collins.fmw.cyres.menus.menubar.resiliency.staircase.transformations"
                      label="Model Transformations">
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddFilter"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddFilter"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
+                        id="com.collins.fmw.cyres.architecture.menus.AddFilter"
                         label="Add Filter..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddAttestationManager"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddAttestationManager"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
                         label="Add Attestation Manager..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddRouter"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddRouter"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
+                        id="com.collins.fmw.cyres.architecture.menus.AddRouter"
                         label="Add Router..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddMonitor"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddMonitor"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
                         label="Add Monitor..."
                         style="push">
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.darpacase.menus.menubar.resiliency.staircase.proofs"
+                     id="com.collins.fmw.cyres.menus.menubar.resiliency.staircase.proofs"
                      label="Proofs">
                </menu>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.menubar.component"
+                  id="com.collins.fmw.cyres.menus.menubar.component"
                   label="Component Analysis">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.SelectImplementation"
-                     id="com.collins.fmw.darpacase.architecture.menus.SelectImplementation"
+                     commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
+                     id="com.collins.fmw.cyres.architecture.menus.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.VerifyImplementation"
-                     id="com.collins.fmw.darpacase.architecture.menus.VerifyImplementation"
+                     commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
+                     id="com.collins.fmw.cyres.architecture.menus.VerifyImplementation"
                      label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.menubar.build"
+                  id="com.collins.fmw.cyres.menus.menubar.build"
                   label="Trusted Build">
                <command
-                     commandId="com.collins.fmw.darpacase.build.commands.TrustedBuild"
+                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
                      label="Build..."
                      style="push">
                </command>
@@ -177,14 +177,14 @@
          <menu
                label="CASE">
             <command
-                  commandId="com.collins.fmw.darpacase.architecture.commands.AddFilter"
-                  id="com.collins.fmw.darpacase.architecture.menus.AddFilter"
+                  commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
+                  id="com.collins.fmw.cyres.architecture.menus.AddFilter"
                   label="Add Filter..."
                   style="push">
             </command>
             <command
-                  commandId="com.collins.fmw.darpacase.architecture.commands.AddMonitor"
-                  id="com.collins.fmw.darpacase.architecture.menus.AddMonitor"
+                  commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                  id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
                   label="Add Monitor..."
                   style="push">
             </command>
@@ -195,80 +195,80 @@
             allPopups="false"
             locationURI="popup:#TextEditorContext?after=additions">
          <menu
-               id="com.collins.fmw.darpacase.menus.editor.main"
+               id="com.collins.fmw.cyres.menus.editor.main"
                label="CASE">
             <menu
-                  id="com.collins.fmw.darpacase.menus.editor.requirements"
+                  id="com.collins.fmw.cyres.menus.editor.requirements"
                   label="Cyber Requirements">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.AddRequirement"
-                     id="com.collins.fmw.darpacase.requirements.menus.gearcase"
+                     commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement"
+                     id="com.collins.fmw.cyres.requirements.menus.gearcase"
                      label="Run TA1 tool"
                      style="push">
                </command>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.editor.resiliency"
+                  id="com.collins.fmw.cyres.menus.editor.resiliency"
                   label="Cyber Resiliency">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.ModelAnnotations"
-                     id="com.collins.fmw.darpacase.architecture.menus.ModelAnnotations"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
+                     id="com.collins.fmw.cyres.architecture.menus.ModelAnnotations"
                      label="Model Annotations..."
                      style="push">
                </command>
                <menu
-                     id="com.collins.fmw.darpacase.menus.editor.resiliency.staircase.transformations"
+                     id="com.collins.fmw.cyres.menus.editor.resiliency.staircase.transformations"
                      label="Model Transformations">
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddFilter"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddFilter"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
+                        id="com.collins.fmw.cyres.architecture.menus.AddFilter"
                         label="Add Filter..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddAttestationManager"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddAttestationManager"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
                         label="Add Attestation Manager..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddRouter"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddRouter"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
+                        id="com.collins.fmw.cyres.architecture.menus.AddRouter"
                         label="Add Router..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.darpacase.architecture.commands.AddMonitor"
-                        id="com.collins.fmw.darpacase.architecture.menus.AddMonitor"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
                         label="Add Monitor..."
                         style="push">
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.darpacase.menus.editor.resiliency.staircase.proofs"
+                     id="com.collins.fmw.cyres.menus.editor.resiliency.staircase.proofs"
                      label="Proofs">
                </menu>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.editor.component"
+                  id="com.collins.fmw.cyres.menus.editor.component"
                   label="Component Analysis">
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.SelectImplementation"
-                     id="com.collins.fmw.darpacase.component.menus.SelectImplementation"
+                     commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
+                     id="com.collins.fmw.cyres.component.menus.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
-                     commandId="com.collins.fmw.darpacase.architecture.commands.VerifyImplementation"
+                     commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
                      label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
             <menu
-                  id="com.collins.fmw.darpacase.menus.editor.build"
+                  id="com.collins.fmw.cyres.menus.editor.build"
                   label="Trusted Build">
                <command
-                     commandId="com.collins.fmw.darpacase.build.commands.TrustedBuild"
+                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
                      label="Build..."
                      style="push">
                </command>
@@ -279,103 +279,103 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.GenerateRequirements"
+            id="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
             name="Generate Requirements">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.AddFilter"
+            id="com.collins.fmw.cyres.architecture.commands.AddFilter"
             name="Add Filter">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.AddAttestationManager"
+            id="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
             name="Add Attestation Manager">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.AddRouter"
+            id="com.collins.fmw.cyres.architecture.commands.AddRouter"
             name="Add Router">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.AddMonitor"
+            id="com.collins.fmw.cyres.architecture.commands.AddMonitor"
             name="Add Monitor">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.ModelAnnotations"
+            id="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
             name="Model Annotations">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.SelectImplementation"
+            id="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
             name="Select Implementation">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.VerifyImplementation"
+            id="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
             name="Verify Implementation">
       </command>
       <command
-            id="com.collins.fmw.darpacase.architecture.commands.FilterChecker"
+            id="com.collins.fmw.cyres.architecture.commands.FilterChecker"
             name="Filter Checker">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.AddFilter"
-            commandId="com.collins.fmw.darpacase.architecture.commands.AddFilter">
+            class="com.collins.fmw.cyres.architecture.handlers.AddFilter"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddFilter">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.AddRouter"
-            commandId="com.collins.fmw.darpacase.architecture.commands.AddRouter">
+            class="com.collins.fmw.cyres.architecture.handlers.AddRouter"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddRouter">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.AddMonitor"
-            commandId="com.collins.fmw.darpacase.architecture.commands.AddMonitor">
+            class="com.collins.fmw.cyres.architecture.handlers.AddMonitor"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.ModelAnnotations"
-            commandId="com.collins.fmw.darpacase.architecture.commands.ModelAnnotations">
+            class="com.collins.fmw.cyres.architecture.handlers.ModelAnnotations"
+            commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.SelectImplementation"
-            commandId="com.collins.fmw.darpacase.architecture.commands.SelectImplementation">
+            class="com.collins.fmw.cyres.architecture.handlers.SelectImplementation"
+            commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.VerifyLegacyImplementation"
-            commandId="com.collins.fmw.darpacase.architecture.commands.VerifyImplementation">
+            class="com.collins.fmw.cyres.architecture.handlers.VerifyLegacyImplementation"
+            commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.AddRequirement"
-            commandId="com.collins.fmw.darpacase.architecture.commands.AddRequirement">
+            class="com.collins.fmw.cyres.architecture.handlers.AddRequirement"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.JsonHandler"
-            commandId="com.collins.fmw.darpacase.architecture.commands.test">
+            class="com.collins.fmw.cyres.architecture.handlers.JsonHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.test">
       </handler>
       <handler
-            class="com.collins.fmw.darpacase.architecture.handlers.AddAttestationManager"
-            commandId="com.collins.fmw.darpacase.architecture.commands.AddAttestationManager">
+            class="com.collins.fmw.cyres.architecture.handlers.AddAttestationManager"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager">
       </handler>
    </extension>
    <extension
          point="org.osate.pluginsupport.aadlcontribution">
       <aadlcontribution
             file="resources/CASE_Properties.aadl"
-            id="com.collins.fmw.darpacase.architecture.aadlcontribution.casepropset">
+            id="com.collins.fmw.cyres.architecture.aadlcontribution.casepropset">
       </aadlcontribution>
       <aadlcontribution
             file="resources/CASE_Model_Transformations.aadl"
-            id="com.collins.fmw.darpacase.architecture.aadlcontribution.casemodeltransformations">
+            id="com.collins.fmw.cyres.architecture.aadlcontribution.casemodeltransformations">
       </aadlcontribution>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.collins.fmw.darpacase.architecture.preferences.CasePreferenceInitializer">
+            class="com.collins.fmw.cyres.architecture.preferences.CasePreferenceInitializer">
       </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.collins.fmw.darpacase.architecture.preferences.CasePreferencePage"
-            id="com.collins.fmw.darpacase.architecture.preferences.CasePreferencePage"
+            class="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
+            id="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
             name="CASE">
       </page>
    </extension>
