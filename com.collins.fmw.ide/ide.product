@@ -25,7 +25,7 @@
       startupProgressRect="5,275,445,15"
       startupMessageRect="7,252,445,20"
       startupForegroundColor="000000" />
-   <launcher name="Formal Methods IDE">
+   <launcher name="fmide">
       <win useIco="false">
          <bmp/>
       </win>
