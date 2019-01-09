@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
+         <menu
+               id="com.collins.atc.darpacase.menus.outline.main"
+               label="CASE">
+            <menu
+                  id="com.collins.atc.darpacase.menus.outline.requirements"
+                  label="Cyber Requirements">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.AddRequirement"
+                     id="com.collins.atc.darpacase.requirements.menus.gearcase"
+                     label="Run TA1 tool"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.outline.resiliency"
+                  label="Cyber Resiliency">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.ModelAnnotations"
+                     id="com.collins.atc.darpacase.architecture.menus.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
+               <menu
+                     id="com.collins.atc.darpacase.menus.outline.resiliency.staircase.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddFilter"
+                        id="com.collins.atc.darpacase.architecture.menus.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddAttestationManager"
+                        id="com.collins.atc.darpacase.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manger..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddRouter"
+                        id="com.collins.atc.darpacase.architecture.menus.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddMonitor"
+                        id="com.collins.atc.darpacase.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.collins.atc.darpacase.menus.outline.resiliency.staircase.proofs"
+                     label="Proofs">
+               </menu>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.outline.component"
+                  label="Component Analysis">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.SelectImplementation"
+                     id="com.collins.atc.darpacase.component.menus.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.VerifyImplementation"
+                     label="Run TA3 tool"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.outline.build"
+                  label="Trusted Build">
+               <command
+                     commandId="com.collins.atc.darpacase.build.commands.TrustedBuild"
+                     label="Build..."
+                     style="push">
+               </command>
+            </menu>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="com.collins.atc.darpacase.menus.menubar.main"
+               label="CASE">
+            <menu
+                  id="com.collins.atc.darpacase.menus.menubar.requirements"
+                  label="Cyber Requirements">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.AddRequirement"
+                     id="com.collins.atc.darpacase.menus.menubar.requirements.gearcase"
+                     label="Run TA1 tool"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.menubar.resiliency"
+                  label="Cyber Resiliency">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.ModelAnnotations"
+                     id="com.collins.atc.darpacase.architecture.menus.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
+               <menu
+                     id="com.collins.atc.darpacase.menus.menubar.resiliency.staircase.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddFilter"
+                        id="com.collins.atc.darpacase.architecture.menus.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddAttestationManager"
+                        id="com.collins.atc.darpacase.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddRouter"
+                        id="com.collins.atc.darpacase.architecture.menus.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddMonitor"
+                        id="com.collins.atc.darpacase.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.collins.atc.darpacase.menus.menubar.resiliency.staircase.proofs"
+                     label="Proofs">
+               </menu>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.menubar.component"
+                  label="Component Analysis">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.SelectImplementation"
+                     id="com.collins.atc.darpacase.architecture.menus.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.VerifyImplementation"
+                     id="com.collins.atc.darpacase.architecture.menus.VerifyImplementation"
+                     label="Run TA3 tool"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.menubar.build"
+                  label="Trusted Build">
+               <command
+                     commandId="com.collins.atc.darpacase.build.commands.TrustedBuild"
+                     label="Build..."
+                     style="push">
+               </command>
+            </menu>
+         </menu>
+      </menuContribution>
+      <!--
+      <menuContribution
+            locationURI="popup:org.osate.ge.editor.AgeDiagramEditor?after=additions">
+         <menu
+               label="CASE">
+            <command
+                  commandId="com.collins.atc.darpacase.architecture.commands.AddFilter"
+                  id="com.collins.atc.darpacase.architecture.menus.AddFilter"
+                  label="Add Filter..."
+                  style="push">
+            </command>
+            <command
+                  commandId="com.collins.atc.darpacase.architecture.commands.AddMonitor"
+                  id="com.collins.atc.darpacase.architecture.menus.AddMonitor"
+                  label="Add Monitor..."
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      -->
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextEditorContext?after=additions">
+         <menu
+               id="com.collins.atc.darpacase.menus.editor.main"
+               label="CASE">
+            <menu
+                  id="com.collins.atc.darpacase.menus.editor.requirements"
+                  label="Cyber Requirements">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.AddRequirement"
+                     id="com.collins.atc.darpacase.requirements.menus.gearcase"
+                     label="Run TA1 tool"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.editor.resiliency"
+                  label="Cyber Resiliency">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.ModelAnnotations"
+                     id="com.collins.atc.darpacase.architecture.menus.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
+               <menu
+                     id="com.collins.atc.darpacase.menus.editor.resiliency.staircase.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddFilter"
+                        id="com.collins.atc.darpacase.architecture.menus.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddAttestationManager"
+                        id="com.collins.atc.darpacase.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddRouter"
+                        id="com.collins.atc.darpacase.architecture.menus.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.atc.darpacase.architecture.commands.AddMonitor"
+                        id="com.collins.atc.darpacase.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.collins.atc.darpacase.menus.editor.resiliency.staircase.proofs"
+                     label="Proofs">
+               </menu>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.editor.component"
+                  label="Component Analysis">
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.SelectImplementation"
+                     id="com.collins.atc.darpacase.component.menus.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.collins.atc.darpacase.architecture.commands.VerifyImplementation"
+                     label="Run TA3 tool"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.atc.darpacase.menus.editor.build"
+                  label="Trusted Build">
+               <command
+                     commandId="com.collins.atc.darpacase.build.commands.TrustedBuild"
+                     label="Build..."
+                     style="push">
+               </command>
+            </menu>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.GenerateRequirements"
+            name="Generate Requirements">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.AddFilter"
+            name="Add Filter">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.AddAttestationManager"
+            name="Add Attestation Manager">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.AddRouter"
+            name="Add Router">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.AddMonitor"
+            name="Add Monitor">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.ModelAnnotations"
+            name="Model Annotations">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.SelectImplementation"
+            name="Select Implementation">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.VerifyImplementation"
+            name="Verify Implementation">
+      </command>
+      <command
+            id="com.collins.atc.darpacase.architecture.commands.FilterChecker"
+            name="Filter Checker">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.AddFilter"
+            commandId="com.collins.atc.darpacase.architecture.commands.AddFilter">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.AddRouter"
+            commandId="com.collins.atc.darpacase.architecture.commands.AddRouter">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.AddMonitor"
+            commandId="com.collins.atc.darpacase.architecture.commands.AddMonitor">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.ModelAnnotations"
+            commandId="com.collins.atc.darpacase.architecture.commands.ModelAnnotations">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.SelectImplementation"
+            commandId="com.collins.atc.darpacase.architecture.commands.SelectImplementation">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.VerifyLegacyImplementation"
+            commandId="com.collins.atc.darpacase.architecture.commands.VerifyImplementation">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.AddRequirement"
+            commandId="com.collins.atc.darpacase.architecture.commands.AddRequirement">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.JsonHandler"
+            commandId="com.collins.atc.darpacase.architecture.commands.test">
+      </handler>
+      <handler
+            class="com.collins.atc.darpacase.architecture.handlers.AddAttestationManager"
+            commandId="com.collins.atc.darpacase.architecture.commands.AddAttestationManager">
+      </handler>
+   </extension>
+   <extension
+         point="org.osate.pluginsupport.aadlcontribution">
+      <aadlcontribution
+            file="resources/CASE_Properties.aadl"
+            id="com.collins.atc.darpacase.architecture.aadlcontribution.casepropset">
+      </aadlcontribution>
+      <aadlcontribution
+            file="resources/CASE_Model_Transformations.aadl"
+            id="com.collins.atc.darpacase.architecture.aadlcontribution.casemodeltransformations">
+      </aadlcontribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.collins.atc.darpacase.architecture.preferences.CasePreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.collins.atc.darpacase.architecture.preferences.CasePreferencePage"
+            id="com.collins.atc.darpacase.architecture.preferences.CasePreferencePage"
+            name="CASE">
+      </page>
+   </extension>
+
+</plugin>

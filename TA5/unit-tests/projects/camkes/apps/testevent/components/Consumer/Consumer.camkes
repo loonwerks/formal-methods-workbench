@@ -1,8 +1,0 @@
-/* apps/testevent/components/Consumer/Consumer.camkes */
-
-/* This consumes events of type TestEvent in various ways
- */
-component Consumer {
-  control;
-  consumes TestEvent s;
-}

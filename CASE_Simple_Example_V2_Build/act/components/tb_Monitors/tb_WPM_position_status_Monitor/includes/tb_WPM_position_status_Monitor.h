@@ -1,4 +1,0 @@
-#ifdef __tb_WPM_position_status_Monitor_H__
-#define __tb_WPM_position_status_Monitor_H__
-
-#endif // __tb_WPM_position_status_Monitor_H__

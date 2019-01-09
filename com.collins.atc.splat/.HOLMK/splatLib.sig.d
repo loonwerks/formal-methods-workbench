@@ -1,0 +1,1 @@
+splatLib.ui: AST.ui /home/collins/case-demo/HOL/sigobj/Abbrev.ui /home/collins/case-demo/HOL/sigobj/Arbint.ui /home/collins/case-demo/HOL/sigobj/Redblackmap.ui /home/collins/case-demo/HOL/examples/formal-languages/regular/Regexp_Type.ui /home/collins/case-demo/HOL/sigobj/simpLib.ui 

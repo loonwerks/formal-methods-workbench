@@ -1,7 +1,0 @@
-import "../../../interfaces/tb_Monitor_SW__MapArray_Impl_1.idl4";
-
-component tb_FPLN_nofly_zones_Monitor {
-
-  provides tb_Monitor_SW__MapArray_Impl_1 mon;
-  emits QueuedData monsig;
-}

@@ -1,5 +1,0 @@
-procedure tb_Monitor_SW__Mission_Impl {
-  include <tb_PROC_HW_types.h>;
-  bool read(out SW__Mission_Impl m);
-  bool write(refin SW__Mission_Impl m);
-};

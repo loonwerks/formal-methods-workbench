@@ -1,7 +1,0 @@
-/*  subscriber.camkes */
-
-component subscriber {
-    include "testshare_types.h";
-    control;
-    dataport thing_t b2;
-}

@@ -1,8 +1,0 @@
-/* testpdmon/interface/monitor.idl4 */
-
-procedure monitor {
-  include <stdbool.h>;
-  include <testdpmon_types.h>;
-  bool enqueue( refin thing_t m );
-  bool dequeue( out   thing_t m );
-};

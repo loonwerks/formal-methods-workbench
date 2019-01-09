@@ -1,0 +1,1 @@
+splat.uo: AADL.ui /home/collins/case-demo/HOL/sigobj/Feedback.ui /home/collins/case-demo/HOL/sigobj/HolKernel.ui Json.ui /home/collins/case-demo/HOL/sigobj/Lib.ui MiscLib.ui /home/collins/case-demo/HOL/sigobj/boolLib.ui /home/collins/case-demo/HOL/examples/formal-languages/regular/regexpLib.ui 

@@ -1,7 +1,0 @@
-import "../../../interfaces/tb_Monitor_SW__Coordinate_Impl_1.idl4";
-
-component tb_CM_position_status_Monitor {
-
-  provides tb_Monitor_SW__Coordinate_Impl_1 mon;
-  emits QueuedData monsig;
-}

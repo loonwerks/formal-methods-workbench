@@ -1,0 +1,43 @@
+/home/collins/git/CASE/TA2/splat/AST.sml:1172: warning: Matches are not exhaustive.
+Found near
+  fn
+     (x as RecdDecl _) => x |
+     (x as DatatypeDecl _) => x |
+     (x as ... ...) => x
+/home/collins/git/CASE/TA2/splat/AST.sml:1175: warning: Matches are not exhaustive.
+Found near
+  fn
+     (x as VarDecl _) => x |
+     (x as SizedDataDecl _) => x |
+     (x as ... ...) => x
+/home/collins/git/CASE/TA2/splat/AST.sml:1178: warning: Matches are not exhaustive. Found near fn EfnDecl x => x
+/home/collins/git/CASE/TA2/splat/AST.sml:1179: warning: Matches are not exhaustive.
+Found near fn (x as ConstDecl _) => x | (x as FnDecl _) => x
+/home/collins/git/CASE/TA2/splat/AST.sml:1181: warning: Matches are not exhaustive. Found near fn SpecDecl x => x
+/home/collins/git/CASE/TA2/splat/AST.sml:2121: warning: Matches are not exhaustive. Found near fn (DatatypeDecl x) => x
+/home/collins/git/CASE/TA2/splat/AST.sml:2122: warning: Matches are not exhaustive. Found near fn (RecdDecl x) => x
+/home/collins/git/CASE/TA2/splat/AST.sml:2143: warning: Matches are not exhaustive. Found near fn (SpecDecl (id, _, ...)) => id
+/home/collins/case-demo/HOL/examples/formal-languages/regular/regexpLib.sml:141: warning: Pattern is not exhaustive. Found near val [t1, t2, t3] = strip_pair triple
+/home/collins/case-demo/HOL/examples/formal-languages/regular/regexpLib.sml:167: warning: Pattern is not exhaustive.
+Found near val (_, [final, ...]) = strip_comb (boolSyntax.lhs eq_tm)
+/home/collins/case-demo/HOL/examples/formal-languages/regular/regexpLib.sml:200: warning: Pattern is not exhaustive. Found near val SOME thm = certificate
+/home/collins/case-demo/HOL/examples/formal-languages/regular/regexpLib.sml:202: warning: Pattern is not exhaustive.
+Found near val (exec_dfa, [finals, ...]) = strip_comb (lhs eqn)
+/home/collins/git/CASE/TA2/splat/splatLib.sml:368: warning: Matches are not exhaustive.
+Found near
+  fun
+     take_list [] [...] = [] |
+        take_list (... :: ...) ... = let ... in ... end handle ... => ...
+/home/collins/git/CASE/TA2/splat/AADL.sml:241: warning: Matches are not exhaustive.
+Found near fun data_decl_name (AList (... :: ...)) = dname
+/home/collins/git/CASE/TA2/splat/AADL.sml:246: warning: Matches are not exhaustive.
+Found near
+  case elt3 of
+     ("components", List comps) =>
+     let val data_tynames = ... ...; val ... = ...; val ... in
+        (... ... recd_decls, ... ...) end
+/home/collins/git/CASE/TA2/splat/AADL.sml:321: warning: Matches are not exhaustive.
+Found near fun data_decl_name (AList (... :: ...)) = dname
+splat.sml:40: warning: Pattern is not exhaustive.
+Found near
+  val ([jpkg], ss) = ... ... jsonfile (... ^ ... ^ " ... ") "succeeded.\n"

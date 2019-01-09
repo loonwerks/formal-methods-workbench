@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.collins.atc</groupId>
+		<artifactId>com.collins.atc.ace</artifactId>
+		<version>0.0.0</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.collins.atc</groupId>
+	<artifactId>com.collins.atc.ace.ide</artifactId>
+	<version>0.0.0</version>
+	<packaging>eclipse-repository</packaging>
+
+
+	<properties>
+		<product.id>com.collins.atc.ace.ide</product.id>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-repository-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<profileProperties>
+						<macosx-bundled>true</macosx-bundled>
+					</profileProperties>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-publisher-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<publishArtifacts>true</publishArtifacts>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-director-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>materialize-products</id>
+						<goals>
+							<goal>materialize-products</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>archive-products</id>
+						<goals>
+							<goal>archive-products</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<formats>
+						<win32>zip</win32>
+						<linux>tar.gz</linux>
+						<macosx>tar.gz</macosx>
+					</formats>
+					<products>
+						<product>
+							<id>${product.id}</id>
+							<archiveFileName>${product.id}-${unqualifiedVersion}-${buildQualifier}</archiveFileName>
+							<rootFolders>
+								<rootFolder>${product.id}</rootFolder>
+								<macosx>${product.id}.app</macosx>
+							</rootFolders>
+						</product>
+					</products>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

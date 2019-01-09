@@ -1,8 +1,0 @@
-/* apps/testevent/components/Emitter/Emitter.camkes */
-
-/* All this does is endlessly emit events of type TestEvent 
- */
-component Emitter {
-  control;
-  emits TestEvent e;
-}

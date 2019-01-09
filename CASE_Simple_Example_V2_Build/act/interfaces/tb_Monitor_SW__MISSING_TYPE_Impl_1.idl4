@@ -1,5 +1,0 @@
-procedure tb_Monitor_SW__MISSING_TYPE_Impl_1 {
-  include <tb_PROC_HW_types.h>;
-  bool enqueue(refin SW__MISSING_TYPE_Impl m);
-  bool dequeue(out SW__MISSING_TYPE_Impl m);
-};
