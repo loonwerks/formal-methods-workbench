@@ -29,9 +29,6 @@ import org.osate.annexsupport.AnnexLinkingService;
 import org.osate.annexsupport.AnnexParser;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.parsing.AgreeAnnexLinkingService;
-import com.rockwellcollins.atc.agree.parsing.AgreeAnnexParser;
-
 import antlr.RecognitionException;
 
 public class AgreeAgent extends LazyLinker {
