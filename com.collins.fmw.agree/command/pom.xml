@@ -15,6 +15,15 @@
   <packaging>jar</packaging>
   	<version>0.0.0</version>
   
+
+
+  <repositories>
+    <repository>
+        <id>agree.jlib</id>
+        <url>file://${basedir}/../jlib</url>
+    </repository>
+  </repositories>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -23,12 +32,6 @@
   </properties>
 
   <dependencies>
-
-	<dependency>
-	    <groupId>org.eclipse.emf</groupId>
-	    <artifactId>org.eclipse.emf.transaction</artifactId>
-	    <version>1.9.0.201506010221</version>
-	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/antlr/antlr -->
 	<dependency>
@@ -58,11 +61,6 @@
         <version>3.1.0.v201006071150</version>
     </dependency>
 
-    <dependency>
-        <groupId>org.eclipse.uml2</groupId>
-        <artifactId>org.eclipse.uml2.types</artifactId>
-        <version>2.0.0.v20170227-0935</version>
-    </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.eclipse.core/org.eclipse.core.runtime -->
     <dependency>
@@ -124,6 +122,19 @@
 	    <version>2.16.0</version>
 	</dependency>
 
+	<!-- ../jlib -->
+	<dependency>
+	    <groupId>org.eclipse.emf</groupId>
+	    <artifactId>org.eclipse.emf.transaction</artifactId>
+	    <version>1.9.0.201506010221</version>
+	</dependency>
+
+    <!-- ../jlib -->
+    <dependency>
+        <groupId>org.eclipse.uml2</groupId>
+        <artifactId>org.eclipse.uml2.types</artifactId>
+        <version>2.0.0.v20170227-0935</version>
+   </dependency>
     
 
     <dependency>      
