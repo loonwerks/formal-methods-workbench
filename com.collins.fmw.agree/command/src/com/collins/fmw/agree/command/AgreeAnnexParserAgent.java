@@ -47,7 +47,7 @@ public class AgreeAnnexParserAgent extends LazyLinker {
 
 	private boolean standalone = false;
 
-	AgreeAgent() {
+	AgreeAnnexParserAgent() {
 //		try {
 //			AnnexRegistry.getRegistry(AnnexRegistry.ANNEX_PARSER_EXT_ID);
 //		} catch (NoClassDefFoundError e) {

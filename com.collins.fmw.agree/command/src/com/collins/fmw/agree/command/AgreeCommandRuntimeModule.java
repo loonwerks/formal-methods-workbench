@@ -1,6 +1,6 @@
 package com.collins.fmw.agree.command;
 
-import org.osate.xtext.aadl2;
+import org.osate.xtext.aadl2.Aadl2RuntimeModule;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.documentation.IEObjectDocumentationProvider;
 import org.eclipse.xtext.formatting2.regionaccess.TextRegionAccessBuilder;
@@ -44,7 +44,7 @@ import com.google.inject.name.Names;
 public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2RuntimeModule {
 	@Override
 	public Class<? extends org.eclipse.xtext.linking.ILinkingService> bindILinkingService() {
-		return org.osate.xtext.aadl2.linking.Aadl2LinkingService.class;
+		return CommandLinkingService.class;
 	}
 
 	@Override
