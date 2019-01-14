@@ -1,5 +1,6 @@
 package com.collins.fmw.agree.command;
 
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -70,7 +71,7 @@ public class AgreeCommand {
 			File basisFile = new File(fileArg);
 			String path = basisFile.getAbsolutePath();
 			Stream<String> stream = Files.lines(Paths.get(path));
-            stream.forEach((line) -> {
+      stream.forEach((line) -> {
 				line = line.replaceFirst("^~", System.getProperty("user.home"));
 				File aadlFile = new File(line);
 				String aadlPath = "";
@@ -84,7 +85,7 @@ public class AgreeCommand {
 				validate(resource);
 				System.out.println("* aadl path (basis): " + aadlPath);
 
-            });
+      });
 
 
 		} else {

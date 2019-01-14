@@ -31,7 +31,7 @@ import org.osate.annexsupport.AnnexUtil;
 
 import antlr.RecognitionException;
 
-public class AgreeAgent extends LazyLinker {
+public class AgreeAnnexParserAgent extends LazyLinker {
 
 	private ParseErrorReporterFactory factory;
 

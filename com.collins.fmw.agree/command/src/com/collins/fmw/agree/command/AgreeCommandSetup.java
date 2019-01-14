@@ -8,6 +8,7 @@ import org.osate.xtext.aadl2.properties.PropertiesStandaloneSetup;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.osate.xtext.aadl2.Aadl2RuntimeModule;
 
 
 @SuppressWarnings("all")
@@ -33,13 +34,13 @@ public class AgreeCommandSetup implements ISetup {
 		IResourceServiceProvider serviceProvider = injector
 				.getInstance(org.eclipse.xtext.resource.IResourceServiceProvider.class);
 
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl", resourceFactory);
-		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl",
-				serviceProvider);
-
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2", resourceFactory);
-		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2",
-				serviceProvider);
+    		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl", resourceFactory);
+    		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl",
+    				serviceProvider);
+    
+    		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2", resourceFactory);
+    		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2",
+    				serviceProvider);
 
 	}
 }

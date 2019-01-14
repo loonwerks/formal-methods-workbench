@@ -21,3 +21,7 @@ json-generated
 caseAttestationDemo
 
 bin
+
+.project
+.settings
+.#*
