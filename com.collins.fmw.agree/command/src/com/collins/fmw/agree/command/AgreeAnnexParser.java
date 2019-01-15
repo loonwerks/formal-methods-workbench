@@ -10,10 +10,10 @@ import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.AgreeStandaloneSetup;
 import com.rockwellcollins.atc.agree.parser.antlr.AgreeParser;
 import com.rockwellcollins.atc.agree.services.AgreeGrammarAccess;
-import com.rockwellcollins.atc.agree.ui.internal.AgreeActivator;
 
 // Based on EMV2AnnexParser from Error Model annex
 public class AgreeAnnexParser implements AnnexParser {
+
 	private AgreeParser parser;
 
 	protected AgreeParser getParser() {

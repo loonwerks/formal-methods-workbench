@@ -3,8 +3,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
-  
+
+
+  <parent>
+  	<groupId>com.collins.fmw</groupId>
+  	<artifactId>com.collins.fmw</artifactId>
+  	<version>0.0.0</version>
+  	<relativePath>..</relativePath>
+  </parent>
+
   <groupId>com.collins.fmw</groupId>
   <artifactId>com.collins.fmw.agree</artifactId>
   <version>0.0.0</version>
@@ -15,12 +22,14 @@
   	<module>../../osate2/ge/osate-ge.releng/modules</module>
   	<module>../../osate2/emv2/emv2.releng/modules</module>
   	<module>../../osate2/analyses/osate2-plugins.releng/modules</module>
-  	<module>../../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
+	  <module>../../osate2-ocarina/osate2-ocarina.releng/modules</module>
+	  <module>../../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
   	<module>command</module>	
   </modules>
+
   
-  <build>
-  </build>
+<build>
+</build>
 
 
 </project>

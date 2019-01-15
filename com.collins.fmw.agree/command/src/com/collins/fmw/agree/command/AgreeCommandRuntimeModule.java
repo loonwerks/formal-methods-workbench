@@ -1,6 +1,5 @@
 package com.collins.fmw.agree.command;
 
-import org.osate.xtext.aadl2.Aadl2RuntimeModule;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.documentation.IEObjectDocumentationProvider;
 import org.eclipse.xtext.formatting2.regionaccess.TextRegionAccessBuilder;
@@ -8,6 +7,7 @@ import org.eclipse.xtext.generator.AbstractFileSystemAccess2;
 import org.eclipse.xtext.generator.IOutputConfigurationProvider;
 import org.eclipse.xtext.generator.InMemoryFileSystemAccess;
 import org.eclipse.xtext.linking.lazy.LazyURIEncoder;
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.resource.IDerivedStateComputer;
 import org.eclipse.xtext.resource.IFragmentProvider;
 import org.eclipse.xtext.resource.IResourceDescription;
@@ -20,7 +20,7 @@ import org.osate.xtext.aadl2.documentation.Aadl2DocumentationProvider;
 import org.osate.xtext.aadl2.findReferences.Aadl2ReferenceFinder;
 import org.osate.xtext.aadl2.formatting2.regionaccess.Aadl2TextRegionAccessBuilder;
 import org.osate.xtext.aadl2.generator.Aadl2OutputConfigurationProvider;
-import org.osate.xtext.aadl2.parsing.AnnexParserAgent;
+import org.osate.xtext.aadl2.naming.Aadl2QualifiedNameProvider;
 import org.osate.xtext.aadl2.resource.Aadl2DerivedStateComputer;
 import org.osate.xtext.aadl2.resource.NoCacheDerivedStateAwareResource;
 import org.osate.xtext.aadl2.resource.persistence.Aadl2ResourceStorageFacade;
@@ -53,10 +53,11 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 	}
 
 	@Override
-	public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
-		return org.osate.xtext.aadl2.naming.Aadl2QualifiedNameProvider.class;
+	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
+		return (Class<? extends IQualifiedNameProvider>) Aadl2QualifiedNameProvider.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.naming.IQualifiedNameConverter> bindIQualifiedNameConverter() {
 		return org.osate.xtext.aadl2.naming.Aadl2QualifiedNameConverter.class;
 	}
@@ -79,16 +80,19 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 		return AgreeAnnexParserAgent.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.validation.INamesAreUniqueValidationHelper> bindINamesAreUniqueValidationHelper() {
 		return Aadl2NamesAreUniqueValidationHelper.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.serializer.tokens.ICrossReferenceSerializer> bindICrossReferenceSerializer() {
 		return org.osate.xtext.aadl2.serializer.Aadl2CrossReferenceSerializer.class;
 	}
 
 	// we are not using it for unassigned values. We use token like PNAME
 	// instead
+	@Override
 	public Class<? extends org.eclipse.xtext.parsetree.reconstr.ITokenSerializer.IValueSerializer> bindITokenSerializer$IValueSerializer() {
 		return org.osate.xtext.aadl2.serializing.Aadl2ValueSerializer.class;
 	}
@@ -98,10 +102,12 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 		return org.osate.xtext.aadl2.serializing.Aadl2TransientValueService.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.resource.EObjectAtOffsetHelper> bindEObjectAtOffsetHelper() {
 		return org.osate.xtext.aadl2.util.Aadl2EObjectAtOffsetHelper.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.resource.DefaultLocationInFileProvider> bindDefaultLocationInFileProvider() {
 		return org.osate.xtext.aadl2.util.Aadl2LocationInFile.class;
 	}
@@ -121,6 +127,7 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 		return Aadl2ScopeProvider.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.findReferences.IReferenceFinder> bindIReferenceFinder() {
 		return Aadl2ReferenceFinder.class;
 	}
@@ -146,28 +153,34 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 		return NoCacheDerivedStateAwareResource.class;
 	}
 
+	@Override
 	public Class<? extends IResourceDescription.Manager> bindIResourceDescriptionManager() {
 		return org.eclipse.xtext.resource.DerivedStateAwareResourceDescriptionManager.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.resource.persistence.IResourceStorageFacade> bindIResourceStorageFacade() {
 		return Aadl2ResourceStorageFacade.class;
 	}
 
+	@Override
 	public Class<? extends AbstractFileSystemAccess2> bindAbstractFileSystemAccess2() {
 		return InMemoryFileSystemAccess.class;
 	}
 
 	// needed for builder participant even though we don't generate anything
 	// builder participant is needed to write bin files
+	@Override
 	public Class<? extends org.eclipse.xtext.generator.IGenerator> bindIGenerator() {
 		return org.eclipse.xtext.generator.IGenerator.NullGenerator.class;
 	}
 
+	@Override
 	public Class<? extends IOutputConfigurationProvider> bindIOutputConfigurationProvider() {
 		return Aadl2OutputConfigurationProvider.class;
 	}
 
+	@Override
 	public Class<? extends IDerivedStateComputer> bindIDerivedStateComputer() {
 		return Aadl2DerivedStateComputer.class;
 	}
@@ -179,14 +192,17 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 				.to(InstanceEnabledSerializer.class);
 	}
 
+	@Override
 	public Class<? extends IEObjectDocumentationProvider> bindIEObjectDocumentationProvider() {
 		return Aadl2DocumentationProvider.class;
 	}
 
+	@Override
 	public Class<? extends TextRegionAccessBuilder> bindTextRegionAccessBuilder() {
 		return Aadl2TextRegionAccessBuilder.class;
 	}
 
+	@Override
 	public Class<? extends org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider> bindILinkingDiagnosticMessageProvider() {
 		return org.osate.xtext.aadl2.properties.linking.PropertiesLinkingDiagnosticMessageProvider.class;
 	}

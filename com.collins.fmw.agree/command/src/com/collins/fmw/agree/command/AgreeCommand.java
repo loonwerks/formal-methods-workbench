@@ -15,47 +15,18 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.validation.Issue;
+import org.osate.aadl2.Element;
 
 import com.google.inject.Injector;
-
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.ui.editor.XtextEditor;
-import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
-import org.eclipse.xtext.ui.editor.utils.EditorUtils;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.Realization;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.ge.BusinessObjectSelection;
-
 import com.rockwellcollins.atc.agree.analysis.handlers.VerifyAllHandler;
 
 public class AgreeCommand {
@@ -141,17 +112,17 @@ public class AgreeCommand {
 	private static List<Issue> issues = new ArrayList<Issue>();
 	private static List<String> visited = new ArrayList<String>();
 
-	private static void validate(Resource resource) {
+	private static IStatus validate(Resource resource) {
 
 		if (visited.contains(resource.getURI().toString())) {
-			return;
+			return Status.CANCEL_STATUS;
 		}
 
 		List<EObject> contents = resource.getContents();
 		for (EObject o : contents) {
 			System.out.println("ooga " + o);
       VerifyAllHandler modelChecker = new VerifyAllHandler();
-			if (eobj instanceof Element) {
+			if (o instanceof Element) {
 			  NullProgressMonitor monitor = new NullProgressMonitor();
 				return modelChecker.runJob((Element) o, monitor);
 			} else {
@@ -159,6 +130,7 @@ public class AgreeCommand {
 			}
 		}
 
+		return Status.CANCEL_STATUS;
 
 	}
 
