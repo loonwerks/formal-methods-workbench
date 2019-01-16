@@ -29,5 +29,4 @@ Require-Bundle: org.eclipse.xtext.generator;bundle-version="2.1.0";resolution:=o
  org.eclipse.emf.transaction,
  org.eclipse.xtext.xbase.lib
 Import-Package: .
-Bundle-ClassPath: .
 Export-Package: com.collins.fmw.agree.command

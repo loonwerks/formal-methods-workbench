@@ -120,11 +120,15 @@ public class AgreeCommand {
 
 		List<EObject> contents = resource.getContents();
 		for (EObject o : contents) {
+
+			System.out.println("ooga 0");
 			System.out.println("ooga " + o);
-      VerifyAllHandler modelChecker = new VerifyAllHandler();
+      AgreeModelChecker modelChecker = new AgreeModelChecker();
 			if (o instanceof Element) {
-			  NullProgressMonitor monitor = new NullProgressMonitor();
-				return modelChecker.runJob((Element) o, monitor);
+			  System.out.println("ooga 1");
+				IStatus status = modelChecker.runJob((Element) o);
+			  System.out.println("ooga 2");
+        return status;
 			} else {
 				return Status.CANCEL_STATUS;
 			}
