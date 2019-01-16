@@ -29,9 +29,7 @@ import jkind.util.Util;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.util.Pair;
 import org.osate.aadl2.AadlPackage;
@@ -138,14 +136,6 @@ public class AgreeModelChecker {
 	public IStatus runJob(Element root) {
 		ProgressMonitor monitor = new NullProgressMonitor();
 		EphemeralImplementationUtil implUtil = new EphemeralImplementationUtil(monitor);
-		// this flag is set by the rerun handler to prevent clearing the advice map
-		if (!calledFromRerun) {
-			rerunAdviceMap.clear();
-		}
-		calledFromRerun = false;
-
-		disableRerunHandler();
-		handlerService = getWindow().getService(IHandlerService.class);
 
 		try {
 
@@ -491,7 +481,7 @@ public class AgreeModelChecker {
 
 					if (api instanceof JKindApi) {
 						String resultName = result.getName();
-						(JKindApi) api).setReadAdviceFile(adviceFileName);
+						((JKindApi) api).setReadAdviceFile(adviceFileName);
 						((JKindApi) api).setWriteAdviceFile(adviceFileName);
 					}
 
@@ -532,7 +522,7 @@ public class AgreeModelChecker {
 			}
 		};
 		analysisThread.start();
-		return Status.OK_STATUS;
+		return org.eclipse.core.runtime.Status.OK_STATUS;
 	}
 
 

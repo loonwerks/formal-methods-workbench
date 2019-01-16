@@ -7,6 +7,8 @@ Automatic-Module-Name: com.collins.fmw.cyres.agree.json.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.xtext.generator;bundle-version="2.1.0";resolution:=optional,
  org.osate.aadl2,
+ org.osate.aadl2.instance,
+ org.osate.aadl2.instantiation,
  org.osate.xtext.aadl2.properties,
  org.osate.contribution.sei,
  org.eclipse.emf.edit;bundle-version="2.7.0",
