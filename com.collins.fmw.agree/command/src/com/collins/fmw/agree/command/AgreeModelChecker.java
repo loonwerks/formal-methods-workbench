@@ -1,30 +1,17 @@
 package com.collins.fmw.agree.command;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import jkind.api.results.AnalysisResult;
-import jkind.api.results.JRealizabilityResult;
-import jkind.api.results.PropertyResult;
-import jkind.api.results.ResultsUtil;
-import jkind.api.results.Status;
-import jkind.api.ui.results.AnalysisResultColumnViewer.Column;
-import jkind.results.InconsistentProperty;
-import jkind.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -63,27 +50,28 @@ import com.rockwellcollins.atc.agree.analysis.ast.AgreeStatement;
 import com.rockwellcollins.atc.agree.analysis.extentions.AgreeAutomater;
 import com.rockwellcollins.atc.agree.analysis.extentions.AgreeAutomaterRegistry;
 import com.rockwellcollins.atc.agree.analysis.extentions.ExtensionRegistry;
+import com.rockwellcollins.atc.agree.analysis.handlers.AadlHandler;
 import com.rockwellcollins.atc.agree.analysis.lustre.visitors.RenamingVisitor;
-import com.rockwellcollins.atc.agree.analysis.preferences.PreferenceConstants;
 import com.rockwellcollins.atc.agree.analysis.preferences.PreferencesUtil;
-import com.rockwellcollins.atc.agree.analysis.saving.AgreeFileUtil;
 import com.rockwellcollins.atc.agree.analysis.translation.LustreAstBuilder;
-import com.rockwellcollins.atc.agree.analysis.translation.LustreContractAstBuilder;
 import com.rockwellcollins.atc.agree.analysis.views.AgreeResultsLinker;
-import com.rockwellcollins.atc.agree.analysis.views.AgreeResultsView;
 
 import jkind.JKindException;
-import jkind.api.JKindApi;
 import jkind.api.JRealizabilityApi;
 import jkind.api.KindApi;
 import jkind.api.results.AnalysisResult;
 import jkind.api.results.CompositeAnalysisResult;
 import jkind.api.results.JKindResult;
 import jkind.api.results.JRealizabilityResult;
+import jkind.api.results.PropertyResult;
+import jkind.api.results.ResultsUtil;
+import jkind.api.results.Status;
 import jkind.lustre.Node;
 import jkind.lustre.Program;
+import jkind.results.InconsistentProperty;
+import jkind.util.Util;
 
-public class AgreeModelChecker {
+public class AgreeModelChecker extends AadlHandler {
 	protected AgreeResultsLinker linker = new AgreeResultsLinker();
 	protected Queue<JKindResult> queue = new ArrayDeque<>();
 	protected AtomicReference<IProgressMonitor> monitorRef = new AtomicReference<>();
@@ -134,7 +122,7 @@ public class AgreeModelChecker {
 	}
 
 	public IStatus runJob(Element root) {
-		ProgressMonitor monitor = new NullProgressMonitor();
+		IProgressMonitor monitor = new NullProgressMonitor();
 		EphemeralImplementationUtil implUtil = new EphemeralImplementationUtil(monitor);
 
 		try {
@@ -166,7 +154,7 @@ public class AgreeModelChecker {
 			return doAnalysis(ci, monitor);
 		} catch (Throwable e) {
 			String messages = getNestedMessages(e);
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, messages, e);
+			return new org.eclipse.core.runtime.Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, messages, e);
 		} finally {
 			implUtil.cleanup();
 		}
@@ -368,41 +356,39 @@ public class AgreeModelChecker {
         private String resultToString (AnalysisResult result) {
             if (result instanceof PropertyResult) {
                 PropertyResult pr = (PropertyResult) result;
-                switch (column) {
-                case PROPERTY:
+
+				String property;
                     if (pr.getName().equals(Util.REALIZABLE)) {
-                        return pr.getParent().getName();
+					property = pr.getParent().getName();
                     } else {
-                        return pr.getName();
+					property = pr.getName();
                     }
-                case RESULT:
+
+				String rsltStr;
                     switch (pr.getStatus()) {
                     case WAITING:
-                        return pr.getStatus().toString();
+					rsltStr = pr.getStatus().toString();
                     case WORKING:
-                        return pr.getStatus().toString() + "..." + getProgress(pr) + " ("
+					rsltStr = pr.getStatus().toString() + "..." + getProgress(pr) + " ("
                             + Util.secondsToTime(pr.getElapsed()) + ")";
                     case INCONSISTENT:
                         InconsistentProperty ic = (InconsistentProperty) pr.getProperty();
-                        return getFinalStatus(pr)
+					rsltStr = getFinalStatus(pr)
                             + " (" + ic.getK()
                             + " steps, "
                             + Util.secondsToTime(pr.getElapsed()) + ")";
                     default:
-                        return getFinalStatus(pr) + " (" + Util.secondsToTime(pr.getElapsed()) + ")";
+					rsltStr = getFinalStatus(pr) + " (" + Util.secondsToTime(pr.getElapsed()) + ")";
                     }
-                }
+				return property + ": " + rsltStr;
             } else if (result instanceof JRealizabilityResult) {
                 JRealizabilityResult jr = (JRealizabilityResult) result;
-                return getText(jr.getPropertyResult());
+				return resultToString(jr.getPropertyResult());
             } else if (result instanceof AnalysisResult) {
-                AnalysisResult ar = (AnalysisResult) result;
-                switch (column) {
-                case PROPERTY:
-                    return ar.getName();
-                case RESULT:
-                    return ResultsUtil.getMultiStatus(ar).toString();
-                }
+                AnalysisResult ar = result;
+
+				return ar.getName() + ": " + ResultsUtil.getMultiStatus(ar).toString();
+
             }
 
             return "";
@@ -453,21 +439,7 @@ public class AgreeModelChecker {
 			@Override
 			public void run() {
 
-				// Record the analysis start time and get model hashcode for
-				// saving to property analysis log, if necessary
-				String modelHash = "";
-				long startTime = 0;
-				if (Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_PROP_LOG)) {
-					try {
-						modelHash = AgreeFileUtil.getModelHashcode(root);
-						startTime = System.currentTimeMillis();
-					} catch (Exception e) {
-						System.out.println(e.getMessage());
-						return;
-					}
-				}
 
-				activateTerminateHandlers(globalMonitor);
 				KindApi api = PreferencesUtil.getKindApi();
 				KindApi consistApi = PreferencesUtil.getConsistencyApi();
 				JRealizabilityApi realApi = PreferencesUtil.getJRealizabilityApi();
@@ -479,11 +451,7 @@ public class AgreeModelChecker {
 
 					Program program = linker.getProgram(result);
 
-					if (api instanceof JKindApi) {
-						String resultName = result.getName();
-						((JKindApi) api).setReadAdviceFile(adviceFileName);
-						((JKindApi) api).setWriteAdviceFile(adviceFileName);
-					}
+
 
 					try {
 						if (result instanceof ConsistencyResult) {
@@ -507,11 +475,6 @@ public class AgreeModelChecker {
 						break;
 					}
 
-					// Print to property analysis log, if necessary
-					if (Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_PROP_LOG)) {
-						AgreeFileUtil.printLog(result, startTime, modelHash);
-					}
-
 					queue.remove();
 				}
 
@@ -525,5 +488,16 @@ public class AgreeModelChecker {
 		return org.eclipse.core.runtime.Status.OK_STATUS;
 	}
 
+	@Override
+	protected IStatus runJob(Element sel, IProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String getJobName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
