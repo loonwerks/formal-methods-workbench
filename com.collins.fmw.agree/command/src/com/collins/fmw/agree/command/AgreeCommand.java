@@ -74,7 +74,7 @@ public class AgreeCommand {
 			File basisFile = new File(fileArg);
 			String path = basisFile.getAbsolutePath();
 			Stream<String> stream = Files.lines(Paths.get(path));
-      stream.forEach((line) -> {
+			stream.forEach((line) -> {
 				line = line.replaceFirst("^~", System.getProperty("user.home"));
 				File aadlFile = new File(line);
 				String aadlPath = "";
@@ -113,7 +113,6 @@ public class AgreeCommand {
 	private static IStatus validate(Resource resource) {
 
 		if (visited.contains(resource.getURI().toString())) {
-
 			System.out.println("visisted");
 			return Status.CANCEL_STATUS;
 		}
@@ -130,7 +129,6 @@ public class AgreeCommand {
 
 				return status;
 			} else {
-
 				System.out.println("not running checker: " + o);
 				return Status.CANCEL_STATUS;
 			}

@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.util.Pair;
@@ -27,16 +26,16 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.InstanceFactory;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.AadlConstants;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
-import org.osate.aadl2.modelsupport.errorreporting.MarkerAnalysisErrorReporter;
 import org.osate.annexsupport.AnnexUtil;
 
+import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.AgreeSubclause;
+import com.rockwellcollins.atc.agree.agree.Contract;
+import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.analysis.Activator;
 import com.rockwellcollins.atc.agree.analysis.AgreeException;
 import com.rockwellcollins.atc.agree.analysis.AgreeLayout;
@@ -44,7 +43,6 @@ import com.rockwellcollins.atc.agree.analysis.AgreeLogger;
 import com.rockwellcollins.atc.agree.analysis.AgreeRenaming;
 import com.rockwellcollins.atc.agree.analysis.AgreeUtils;
 import com.rockwellcollins.atc.agree.analysis.ConsistencyResult;
-import com.rockwellcollins.atc.agree.analysis.ast.AgreeASTBuilder;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeNode;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeProgram;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeStatement;
@@ -81,16 +79,28 @@ public class AgreeModelChecker {
 	};
 
 	protected SystemInstance getSysInstance(ComponentImplementation ci, Resource aadlResource) {
-		try {
-			final InstantiateModel instantiateModel = new InstantiateModel(new NullProgressMonitor(),
-					new AnalysisErrorReporterManager(
-							new MarkerAnalysisErrorReporter.Factory(AadlConstants.INSTANTIATION_OBJECT_MARKER)));
-			return instantiateModel.createSystemInstance(ci, aadlResource);
 
-		} catch (Exception e) {
-        System.out.println("Error while re-instantiating the model: " + e.getMessage());
-			throw new AgreeException("Error Instantiating model");
-		}
+		SystemInstance root = InstanceFactory.eINSTANCE.createSystemInstance();
+		final String instanceName = ci.getTypeName() + "_" + ci.getImplementationName();
+
+		root.setComponentImplementation(ci);
+		root.setName(instanceName);
+		root.setCategory(ci.getCategory());
+//		aadlResource.getContents().add(root);
+		return root;
+
+//
+//
+//		try {
+//			final InstantiateModel instantiateModel = new InstantiateModel(new NullProgressMonitor(),
+//					new AnalysisErrorReporterManager(
+//							new MarkerAnalysisErrorReporter.Factory(AadlConstants.INSTANTIATION_OBJECT_MARKER)));
+//			return instantiateModel.createSystemInstance(ci, aadlResource);
+//
+//		} catch (Exception e) {
+//        System.out.println("Error while re-instantiating the model: " + e.getMessage());
+//			throw new AgreeException("Error Instantiating model");
+//		}
 	}
 
 	private ComponentImplementation getComponentImplementation(AadlPackage root) {
@@ -117,38 +127,36 @@ public class AgreeModelChecker {
 
 	public IStatus runJob(AadlPackage root, Resource aadlResource) {
 
-		System.out.println("booga 0: ");
 		try {
 
 			// Make sure the user selected a component implementation
 			ComponentImplementation ci = getComponentImplementation(root);
-
-			System.out.println("booga 1.1: ");
 			SystemInstance si = getSysInstance(ci, aadlResource);
 
-			System.out.println("booga 1.2: ");
 			AnalysisResult result;
 			CompositeAnalysisResult wrapper = new CompositeAnalysisResult("");
 
 			ComponentType sysType = AgreeUtils.getInstanceType(si);
-			EList<AnnexSubclause> annexSubClauses = AnnexUtil.getAllAnnexSubclauses(sysType,
-					AgreePackage.eINSTANCE.getAgreeContractSubclause());
-
-			System.out.println("booga 1.4: ");
-			if (annexSubClauses.size() == 0) {
-				throw new AgreeException("There is not an AGREE annex in the '" + sysType.getName() + "' system type.");
-			}
-
-			if (AgreeUtils.usingKind2()) {
-				throw new AgreeException("Kind2 only supports monolithic verification");
-			}
+//			EList<AnnexSubclause> annexSubClauses = AnnexUtil.getAllAnnexSubclauses(sysType,
+//					AgreePackage.eINSTANCE.getAgreeContractSubclause());
+//
+//			if (annexSubClauses.size() == 0) {
+//				throw new AgreeException("There is not an AGREE annex in the '" + sysType.getName() + "' system type.");
+//			}
+//
+//			if (AgreeUtils.usingKind2()) {
+//				throw new AgreeException("Kind2 only supports monolithic verification");
+//			}
 			result = buildAnalysisResult(ci.getName(), si);
 			wrapper.addChild(result);
 			result = wrapper;
 
 			listenForAnalysisResults(result);
+
 			return doAnalysis(ci);
 		} catch (Throwable e) {
+
+			e.printStackTrace();
 
 			String messages = getNestedMessages(e);
 			return new org.eclipse.core.runtime.Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, messages, e);
@@ -156,7 +164,7 @@ public class AgreeModelChecker {
 	}
 
 	private void wrapVerificationResult(ComponentInstance si, CompositeAnalysisResult wrapper) {
-		AgreeProgram agreeProgram = new AgreeASTBuilder().getAgreeProgram(si, false);
+		AgreeProgram agreeProgram = new ASTBuilder().getAgreeProgram(si, false);
 
 		// generate different lustre depending on which model checker we are
 		// using
@@ -221,6 +229,14 @@ public class AgreeModelChecker {
 		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(compClass,
 				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
 			if (annex instanceof AgreeContractSubclause) {
+
+				Contract c = ((AgreeContractSubclause) annex).getContract();
+				System.out.println("ooga contract: " + c);
+				if (c instanceof AgreeContract) {
+					for (SpecStatement spec : ((AgreeContract) c).getSpecs()) {
+						System.out.println("ooga spec: " + spec);
+					}
+				}
 				return true;
 			}
 		}
@@ -313,11 +329,11 @@ public class AgreeModelChecker {
 		String propPrefix = (userPropPrefix.equals("")) ? "" : userPropPrefix + ": ";
 		for (AgreeStatement statement : agreeNode.lemmas) {
 			renaming.addExplicitRename(prefix + "[" + (++i) + "]", propPrefix + statement.string);
-			properties.add(prefix.replaceAll("\\.", AgreeASTBuilder.dotChar) + "[" + i + "]");
+			properties.add(prefix.replaceAll("\\.", ASTBuilder.dotChar) + "[" + i + "]");
 		}
 		for (AgreeStatement statement : agreeNode.guarantees) {
 			renaming.addExplicitRename(prefix + "[" + (++i) + "]", propPrefix + statement.string);
-			properties.add(prefix.replaceAll("\\.", AgreeASTBuilder.dotChar) + "[" + i + "]");
+			properties.add(prefix.replaceAll("\\.", ASTBuilder.dotChar) + "[" + i + "]");
 		}
 
 		userPropPrefix = userPropPrefix.equals("") ? "" : userPropPrefix + ".";
@@ -439,7 +455,7 @@ public class AgreeModelChecker {
 			@Override
 			public void run() {
 
-
+				System.out.println("doAnalysis " + queue);
 				KindApi api = PreferencesUtil.getKindApi();
 				KindApi consistApi = PreferencesUtil.getConsistencyApi();
 				JRealizabilityApi realApi = PreferencesUtil.getJRealizabilityApi();
