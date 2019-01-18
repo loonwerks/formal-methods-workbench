@@ -13,9 +13,6 @@
   
   <artifactId>com.collins.fmw.agree.command</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.0</version>
-  
-
   <repositories>
     <repository>
         <id>agree.jlib</id>

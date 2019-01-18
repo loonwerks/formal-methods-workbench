@@ -16,7 +16,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -24,10 +23,9 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.validation.Issue;
-import org.osate.aadl2.Element;
+import org.osate.aadl2.AadlPackage;
 
 import com.google.inject.Injector;
-import com.rockwellcollins.atc.agree.analysis.handlers.VerifyAllHandler;
 
 public class AgreeCommand {
 
@@ -115,21 +113,25 @@ public class AgreeCommand {
 	private static IStatus validate(Resource resource) {
 
 		if (visited.contains(resource.getURI().toString())) {
+
+			System.out.println("visisted");
 			return Status.CANCEL_STATUS;
 		}
 
 		List<EObject> contents = resource.getContents();
+
+		System.out.println("resource contents: " + contents);
 		for (EObject o : contents) {
 
-			System.out.println("ooga 0");
-			System.out.println("ooga " + o);
-      AgreeModelChecker modelChecker = new AgreeModelChecker();
-			if (o instanceof Element) {
-			  System.out.println("ooga 1");
-				IStatus status = modelChecker.runJob((Element) o);
-			  System.out.println("ooga 2");
-        return status;
+			AgreeModelChecker modelChecker = new AgreeModelChecker();
+			if (o instanceof AadlPackage) {
+				System.out.println("run model checker: " + resource.isLoaded());
+				IStatus status = modelChecker.runJob((AadlPackage) o, resource);
+
+				return status;
 			} else {
+
+				System.out.println("not running checker: " + o);
 				return Status.CANCEL_STATUS;
 			}
 		}

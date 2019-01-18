@@ -17,11 +17,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.util.Pair;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
@@ -29,7 +29,9 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
+import org.osate.aadl2.modelsupport.AadlConstants;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
+import org.osate.aadl2.modelsupport.errorreporting.MarkerAnalysisErrorReporter;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -42,7 +44,6 @@ import com.rockwellcollins.atc.agree.analysis.AgreeLogger;
 import com.rockwellcollins.atc.agree.analysis.AgreeRenaming;
 import com.rockwellcollins.atc.agree.analysis.AgreeUtils;
 import com.rockwellcollins.atc.agree.analysis.ConsistencyResult;
-import com.rockwellcollins.atc.agree.analysis.EphemeralImplementationUtil;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeASTBuilder;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeNode;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeProgram;
@@ -50,7 +51,6 @@ import com.rockwellcollins.atc.agree.analysis.ast.AgreeStatement;
 import com.rockwellcollins.atc.agree.analysis.extentions.AgreeAutomater;
 import com.rockwellcollins.atc.agree.analysis.extentions.AgreeAutomaterRegistry;
 import com.rockwellcollins.atc.agree.analysis.extentions.ExtensionRegistry;
-import com.rockwellcollins.atc.agree.analysis.handlers.AadlHandler;
 import com.rockwellcollins.atc.agree.analysis.lustre.visitors.RenamingVisitor;
 import com.rockwellcollins.atc.agree.analysis.preferences.PreferencesUtil;
 import com.rockwellcollins.atc.agree.analysis.translation.LustreAstBuilder;
@@ -71,7 +71,7 @@ import jkind.lustre.Program;
 import jkind.results.InconsistentProperty;
 import jkind.util.Util;
 
-public class AgreeModelChecker extends AadlHandler {
+public class AgreeModelChecker {
 	protected AgreeResultsLinker linker = new AgreeResultsLinker();
 	protected Queue<JKindResult> queue = new ArrayDeque<>();
 	protected AtomicReference<IProgressMonitor> monitorRef = new AtomicReference<>();
@@ -80,25 +80,22 @@ public class AgreeModelChecker extends AadlHandler {
 		AssumeGuarantee, Consistency, Realizability
 	};
 
-	protected SystemInstance getSysInstance(ComponentImplementation ci, EphemeralImplementationUtil implUtil) {
+	protected SystemInstance getSysInstance(ComponentImplementation ci, Resource aadlResource) {
 		try {
-			return InstantiateModel.buildInstanceModelFile(ci);
+			final InstantiateModel instantiateModel = new InstantiateModel(new NullProgressMonitor(),
+					new AnalysisErrorReporterManager(
+							new MarkerAnalysisErrorReporter.Factory(AadlConstants.INSTANTIATION_OBJECT_MARKER)));
+			return instantiateModel.createSystemInstance(ci, aadlResource);
+
 		} catch (Exception e) {
         System.out.println("Error while re-instantiating the model: " + e.getMessage());
 			throw new AgreeException("Error Instantiating model");
 		}
 	}
 
-	private ComponentImplementation getComponentImplementation(Element root, EphemeralImplementationUtil implUtil) {
-		Classifier classifier = getOutermostClassifier(root);
-		if (classifier instanceof ComponentImplementation) {
-			return (ComponentImplementation) classifier;
-		}
-		if (!(classifier instanceof ComponentType)) {
-			throw new AgreeException("Must select an AADL Component Type or Implementation");
-		}
-		ComponentType ct = (ComponentType) classifier;
-		List<ComponentImplementation> cis = getComponentImplementations(ct);
+	private ComponentImplementation getComponentImplementation(AadlPackage root) {
+
+		List<ComponentImplementation> cis = getComponentImplementations(root);
 		if (cis.size() == 0) {
 			throw new AgreeException("AADL Component Type has no implementation to verify");
 		} else if (cis.size() == 1) {
@@ -110,28 +107,26 @@ public class AgreeModelChecker extends AadlHandler {
 		}
 	}
 
-	private List<ComponentImplementation> getComponentImplementations(ComponentType ct) {
+	private List<ComponentImplementation> getComponentImplementations(AadlPackage pkg) {
 		List<ComponentImplementation> result = new ArrayList<>();
-		AadlPackage pkg = AadlUtil.getContainingPackage(ct);
 		for (ComponentImplementation ci : EcoreUtil2.getAllContentsOfType(pkg, ComponentImplementation.class)) {
-			if (ci.getType().equals(ct)) {
 				result.add(ci);
-			}
 		}
 		return result;
 	}
 
-	public IStatus runJob(Element root) {
-		IProgressMonitor monitor = new NullProgressMonitor();
-		EphemeralImplementationUtil implUtil = new EphemeralImplementationUtil(monitor);
+	public IStatus runJob(AadlPackage root, Resource aadlResource) {
 
+		System.out.println("booga 0: ");
 		try {
 
 			// Make sure the user selected a component implementation
-			ComponentImplementation ci = getComponentImplementation(root, implUtil);
+			ComponentImplementation ci = getComponentImplementation(root);
 
-			SystemInstance si = getSysInstance(ci, implUtil);
+			System.out.println("booga 1.1: ");
+			SystemInstance si = getSysInstance(ci, aadlResource);
 
+			System.out.println("booga 1.2: ");
 			AnalysisResult result;
 			CompositeAnalysisResult wrapper = new CompositeAnalysisResult("");
 
@@ -139,6 +134,7 @@ public class AgreeModelChecker extends AadlHandler {
 			EList<AnnexSubclause> annexSubClauses = AnnexUtil.getAllAnnexSubclauses(sysType,
 					AgreePackage.eINSTANCE.getAgreeContractSubclause());
 
+			System.out.println("booga 1.4: ");
 			if (annexSubClauses.size() == 0) {
 				throw new AgreeException("There is not an AGREE annex in the '" + sysType.getName() + "' system type.");
 			}
@@ -150,13 +146,12 @@ public class AgreeModelChecker extends AadlHandler {
 			wrapper.addChild(result);
 			result = wrapper;
 
-      listenForAnalysisResults(result);
-			return doAnalysis(ci, monitor);
+			listenForAnalysisResults(result);
+			return doAnalysis(ci);
 		} catch (Throwable e) {
+
 			String messages = getNestedMessages(e);
 			return new org.eclipse.core.runtime.Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, messages, e);
-		} finally {
-			implUtil.cleanup();
 		}
 	}
 
@@ -416,24 +411,29 @@ public class AgreeModelChecker extends AadlHandler {
 
 	protected void listenForAnalysisResults(final AnalysisResult root) {
 
-    if (root instanceof JKindResult) {
-        JKindResult jKindResult = (JKindResult) root;
-        jKindResult.addPropertyChangeListener(pcl);
-        for (PropertyResult pr : jKindResult.getPropertyResults()) {
-            pr.addPropertyChangeListener(pcl);
-        }
-    } else if (root instanceof CompositeAnalysisResult) {
-        CompositeAnalysisResult compositeResult = (CompositeAnalysisResult) root;
-        compositeResult.addPropertyChangeListener(pcl);
-        for (AnalysisResult subResult : compositeResult.getChildren()) {
-            listenForAnalysisResults(subResult);
-        }
-    }
+		System.out.println("listen 1!");
+		if (root instanceof JKindResult) {
+			JKindResult jKindResult = (JKindResult) root;
+			jKindResult.addPropertyChangeListener(pcl);
+			for (PropertyResult pr : jKindResult.getPropertyResults()) {
+				pr.addPropertyChangeListener(pcl);
+			}
+
+			System.out.println("listen 2: " + root);
+		} else if (root instanceof CompositeAnalysisResult) {
+			CompositeAnalysisResult compositeResult = (CompositeAnalysisResult) root;
+			compositeResult.addPropertyChangeListener(pcl);
+			for (AnalysisResult subResult : compositeResult.getChildren()) {
+				listenForAnalysisResults(subResult);
+			}
+
+			System.out.println("listen 3: " + root);
+		}
 
 	}
 
 
-	private IStatus doAnalysis(final Element root, final IProgressMonitor globalMonitor) {
+	private IStatus doAnalysis(final Element root) {
 
 		Thread analysisThread = new Thread() {
 			@Override
@@ -444,7 +444,7 @@ public class AgreeModelChecker extends AadlHandler {
 				KindApi consistApi = PreferencesUtil.getConsistencyApi();
 				JRealizabilityApi realApi = PreferencesUtil.getJRealizabilityApi();
 
-				while (!queue.isEmpty() && !globalMonitor.isCanceled()) {
+				while (!queue.isEmpty()) {
 					JKindResult result = queue.peek();
 					NullProgressMonitor subMonitor = new NullProgressMonitor();
 					monitorRef.set(subMonitor);
@@ -486,18 +486,6 @@ public class AgreeModelChecker extends AadlHandler {
 		};
 		analysisThread.start();
 		return org.eclipse.core.runtime.Status.OK_STATUS;
-	}
-
-	@Override
-	protected IStatus runJob(Element sel, IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected String getJobName() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
