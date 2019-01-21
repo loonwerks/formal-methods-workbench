@@ -43,15 +43,8 @@ import com.rockwellcollins.atc.agree.analysis.AgreeLogger;
 import com.rockwellcollins.atc.agree.analysis.AgreeRenaming;
 import com.rockwellcollins.atc.agree.analysis.AgreeUtils;
 import com.rockwellcollins.atc.agree.analysis.ConsistencyResult;
-import com.rockwellcollins.atc.agree.analysis.ast.AgreeNode;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeProgram;
-import com.rockwellcollins.atc.agree.analysis.ast.AgreeStatement;
-import com.rockwellcollins.atc.agree.analysis.extentions.AgreeAutomater;
-import com.rockwellcollins.atc.agree.analysis.extentions.AgreeAutomaterRegistry;
-import com.rockwellcollins.atc.agree.analysis.extentions.ExtensionRegistry;
 import com.rockwellcollins.atc.agree.analysis.lustre.visitors.RenamingVisitor;
-import com.rockwellcollins.atc.agree.analysis.preferences.PreferencesUtil;
-import com.rockwellcollins.atc.agree.analysis.translation.LustreAstBuilder;
 import com.rockwellcollins.atc.agree.analysis.views.AgreeResultsLinker;
 
 import jkind.JKindException;
@@ -169,13 +162,9 @@ public class AgreeModelChecker {
 		// generate different lustre depending on which model checker we are
 		// using
 
-		Program program;
-		if (AgreeUtils.usingKind2()) {
-			throw new AgreeException("Kind2 now only supports monolithic verification");
-		} else {
-			program = LustreAstBuilder.getAssumeGuaranteeLustreProgram(agreeProgram);
-		}
-		List<Pair<String, Program>> consistencies = LustreAstBuilder.getConsistencyChecks(agreeProgram);
+		Program program = LustreASTBuilder.getAssumeGuaranteeLustreProgram(agreeProgram);
+
+		List<Pair<String, Program>> consistencies = LustreASTBuilder.getConsistencyChecks(agreeProgram);
 
 		wrapper.addChild(
 				createVerification("Contract Guarantees", si, program, agreeProgram, AnalysisType.AssumeGuarantee));
@@ -245,9 +234,9 @@ public class AgreeModelChecker {
 
 	private AnalysisResult createVerification(String resultName, ComponentInstance compInst, Program lustreProgram,
 			AgreeProgram agreeProgram, AnalysisType analysisType) {
-		AgreeAutomaterRegistry aAReg = (AgreeAutomaterRegistry) ExtensionRegistry
-				.getRegistry(ExtensionRegistry.AGREE_AUTOMATER_EXT_ID);
-		List<AgreeAutomater> automaters = aAReg.getAgreeAutomaters();
+//		AgreeAutomaterRegistry aAReg = (AgreeAutomaterRegistry) ExtensionRegistry
+//				.getRegistry(ExtensionRegistry.AGREE_AUTOMATER_EXT_ID);
+//		List<AgreeAutomater> automaters = aAReg.getAgreeAutomaters();
 		AgreeRenaming renaming = new AgreeRenaming();
 		AgreeLayout layout = new AgreeLayout();
 		Node mainNode = null;
@@ -265,11 +254,11 @@ public class AgreeModelChecker {
 
 		RenamingVisitor.addRenamings(lustreProgram, renaming, compInst, layout);
 		addProperties(renaming, properties, mainNode, agreeProgram);
-
-		for (AgreeAutomater aa : automaters) {
-			renaming = aa.rename(renaming);
-			layout = aa.transformLayout(layout);
-		}
+//
+//		for (AgreeAutomater aa : automaters) {
+//			renaming = aa.rename(renaming);
+//			layout = aa.transformLayout(layout);
+//		}
 
 		JKindResult result;
 		switch (analysisType) {
@@ -306,11 +295,9 @@ public class AgreeModelChecker {
 
 		// there is a special case in the AgreeRenaming which handles this
 		// translation
-		if (AgreeUtils.usingKind2()) {
-			addKind2Properties(agreeProgram.topNode, properties, renaming, "_TOP", "");
-		} else {
-			properties.addAll(mainNode.properties);
-		}
+
+		properties.addAll(mainNode.properties);
+
 
 		Set<String> strs = new HashSet<>();
 		for (String prop : properties) {
@@ -322,25 +309,25 @@ public class AgreeModelChecker {
 
 	}
 
-	void addKind2Properties(AgreeNode agreeNode, List<String> properties, AgreeRenaming renaming, String prefix,
-			String userPropPrefix) {
-		int i = 0;
-
-		String propPrefix = (userPropPrefix.equals("")) ? "" : userPropPrefix + ": ";
-		for (AgreeStatement statement : agreeNode.lemmas) {
-			renaming.addExplicitRename(prefix + "[" + (++i) + "]", propPrefix + statement.string);
-			properties.add(prefix.replaceAll("\\.", ASTBuilder.dotChar) + "[" + i + "]");
-		}
-		for (AgreeStatement statement : agreeNode.guarantees) {
-			renaming.addExplicitRename(prefix + "[" + (++i) + "]", propPrefix + statement.string);
-			properties.add(prefix.replaceAll("\\.", ASTBuilder.dotChar) + "[" + i + "]");
-		}
-
-		userPropPrefix = userPropPrefix.equals("") ? "" : userPropPrefix + ".";
-		for (AgreeNode subNode : agreeNode.subNodes) {
-			addKind2Properties(subNode, properties, renaming, prefix + "." + subNode.id, userPropPrefix + subNode.id);
-		}
-	}
+//	void addKind2Properties(AgreeNode agreeNode, List<String> properties, AgreeRenaming renaming, String prefix,
+//			String userPropPrefix) {
+//		int i = 0;
+//
+//		String propPrefix = (userPropPrefix.equals("")) ? "" : userPropPrefix + ": ";
+//		for (AgreeStatement statement : agreeNode.lemmas) {
+//			renaming.addExplicitRename(prefix + "[" + (++i) + "]", propPrefix + statement.string);
+//			properties.add(prefix.replaceAll("\\.", ASTBuilder.dotChar) + "[" + i + "]");
+//		}
+//		for (AgreeStatement statement : agreeNode.guarantees) {
+//			renaming.addExplicitRename(prefix + "[" + (++i) + "]", propPrefix + statement.string);
+//			properties.add(prefix.replaceAll("\\.", ASTBuilder.dotChar) + "[" + i + "]");
+//		}
+//
+//		userPropPrefix = userPropPrefix.equals("") ? "" : userPropPrefix + ".";
+//		for (AgreeNode subNode : agreeNode.subNodes) {
+//			addKind2Properties(subNode, properties, renaming, prefix + "." + subNode.id, userPropPrefix + subNode.id);
+//		}
+//	}
 
 	private AgreeSubclause getContract(ComponentImplementation ci) {
 		ComponentType ct = ci.getOwnedRealization().getImplemented();
@@ -456,7 +443,7 @@ public class AgreeModelChecker {
 			public void run() {
 
 				System.out.println("doAnalysis " + queue);
-				KindApi api = PreferencesUtil.getKindApi();
+				KindApi api = PreferencesUtil.getJKindApi();
 				KindApi consistApi = PreferencesUtil.getConsistencyApi();
 				JRealizabilityApi realApi = PreferencesUtil.getJRealizabilityApi();
 

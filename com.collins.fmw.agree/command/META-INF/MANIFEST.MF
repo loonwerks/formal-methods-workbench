@@ -30,5 +30,7 @@ Require-Bundle: org.eclipse.xtext.generator;bundle-version="2.1.0";resolution:=o
  org.eclipse.uml2.codegen.ecore;bundle-version="1.9.100";resolution:=optional,
  org.eclipse.emf.transaction,
  org.eclipse.xtext.xbase.lib
-Import-Package: .
+Import-Package: .,
+ com.rockwellcollins.atc.agree.analysis.preferences,
+  com.rockwellcollins.atc.z3
 Export-Package: com.collins.fmw.agree.command

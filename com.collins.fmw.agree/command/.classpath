@@ -191,5 +191,6 @@
 			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
 		</accessrules>
 	</classpathentry>
+	<classpathentry kind="src" path="/com.rockwellcollins.atc.z3"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
