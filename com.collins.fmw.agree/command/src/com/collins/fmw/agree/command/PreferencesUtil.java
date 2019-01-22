@@ -1,7 +1,8 @@
 package com.collins.fmw.agree.command;
 
 import java.io.File;
-import java.net.URL;
+import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 
 import com.rockwellcollins.atc.agree.analysis.preferences.PreferenceConstants;
 import com.rockwellcollins.atc.z3.Z3Plugin;
@@ -91,17 +92,22 @@ public class PreferencesUtil {
 		try {
 //			URL fileUrl = FileLocator.toFileURL(url);
 
-			URL rootUrl = PreferencesUtil.class.getResource("/");
-			System.out.println("root path: " + rootUrl.getPath());
 
-			URL fileUrl = PreferencesUtil.class.getResource("/static/jkind.jar");
-			System.out.println("file path: " + fileUrl.getPath());
-			return new File(fileUrl.getPath()).toString();
+			InputStream input = PreferencesUtil.class.getResourceAsStream("/jkind.jar");
+			File target = new File("jkind.jar.tmp");
+			java.nio.file.Files.copy(input, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+			System.out.println("file path: " + target.toString());
+
+			String path = target.toString();
+			input.close();
+			return path;
 
 //			String jsonToHolPath = (FileLocator
 //					.toFileURL(FileLocator.find(bundle, new Path("static/jkind.jar"), null))).getFile();
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new JKindException("Unable to extract jkind.jar from plug-in", e);
 		}
 	}
