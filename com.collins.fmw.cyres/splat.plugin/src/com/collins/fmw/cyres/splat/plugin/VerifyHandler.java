@@ -78,16 +78,17 @@ public class VerifyHandler extends AbstractHandler {
 
 			Bundle bundle = Platform.getBundle(bundleId);
 
-			String jsonToHolPath = (FileLocator
-					.toFileURL(FileLocator.find(bundle, new Path("static/json2hol"), null))).getFile();
+			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("static/splat"), null)))
+					.getFile();
 
 			Runtime rt = Runtime.getRuntime();
-			String[] commands = { jsonToHolPath, fullpath };
+			rt.exec("chmod a+x " + splatPath);
+
+			String[] commands = { splatPath, fullpath };
 
 			Process proc = rt.exec(commands);
 
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-			System.out.println("Here is the standard output of the command:\n");
 
 			MessageConsole console = findConsole("HOL Proof of Filter Claims");
 			MessageConsoleStream out = console.newMessageStream();
