@@ -228,9 +228,9 @@
 	  
 	    <resources>
 	      <resource>
-	        <targetPath>static</targetPath>
+	        <targetPath>resources</targetPath>
 	        <filtering>false</filtering>
-	        <directory>${basedir}/static</directory>
+	        <directory>${basedir}/resources</directory>
 	        <includes>
 	          <include>**/*</include>
 	        </includes>
