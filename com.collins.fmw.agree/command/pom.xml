@@ -224,6 +224,20 @@
   
   <build>
 	  <sourceDirectory>src</sourceDirectory>
+	  
+	  
+	    <resources>
+	      <resource>
+	        <targetPath>static</targetPath>
+	        <filtering>false</filtering>
+	        <directory>${basedir}/static</directory>
+	        <includes>
+	          <include>**/*</include>
+	        </includes>
+	      </resource>
+	    </resources>
+	  
+	  
 
 	  <plugins>
 		 <plugin>

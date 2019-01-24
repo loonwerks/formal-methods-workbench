@@ -15,6 +15,14 @@ import jkind.api.KindApi;
 
 public class PreferencesUtil {
 
+	private static int timeout = 100;
+	private static int depth = 200;
+	private static int consistDepth = 1;
+	private static boolean inductCex = true;
+	private static boolean smoothCex = false;
+	private static boolean support = true;
+	private static int pdrMax = 0;
+	private static boolean noKInduction = false;
 
 	public static SolverOption getSolverOption() {
 		String solverString = PreferenceConstants.SOLVER_Z3;
@@ -27,10 +35,8 @@ public class PreferencesUtil {
 		KindApi api = getJKindApi();
 
 		if (api instanceof JKindApi) {
-			int depth = 20 + 1;
-			((JKindApi) api).setN(depth);
+			((JKindApi) api).setN(consistDepth + 1);
 			((JKindApi) api).disableInvariantGeneration();
-			// ((JKindApi) api).disableKInduction();
 			((JKindApi) api).setPdrMax(0);
 		}
 		return api;
@@ -50,21 +56,24 @@ public class PreferencesUtil {
 		SolverOption solver = SolverOption.valueOf(solverString);
 		api.setSolver(solver);
 
+		if (inductCex) {
 			api.setInductiveCounterexamples();
-		if (solver == SolverOption.YICES) {
+		}
+		if (smoothCex && solver == SolverOption.YICES) {
 			api.setSmoothCounterexamples();
 		}
 
+		if (support) {
 			api.setIvcReduction();
-
-		api.setN(20);
-		api.setTimeout(100);
-		api.setPdrMax(100);
+		}
+		api.setN(depth);
+		api.setTimeout(timeout);
+		api.setPdrMax(pdrMax);
 		// TODO set pdr invariants as preferences option
 		// api.setPdrInvariants();
-//		if (prefs.getBoolean(PreferenceConstants.PREF_NO_KINDUCTION)) {
-//			api.disableKInduction();
-//		}
+		if (noKInduction) {
+			api.disableKInduction();
+		}
 		return api;
 	}
 
@@ -78,8 +87,8 @@ public class PreferencesUtil {
 			// Z3Plugin not present
 		}
 
-		api.setN(20);
-		api.setTimeout(100);
+		api.setN(depth);
+		api.setTimeout(timeout);
 
 		return api;
 	}
@@ -93,7 +102,7 @@ public class PreferencesUtil {
 //			URL fileUrl = FileLocator.toFileURL(url);
 
 
-			InputStream input = PreferencesUtil.class.getResourceAsStream("/jkind.jar");
+			InputStream input = PreferencesUtil.class.getResourceAsStream("/static/jkind.jar");
 			File target = new File("jkind.jar.tmp");
 			java.nio.file.Files.copy(input, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
