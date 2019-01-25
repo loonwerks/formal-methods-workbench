@@ -56,6 +56,7 @@ import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureCategory;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.modelsupport.scoping.Aadl2GlobalScopeUtil;
+import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
@@ -726,7 +727,7 @@ public class ASTBuilder extends AgreeASTBuilder {
 			try {
 				EnumerationLiteral lit = PropertyUtils.getEnumLiteral(conn, commTimingProp);
 				delayed = lit.getName().equals("delayed");
-			} catch (Exception e) {
+			} catch (PropertyDoesNotApplyToHolderException e) {
 				delayed = false;
 			}
 			Context destContext = absConnDest.getContext();
@@ -1740,7 +1741,6 @@ public class ASTBuilder extends AgreeASTBuilder {
 			NamedElement compName = AgreeTypeUtils.namedElFromId(expr.getComponent(), curInst);
 			Property prop = (Property) propName;
 			propVal = AgreeUtils.getPropExpression(compName, prop);
-
 
 		} else {
 			propVal = AgreeUtils.getPropExpression((PropertyConstant) propName);

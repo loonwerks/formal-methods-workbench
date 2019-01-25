@@ -37,10 +37,6 @@
 
 
    <plugins>
-      <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.console"/>
-      <plugin id="org.eclipse.ui.views"/>
-      <plugin id="org.eclipse.jface.text"/>
    </plugins>
 
    <features>
@@ -185,6 +181,7 @@
       <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
       <repository location="http://download.eclipse.org/eclipse/updates/4.7" enabled="true" />
       <repository location="http://download.eclipse.org/releases/oxygen" enabled="true" />
+      <repository location="https://raw.githubusercontent.com/sireum/osate-plugin-update-site/master/" enabled="true" />
    </repositories>
 
    <preferencesInfo>

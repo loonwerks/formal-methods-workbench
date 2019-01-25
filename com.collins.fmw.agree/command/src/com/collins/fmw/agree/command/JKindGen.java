@@ -9,10 +9,12 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
-//import org.eclipse.xtext.util.Pair;
+import org.eclipse.xtext.util.Pair;
+import org.eclipse.xtext.util.Tuples;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentClassifier;
@@ -20,6 +22,10 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.InstanceFactory;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.instantiation.InstantiateModel;
+import org.osate.aadl2.modelsupport.AadlConstants;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
+import org.osate.aadl2.modelsupport.errorreporting.MarkerAnalysisErrorReporter;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
@@ -28,12 +34,15 @@ import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.Contract;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.analysis.AgreeException;
+import com.rockwellcollins.atc.agree.analysis.AgreeLayout;
+import com.rockwellcollins.atc.agree.analysis.AgreeRenaming;
 import com.rockwellcollins.atc.agree.analysis.AgreeUtils;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeProgram;
+import com.rockwellcollins.atc.agree.analysis.lustre.visitors.RenamingVisitor;
 import com.rockwellcollins.atc.agree.analysis.views.AgreeResultsLinker;
 
-import javafx.util.Pair;
 import jkind.api.results.JKindResult;
+import jkind.lustre.Node;
 import jkind.lustre.Program;
 
 public class JKindGen {
@@ -46,6 +55,28 @@ public class JKindGen {
 //	};
 
 	protected SystemInstance getSysInstance(ComponentImplementation ci, Resource aadlResource) {
+// ORIGINAL
+//		try {
+//			return InstantiateModel.buildInstanceModelFile(ci);
+//		} catch (Exception e) {
+////			Dialog.showError("Model Instantiate", "Error while re-instantiating the model: " + e.getMessage());
+//			throw new AgreeException("Error Instantiating model");
+//		}
+
+// VERSION 1
+//		SystemInstance root = InstanceFactory.eINSTANCE.createSystemInstance();
+//		final String instanceName = ci.getTypeName() + "_" + ci.getImplementationName();
+//
+//		root.setComponentImplementation(ci);
+//		root.setName(instanceName);
+//		root.setCategory(ci.getCategory());
+//		return root;
+
+//VERSION 2
+		final InstantiateModel instantiateModel = new InstantiateModel(new NullProgressMonitor(),
+				new AnalysisErrorReporterManager(
+						new MarkerAnalysisErrorReporter.Factory(AadlConstants.INSTANTIATION_OBJECT_MARKER)));
+
 
 		SystemInstance root = InstanceFactory.eINSTANCE.createSystemInstance();
 		final String instanceName = ci.getTypeName() + "_" + ci.getImplementationName();
@@ -53,6 +84,18 @@ public class JKindGen {
 		root.setComponentImplementation(ci);
 		root.setName(instanceName);
 		root.setCategory(ci.getCategory());
+		aadlResource.getContents().add(root);
+		// Needed to save the root object because we may attach warnings to the
+		// IResource as we build it.
+
+
+		try {
+			instantiateModel.fillSystemInstance(root);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return root;
 
 	}
@@ -150,12 +193,24 @@ public class JKindGen {
 //		CompositeAnalysisResult result = new CompositeAnalysisResult("Verification for " + name);
 
 		List<Pair<String, Program>> programs = new ArrayList<Pair<String, Program>>();
+
+		System.out.println("Comp Instance: " + ci);
 		if (containsAGREEAnnex(ci)) {
 //			wrapVerificationResult(ci, result);
-
 			AgreeProgram agreeProgram = new ASTBuilder().getAgreeProgram(ci, false);
 			Program program = LustreASTBuilder.getAssumeGuaranteeLustreProgram(agreeProgram);
-			programs.add(new Pair<String, Program>(ci.getName(), program));
+
+			List<Pair<String, Program>> consistencies = LustreASTBuilder.getConsistencyChecks(agreeProgram);
+
+			System.out.println("consist size: " + consistencies.size());
+
+			createVerification("Contract Guarantees", ci, program, agreeProgram);
+			programs.add(Tuples.create("Contract Guarantees", program));
+
+			for (Pair<String, Program> consistencyAnalysis : consistencies) {
+				createVerification(consistencyAnalysis.getFirst(), ci, consistencyAnalysis.getSecond(), agreeProgram);
+			}
+			programs.addAll(consistencies);
 
 //			ComponentImplementation compImpl = AgreeUtils.getInstanceImplementation(ci);
 			for (ComponentInstance subInst : ci.getComponentInstances()) {
@@ -172,55 +227,32 @@ public class JKindGen {
 		return programs;
 	}
 
-	private boolean containsAGREEAnnex(ComponentInstance ci) {
-		ComponentClassifier compClass = ci.getComponentClassifier();
-		if (compClass instanceof ComponentImplementation) {
-			compClass = ((ComponentImplementation) compClass).getType();
-		}
-		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(compClass,
-				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
-			if (annex instanceof AgreeContractSubclause) {
-
-				Contract c = ((AgreeContractSubclause) annex).getContract();
-				System.out.println("ooga contract: " + c);
-				if (c instanceof AgreeContract) {
-					for (SpecStatement spec : ((AgreeContract) c).getSpecs()) {
-						System.out.println("ooga spec: " + spec);
-					}
-				}
-				return true;
+	private void createVerification(String resultName, ComponentInstance compInst, Program lustreProgram,
+			AgreeProgram agreeProgram) {
+//		AgreeAutomaterRegistry aAReg = (AgreeAutomaterRegistry) ExtensionRegistry
+//				.getRegistry(ExtensionRegistry.AGREE_AUTOMATER_EXT_ID);
+//		List<AgreeAutomater> automaters = aAReg.getAgreeAutomaters();
+		AgreeRenaming renaming = new AgreeRenaming();
+		AgreeLayout layout = new AgreeLayout();
+		Node mainNode = null;
+		for (Node node : lustreProgram.nodes) {
+			if (node.id.equals(lustreProgram.main)) {
+				mainNode = node;
+				break;
 			}
 		}
-		return false;
-	}
+		if (mainNode == null) {
+			throw new AgreeException("Could not find main lustre node after translation");
+		}
 
-//	private AnalysisResult createVerification(String resultName, ComponentInstance compInst, Program lustreProgram,
-//			AgreeProgram agreeProgram, AnalysisType analysisType) {
-////		AgreeAutomaterRegistry aAReg = (AgreeAutomaterRegistry) ExtensionRegistry
-////				.getRegistry(ExtensionRegistry.AGREE_AUTOMATER_EXT_ID);
-////		List<AgreeAutomater> automaters = aAReg.getAgreeAutomaters();
-//		AgreeRenaming renaming = new AgreeRenaming();
-//		AgreeLayout layout = new AgreeLayout();
-//		Node mainNode = null;
-//		for (Node node : lustreProgram.nodes) {
-//			if (node.id.equals(lustreProgram.main)) {
-//				mainNode = node;
-//				break;
-//			}
-//		}
-//		if (mainNode == null) {
-//			throw new AgreeException("Could not find main lustre node after translation");
-//		}
-//
+		RenamingVisitor.addRenamings(lustreProgram, renaming, compInst, layout);
 //		List<String> properties = new ArrayList<>();
-//
-//		RenamingVisitor.addRenamings(lustreProgram, renaming, compInst, layout);
 //		addProperties(renaming, properties, mainNode, agreeProgram);
-////
-////		for (AgreeAutomater aa : automaters) {
-////			renaming = aa.rename(renaming);
-////			layout = aa.transformLayout(layout);
-////		}
+
+//		for (AgreeAutomater aa : automaters) {
+//			renaming = aa.rename(renaming);
+//			layout = aa.transformLayout(layout);
+//		}
 //
 //		JKindResult result;
 //		switch (analysisType) {
@@ -249,36 +281,29 @@ public class JKindGen {
 //
 //		// System.out.println(program);
 //		return result;
-//
-//	}
 
-//	private void addProperties(AgreeRenaming renaming, List<String> properties, Node mainNode,
-//			AgreeProgram agreeProgram) {
-//
-//		// there is a special case in the AgreeRenaming which handles this
-//		// translation
-//
-//		properties.addAll(mainNode.properties);
-//
-//		Set<String> strs = new HashSet<>();
-//		for (String prop : properties) {
-//			String renamed = renaming.rename(prop);
-//			if (!strs.add(renamed)) {
-//				throw new AgreeException("Multiple properties named \"" + renamed + "\"");
-//			}
-//		}
-//
-//	}
-//
-//	private AgreeSubclause getContract(ComponentImplementation ci) {
-//		ComponentType ct = ci.getOwnedRealization().getImplemented();
-//		for (AnnexSubclause annex : ct.getOwnedAnnexSubclauses()) {
-//			if (annex instanceof AgreeSubclause) {
-//				return (AgreeSubclause) annex;
-//			}
-//		}
-//		return null;
-//	}
+	}
 
+	private boolean containsAGREEAnnex(ComponentInstance ci) {
+		ComponentClassifier compClass = ci.getComponentClassifier();
+		if (compClass instanceof ComponentImplementation) {
+			compClass = ((ComponentImplementation) compClass).getType();
+		}
+		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(compClass,
+				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
+			if (annex instanceof AgreeContractSubclause) {
+
+				Contract c = ((AgreeContractSubclause) annex).getContract();
+				System.out.println("ooga contract: " + c);
+				if (c instanceof AgreeContract) {
+					for (SpecStatement spec : ((AgreeContract) c).getSpecs()) {
+						System.out.println("ooga spec: " + spec);
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 
 }

@@ -20,10 +20,10 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.util.Pair;
 
 import com.google.inject.Injector;
 
-import javafx.util.Pair;
 import jkind.lustre.Program;
 
 public class AgreeCommand {
@@ -109,9 +109,13 @@ public class AgreeCommand {
 	private static void write(String inputPath, List<Pair<String, Program>> programPairs) {
 
 		for (Pair<String, Program> pair : programPairs) {
-			String componentName = pair.getKey();
-			Program program = pair.getValue();
-			File target = new File(new File(inputPath).getName() + "." + componentName + ".jkind");
+			String programName = pair.getFirst();
+
+			Program program = pair.getSecond();
+
+			System.out.println("program name: " + programName);
+
+			File target = new File(new File(inputPath).getName() + "." + programName + ".jkind");
 			FileWriter fileWriter;
 			try {
 				fileWriter = new FileWriter(target);
