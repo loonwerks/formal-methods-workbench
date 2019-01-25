@@ -2,9 +2,10 @@ package com.collins.fmw.agree.command;
 
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -15,17 +16,15 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
-import org.eclipse.xtext.validation.Issue;
-import org.osate.aadl2.AadlPackage;
 
 import com.google.inject.Injector;
+
+import javafx.util.Pair;
+import jkind.lustre.Program;
 
 public class AgreeCommand {
 
@@ -68,7 +67,6 @@ public class AgreeCommand {
 		XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
 		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
 
-
 		if (cli.hasOption(basisFlag)) {
 			String fileArg = cli.getArgs()[0];
 			File basisFile = new File(fileArg);
@@ -85,7 +83,10 @@ public class AgreeCommand {
 				}
 
 				Resource resource = resourceSet.getResource(URI.createFileURI(aadlPath), true);
-				validate(resource);
+				List<Pair<String, Program>> programPairs = new JKindGen().run(resource);
+				write(aadlPath, programPairs);
+
+
 				System.out.println("* aadl path (basis): " + aadlPath);
 
       });
@@ -95,49 +96,35 @@ public class AgreeCommand {
 			String fileArg = cli.getArgs()[0];
 			File aadlFile = new File(fileArg);
 			String aadlPath = aadlFile.getAbsolutePath();
-
 			Resource resource = resourceSet.getResource(URI.createFileURI(aadlPath), true);
-			validate(resource);
+			List<Pair<String, Program>> programPairs = new JKindGen().run(resource);
+			write(aadlPath, programPairs);
 			System.out.println("* aadl path: " + aadlPath);
 
-
 		}
-
 
 
 	}
 
-	private static List<Issue> issues = new ArrayList<Issue>();
-	private static List<String> visited = new ArrayList<String>();
+	private static void write(String inputPath, List<Pair<String, Program>> programPairs) {
 
-	private static IStatus validate(Resource resource) {
+		for (Pair<String, Program> pair : programPairs) {
+			String componentName = pair.getKey();
+			Program program = pair.getValue();
+			File target = new File(new File(inputPath).getName() + "." + componentName + ".jkind");
+			FileWriter fileWriter;
+			try {
+				fileWriter = new FileWriter(target);
+				fileWriter.write(program.toString());
 
-		if (visited.contains(resource.getURI().toString())) {
-			System.out.println("visisted");
-			return Status.CANCEL_STATUS;
-		}
+				fileWriter.close();
 
-		List<EObject> contents = resource.getContents();
-
-		System.out.println("resource contents: " + contents);
-		for (EObject o : contents) {
-
-			AgreeModelChecker modelChecker = new AgreeModelChecker();
-			if (o instanceof AadlPackage) {
-				System.out.println("run model checker: " + resource.isLoaded());
-				IStatus status = modelChecker.runJob((AadlPackage) o, resource);
-
-				return status;
-			} else {
-				System.out.println("not running checker: " + o);
-				return Status.CANCEL_STATUS;
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+
 		}
-
-		return Status.CANCEL_STATUS;
-
 	}
-
 
 
 }
