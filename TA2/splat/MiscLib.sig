@@ -62,8 +62,8 @@ sig
    val succeed : unit -> 'a
    val fail : unit -> 'a
 
-   val exp : int -> int -> int
-   val bits_needed : int -> int
+   val exp : Arbint.int -> int -> Arbint.int
+   val twoE : int -> Arbint.int
 
    val inv_image : ('a -> 'a -> 'b) -> ('c -> 'a) -> 'c -> 'c -> 'b
    val sort_on_int_key : (int * 'a) list -> (int * 'a) list

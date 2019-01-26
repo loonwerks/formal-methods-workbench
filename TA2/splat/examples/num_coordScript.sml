@@ -204,10 +204,10 @@ val in_chset_str = Q.prove
 val string_in_lang_len = Q.prove
 (`!s cs1 cs2 cs3 cs4 cs5 cs6.
      s IN regexp_lang (Chset cs1) dot
-         regexp_lang (Chset cs2) dot
-	 ((regexp_lang (Chset cs3) dot regexp_lang (Chset cs4))
-          UNION
-	  (regexp_lang (Chset cs5) dot regexp_lang (Chset cs6)))
+          regexp_lang (Chset cs2) dot
+          ((regexp_lang (Chset cs3) dot regexp_lang (Chset cs4))
+           UNION
+	   (regexp_lang (Chset cs5) dot regexp_lang (Chset cs6)))
 	 ==> ?a b c d. s = [a;b;c;d]`,
  rw_tac (list_ss ++ PRED_SET_ss) [IN_dot]
  >> imp_res_tac in_chset_str

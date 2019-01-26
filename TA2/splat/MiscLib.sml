@@ -548,25 +548,8 @@ fun apply_with_chatter f x prefix postfix =
    result
  end
 
-fun exp x n = if n <= 0 then 1 else x * exp x (n-1);
-
-fun is_pow2 n = 
- if n <= 0 then false else
- if n = 1 then true 
-  else (n mod 2 = 0) andalso is_pow2 (n div 2) ;
-
-(*---------------------------------------------------------------------------*)
-(* Find the nearest power of two >= n                                        *)
-(*---------------------------------------------------------------------------*)
-
-fun bits_needed n = 
- let fun aux len = 
-      let val bound = exp 2 len
-      in if n < bound andalso is_pow2 len then len
-         else aux (len + 1)
-      end
- in aux 0
- end;
+fun exp n e = if Int.<(e,1) then Arbint.one else Arbint.*(n,exp n (Int.-(e,1)));
+val twoE = exp Arbint.two;
 
 fun inv_image R f x y = R (f x) (f y);
 

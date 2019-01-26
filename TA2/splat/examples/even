@@ -1,0 +1,15 @@
+load "splatTheory";
+load "regexpLib";
+
+val even_def =
+ Define
+  `even n = (n MOD 2 = 0n)`;
+
+val even_cset = 
+ let fun is_even n = (n mod 2 = 0)
+ in Regexp_Type.charset_of (filter is_even (upto 0 255))
+ end;
+
+val even_regexp = ``Cat (Chset ^even_cset) (Chset
+ 
+Goal: `!n w. even n <=> enc w n IN regexp_lang ^even_regexp`;

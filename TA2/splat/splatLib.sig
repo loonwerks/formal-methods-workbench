@@ -26,7 +26,6 @@ sig
   datatype fieldval
     = Num of Arbint.int * format 
     | Interval of Arbint.int * Arbint.int * format
-    | Bool of bool * format
     | Char of char * format
     | Enumset of string * term list * format
     | Raw of string * width
@@ -36,9 +35,11 @@ sig
   val format_of : fieldval -> format
 
   type enumMap = (string, (term * int) list) fmap
+  val the_enumMap : unit -> enumMap
+  val insert_enum : string * (term * int) list -> unit
+  val define_enum_encoding : hol_type -> unit
 					       
-  val fieldval_to_tree : enumMap -> fieldval -> Regexp_Type.tree
-  
+
   type coding 
       = {enc : term, 
          dec : term,
@@ -48,11 +49,10 @@ sig
   
 
   type codingMap = (format, coding) fmap
-
-  val the_enumMap : unit -> enumMap
   val the_codingMap : unit -> codingMap
+  val insert_coding : format * coding -> unit
 
-  val define_enum_encoding : hol_type -> unit
+  val fieldval_to_tree : enumMap -> fieldval -> Regexp_Type.tree
 
   type precord = {fields : (string * fieldval) list, pred : term}
   
@@ -62,7 +62,14 @@ sig
   (* recds *)    (string * (string * AST.ty) list) list *
   (* fns *)      thm list
 
-  val mk_correctness : decls -> thm -> term * thm * thm * term
+  val mk_correctness_goals 
+      : decls -> thm 
+              -> {regexp:Regexp_Type.regexp,
+                  encode_def:thm, 
+                  decode_def:thm,
+                  inversion:term,
+                  correctness:term,
+		  implicit_constraints: thm option}
 
   val charset_conv_ss : simpLib.ssfrag
 

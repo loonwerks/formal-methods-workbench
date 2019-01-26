@@ -1,0 +1,319 @@
+%<a href="splat.pdf" target="_blank">Semantic Properties for Language and Automata Theory (SPLAT)</a>
+% Konrad Slind, Trusted Systems Group, Rockwell Collins 
+% January 23, 2019
+
+
+\newcommand{\imp}{\;\Rightarrow\;}
+\newcommand{\valid}{\mathsf{Valid}}
+\newcommand{\dom}{\mathsf{Dom}}
+\newcommand{\cod}{\mathsf{Cod}}
+\newcommand{\con}{\mathsf{CON}}
+\newcommand{\cons}[2]{{#1}\, :: \,{#2}}
+\newcommand{\konst}[1]{\mathsf{#1}}
+\newcommand{\set}[1]{\{ {#1} \}}
+\newcommand{\Lang}[1]{{\mathcal L}({#1})}
+\newcommand{\condA}[2]{\konst{if}\; {#1} \;\konst{then}\; {#2}}
+\newcommand{\condB}[3]{\konst{if}\; {#1} \;\konst{then}\; {#2} \;\konst{else}\; {#3}}
+\newcommand{\lsb}{\mathbf{\small{[}}}
+\newcommand{\rsb}{\mathbf{\small{]}}}
+\newcommand{\ltb}{\mathbf{\small{<}}}
+\newcommand{\gtb}{\mathbf{\small{>}}}
+\newcommand{\Env}{\mathcal{E}}
+\newcommand{\sem}[1]{[ \! [ {#1} ] \! ]}
+\newcommand{\divk}[1]{{#1}\;\konst{div}\; 256}
+\newcommand{\modk}[1]{{#1}\;\konst{mod}\; 256}
+
+
+**Draft Status**. This document is a work in progress.
+
+Introduction
+============
+
+**SPLAT** (Semantic Properties for Language and Automata Theory)
+designates the application of language theory---which is based on
+*strings*---to help enforce, formulate and prove properties over a
+collection of useful types, such as numbers, enumerations, records,
+and arrays. In particular, our focus is in applying tools and concepts
+from language theory to help automate the specification and
+verification of practical programs.
+
+As one example of this approach, we employ regular expressions to
+model and implement arithmetic constraints. This has been applied to
+the task of automating the generation and proof of correctness of
+encoders and decoders for network message formats.
+
+Language Theory and Encoding
+============================
+
+The basic elements of theoretical computer science are commonly
+formulated over strings of symbols drawn from an
+alphabet. Automata, grammars, and Turing machines all use strings as
+their main data structure. Encoding and decoding is employed in the
+service of theoretical results, for example, showing the existence of
+a universal Turing machine operating over codes of Turing machines. Of
+course, the activity of packing data into a string format and then
+unpacking it is pervasive, not only in theoretical computer science,
+but also in practice, *eg*, sending structured data over a network. 
+
+Regular expressions
+-------------------
+
+We are building on previously reported [safecomp2016] work in HOL4
+providing a theory of regular expressions and a verified translator of
+$\konst{regexp}$s to table-driven DFAs (deterministic finite state
+automata).
+
+Let $\mathbb{S}$ be the set of finite strings over an alphabet
+$\Sigma$.  A regular expression over the alphabet designates a set of
+strings $\mathbb{S} \to \konst{bool}$. We use the following datatype
+to represent regular expressions:
+
+$$
+\begin{array}{rcl}
+\konst{regexp} & ::= & \konst{Chset}\; \konst{w64}\;\konst{w64}\;\konst{w64}\;\konst{w64} \\
+     & \mid & \konst{Cat}\; \konst{regexp}\; \konst{regexp} \\
+     & \mid & \konst{Or} \; \konst{regexp}\;\konst{list} \\
+     & \mid & \konst{Star}\; \konst{regexp} \\
+     & \mid & \konst{Neg}\;  \konst{regexp} 
+\end{array}
+$$
+
+We set $\Sigma$ to be the 256 ASCII characters. $\konst{Chset}$
+represents a *charset*: a 256-wide bitset capable of representing any
+subset of $\Sigma$. We have chosen to represent bitsets with
+four-tuples of 64-bit numbers. $\konst{Cat}$ is the concatenation
+operator, $\konst{Star}$ is Kleene star, the $\konst{Or}$ operator is
+an *n*-ary disjunction, and $\konst{Neg}$ is a complement
+operator. 
+
+The semantics of regular expressions inteprets a $\konst{regexp}$ as a
+set of strings:
+
+$$
+\begin{array}{rcl}
+\Lang{\konst{Chset}\; \mathit{cset}} & = & \set{[c] \mid c \in \mathit{cset}} \\
+\Lang{\konst{Cat}\; r_1\;r_2}  & = & \Lang{r_1} \cdot \Lang{r_2} \\
+\Lang{\konst{Or} \; [r_1,\ldots,r_n]} & = & \Lang{r_1} \cup \cdots \cup \Lang{r_n}\\
+\Lang{\konst{Star}\;r} & = & (\Lang{r})^{*} \\
+\Lang{\konst{Neg}\; r} & = & \konst{COMPL}(\Lang{r})
+\end{array}
+$$
+
+where concatenation ($-\cdot-$), Kleene star $(-)^{*}$, and set
+complement $\konst{COMPL}(-)$ are pre-defined operators in a theory
+including sets and formal languages. It is also useful to have a
+function $\konst{charset\_of} : \konst{char}\;\konst{list} \to
+\mathit{cset}$ that creates a charset given a list of ASCII characters.
+
+Some common regexps and derived operations in this representation:
+
+$$
+\begin{array}{l}
+\Sigma = \konst{Chset}(\konst{charset\_of} \; [0,1,\ldots,255]) \\
+\emptyset = \konst{Chset}(\konst{charset\_of} \; []) \\
+\varepsilon = \konst{Star}(\emptyset) \\
+\konst{And}\;r_1\;r_2 = \konst{Neg}(\konst{Or}[\konst{Neg}\; r_1,  \konst{Neg}\; r_2] \\
+\konst{Diff}\;r_1\;r_2 = \konst{And}\;r_1\; (\konst{Neg}\;r_2)
+\end{array}
+$$
+
+$\Sigma$ is the full charset, also known as "dot" ($\bullet$);
+$\emptyset$ matches no string; and $\varepsilon$ is the empty string.
+
+Encodings
+----------
+
+- $\mathbb{N} \to \konst{bool}$. By encoding, a set of natural numbers
+can be modelled by a regular expression. First, define the map
+$\konst{n2l} : \mathbb{N}\to \mathbb{N}\;\konst{list}$ from a number
+to its little-endian base-256 representation, and the inverse.
+
+$$
+\begin{array}{lcl}
+\konst{n2l}(n) & = &
+   \condB{n=0}{[]}{\cons{(\modk{n})}{\konst{n2l}\; (\divk{n})}} \\
+\konst{l2n}\;[] & = & 0 \\
+\konst{l2n}\;(\cons{h}{t}) & = & h + 256 * \konst{l2n}\; t \\
+\end{array}
+$$
+
+Then we have $\vdash \forall n.\; \konst{l2n} (\konst{n2l}\; n) = n$.
+Big-endian versions are similarly defined. Another issue is *padding*
+to a specified width. Using a builtin operator, $\konst{pad\_right}$,
+we can define a basic number encoder $\konst{enc} : \mathbb{N} \to
+\mathbb{N} \to \mathbb{S}$ and the corresponding decoder $\konst{dec}
+: \mathbb{S}\to\mathbb{N}$:
+
+$$
+\begin{array}{rcl}
+\konst{layout}\; n \; \mathit{width} & = & 
+   \konst{pad\_right}\; 0\; \mathit{width}\; (\konst{n2l}\; n) \\
+\konst{enc}\; w\; n & = & 
+\konst{map}\; \konst{chr}\; (\konst{layout}\; n\; w) \\
+\konst{dec}\; s & = & \konst{l2n}\; (\konst{map}\; \konst{ord}\; s)
+\end{array}
+$$
+
+Then we have $\vdash \forall n\;w.\; \konst{dec} (\konst{enc}\; w\; n) = n$.
+
+Now we come to one of the main themes of this paper. We are going to
+investigate statements of the form
+
+$$
+  n \in P \iff \konst{enc}\;n \in \Lang{\konst{regexp\_of}\; P}
+$$
+
+where $P$ represent a predicate on numbers, and
+$\konst{regexp\_of}\;P$ denotes the regular expression resulting from an
+analysis of $P$. Stripping a bit of structure away, its
+essence is "what happens when we stick an encoder in front of some
+regexp machinery":
+
+$$
+  P: \mathbb{N}\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
+$$
+
+### Example
+
+Consider the "even-number" predicate $\konst{even}$. Let
+$\mathit{cset} = \konst{charset\_of}\;[0,2,4, \ldots, 254]$ be the
+character set corresponding to the non-negative even numbers less than
+256. Suppose that $\konst{regexp\_of}\; \konst{even} = \konst{Cat}\;
+(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)$, and so we
+have $\konst{even}(n) \iff \konst{enc}(n) \in \Lang{\konst{Cat}\;
+(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}$.
+
+### End Example
+
+
+- $\mathbb{Z} \to \konst{bool}$. Sets of integers can be expressed by
+adding an encoding to map from integers to natural numbers.  Twos
+complement is most commonly used. At the word level, the twos
+complement operation is "flip each bit and add 1". But it is
+expressible at the level of integers and natural numbers since an
+$n-1$-bit integer added to its twos complement equals $2^n$ (with
+appropriate coercions tossed in to map back and forth as needed. Thus
+
+$$\konst{twos\_comp}_N : \set{i \in \mathbb{Z} \mid -2^{N-1} \leq i < 2^{N-1}} \to \set{k \in \mathbb{N} \mid 0 \leq k < 2^{N}}$$
+
+maps an integer into its corresponding natural number and is defined by
+$$
+ \konst{twos\_comp}_N (i) = \condB{0 \leq i < 2^{N-1}}{\konst{Nat}(i)}
+                                  {2^{N} - \konst{Nat}(\konst{Abs}(i))}
+$$
+
+To round-trip encode-then-decode integer $i$, therefore, we map $i$ to
+$n = \konst{twos\_comp}_N(i)$. Then we use $\konst{l2n}\circ
+\konst{n2l}$ to get back out to twos complement format in natural
+numbers, and then we reverse the twos complement map.
+
+- Enumerations. An enumerated type can be encoded by providing a map
+from elements of the type to $\mathbb{N}$.
+
+- Records. Sets of records of a given type $\mathbb{R}$ can be encoded
+by fixing an order on the fields and concatenating their encodings.
+
+- Pairs, Lists, Trees, etc.
+
+- Fixed- and variable-width encodings.
+
+
+Intervals
+----------
+
+$[i..j] \to \konst{bool}$. Intervals provide a concise way to express
+numeric constraints. These can be directly mapped to regular
+expressions. 
+
+Correctness Theorems
+====================
+
+Given a declaration of record type $\konst{recd}$ plus a predicate $P :
+\konst{recd} \to \konst{bool}$ over the fields of the record, we
+generate the following artifacts:
+
+- a regexp $\mathcal{R}$
+- an encoding function $\konst{encode} : \konst{recd} \to \mathbb{S}$
+- a decoding function $\konst{decode} : \mathbb{S} \to \konst{recd}\;\konst{option}$
+- an inversion theorem showing that decoding inverts encoding
+
+   $~~~~~~~~~~~~~~~~~\vdash \forall r:\konst{recd}.\; P(r) \imp \konst{decode}(\konst{encode}\; r) = \konst{SOME}\;r$
+
+- a correctness theorem showing that encodings of well-formed records are exactly in the language of $\mathcal{R}$.
+
+   $~~~~~~~~~~~~~~~~~\vdash \forall r:\konst{recd}.\; P(r) \Leftrightarrow \konst{encode}(r) \in \Lang{\mathcal{R}}$
+
+- a deterministic finite state automaton (DFA) $M$ with the property that
+
+   $~~~~~~~~~~~~~~~~~\vdash \forall s:\mathbb{S}.\; s \in \Lang{\mathcal{R}} \Leftrightarrow \konst{exec}(M,s) = \konst{true}$
+
+- a theorem stating that DFA $M$ enforces property $P$:
+
+   $~~~~~~~~~~~~~~~~~\vdash \forall r:\konst{recd}.\; P(r) \Leftrightarrow \konst{exec}(M,\konst{encode}(r)) = \konst{true}$
+
+- CakeML programs and proofs (Johannes)
+
+ In summary, given the record type and a wellformedness predicate, the
+package produces implementations for an encoder and decoder, a DFA
+that checks wellformedness of encoded records, along with correctness
+proofs.
+
+Property Discussion
+--------------------
+
+A variety of theorems can be proved in this setting, and it is worth
+discussing how they can be applied. For example, invertibility of encoding
+
+ $~~~~~~~~~~~~~~~~~\vdash \forall r:\konst{recd}.\; P(r) \imp \konst{decode}(\konst{encode}\; r) = \konst{SOME}\;r$
+
+is dependent on the well-formedness of the record. What happens when
+the record is not well-formed? Proving the "iff" form of this might be
+better.  Similarly, one might want the property that successfully
+decoding a string into a record implies that the record is
+well-formed. One version of this is
+
+ $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp P(r)$
+
+Another (where $\mathit{regexp}$ is the regexp generated from $P$):
+
+ $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp s \in \Lang{\mathcal{R}}$
+
+Both of these fail to exclude an incorrect encoder that (say) maps all
+records into one (well-formed) value. To forbid that, one could demand
+that the encoder is injective:
+
+ $~~~~~~~~~~~~~~~~~\forall \mathit{recd}_1\; \mathit{recd}_2.\; \konst{encode}(\mathit{recd}_1) = \konst{encode}(\mathit{recd}_2) \imp \mathit{recd}_1 = \mathit{recd}_2$
+
+Regarding applicability, another consideration is that, typically,
+encoders and decoders are written by different people at different
+times and places, trying to conform to a standard. Thus statements
+about a generated encoding/decoding pair are of limited utility, so
+separate properties about the encoder and decoder are valuable, whence
+the importance of the well-formedness specification.
+
+Packed Record Formats
+=====================
+
+Dependent Records
+=================
+
+Lexing
+=======
+
+Related Work
+=============
+
+Buechi, Mona, Narcissus, D'Antoni, Slind and Hurd
+(encoding/decoding). Sail, PADS, message format specification
+languages.
+
+Note: unlike, say, Narcissus, we do not focus solely on encoding and
+decoding. We add verified compilation, and proof of well-formedness
+with respect to arithmetic specifications.
+
+The details about encoding higher data in regexps are probably not
+novel, given the huge amount of work expended on transition system
+encodings for model-checking and in applying SAT algorithms. However,
+I haven't yet come across any literature focusing on intervals.
+
+

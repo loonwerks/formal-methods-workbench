@@ -687,23 +687,26 @@ fun mk_filter_goal (info as (pkgName,enums,recds,fn_defs))
         val thm = 
 	    PURE_REWRITE_CONV 
               (GSYM CONJ_ASSOC::GSYM DISJ_ASSOC::fn_defs) simple_prop
-         handle _ => raise ERR "mk_filter_goal" "strange filter goal"
-        val (regexp_tm,encode_def,decode_def,the_goal) = splatLib.mk_correctness info thm
+         handle _ => raise ERR "mk_filter_goal" "unexpected filter goal format"
+        val {regexp,encode_def,decode_def,
+             inversion, correctness, implicit_constraints} = 
+               splatLib.mk_correctness_goals info thm
   in
-      (fname, regexp_tm, encode_def, decode_def, the_goal)
+      (fname, regexp, encode_def, decode_def, 
+       inversion, correctness, implicit_constraints)
   end
 
-fun declare_hol_filter_goal (fname,regexp_tm,encode_def, decode_def, the_goal) =
-  let val correctness = 
+fun declare_hol_filter_goal (fname,regexp_tm,encode_def, decode_def, inversion, correctness,iconstraints_opt) =
+  let val correctness_thm = 
      store_thm(fname^"_correct", 
-       ``FILTER_CORRECT ^(stringSyntax.fromMLstring fname) ^the_goal``,
+       ``FILTER_CORRECT ^(stringSyntax.fromMLstring fname) ^correctness``,
        cheat)
    in 
     stdErr_print 
           (String.concat 
                ["\nFilter ", Lib.quote fname, 
                 " is specified by property \n\n  ",
-                thm_to_string correctness, "\n\n"])
+                thm_to_string correctness_thm, "\n\n"])
   end;
 
 (* TOPSORT GUNK : second fn calls the first *)

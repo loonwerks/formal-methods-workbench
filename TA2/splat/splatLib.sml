@@ -5,7 +5,7 @@
 structure splatLib :> splatLib =
 struct
 
-open HolKernel Parse boolLib bossLib;
+open HolKernel Parse boolLib bossLib MiscLib;
 
 open regexpSyntax pred_setSyntax Regexp_Type
      arithmeticTheory listTheory stringTheory
@@ -102,7 +102,6 @@ fun compare_format (nf1,nf2) =
 datatype fieldval
   = Num of Arbint.int * format 
   | Interval of Arbint.int * Arbint.int * format
-  | Bool of bool * format
   | Char of char * format
   | Enumset of string * term list * format
   | Raw of string * width (* uninterpreted sequence of bytes *)
@@ -113,7 +112,6 @@ fun format_of field =
  case field
   of Num(_,f) => f
    | Interval(_,_,f) => f
-   | Bool(_,f) => f
    | Char (_,f) => f
    | Enumset(tyname,constrs,f) => ENUM (mk_type(tyname,[]))
    | Raw _ => raise ERR "format_of" "Raw not handled"
@@ -123,13 +121,6 @@ fun format_of field =
 (*---------------------------------------------------------------------------*)
 (* Width of (un)signed number in bits and bytes                              *)
 (*---------------------------------------------------------------------------*)
-
-fun exp n e = if Int.<(e,1) then Arbint.one else Arbint.*(n,exp n (Int.-(e,1)));
-
-val bits2bytes = 
- let fun roundup (q,r) = q + (if r > 0 then 1 else 0);
- in fn n => roundup(n div 8,n mod 8)
- end
 
 fun width b =
  let val base = Arbint.fromInt b
@@ -144,11 +135,16 @@ val ubyte_width = width 256;
 fun sbit_width i =
  let open Arbint
      fun W bits =
-       let val N = exp Arbint.two (Int.-(bits,1))
+       let val N = twoE (Int.-(bits,1))
        in if Arbint.~(N) <= i andalso i < N then bits else W (Int.+(bits,1))
        end
  in W 0
  end;
+
+val bits2bytes = 
+ let fun roundup (q,r) = q + (if r > 0 then 1 else 0)
+ in fn n => roundup(n div 8,n mod 8)
+ end
 
 fun sbyte_width i = bits2bytes(sbit_width i)
 
@@ -227,19 +223,14 @@ fun fieldval_to_tree enumMap fv =
       | NONE => raise ERR "fieldval_to_tree" 
                     ("enumerated type "^Lib.quote tyname^" not registered"))
    | Enumset otherwise => raise ERR "fieldval_to_tree" "Unexpected Enumset format"
-   | Bool _ => raise ERR "fieldval_to_tree" "Bool not implemented"
    | Char _ => raise ERR "fieldval_to_tree" "Char not implemented"
    | Raw _ => raise ERR "fieldval_to_tree" "Raw not implemented"
-   | Padding _ =>raise ERR "fieldval_to_tree" "Padding not implemented"
+   | Padding _ => raise ERR "fieldval_to_tree" "Padding not implemented"
    | Packed _ => raise ERR "fieldval_to_tree" "Packed not implemented"
 ;
 
-fun catlist [] = Regexp_Type.EPSILON
-  | catlist [x] = x
-  | catlist (h::t) = Regexp_Type.Cat (h,catlist t);
-
 (*---------------------------------------------------------------------------*)
-(* A map from formats (especially format) to encoders/decoders            *)
+(* A map from formats (especially format) to encoders/decoders               *)
 (*---------------------------------------------------------------------------*)
 
 type coding = {enc : term, 
@@ -269,13 +260,19 @@ val base_codingMap =
          dec = ``splat$deci 1``,
          enc_def = splatTheory.enci_def,
          dec_def = splatTheory.deci_def,
-         dec_enc = splatTheory.deci_enci}),
+         dec_enc = el 1 (CONJUNCTS splatTheory.deci_encis)}),
      (BINARY(SIGNED LSB,BYTEWIDTH 2),
         {enc = ``splat$enci 2``, 
          dec = ``splat$deci 2``,
          enc_def = splatTheory.enci_def,
          dec_def = splatTheory.deci_def,
-         dec_enc = splatTheory.deci_enci}),
+         dec_enc = el 2 (CONJUNCTS splatTheory.deci_encis)}),
+     (BINARY(SIGNED LSB,BYTEWIDTH 8),
+        {enc = ``splat$enci 8``, 
+         dec = ``splat$deci 8``,
+         enc_def = splatTheory.enci_def,
+         dec_def = splatTheory.deci_def,
+         dec_enc = el 8 (CONJUNCTS splatTheory.deci_encis)}),
      (ENUM Type.bool,
         {enc = ``splat$enc_bool``, 
          dec = ``splat$dec_bool``,
@@ -366,11 +363,38 @@ fun mk_set_lr list =
 fun tdrop i list = (List.take(list,i),List.drop(list,i))
 
 fun take_list [] [] = []
+  | take_list [] _ = raise ERR "take_list" "non-empty list remains"
   | take_list (i::t) elts = 
     let val (h,elts') = tdrop i elts
     in h::take_list t elts'
     end
     handle _ => raise ERR "take_list" "";
+
+(*---------------------------------------------------------------------------*)
+(* Expand out all possible nested record projections from a variable of      *)
+(* record type. The sequence of paths is the order in which fields will be   *)
+(* written to the format.                                                    *)
+(*---------------------------------------------------------------------------*)
+
+fun all_paths recdvar =
+ let val recdty = type_of recdvar
+     val {Thy,Tyop=rtyname,Args} = dest_thy_type recdty
+     fun projfn_of th = fst(strip_comb(lhs(snd(strip_forall (concl th)))))
+     fun grow tm =
+       let val ty = type_of tm
+       in if TypeBase.is_record_type ty
+	  then let val pfns = map projfn_of (TypeBase.accessors_of ty)
+	       in map (Lib.C (curry mk_comb) tm) pfns
+	       end
+          else [tm]
+       end
+     fun genpaths paths =
+       let val paths' = flatten (map grow paths)
+       in if paths' = paths then paths else genpaths paths'
+       end
+ in
+    genpaths [recdvar]
+ end;
 
 type decls = 
   (* pkgName *)  string * 
@@ -378,9 +402,26 @@ type decls =
   (* recds *)    (string * (string * AST.ty) list) list *
   (* fns *)      thm list;
 
-fun mk_correctness (info as (pkgName,enums,recds,fn_defs)) thm =
+(*---------------------------------------------------------------------------*)
+(* mk_interval is a convoluted mapping (to eventually be made simpler by     *)
+(* merging fieldval and Regexp_Type.tree) fron intervals to regexps:         *)
+(*                                                                           *)
+(*       (lo,hi) : term * term                                               *)
+(*	  -->                                                                *)
+(*	  Interval(lo,hi,format)  ; splatLib.fieldval                        *)
+(*	  -->                                                                *)
+(*	  Interval(lo,hi,dir)     ; Regexp_Type.tree                         *)
+(*	  -->                                                                *)
+(*          regexp                ; Regexp_Type.tree_to_regexp               *)
+(*	  -->                                                                *)
+(*	  term                    ; regexpSyntax.mk_regexp                   *)
+(*                                                                           *)
+(*---------------------------------------------------------------------------*)
+
+fun mk_correctness_goals (info as (pkgName,enums,recds,fn_defs)) thm =
  let val (wfpred_app,expansion) = dest_eq(concl thm)
      val (wfpred,recdvar) = dest_comb wfpred_app
+     val (wfpred_name,wfpred_ty) = dest_const wfpred
      val recdty = type_of recdvar
      val {Thy,Tyop=rtyname,Args} = dest_thy_type recdty
      val constraints = strip_conj expansion
@@ -394,86 +435,107 @@ fun mk_correctness (info as (pkgName,enums,recds,fn_defs)) thm =
             else if is_eq t then snd (strip_comb t)
                  else raise ERR "proj_of" 
                    "expected a disjunction of equalities or an arithmetic inequality")
+     val allprojs = all_paths recdvar
      val projs = mk_set_lr (flatten (map proj_of constraints))
-     fun in_group tmlist tm = filter (Lib.can (find_term (aconv tm))) tmlist
-     val groups = map (in_group constraints) projs  (* precise enough? *)
-     val _ = if HOLset.equal
-                 (HOLset.addList(Term.empty_tmset,flatten groups),
-                  HOLset.addList(Term.empty_tmset,constraints))
-              then ()
-	      else raise ERR "mk_correctness" 
-                 "lossy step in building field-specific constraints"
+     val omitted_projs = set_diff allprojs projs
+     fun in_group tmlist tm = (tm, filter (Lib.can (find_term (aconv tm))) tmlist)
+     val allgroups = map (in_group constraints) allprojs 
+     val groups = map (in_group constraints) projs 
+     val groups' =  (* unconstrained fields get explicitly constrained *)
+         if null omitted_projs
+	 then groups
+	 else
+         let fun unconstrained proj = (* Done for integers and enums currently *)
+              let val ty = type_of proj
+                  open intSyntax
+              in if ty = int_ty
+                    then [mk_leq(term_of_int (Arbint.~(twoE 63)),proj),
+                          mk_less(proj,term_of_int (twoE 63))]
+	         else case Finmap.peek (the_enumMap(),fst(dest_type (type_of proj)))
+                       of NONE => raise ERR "mk_correctness_goals" 
+                                ("following field is not in the_enumMap(): "^term_to_string proj)
+		        | SOME plist => [list_mk_disj (map (curry mk_eq proj o fst) plist)]
+              end
+             fun supplement (proj,[]) = (proj,unconstrained proj)
+               | supplement other = other
+	 in 
+            map supplement allgroups
+         end
 
-     (* A convoluted mapping (to eventually be made simpler by merging Splat.fieldval
-        and Regexp_Type.tree):
+     (* Add implicit constraints to the wfpred *)
 
-          (lo,hi) : term * term
-	  -->
-	  Interval(lo,hi,format)  ; splatLib.fieldval
-	  -->
-	  Interval(lo,hi,dir)        ; Regexp_Type.tree
-	  --> 
-          regexp                     ; Regexp_Type.tree_to_regexp
-	  -->
-	  term                       ; regexpSyntax.mk_regexp
+     val implicit_constraints = List.mapPartial (C assoc1 groups') omitted_projs
+     val (wfpred_app',iconstraints_opt) = 
+	 if null implicit_constraints
+	 then (wfpred_app,NONE)
+	 else 
+         let val implicit_constraints_tm =
+                 list_mk_conj (map (list_mk_conj o snd) implicit_constraints)
+	     val iconstr_name = wfpred_name^"_implicit_constraints"
+	     val iconstr_app = mk_comb(mk_var(iconstr_name,wfpred_ty),recdvar)
+	     val iconstr_def_tm = mk_eq(iconstr_app, implicit_constraints_tm)
+	     val implicit_constraints_def = TotalDefn.Define `^iconstr_def_tm`
+	     val implicit_constraints_const = 
+                  mk_const(dest_var(fst(dest_comb iconstr_app)))
+         in
+            (mk_conj(wfpred_app,mk_comb(implicit_constraints_const,recdvar)),
+             SOME implicit_constraints_def)
+         end
 
-        From splatLib.fieldval, we generate necessary proof infrastructure
+     (* map constraints to an interval. The (lo,hi) pair denotes the inclusive
+        interval {i | lo <= i <= hi} so there is some fiddling to translate
+        all relations to <=.
      *)
-     fun mk_interval g =  (* elements of g have form relop t1 t2 *)
-      let fun norm tm =
+     fun mk_interval ctr =  (* elements of c expected to have form relop t1 t2 *)
+      let fun elim_gtr tm = (* elim > and >= *)
             case strip_comb tm
 	      of (rel,[a,b]) =>
                   if rel = numSyntax.greater_tm
-		    then list_mk_comb(numSyntax.less_tm,[b,a]) else 
+		    then (numSyntax.less_tm,b,a) else 
                   if rel = numSyntax.geq_tm 
-		    then list_mk_comb(numSyntax.leq_tm,[b,a]) else 
+		    then (numSyntax.leq_tm,b,a) else 
                   if rel = intSyntax.great_tm
-		    then list_mk_comb(intSyntax.less_tm,[b,a]) else 
+		    then (intSyntax.less_tm,b,a) else 
                   if rel = intSyntax.geq_tm 
-		    then list_mk_comb(intSyntax.leq_tm,[b,a]) 
-                  else tm
+		    then (intSyntax.leq_tm,b,a) 
+                  else if op_mem same_const rel
+                          [intSyntax.leq_tm,numSyntax.leq_tm,
+                           intSyntax.less_tm,numSyntax.less_tm]
+                     then (rel,a,b)
+                  else raise ERR "mk_interval" "unknown numeric relation"
 	       | other => raise ERR "mk_interval" "expected term of form `relop a b`"
-          val blarg = rand o rator  (* binary left arg *)
-          val brarg = rand          (* binary right arg *)
-          fun sort [c] =
-                 if mem recdvar (free_vars (rand c)) then 
-                   let val hi = blarg c
-		       val hity = type_of hi
-		       val lo = if hity = numSyntax.num
-		                 then numSyntax.zero_tm else
-				if hity = intSyntax.int_ty
-		                 then intSyntax.zero_tm else
-				raise ERR "mk_interval (sort)" "expected numeric type"
-		    in (lo,hi)
-                    end
-                 else raise ERR "mk_interval" "badly formed singleton interval"
-            | sort [c1,c2] = 
-	       if mem recdvar (free_vars (brarg c1)) andalso 
-                  mem recdvar (free_vars (blarg c2))
-               then (blarg c1,brarg c2)
-	       else
-	       if mem recdvar (free_vars (brarg c2)) andalso 
-                  mem recdvar (free_vars (blarg c1))
-               then (blarg c2, brarg c1)
-	       else raise ERR "mk_interval(sort)" "unexpected format"
+          val ctr' = map elim_gtr ctr
+          fun sort [c1 as (_,a,b), c2 as (_,c,d)] = 
+              let val fva = free_vars a
+                  val fvb = free_vars b
+                  val fvc = free_vars c
+                  val fvd = free_vars d
+              in 
+                 if mem recdvar fvb andalso mem recdvar fvc andalso aconv b c
+                   then (c1,c2)
+	         else
+	         if mem recdvar fvd andalso mem recdvar fva andalso aconv a d
+                   then (c2,c1)
+	         else raise ERR "mk_interval(sort)" "unexpected format"
+              end
             | sort otherwise = raise ERR "mk_interval(sort)" "unexpected format"
-          val (lo_tm,hi_tm) = sort (map norm g)
-	  val dest_literal = 
-             if type_of lo_tm = numSyntax.num
+          val ((rel1,lo_tm,_),(rel2,_,hi_tm)) = sort ctr'
+	  fun dest_literal t = 
+             (if type_of t = numSyntax.num
 	        then Arbint.fromNat o numSyntax.dest_numeral
-                else intSyntax.int_of_term
+                else intSyntax.int_of_term) t
           val lo = dest_literal lo_tm
           val hi = dest_literal hi_tm
-	  val sign = SIGNED LSB (* Temporary! *)
-              (* if Arbint.<(lo,Arbint.zero)
-	          then SIGNED LSB 
-                  else UNSIGNED LSB  (* making LSB the default *)
-              *)
-          fun byte_width i =
-              if Arbint.<(i, Arbint.zero) then sbyte_width i else ubyte_width i
-	  val width = BYTEWIDTH (Int.max(byte_width lo, byte_width hi))
+          val lo' = if op_mem same_const rel1 [numSyntax.less_tm,intSyntax.less_tm]
+                      then Arbint.+(lo, Arbint.one) else lo
+          val hi' = if op_mem same_const rel2 [numSyntax.less_tm,intSyntax.less_tm]
+                      then Arbint.-(hi,Arbint.one) else hi
+          val ctype = type_of lo_tm
+	  val sign = if ctype = numSyntax.num then UNSIGNED LSB else SIGNED LSB
+          val byte_width = if ctype = numSyntax.num then ubyte_width else sbyte_width
+	  val width = BYTEWIDTH (Int.max(byte_width lo', byte_width hi'))
       in  
-        Interval(lo,hi, BINARY (sign,width))
+        Interval(lo',hi', BINARY (sign,width))
       end
 
      fun mk_enumset [g] =   (* Should be extended to finite sets of numbers *)
@@ -496,24 +558,25 @@ fun mk_correctness (info as (pkgName,enums,recds,fn_defs)) thm =
           in Enumset (etyname,elts,ENUM enumty)
 	  end
        | mk_enumset other = raise ERR "mk_enumset" "expected a disjunction of equations"
-				   
-     fun mk_fieldval x = mk_interval x handle HOL_ERR _ => mk_enumset x;
 
-     val fvals = map mk_fieldval groups
+				  
+     fun mk_fieldval x = mk_interval (snd x) handle HOL_ERR _ => mk_enumset (snd x);
+
+     val fvals = map mk_fieldval groups'
      val fwidths = map fieldval_byte_width fvals
 
      (* Compute regexps for the fields *)
 
      val treevals = List.map (fieldval_to_tree (the_enumMap())) fvals
      val regexps = map Regexp_Type.tree_to_regexp treevals
-     val the_regexp = catlist regexps
+     val the_regexp = Regexp_Match.normalize (catlist regexps)
      val the_regexp_tm = regexpSyntax.mk_regexp the_regexp
      
      val codings = List.map (curry Finmap.find (the_codingMap()) o format_of) fvals
 
      (* Define encoder *)
      val encs = map #enc codings
-     val encode_fields = map mk_comb (zip encs projs)
+     val encode_fields = map mk_comb (zip encs allprojs)
      val encode_fields_list = listSyntax.mk_list(encode_fields,stringLib.string_ty)
      val encodeFn_var = mk_var("encode_"^rtyname,recdty --> stringLib.string_ty)
      val encodeFn_lhs = mk_comb(encodeFn_var,recdvar)
@@ -525,44 +588,102 @@ fun mk_correctness (info as (pkgName,enums,recds,fn_defs)) thm =
      val regexp_lang_tm = 
        mk_thy_const{Name = "regexp_lang", Thy = "regexp", 
           Ty = regexpSyntax.regexp_ty --> stringSyntax.string_ty --> Type.bool}
-     val the_goal = mk_forall(recdvar,
-        mk_eq(wfpred_app,
+
+     val correctness_goal = mk_forall(recdvar,
+        mk_eq(wfpred_app',
           pred_setSyntax.mk_in
             (mk_comb(encodeFn,recdvar),
 	     mk_comb(regexp_lang_tm,the_regexp_tm))))
-     (* Define decoder (simplistic for now) *)
+
+     (* Define decoder *)
      val vars = map (fn i => mk_var("v"^Int.toString i, stringSyntax.char_ty))
                     (upto 0 (List.foldl (op+) 0 fwidths - 1))
+     val decs = map #dec codings
      val chunked_vars = take_list fwidths vars
-     val decodeFn_var = mk_var("decode_"^rtyname,
-                            stringSyntax.string_ty --> optionSyntax.mk_option recdty)
-     val decodeFn_lhs = mk_comb(decodeFn_var, mk_var("s",stringSyntax.string_ty))
-     val decode_def =
-        Define
-          `decode s =
-             case s 
-              of [v0; v1; v2; v3; v4; v5; v6; v7; v8; v9; v10; v11;
-                  v12; v13; v14; v15; v16; v17; v18; v19; v20; v21]
-                  => SOME <| map := 
-                              <| wp1 := <| latitude := deci 1 [v0]; 
-                                           longitude := deci 2 [v1;v2]; 
-                                           altitude := deci 2 [v3;v4] |>; 
-                                 wp2 := <| latitude := deci 1 [v5]; 
-                                           longitude := deci 2 [v6;v7]; 
-                                           altitude := deci 2 [v8;v9] |>;
-                                 wp3 := <| latitude := deci 1 [v10]; 
-                                           longitude := deci 2 [v11;v12]; 
-                                           altitude := deci 2 [v13;v14] |>;
-                                 wp4 := <| latitude := deci 1 [v15]; 
-                                           longitude := deci 2 [v16;v17]; 
-                                           altitude := deci 2 [v18;v19] |>; 
-          		       |>;
-                             pattern := dec_FlightPattern [v20]
-                           |>
-                | otherwise => NONE`
+     fun enlist vlist = listSyntax.mk_list(vlist,stringSyntax.char_ty)
+     val chunked_vars_tms = map enlist chunked_vars
+     val rhs_info = zip allprojs (map mk_comb (zip decs chunked_vars_tms))
+     fun rev_strip t b acc = 
+         if is_var t
+	 then (rev acc, b)
+         else let val (M,N) = dest_comb t
+	      in rev_strip N b (M::acc)
+	      end;
+     val rhs_info' = map (fn (p,x) => rev_strip p x []) rhs_info
+
+     fun parts [] = []
+       | parts ((p as ([_],v))::t) = [p]::parts t
+       | parts ((h as (segs1,_))::t) = 
+	 let fun pred (segs2,_) = 
+                   if null segs1 orelse null segs2 then false else tl segs1 = tl segs2
+             val (L1,L2) = Lib.partition pred (h::t)
+	 in L1 :: parts L2
+	 end
+
+     fun mk_recd_app rty args = 
+       case TypeBase.constructors_of rty
+        of [constr] => list_mk_comb (constr,args)
+         | otherwise => raise ERR "mk_recd_app" "expected to find a record constructor"
+     
+     fun maybe_shrink [] = raise ERR "maybe_shrink" "empty partition"
+       | maybe_shrink (partn as [([_],_)]) = partn  (* fully shrunk *)
+       | maybe_shrink (partn as (apath::_)) = 
+          let val segs = fst apath
+              val proj_ty = type_of (hd segs)
+              val recdty = dom proj_ty
+              val args = map snd partn
+              val recd_app = mk_recd_app recdty args
+       in 
+           [(tl segs,recd_app)]
+       end
+       handle e => raise wrap_exn "splatLib" "maybe_shrink" e
+
+     fun mk_recd paths =
+      if Lib.all (equal 1 o length o fst) paths
+         then mk_recd_app recdty (map snd paths)
+      else 
+      let val partns = parts paths
+          val partns' = map maybe_shrink partns
+	  val paths' = flatten partns'
+      in
+          if length paths' < length paths
+	  then mk_recd paths'
+	  else 
+            if paths' = paths
+            then raise ERR "mk_recd" "irreducible path"
+          else if length paths' = length paths
+            then raise ERR "mk_recd" "length of paths not reduced"
+            else raise ERR "mk_recd" "length of some path(s) increased"
+      end
+
+     val decodeFn_name = "decode_"^rtyname
+     val decodeFn_ty = stringSyntax.string_ty --> optionSyntax.mk_option recdty
+     val decodeFn_var = mk_var(decodeFn_name,decodeFn_ty)
+     val fvar = mk_var("s",stringSyntax.string_ty)
+     val decodeFn_lhs = mk_comb(decodeFn_var, fvar)
+
+     val pat = listSyntax.mk_list(vars,stringSyntax.char_ty)
+     val valid_rhs = optionSyntax.mk_some(mk_recd rhs_info')
+     val rules = [(pat,valid_rhs), (``otherwise:string``,optionSyntax.mk_none recdty)]
+     val rhs = TypeBase.mk_pattern_fn rules
+     val decodeFn_rhs = Term.beta_conv (mk_comb(rhs,fvar))
+     val decodeFn_def = Define `^(mk_eq(decodeFn_lhs,decodeFn_rhs))`
+     val decodeFn = mk_const(decodeFn_name,decodeFn_ty)
+
+    val inversion_goal = mk_forall(recdvar,
+        mk_imp(wfpred_app',
+               mk_eq(mk_comb(decodeFn,mk_comb(encodeFn,recdvar)),
+                     optionSyntax.mk_some recdvar)))
  in
-     (the_regexp_tm, encodeFn_def, decode_def, the_goal)
+   {regexp      = the_regexp,
+    encode_def  = encodeFn_def,
+    decode_def  = decodeFn_def,
+    inversion   = inversion_goal,
+    correctness = correctness_goal,
+    implicit_constraints = iconstraints_opt}
  end
+ handle e => raise wrap_exn "splatLib" "mk_correctness_goals" e;
+
 
 (*---------------------------------------------------------------------------*)
 (* Reasoner for character sets. charset_conv converts terms of the form      *)
@@ -631,7 +752,8 @@ val charset_conv_ss =
 val IN_CHARSET_NUM_TAC =
  rw_tac (list_ss ++ charset_conv_ss) [EQ_IMP_THM,strlen_eq,LE_LT1]
   >> TRY EVAL_TAC 
-  >> rule_assum_tac (SIMP_RULE list_ss [dec_def, numposrepTheory.l2n_def, ord_mod_256])
+  >> rule_assum_tac 
+        (SIMP_RULE list_ss [dec_def, numposrepTheory.l2n_def, ord_mod_256])
   >> pop_assum mp_tac
   >> Q.SPEC_TAC (`ORD c`, `n`)
   >> REPEAT (CONV_TAC (numLib.BOUNDED_FORALL_CONV EVAL))

@@ -109,9 +109,81 @@ val n2l_bytes_3 = Q.prove
     [Ntimes n2l_256 3, 
      arithmeticTheory.DIV_DIV_DIV_MULT,arithmeticTheory.DIV_LT_X]);
 
+val n2l_bytes_4 = Q.prove
+(`!n. ~(n < 16777216) /\ n < 256 * 16777216 ==> 
+       (n2l 256 n = [n MOD 256; 
+                     (n DIV 256) MOD 256;
+		     (n DIV 65536) MOD 256;
+		     (n DIV 16777216) MOD 256])`,
+ rw_tac list_ss 
+    [Ntimes n2l_256 4, 
+     arithmeticTheory.DIV_DIV_DIV_MULT,arithmeticTheory.DIV_LT_X]);
+
+(* Table of powers of 256 
+
+   2 -- 65536
+   3 -- 16777216
+   4 -- 4294967296
+   5 -- 1099511627776
+   6 -- 281474976710656
+   7 -- 72057594037927936
+   8 -- 18446744073709551616
+*)
+
+val n2l_bytes_5 = Q.prove
+(`!n. ~(n < 4294967296) /\ n < 1099511627776 ==> 
+       (n2l 256 n = [n MOD 256; 
+                     (n DIV 256) MOD 256;
+		     (n DIV 65536) MOD 256;
+		     (n DIV 16777216) MOD 256;
+                     (n DIV 4294967296) MOD 256])`,
+ rw_tac list_ss 
+    [Ntimes n2l_256 5, 
+     arithmeticTheory.DIV_DIV_DIV_MULT,arithmeticTheory.DIV_LT_X]);
+
+val n2l_bytes_6 = Q.prove
+(`!n. ~(n < 1099511627776) /\ n < 281474976710656 ==> 
+       (n2l 256 n = [n MOD 256; 
+                     (n DIV 256) MOD 256;
+		     (n DIV 65536) MOD 256;
+		     (n DIV 16777216) MOD 256;
+                     (n DIV 4294967296) MOD 256;
+                     (n DIV 1099511627776) MOD 256])`,
+ rw_tac list_ss 
+    [Ntimes n2l_256 6, 
+     arithmeticTheory.DIV_DIV_DIV_MULT,arithmeticTheory.DIV_LT_X]);
+
+val n2l_bytes_7 = Q.prove
+(`!n. ~(n < 281474976710656) /\ n < 72057594037927936 ==> 
+       (n2l 256 n = [n MOD 256; 
+                     (n DIV 256) MOD 256;
+		     (n DIV 65536) MOD 256;
+		     (n DIV 16777216) MOD 256;
+                     (n DIV 4294967296) MOD 256;
+                     (n DIV 1099511627776) MOD 256;
+                     (n DIV 281474976710656) MOD 256])`,
+ rw_tac list_ss 
+    [Ntimes n2l_256 7, 
+     arithmeticTheory.DIV_DIV_DIV_MULT,arithmeticTheory.DIV_LT_X]);
+
+val n2l_bytes_8 = Q.prove
+(`!n. ~(n < 72057594037927936) /\ n < 18446744073709551616 ==> 
+       (n2l 256 n = [n MOD 256; 
+                     (n DIV 256) MOD 256;
+		     (n DIV 65536) MOD 256;
+		     (n DIV 16777216) MOD 256;
+                     (n DIV 4294967296) MOD 256;
+                     (n DIV 1099511627776) MOD 256;
+                     (n DIV 281474976710656) MOD 256;
+                     (n DIV 72057594037927936) MOD 256])`,
+ rw_tac list_ss 
+    [Ntimes n2l_256 8, 
+     arithmeticTheory.DIV_DIV_DIV_MULT,arithmeticTheory.DIV_LT_X]);
+
 val n2l_bytes = save_thm
 ("n2l_bytes",
- LIST_CONJ [n2l_bytes_1,n2l_bytes_1,n2l_bytes_1]);
+ LIST_CONJ [n2l_bytes_1,n2l_bytes_2,n2l_bytes_3,n2l_bytes_4,
+            n2l_bytes_5,n2l_bytes_6,n2l_bytes_7,n2l_bytes_8]);
 
 (*---------------------------------------------------------------------------*)
 (* Encoding nums in expected ranges                                          *)
@@ -143,10 +215,123 @@ rw_tac list_ss [enc_def, PAD_RIGHT, GENLIST, layout_def]
      >- rw_tac list_ss [n2l_bytes_2,arithmeticTheory.LESS_DIV_EQ_ZERO]
      >- rw_tac list_ss [n2l_bytes_3]));
 
+val enc_4_lem = Q.prove
+(`!n. n < 256 * 256 * 256 * 256 ==> 
+      (enc 4 n = STRING (CHR (n MOD 256)) 
+                (STRING (CHR ((n DIV 256) MOD 256)) 
+                (STRING (CHR ((n DIV 65536) MOD 256))
+		(STRING (CHR ((n DIV 16777216) MOD 256)) ""))))`,
+rw_tac list_ss [enc_def, PAD_RIGHT, GENLIST, layout_def]
+ >> Cases_on `n < 256`
+ >- rw_tac list_ss [n2l_bytes_1,arithmeticTheory.LESS_DIV_EQ_ZERO]
+ >- (Cases_on `n < 65536`
+     >- rw_tac list_ss [n2l_bytes_2,arithmeticTheory.LESS_DIV_EQ_ZERO]
+     >- (Cases_on `n < 16777216`
+         >- rw_tac list_ss [n2l_bytes_3,arithmeticTheory.LESS_DIV_EQ_ZERO]
+         >- rw_tac list_ss [n2l_bytes_4])));
+
+val enc_5_lem = Q.prove
+(`!n. n < 256 * 256 * 256 * 256 * 256 ==> 
+      (enc 5 n = STRING (CHR (n MOD 256)) 
+                (STRING (CHR ((n DIV 256) MOD 256)) 
+                (STRING (CHR ((n DIV 65536) MOD 256))
+		(STRING (CHR ((n DIV 16777216) MOD 256))
+		(STRING (CHR ((n DIV 4294967296) MOD 256))
+                "")))))`,
+rw_tac list_ss [enc_def, PAD_RIGHT, GENLIST, layout_def]
+ >> Cases_on `n < 256`
+ >- rw_tac list_ss [n2l_bytes_1,LESS_DIV_EQ_ZERO]
+ >- (Cases_on `n < 65536`
+     >- rw_tac list_ss [n2l_bytes_2,LESS_DIV_EQ_ZERO]
+     >- (Cases_on `n < 16777216`
+         >- rw_tac list_ss [n2l_bytes_3,LESS_DIV_EQ_ZERO]
+         >- (Cases_on `n < 4294967296`
+             >- rw_tac list_ss [n2l_bytes_4,LESS_DIV_EQ_ZERO]
+             >- rw_tac list_ss [n2l_bytes_5]))))
+;
+
+val enc_6_lem = Q.prove
+(`!n. n < 256 * 256 * 256 * 256 * 256 * 256 ==> 
+      (enc 6 n = STRING (CHR (n MOD 256)) 
+                (STRING (CHR ((n DIV 256) MOD 256)) 
+                (STRING (CHR ((n DIV 65536) MOD 256))
+		(STRING (CHR ((n DIV 16777216) MOD 256))
+		(STRING (CHR ((n DIV 4294967296) MOD 256))
+		(STRING (CHR ((n DIV 1099511627776) MOD 256))
+                ""))))))`,
+rw_tac list_ss [enc_def, PAD_RIGHT, GENLIST, layout_def]
+ >> Cases_on `n < 256`
+ >- rw_tac list_ss [n2l_bytes_1,LESS_DIV_EQ_ZERO]
+ >- (Cases_on `n < 65536`
+     >- rw_tac list_ss [n2l_bytes_2,LESS_DIV_EQ_ZERO]
+     >- (Cases_on `n < 16777216`
+         >- rw_tac list_ss [n2l_bytes_3,LESS_DIV_EQ_ZERO]
+         >- (Cases_on `n < 4294967296`
+             >- rw_tac list_ss [n2l_bytes_4,LESS_DIV_EQ_ZERO]
+             >- (Cases_on `n < 1099511627776`
+                 >- rw_tac list_ss [n2l_bytes_5,LESS_DIV_EQ_ZERO]
+                 >- rw_tac list_ss [n2l_bytes_6])))))
+;
+
+val enc_7_lem = Q.prove
+(`!n. n < 256 * 256 * 256 * 256 * 256 * 256 * 256 ==> 
+      (enc 7 n = STRING (CHR (n MOD 256)) 
+                (STRING (CHR ((n DIV 256) MOD 256)) 
+                (STRING (CHR ((n DIV 65536) MOD 256))
+		(STRING (CHR ((n DIV 16777216) MOD 256))
+		(STRING (CHR ((n DIV 4294967296) MOD 256))
+		(STRING (CHR ((n DIV 1099511627776) MOD 256))
+		(STRING (CHR ((n DIV 281474976710656) MOD 256))
+                "")))))))`,
+rw_tac list_ss [enc_def, PAD_RIGHT, GENLIST, layout_def]
+ >> Cases_on `n < 256`
+ >- rw_tac list_ss [n2l_bytes_1,LESS_DIV_EQ_ZERO]
+ >- (Cases_on `n < 65536`
+     >- rw_tac list_ss [n2l_bytes_2,LESS_DIV_EQ_ZERO]
+     >- (Cases_on `n < 16777216`
+         >- rw_tac list_ss [n2l_bytes_3,LESS_DIV_EQ_ZERO]
+         >- (Cases_on `n < 4294967296`
+             >- rw_tac list_ss [n2l_bytes_4,LESS_DIV_EQ_ZERO]
+             >- (Cases_on `n < 1099511627776`
+                 >- rw_tac list_ss [n2l_bytes_5,LESS_DIV_EQ_ZERO]
+                 >- (Cases_on `n < 281474976710656`
+                     >- rw_tac list_ss [n2l_bytes_6,LESS_DIV_EQ_ZERO]
+                     >- rw_tac list_ss [n2l_bytes_7]))))))
+;
+
+val enc_8_lem = Q.prove
+(`!n. n < 256 * 256 * 256 * 256 * 256 * 256 * 256 * 256 ==> 
+      (enc 8 n = STRING (CHR (n MOD 256)) 
+                (STRING (CHR ((n DIV 256) MOD 256)) 
+                (STRING (CHR ((n DIV 65536) MOD 256))
+		(STRING (CHR ((n DIV 16777216) MOD 256))
+		(STRING (CHR ((n DIV 4294967296) MOD 256))
+		(STRING (CHR ((n DIV 1099511627776) MOD 256))
+		(STRING (CHR ((n DIV 281474976710656) MOD 256))
+		(STRING (CHR ((n DIV 72057594037927936) MOD 256)) 
+                ""))))))))`,
+rw_tac list_ss [enc_def, PAD_RIGHT, GENLIST, layout_def]
+ >> Cases_on `n < 256`
+ >- rw_tac list_ss [n2l_bytes_1,LESS_DIV_EQ_ZERO]
+ >- (Cases_on `n < 65536`
+     >- rw_tac list_ss [n2l_bytes_2,LESS_DIV_EQ_ZERO]
+     >- (Cases_on `n < 16777216`
+         >- rw_tac list_ss [n2l_bytes_3,LESS_DIV_EQ_ZERO]
+         >- (Cases_on `n < 4294967296`
+             >- rw_tac list_ss [n2l_bytes_4,LESS_DIV_EQ_ZERO]
+             >- (Cases_on `n < 1099511627776`
+                 >- rw_tac list_ss [n2l_bytes_5,LESS_DIV_EQ_ZERO]
+                 >- (Cases_on `n < 281474976710656`
+                     >- rw_tac list_ss [n2l_bytes_6,LESS_DIV_EQ_ZERO]
+                     >- (Cases_on `n < 72057594037927936`
+                         >- rw_tac list_ss [n2l_bytes_7,LESS_DIV_EQ_ZERO]
+                         >- rw_tac list_ss [n2l_bytes_8])))))))
+;
+
 val enc_bytes = save_thm
 ("enc_bytes",
- LIST_CONJ [enc_1_lem,enc_2_lem,enc_3_lem]);
-
+ LIST_CONJ [enc_1_lem,enc_2_lem,enc_3_lem,enc_4_lem,
+            enc_5_lem,enc_6_lem,enc_7_lem,enc_8_lem]);
 
 (*---------------------------------------------------------------------------*)
 (* Lower bounds on encoding lengths                                          *)
@@ -184,14 +369,21 @@ val strlen_eq = save_thm
 (*---------------------------------------------------------------------------*)
 (* Signed numbers                                                            *)
 (*                                                                           *)
-(* To encode integer i, we map it to n:num by using 2s complement. Then we   *)
-(* use l2n o n2l to get back out to 2s complement num, and then we reverse   *)
-(* the 2s complement map.                                                    *)
-(*                                                                           *)
 (* At the word level, 2s complement is "flip each bit and add 1". But it is  *)
-(* also implementable purely at the level of ints and nums since an n-bit    *)
+(* also understood purely at the level of ints and nums since an n-bit       *)
 (* integer added to its 2s complement equals 2^n (with appropriate coercions *)
-(* tossed in to map back and forth between ints and nums).                   *)
+(* tossed in to map back and forth between ints and nums). Thus              *)
+(*                                                                           *)
+(*   twos_comp : {i | -2^{N-1} <= i < 2^{N-1}} -> {k | 0 <= k < 2^{N}}       *)
+(*                                                                           *)
+(* maps an integer into its corresponding natural number and is defined by   *)
+(*                                                                           *)
+(*   twos_comp(i) = if 0 <= i < 2^{N-1} then Nat(i) else Nat(2^{N} + i)      *)
+(*                                                                           *)
+(* To round-trip encode-then-decode integer i, we map i to n:num by using    *)
+(* 2s complement. Then we use l2n o n2l to get back out to 2s complement     *)
+(* num, and then we reverse the 2s complement map.                           *)
+(*                                                                           *)
 (*---------------------------------------------------------------------------*)
 (*
  ML version:
@@ -238,20 +430,18 @@ EVAL ``n2i 8n (i2n 8n 13i)``;
 EVAL ``n2i 8n (i2n 8n (-13i))``;
 *)
 
-val enci_def = Define `enci w i = enc w (i2n (8n * w) i)`
-val deci_def = Define `deci w s = n2i (8*w) (dec s)`;
-
 val lem = Q.prove
 (`!x i:int. i < 0 /\ x < Num (ABS i) /\ -(&x) <= i ==> F`,
  rw_tac int_ss [INT_ABS] >> intLib.ARITH_TAC);
 
-val invertible = Q.prove
-(`!bits i. 
-   0n < bits /\
-  -(&(2n ** (bits - 1))) <= i /\ i < &(2n ** (bits - 1))
+val n2i_i2n = Q.store_thm
+("n2i_i2n",
+ `!bits i. 
+    0n < bits /\
+   -(&(2n ** (bits - 1))) <= i /\ i < &(2n ** (bits - 1))
   ==>
-   (n2i bits (i2n bits i) = i)`,
-rw_tac int_ss [n2i_def, i2n_def]
+    (n2i bits (i2n bits i) = i)`,
+ rw_tac int_ss [n2i_def, i2n_def]
  >> full_simp_tac int_ss [INT_OF_NUM]
  >- (rw_tac int_ss [INT_ABS]
      >- (qpat_x_assum `~(0 <= i)` kall_tac
@@ -266,27 +456,49 @@ rw_tac int_ss [n2i_def, i2n_def]
  >- intLib.ARITH_TAC
 );
 
+
+val enci_def = Define `enci w i = enc w (i2n (8*w) i)`;
+
+val deci_def = Define `deci w s = n2i (8*w) (dec s)`;
+
+
 val deci_enci = Q.store_thm
 ("deci_enci",
-`!w i. 0 < w /\ 
-     -&(2 ** (8 * w − 1)) ≤ i /\ i < &(2 ** (8 * w − 1)) 
-   ==> 
-   (deci w (enci w i) = i)`,
-rw_tac arith_ss [deci_def, enci_def,dec_enc]
- >> match_mp_tac invertible
- >> rw_tac arith_ss []);
+ `!w i. 0 < w /\ -(&(2n ** ((8 * w) - 1))) <= i /\ i < &(2n ** ((8 * w) - 1))
+        ==> deci w (enci w i) = i`,
+ rw_tac int_ss [enci_def, deci_def,dec_enc,n2i_i2n]);
+
+val deci_encis = save_thm
+("deci_encis",
+ LIST_CONJ
+     (map (C qspec_arith deci_enci) [`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`]));
+
+val i2n_bounds = Q.prove
+(`!bits i. -(int_of_num(2 ** (bits-1))) <= i /\ 
+        i < (int_of_num (2 ** (bits-1))) ==> i2n bits i < 2 ** bits`,
+ Cases >> rw_tac int_ss [i2n_def,EXP] >> intLib.ARITH_TAC);
 
 val i2n_bounds_1 = Q.prove
 (`!i:int. -128i <= i /\ i < 128 ==> i2n 8 i < 256n`,
- rw_tac int_ss [i2n_def] >> intLib.ARITH_TAC);
+ metis_tac [qspec_arith `8` i2n_bounds]);
 
 val i2n_bounds_2 = Q.prove
-(`!i:int. -32768i <= i /\ i < 32767 ==> i2n 16 i < 65536n`,
- rw_tac int_ss [i2n_def] >> intLib.ARITH_TAC);
+(`!i:int. -32768i <= i /\ i < 32768 ==> i2n 16 i < 65536n`,
+ metis_tac [qspec_arith `16` i2n_bounds]);
 
 val i2n_bounds_3 = Q.prove
-(`!i:int. -8388608i <= i /\ i < 8388607 ==> i2n 24 i < 16777216n`,
- rw_tac int_ss [i2n_def] >> intLib.ARITH_TAC);
+(`!i:int. -8388608i <= i /\ i < 8388608 ==> i2n 24 i < 16777216n`,
+ metis_tac [qspec_arith `24` i2n_bounds]);
+
+val i2n_bounds_4 = Q.prove
+(`!i:int. -2147483648i <= i /\ i < 2147483648i ==> i2n 32 i < 4294967296`,
+ metis_tac [qspec_arith `32` i2n_bounds]);
+
+val i2n_bounds_8 = Q.prove
+(`!i:int. -9223372036854775808i <= i /\ i < 9223372036854775808i 
+    ==> 
+   i2n 64 i < 18446744073709551616n`,
+ metis_tac [qspec_arith `64` i2n_bounds]);
 
 val enc_bytes' = SIMP_RULE arith_ss [] enc_bytes;
 
@@ -296,18 +508,29 @@ val enci_byte_1 = Q.prove
  >> metis_tac [enc_bytes',i2n_bounds_1]);
 
 val enci_byte_2 = Q.prove
-(`!i:int. -32768i <= i /\ i < 32767 ==> ?a b. enci 2 i = [a;b]`,
+(`!i:int. -32768i <= i /\ i < 32768 ==> ?a b. enci 2 i = [a;b]`,
  rw_tac list_ss [enci_def]
  >> metis_tac [enc_bytes',i2n_bounds_2]);
 
 val enci_byte_3 = Q.prove
-(`!i:int. -8388608i <= i /\ i < 8388607 ==> ?a b c. enci 3 i = [a;b;c]`,
+(`!i:int. -8388608i <= i /\ i < 8388608 ==> ?a b c. enci 3 i = [a;b;c]`,
  rw_tac list_ss [enci_def]
  >> metis_tac [enc_bytes',i2n_bounds_3]);
 
+val enci_byte_4 = Q.prove
+(`!i:int. -2147483648i <= i /\ i < 2147483648i ==> ?a b c d. enci 4 i = [a;b;c;d]`,
+ rw_tac list_ss [enci_def]
+ >> metis_tac [enc_bytes',i2n_bounds_4]);
+
+val enci_byte_8 = Q.prove
+(`!i:int. -9223372036854775808i <= i /\ i < 9223372036854775808i 
+        ==> ?a b c d e f g h. enci 8 i = [a;b;c;d;e;f;g;h]`,
+ rw_tac list_ss [enci_def]
+ >> metis_tac [enc_bytes',i2n_bounds_8]);
+
 val enci_bytes = save_thm
  ("enci_bytes",
-  LIST_CONJ [enci_byte_1,enci_byte_2,enci_byte_3]);
+  LIST_CONJ [enci_byte_1,enci_byte_2,enci_byte_3,enci_byte_4,enci_byte_8]);
 
 (*---------------------------------------------------------------------------*)
 (* Length directed string destructor                                         *)
@@ -454,8 +677,9 @@ val chop_aux_lem = Q.prove
           >> rw_tac list_ss [])))
 ;
 
-val chop_lem = Q.prove
-(`!nlist s lists. 
+val chop_thm = Q.prove
+("chop_thm",
+ `!nlist s lists. 
     (chop nlist s = SOME lists)
     ==> 
     (LENGTH lists = LENGTH nlist) /\
@@ -470,7 +694,7 @@ val chop_lem = Q.prove
 
 (*---------------------------------------------------------------------------*)
 (* Enumerations need bijections between constructors and numbers. Booleans   *)
-(* are built in, others are defined on when the AADL package is processed.   *)
+(* are built in, others are defined when the AADL package is processed.      *)
 (*---------------------------------------------------------------------------*)
 
 val num_of_bool_def =
@@ -495,6 +719,11 @@ val dec_enc_bool = Q.store_thm
 val bool_bound = Q.store_thm
 ("bool_bound",
  `!b. num_of_bool b < 256`,
+ Cases >> rw_tac arith_ss [num_of_bool_def]);
+
+val num_of_bool_bound = Q.store_thm
+("num_of_bool_bound",
+ `!b. num_of_bool b < 2`,
  Cases >> rw_tac arith_ss [num_of_bool_def]);
 
 val FILTER_CORRECT_def = 

@@ -1,0 +1,59 @@
+%%%--- Cut here -----------------------------------------------------------
+%%% File toc.tex
+%
+% Automatically generate a Table Of Contents (TOC) while the
+% document is being processed by PLAIN TeX
+%
+% Use \tocref{ texta }{ textb } to insert TOC entries. `texta'
+%         will be typeset in the TOC and at the current location,
+%         for example `\centerline{\tocref{Chapter 1}{}}' inserts
+%         `Chapter 1' at the current location in your document
+%         centered, and enters it in the TOC (not centered).
+%         `textb' is a prefix text/TeX commands to precede `texta'
+%         in the TOC only (it will not appear in the current loc-
+%         ation of your document -- {{`textb'`texta'}.....\folio}).
+% Use \tocline to add info only intended for the TOC (no page number or
+%         dotfill is used for tocline entries).
+% Use \tocgen to force the last TOC page to be printed (last command
+%         before \end?)
+% To specialize, look at the below comments in the right
+%
+% Uses variable names
+%         tocnew, tocopage, tocbox, tocsize, tocstrut, tocref,
+%         tocbanner, tocsuffix, tocline, tocstart, tocont, tocgen
+%
+% Created by Dan Zirin. Copyright (c) 1987 Zar Limited.
+% Permission given for inclusion in TeXMaG.
+%
+\newcount\tocnew\tocnew=1\newcount\tocopage
+\newbox\tocbox\newdimen\tocsize
+\def\tocstrut{{\vrule height8.5pt depth3.5pt width0pt}} % TOC baselineskip -1pt
+\def\tocref#1#2{\tocbanner#1               % Where `texta' is duplicated
+    \global\setbox\tocbox=\vbox{
+    \box\tocbox\vbox{
+    \line{\tocstrut{#2#1}~\dotfill~\folio} % Where the TOC line is made
+    }}\tocsuffix}
+\def\tocline#1{\tocbanner
+    \global\setbox\tocbox=\vbox{
+    \box\tocbox\vbox{
+    \line{\tocstrut{#1}}
+    }}\tocsuffix}
+\def\tocbanner{\ifnum\tocnew=1\tocstart\fi
+    \ifnum\tocnew=3\tocont\fi}
+\def\tocsuffix{\ifdim\tocsize<\ht\tocbox\tocgen
+    \global\tocnew=3\fi}
+% Do not change tocsize = 1.0 (TeX may go into an infinite loop)
+\def\tocstart{\global\tocsize=.95\vsize   % TOC page >95% full, print it
+    \global\setbox\tocbox=\vbox{
+    \centerline{\tocstrut\bf Table Of Contents} % TOC page 1 banner line 1
+    \line{\tocstrut\hfil}                 % TOC page 1 banner line 2 blank line
+    }\global\tocnew=2}
+\def\tocont{\global\setbox\tocbox=\vbox{
+    \centerline{\tocstrut Table Of Contents (Continued)} % TOC page <> 1 banner
+    }\global\tocnew=2}
+\def\tocgen{\ifnum\tocnew=1
+    \message{No TOC entries found.}\else
+    \tocopage=\pageno\pageno=0\message{(TOC}
+    \shipout\box\tocbox\message{)}
+    \pageno=\tocopage\global\tocnew=1\fi}
+%%%--- Cut here -----------------------------------------------------------
