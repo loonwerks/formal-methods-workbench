@@ -1,7 +1,6 @@
 package com.collins.fmw.agree.command;
 
 import org.eclipse.emf.ecore.resource.Resource;
-
 import org.eclipse.xtext.ISetup;
 import org.eclipse.xtext.resource.IResourceFactory;
 import org.eclipse.xtext.resource.IResourceServiceProvider;
@@ -9,9 +8,6 @@ import org.osate.xtext.aadl2.properties.PropertiesStandaloneSetup;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.osate.xtext.aadl2.Aadl2RuntimeModule;
-
-import org.eclipse.emf.common.notify.Notifier ;
 
 
 @SuppressWarnings("all")
@@ -40,10 +36,18 @@ public class AgreeCommandSetup implements ISetup {
     		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl", resourceFactory);
     		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl",
     				serviceProvider);
-    
+
     		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2", resourceFactory);
     		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2",
     				serviceProvider);
+
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2", resourceFactory);
+		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2",
+				serviceProvider);
+
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aail2", resourceFactory);
+		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2",
+				serviceProvider);
 
 	}
 }

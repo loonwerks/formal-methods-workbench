@@ -193,13 +193,9 @@
 	</classpathentry>
 	<classpathentry kind="src" path="/com.rockwellcollins.atc.z3"/>
 	<classpathentry kind="src" path="/org.osate.aadl2.instantiation"/>
-	<classpathentry kind="lib" path="/home/collins/.m2/repository/org/osate/org.osate.aadl2.instantiation/1.0.0-SNAPSHOT/org.osate.aadl2.instantiation-1.0.0-SNAPSHOT.jar" sourcepath="/home/collins/.m2/repository/org/osate/org.osate.aadl2.instantiation/1.0.0-SNAPSHOT/org.osate.aadl2.instantiation-1.0.0-SNAPSHOT-sources.jar">
+	<classpathentry excluding="**" kind="src" output="target/classes" path="resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="maven.groupId" value="org.osate"/>
-			<attribute name="maven.artifactId" value="org.osate.aadl2.instantiation"/>
-			<attribute name="maven.version" value="1.0.0-SNAPSHOT"/>
-			<attribute name="maven.scope" value="compile"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>

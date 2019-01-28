@@ -9,9 +9,10 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
@@ -20,19 +21,11 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.InstanceFactory;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.AadlConstants;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
-import org.osate.aadl2.modelsupport.errorreporting.MarkerAnalysisErrorReporter;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
-import com.rockwellcollins.atc.agree.agree.Contract;
-import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.analysis.AgreeException;
 import com.rockwellcollins.atc.agree.analysis.AgreeLayout;
 import com.rockwellcollins.atc.agree.analysis.AgreeRenaming;
@@ -54,14 +47,16 @@ public class JKindGen {
 //		AssumeGuarantee, Consistency, Realizability
 //	};
 
-	protected SystemInstance getSysInstance(ComponentImplementation ci, Resource aadlResource) {
+	protected SystemInstance getSysInstance(ComponentImplementation ci, Resource aadlResource, ResourceSet rset) {
+
 // ORIGINAL
-//		try {
-//			return InstantiateModel.buildInstanceModelFile(ci);
-//		} catch (Exception e) {
-////			Dialog.showError("Model Instantiate", "Error while re-instantiating the model: " + e.getMessage());
-//			throw new AgreeException("Error Instantiating model");
-//		}
+		try {
+			return Instance.buildInstanceModelFile(ci, rset);
+		} catch (Exception e) {
+//			Dialog.showError("Model Instantiate", "Error while re-instantiating the model: " + e.getMessage());
+			e.printStackTrace();
+			throw new AgreeException("Error Instantiating model");
+		}
 
 // VERSION 1
 //		SystemInstance root = InstanceFactory.eINSTANCE.createSystemInstance();
@@ -72,31 +67,29 @@ public class JKindGen {
 //		root.setCategory(ci.getCategory());
 //		return root;
 
+
 //VERSION 2
-		final InstantiateModel instantiateModel = new InstantiateModel(new NullProgressMonitor(),
-				new AnalysisErrorReporterManager(
-						new MarkerAnalysisErrorReporter.Factory(AadlConstants.INSTANTIATION_OBJECT_MARKER)));
-
-
-		SystemInstance root = InstanceFactory.eINSTANCE.createSystemInstance();
-		final String instanceName = ci.getTypeName() + "_" + ci.getImplementationName();
-
-		root.setComponentImplementation(ci);
-		root.setName(instanceName);
-		root.setCategory(ci.getCategory());
-		aadlResource.getContents().add(root);
-		// Needed to save the root object because we may attach warnings to the
-		// IResource as we build it.
-
-
-		try {
-			instantiateModel.fillSystemInstance(root);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return root;
+//		final Instance instance = new Instance(new NullProgressMonitor(), new AnalysisErrorReporterManager(
+//				new MarkerAnalysisErrorReporter.Factory(AadlConstants.INSTANTIATION_OBJECT_MARKER)));
+//
+//		SystemInstance root = InstanceFactory.eINSTANCE.createSystemInstance();
+//		final String instanceName = ci.getTypeName() + "_" + ci.getImplementationName();
+//
+//		root.setComponentImplementation(ci);
+//		root.setName(instanceName);
+//		root.setCategory(ci.getCategory());
+//		aadlResource.getContents().add(root);
+//		// Needed to save the root object because we may attach warnings to the
+//		// IResource as we build it.
+//
+//		try {
+//			instance.fillSystemInstance(root);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		return root;
 
 	}
 
@@ -122,7 +115,9 @@ public class JKindGen {
 		return result;
 	}
 
-	public List<Pair<String, Program>> run(Resource resource) {
+	public List<Pair<String, Program>> run(ResourceSet rset, String aadlPath) {
+
+		Resource resource = rset.getResource(URI.createFileURI(aadlPath), true);
 
 		List<Pair<String, Program>> programPairs = new ArrayList<Pair<String, Program>>();
 		List<EObject> contents = resource.getContents();
@@ -132,24 +127,9 @@ public class JKindGen {
 			if (o instanceof AadlPackage) {
 
 				ComponentImplementation ci = getComponentImplementation((AadlPackage) o);
-				SystemInstance si = getSysInstance(ci, resource);
+				SystemInstance si = getSysInstance(ci, resource, rset);
 
 				programPairs.addAll(genComponentPrograms(ci.getName(), si));
-
-//				while (!queue.isEmpty()) {
-//					JKindResult result = queue.peek();
-//					result.getName();
-//
-//					Program program = linker.getProgram(result);
-//					programs.add(program);
-////					System.out.println("OOGA PROGRAM: " + program);
-//
-//					queue.remove();
-//				}
-//
-//				while (!queue.isEmpty()) {
-//					queue.remove().cancel();
-//				}
 
 			} else {
 				System.out.println("not running jkind generation: " + o);
@@ -194,7 +174,6 @@ public class JKindGen {
 
 		List<Pair<String, Program>> programs = new ArrayList<Pair<String, Program>>();
 
-		System.out.println("Comp Instance: " + ci);
 		if (containsAGREEAnnex(ci)) {
 //			wrapVerificationResult(ci, result);
 			AgreeProgram agreeProgram = new ASTBuilder().getAgreeProgram(ci, false);
@@ -292,14 +271,6 @@ public class JKindGen {
 		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(compClass,
 				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
 			if (annex instanceof AgreeContractSubclause) {
-
-				Contract c = ((AgreeContractSubclause) annex).getContract();
-				System.out.println("ooga contract: " + c);
-				if (c instanceof AgreeContract) {
-					for (SpecStatement spec : ((AgreeContract) c).getSpecs()) {
-						System.out.println("ooga spec: " + spec);
-					}
-				}
 				return true;
 			}
 		}

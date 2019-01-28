@@ -16,8 +16,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.util.Pair;
@@ -82,8 +80,7 @@ public class AgreeCommand {
 					aadlPath = basisFile.getParentFile().getAbsolutePath() + File.separator + aadlFile.getPath();
 				}
 
-				Resource resource = resourceSet.getResource(URI.createFileURI(aadlPath), true);
-				List<Pair<String, Program>> programPairs = new JKindGen().run(resource);
+				List<Pair<String, Program>> programPairs = new JKindGen().run(resourceSet, aadlPath);
 				write(aadlPath, programPairs);
 
 
@@ -96,8 +93,7 @@ public class AgreeCommand {
 			String fileArg = cli.getArgs()[0];
 			File aadlFile = new File(fileArg);
 			String aadlPath = aadlFile.getAbsolutePath();
-			Resource resource = resourceSet.getResource(URI.createFileURI(aadlPath), true);
-			List<Pair<String, Program>> programPairs = new JKindGen().run(resource);
+			List<Pair<String, Program>> programPairs = new JKindGen().run(resourceSet, aadlPath);
 			write(aadlPath, programPairs);
 			System.out.println("* aadl path: " + aadlPath);
 
