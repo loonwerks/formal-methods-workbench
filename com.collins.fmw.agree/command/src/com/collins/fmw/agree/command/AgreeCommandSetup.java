@@ -4,6 +4,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.ISetup;
 import org.eclipse.xtext.resource.IResourceFactory;
 import org.eclipse.xtext.resource.IResourceServiceProvider;
+import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
+import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
 import org.osate.xtext.aadl2.properties.PropertiesStandaloneSetup;
 
 import com.google.inject.Guice;
@@ -30,6 +32,7 @@ public class AgreeCommandSetup implements ISetup {
 
 		IResourceFactory resourceFactory = injector
 				.getInstance(org.eclipse.xtext.resource.IResourceFactory.class);
+
 		IResourceServiceProvider serviceProvider = injector
 				.getInstance(org.eclipse.xtext.resource.IResourceServiceProvider.class);
 
@@ -41,13 +44,11 @@ public class AgreeCommandSetup implements ISetup {
     		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aadl2",
     				serviceProvider);
 
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2", resourceFactory);
-		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2",
-				serviceProvider);
 
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aail2", resourceFactory);
-		org.eclipse.xtext.resource.IResourceServiceProvider.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2",
-				serviceProvider);
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aaxl2", new Aadl2ResourceFactoryImpl());
+
+
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aail2", new InstanceResourceFactoryImpl());
 
 	}
 }

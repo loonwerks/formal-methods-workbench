@@ -235,20 +235,6 @@ public class Instance {
 		// add it to a resource; otherwise we cannot attach error messages to
 		// the instance file
 
-//		Resource res = ci.eResource();
-//		URI modeluri = res.getURI();
-//		String last = modeluri.lastSegment();
-//		String filename = last.substring(0, last.indexOf('.'));
-//		URI path = modeluri.trimSegments(1);
-//		if (!path.isEmpty() && path.lastSegment().equalsIgnoreCase(WorkspacePlugin.AADL_PACKAGES_DIR)) {
-//			path = path.trimSegments(1);
-//		}
-//		URI instanceURI = path.appendSegment(WorkspacePlugin.AADL_INSTANCES_DIR).appendSegment(filename + "_"
-//				+ ci.getTypeName() + "_" + ci.getImplementationName() + WorkspacePlugin.INSTANCE_MODEL_POSTFIX);
-//		instanceURI = instanceURI.appendFileExtension(WorkspacePlugin.INSTANCE_FILE_EXT);
-//		return instanceURI;
-
-
 
 		URI modeluri = ci.eResource().getURI();
 		String last = modeluri.lastSegment();
@@ -257,7 +243,6 @@ public class Instance {
 		URI instanceURI = path.appendSegment("instances")
 				.appendSegment(filename + "_" + ci.getTypeName() + "_" + ci.getImplementationName() + "_Instance");
 		instanceURI = instanceURI.appendFileExtension("aaxl2");
-
 
 		Resource res = null;
 		try {
