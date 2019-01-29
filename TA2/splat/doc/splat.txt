@@ -45,23 +45,28 @@ encoders and decoders for network message formats.
 Language Theory and Encoding
 ============================
 
-The basic elements of theoretical computer science are commonly
-formulated over strings of symbols drawn from an
-alphabet. Automata, grammars, and Turing machines all use strings as
-their main data structure. Encoding and decoding is employed in the
-service of theoretical results, for example, showing the existence of
-a universal Turing machine operating over codes of Turing machines. Of
-course, the activity of packing data into a string format and then
+The basic notions of theoretical computer science are often formulated
+in terms of strings of symbols drawn from an alphabet: automata,
+grammars, and Turing machines all use strings as their main data
+structure. Of more practical import, the theory of grammars and
+regular expressions provides a solid basis for tools such as lexer and
+parser generators. Encoding and decoding is employed in order to
+bridge the gap between strings and the rich universe of data
+structures used in computer science. For example, showing the
+existence of a universal Turing machine requires an encoding/decoding
+scheme for the strings (Turing machines) being taken as arguments. In
+fact, the activity of packing data into a string format and then
 unpacking it is pervasive, not only in theoretical computer science,
-but also in practice, *eg*, sending structured data over a network. 
+but also in practical contexts, *e.g.* data compression, data
+encryption, sending structured data over a network, *etc*.
 
 Regular expressions
--------------------
+===================
 
 We are building on previously reported [safecomp2016] work in HOL4
 providing a theory of regular expressions and a verified translator of
 $\konst{regexp}$s to table-driven DFAs (deterministic finite state
-automata).
+automata). The formalization is available in the HOL4 distribution.
 
 Let $\mathbb{S}$ be the set of finite strings over an alphabet
 $\Sigma$.  A regular expression over the alphabet designates a set of
@@ -120,14 +125,65 @@ $$
 $\Sigma$ is the full charset, also known as "dot" ($\bullet$);
 $\emptyset$ matches no string; and $\varepsilon$ is the empty string.
 
-Encodings
-----------
+Properties and Encodings
+=========================
 
-- $\mathbb{N} \to \konst{bool}$. By encoding, a set of natural numbers
-can be modelled by a regular expression. First, define the map
-$\konst{n2l} : \mathbb{N}\to \mathbb{N}\;\konst{list}$ from a number
-to its little-endian base-256 representation, and the inverse.
+Now we come to our main focus: statements of the form
+$$
+  x \in P \iff \konst{encode}\;x \in \Lang{\konst{regexp\_of}\; P}
+$$
+where $P:\tau\to\konst{bool}$ represents a predicate on type $\tau$,
+$\konst{encode} : \tau \to \mathbb{S}$ maps items of type $\tau$ to
+strings, and $\konst{regexp\_of}\;P$ denotes the regular expression
+resulting from an analysis of $P$. Stripping a bit of formula structure away
+$$
+  P: \tau\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
+$$
+our focus can be restated informally as asking "what happens when we
+stick an encoder in front of some formal language machinery?" Formula
+constructions on the left can be paralleled by regular expression
+constructions on the right. We haven't yet pursued this; it would
+presumably end up with something similar to B\"{u}chi's logic
+(swapping regular expressions in for automata). The main practical
+benefit for us comes from being able to compile the
+$\Lang{\konst{regexp\_of}\; P}$ expression to DFAs, thus giving an
+efficiently executable version of $P$.
 
+**Remark** Whether $\konst{regexp\_of}$ is *shallowly* or *deeply*
+embedded is an important consideration, but we gloss over it for
+now.
+
+**Remark** Certainly $\konst{regexp\_of}$ is limited to what
+  predicates can be expressed with regular languages. Moving up to
+  grammars, such as context-free grammars, gives more expressive
+  power, and would require a $\konst{grammar\_of}$ operator in the
+  statements of interest:
+$$
+  x \in P \iff \konst{encode}\;x \in \Lang{\konst{grammar\_of}\; P}
+$$
+
+### Example
+
+Consider the "even-number" predicate $\konst{even}$ on natural
+numbers. Let $\mathit{cset} = \konst{charset\_of}\;[0,2,4, \ldots,
+254]$ be the character set corresponding to the non-negative even
+numbers less than 256. Suppose that $\konst{regexp\_of}\; \konst{even}
+= \konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;
+(\konst{Star}\;\bullet)$, and so we have $\konst{even}(n) \iff
+\konst{encode}(n) \in \Lang{\konst{Cat}\;
+(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}$. This can
+be proven with the encodings we define in this section.
+
+
+## Encodings for common types
+
+We now discuss a collection of common types and their encoding and
+decoding functions. Our approach is to reduce to a base
+encoder/decoder for natural numbers.
+
+- $\mathbb{N}$. First, define the map $\konst{n2l} : \mathbb{N}\to
+\mathbb{N}\;\konst{list}$ from a number to its little-endian base-256
+representation, and the inverse.
 $$
 \begin{array}{lcl}
 \konst{n2l}(n) & = &
@@ -136,14 +192,12 @@ $$
 \konst{l2n}\;(\cons{h}{t}) & = & h + 256 * \konst{l2n}\; t \\
 \end{array}
 $$
-
 Then we have $\vdash \forall n.\; \konst{l2n} (\konst{n2l}\; n) = n$.
 Big-endian versions are similarly defined. Another issue is *padding*
 to a specified width. Using a builtin operator, $\konst{pad\_right}$,
 we can define a basic number encoder $\konst{enc} : \mathbb{N} \to
 \mathbb{N} \to \mathbb{S}$ and the corresponding decoder $\konst{dec}
 : \mathbb{S}\to\mathbb{N}$:
-
 $$
 \begin{array}{rcl}
 \konst{layout}\; n \; \mathit{width} & = & 
@@ -153,62 +207,50 @@ $$
 \konst{dec}\; s & = & \konst{l2n}\; (\konst{map}\; \konst{ord}\; s)
 \end{array}
 $$
-
 Then we have $\vdash \forall n\;w.\; \konst{dec} (\konst{enc}\; w\; n) = n$.
 
-Now we come to one of the main themes of this paper. We are going to
-investigate statements of the form
-
-$$
-  n \in P \iff \konst{enc}\;n \in \Lang{\konst{regexp\_of}\; P}
-$$
-
-where $P$ represent a predicate on numbers, and
-$\konst{regexp\_of}\;P$ denotes the regular expression resulting from an
-analysis of $P$. Stripping a bit of structure away, its
-essence is "what happens when we stick an encoder in front of some
-regexp machinery":
-
-$$
-  P: \mathbb{N}\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
-$$
-
-### Example
-
-Consider the "even-number" predicate $\konst{even}$. Let
-$\mathit{cset} = \konst{charset\_of}\;[0,2,4, \ldots, 254]$ be the
-character set corresponding to the non-negative even numbers less than
-256. Suppose that $\konst{regexp\_of}\; \konst{even} = \konst{Cat}\;
-(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)$, and so we
-have $\konst{even}(n) \iff \konst{enc}(n) \in \Lang{\konst{Cat}\;
-(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}$.
-
-### End Example
-
-
-- $\mathbb{Z} \to \konst{bool}$. Sets of integers can be expressed by
+- $\mathbb{Z}$. Sets of integers can be expressed by
 adding an encoding to map from integers to natural numbers.  Twos
-complement is most commonly used. At the word level, the twos
-complement operation is "flip each bit and add 1". But it is
-expressible at the level of integers and natural numbers since an
-$n-1$-bit integer added to its twos complement equals $2^n$ (with
-appropriate coercions tossed in to map back and forth as needed. Thus
-
-$$\konst{twos\_comp}_N : \set{i \in \mathbb{Z} \mid -2^{N-1} \leq i < 2^{N-1}} \to \set{k \in \mathbb{N} \mid 0 \leq k < 2^{N}}$$
-
-maps an integer into its corresponding natural number and is defined by
+complement representation is most commonly used. At the word level,
+the twos complement operation on negative integers is "flip each bit
+and add 1". But it is expressible at the level of integers and natural
+numbers since an $(n-1)$-bit integer added to its twos complement equals
+$2^n$ Thus
 $$
- \konst{twos\_comp}_N (i) = \condB{0 \leq i < 2^{N-1}}{\konst{Nat}(i)}
-                                  {2^{N} - \konst{Nat}(\konst{Abs}(i))}
+\konst{i2n}_N : \set{i \in \mathbb{Z} \mid -2^{N-1} \leq i < 2^{N-1}} \to \set{k \in \mathbb{N} \mid 0 \leq k < 2^{N}}
 $$
-
-To round-trip encode-then-decode integer $i$, therefore, we map $i$ to
-$n = \konst{twos\_comp}_N(i)$. Then we use $\konst{l2n}\circ
-\konst{n2l}$ to get back out to twos complement format in natural
-numbers, and then we reverse the twos complement map.
+specifies a map from an integer to its corresponding natural number defined by
+$$
+ \konst{i2n}_N (i) = \condB{0 \leq i < 2^{N-1}}
+                           {\konst{Nat}(i)}
+                           {2^{N} - \konst{Nat}(\konst{Abs}(i))}
+$$
+The inverse function is
+$$
+\konst{n2i}_N n = \condB{n < 2 ^{N-1}}{\konst{Int}(n)}{-\konst{Int}(2^N - n)}
+$$
+An encoder and decoder for integers is then directly obtained:
+$$
+\begin{array}{l}
+\konst{enci}\; w\; i = \konst{enc}\; w\; (\konst{i2n}\; (8*w)\; i) \\
+\konst{deci}\;w\; s = \konst{n2i}\; (8*w)\; (\konst{dec}\; s)
+\end{array}
+$$
+which enjoy the inversion property, under the constraint of the integer being 
+representable in $8 * w$ bits:
+$$
+\vdash \forall w\; i.\; 0 < w \land -(\konst{Int}(2^{8 * w - 1})) \leq i \land i < \konst{Int}(2^{8 * w - 1})
+       \imp \konst{deci}\; w\; (\konst{enci}\; w\; i) = i
+$$
 
 - Enumerations. An enumerated type can be encoded by providing a map
-from elements of the type to $\mathbb{N}$.
+from elements of the type to $\mathbb{N}$. For example the type of booleans, with the map
+$$
+\begin{array}{l}
+\konst{bool2n} \; \konst{false} = 0 \\
+\konst{bool2n} \; \konst{true} = 1 
+\end{array}
+$$
 
 - Records. Sets of records of a given type $\mathbb{R}$ can be encoded
 by fixing an order on the fields and concatenating their encodings.
@@ -305,7 +347,7 @@ Related Work
 
 Buechi, Mona, Narcissus, D'Antoni, Slind and Hurd
 (encoding/decoding). Sail, PADS, message format specification
-languages.
+languages. G. Rosu and generation of runtime monitors from regexps (any property proofs there?)
 
 Note: unlike, say, Narcissus, we do not focus solely on encoding and
 decoding. We add verified compilation, and proof of well-formedness
