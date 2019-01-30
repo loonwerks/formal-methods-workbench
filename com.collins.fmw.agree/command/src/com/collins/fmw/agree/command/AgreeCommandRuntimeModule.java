@@ -54,7 +54,7 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 
 	@Override
 	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
-		return (Class<? extends IQualifiedNameProvider>) Aadl2QualifiedNameProvider.class;
+		return Aadl2QualifiedNameProvider.class;
 	}
 
 	@Override
@@ -206,4 +206,5 @@ public class AgreeCommandRuntimeModule extends org.osate.xtext.aadl2.Aadl2Runtim
 	public Class<? extends org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider> bindILinkingDiagnosticMessageProvider() {
 		return org.osate.xtext.aadl2.properties.linking.PropertiesLinkingDiagnosticMessageProvider.class;
 	}
+
 }

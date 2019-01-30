@@ -835,6 +835,7 @@ public class ASTBuilder extends AgreeASTBuilder {
 		}
 
 		if (port instanceof FeatureGroup) {
+
 			FeatureGroup featGroup = (FeatureGroup) port;
 			FeatureGroupType featType = featGroup.getFeatureGroupType();
 			for (FeatureGroup subFeatGroup : featType.getOwnedFeatureGroups()) {

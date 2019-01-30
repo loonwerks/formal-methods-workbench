@@ -50,5 +50,6 @@ public class AgreeCommandSetup implements ISetup {
 
 		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("aail2", new InstanceResourceFactoryImpl());
 
+
 	}
 }
