@@ -1,6 +1,9 @@
 package com.collins.fmw.cyres.agree.json.plugin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
@@ -19,6 +22,7 @@ import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PropertySet;
 
 import com.collins.fmw.cyres.util.plugin.Filesystem;
+import com.collins.fmw.json.ArrayValue;
 import com.collins.fmw.json.Value;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -61,19 +65,25 @@ public class AgreeJson {
 
 		AadlTranslate aadlTranslate = new AadlTranslate();
 
-		Value jsonValue = null;
-		if (model instanceof AadlPackage) {
-			jsonValue = aadlTranslate.doSwitch(model);
-		} else if (model instanceof PropertySet) {
-			jsonValue = aadlTranslate.doSwitch(model);
-		} else {
-			MessageDialog.openError(window.getShell(), "Expecting AADL Package or Property Set",
-					"An AADL package or property set must be the entry point for generating JSON.");
+		// Get (recursively) the set of models referenced in this file
+		List<ModelUnit> modelUnits = new ArrayList<>();
+		getModelDependencies(model, modelUnits);
+
+		ArrayList<Value> modelBuilder = new ArrayList<Value>();
+		Iterator<ModelUnit> i = modelUnits.iterator();
+
+		while (i.hasNext()) {
+
+			ModelUnit m = i.next();
+			if (m instanceof AadlPackage || m instanceof PropertySet) {
+				modelBuilder.add(aadlTranslate.doSwitch(m));
+			}
+
 		}
 
 		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();
-		JsonElement je = jp.parse(jsonValue.toString());
+		JsonElement je = jp.parse(ArrayValue.build(modelBuilder).toString());
 
 		URI jsonURI = null;
 		try {
@@ -88,4 +98,33 @@ public class AgreeJson {
 
 		return jsonURI;
 	}
+
+	static private void getModelDependencies(ModelUnit model, List<ModelUnit> modelUnits) {
+
+		// Add the parent package if it's not there, otherwise return
+		if (modelUnits.contains(model)) {
+			return;
+		} else {
+			modelUnits.add(model);
+		}
+
+		if (model instanceof AadlPackage) {
+			AadlPackage pkg = (AadlPackage) model;
+			// Look at direct dependencies in private section
+			if (pkg.getPrivateSection() != null) {
+				for (ModelUnit mu : pkg.getPrivateSection().getImportedUnits()) {
+					getModelDependencies(mu, modelUnits);
+				}
+			}
+
+			// Look at direct dependencies in public section
+			if (pkg.getPublicSection() != null) {
+				for (ModelUnit mu : pkg.getPublicSection().getImportedUnits()) {
+					getModelDependencies(mu, modelUnits);
+				}
+			}
+		}
+
+	}
+
 }
