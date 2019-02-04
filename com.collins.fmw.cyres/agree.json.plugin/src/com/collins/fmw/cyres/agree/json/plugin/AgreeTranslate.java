@@ -9,6 +9,9 @@ import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Comment;
 import org.osate.aadl2.ComponentClassifier;
+import org.osate.aadl2.DefaultAnnexLibrary;
+import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.PackageSection;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.collins.fmw.json.ArrayValue;
@@ -30,6 +33,7 @@ import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.Contract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.FnCallExpr;
 import com.rockwellcollins.atc.agree.agree.FnDefExpr;
@@ -37,6 +41,11 @@ import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.NestedDotID;
+import com.rockwellcollins.atc.agree.agree.NodeDefExpr;
+import com.rockwellcollins.atc.agree.agree.NodeEq;
+import com.rockwellcollins.atc.agree.agree.NodeLemma;
+import com.rockwellcollins.atc.agree.agree.NodeStmt;
+import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
 import com.rockwellcollins.atc.agree.agree.PropertyStatement;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
@@ -51,7 +60,7 @@ public class AgreeTranslate {
 
 	private Value genBinaryExpr(BinaryExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "binary"));
+		pairList.add(Pair.build("kind", "BinaryExpr"));
 		pairList.add(Pair.build("left", genExpr(expr.getLeft())));
 		pairList.add(Pair.build("op", (expr.getOp())));
 		pairList.add(Pair.build("right", genExpr(expr.getRight())));
@@ -60,36 +69,39 @@ public class AgreeTranslate {
 
 	private Value genUnaryExpr(UnaryExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "unary"));
+		pairList.add(Pair.build("kind", "UnaryExpr"));
 		pairList.add(Pair.build("operand", genExpr(expr.getExpr())));
 		pairList.add(Pair.build("op", (expr.getOp())));
 		return ObjectValue.build(pairList);
 	}
 
 	private Value genIntLitExpr(IntLitExpr expr) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "intLit"));
-		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-		return ObjectValue.build(pairList);
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "IntLitExpr"));
+//		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
+		return StringValue.build(expr.getVal());
+//		return ObjectValue.build(pairList);
 	}
 
 	private Value genRealLitExpr(RealLitExpr expr) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "realLit"));
-		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-		return ObjectValue.build(pairList);
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "RealLitExpr"));
+//		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
+		return StringValue.build(expr.getVal());
+//		return ObjectValue.build(pairList);
 	}
 
 	private Value genBoolLitExpr(BoolLitExpr expr) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "boolLit"));
-		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
-		return ObjectValue.build(pairList);
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "BoolLitExpr"));
+//		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
+		return StringValue.build(expr.getVal().getValue() + "");
+//		return ObjectValue.build(pairList);
 	}
 
 	private Value genNestedDotID(NestedDotID expr) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "nestedDotId"));
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "NestedDotID"));
 		String id = expr.getBase().getName();
 		NestedDotID sub = expr.getSub();
 
@@ -105,14 +117,15 @@ public class AgreeTranslate {
 			id += "." + expr.getTag();
 		}
 
-		pairList.add(Pair.build("name", id));
-		return ObjectValue.build(pairList);
+//		pairList.add(Pair.build("name", id));
+//		return ObjectValue.build(pairList);
+		return StringValue.build(id);
 	}
 
 	private Value genFnCallExpr(FnCallExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "fnCall"));
-		pairList.add(Pair.build("function", genExpr(expr.getFn())));
+		pairList.add(Pair.build("kind", "FnCallExpr"));
+		pairList.add(Pair.build("function", genNestedDotID(expr.getFn())));
 		ArrayList<Value> argList = new ArrayList<Value>();
 		for (Expr arg : expr.getArgs()) {
 			argList.add(genExpr(arg));
@@ -123,7 +136,7 @@ public class AgreeTranslate {
 
 	private Value genIfThenElseExpr(IfThenElseExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "ifThenElse"));
+		pairList.add(Pair.build("kind", "IfThenElseExpr"));
 		pairList.add(Pair.build("if", genExpr(expr.getA())));
 		pairList.add(Pair.build("then", genExpr(expr.getB())));
 		pairList.add(Pair.build("else", genExpr(expr.getC())));
@@ -133,7 +146,8 @@ public class AgreeTranslate {
 	private Value genRecordExpr(RecordExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 
-		pairList.add(Pair.build("kind", "record"));
+		pairList.add(Pair.build("kind", "RecordExpr"));
+		pairList.add(Pair.build("recordType", genTypeID(expr.getRecord())));
 		ArrayList<Pair> fieldList = new ArrayList<Pair>();
 		int sz = expr.getArgs().size();
 		for (int i = 0; i < sz; i++) {
@@ -143,10 +157,23 @@ public class AgreeTranslate {
 			fieldList.add(field);
 		}
 
-		pairList.add(Pair.build("record", ObjectValue.build(fieldList)));
+		pairList.add(Pair.build("value", ObjectValue.build(fieldList)));
 		return ObjectValue.build(pairList);
 	}
 
+	private Value genEventExpr(EventExpr expr) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "EventExpr"));
+		pairList.add(Pair.build("id", genNestedDotID(expr.getId())));
+		return ObjectValue.build(pairList);
+	}
+
+	private Value genPreExpr(PreExpr expr) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "PreExpr"));
+		pairList.add(Pair.build("expr", genExpr(expr.getExpr())));
+		return ObjectValue.build(pairList);
+	}
 
 	private Value genExpr(Expr expr) {
 
@@ -170,6 +197,10 @@ public class AgreeTranslate {
 			return genIfThenElseExpr((IfThenElseExpr) expr);
 		} else if (expr instanceof RecordExpr) {
 			return genRecordExpr((RecordExpr) expr);
+		} else if (expr instanceof EventExpr) {
+			return genEventExpr((EventExpr) expr);
+		} else if (expr instanceof PreExpr) {
+			return genPreExpr((PreExpr) expr);
 		} else {
 			return StringValue.build("new_case/genExpr/" + (expr == null ? "null" : expr.toString()));
 		}
@@ -178,7 +209,7 @@ public class AgreeTranslate {
 
 	private Value genAADLEnumerator(AADLEnumerator expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "aadlEnum"));
+		pairList.add(Pair.build("kind", "AadlEnumerator"));
 		pairList.add(Pair.build("type", genExpr(expr.getEnumType())));
 		pairList.add(Pair.build("value", expr.getValue()));
 		return ObjectValue.build(pairList);
@@ -186,7 +217,7 @@ public class AgreeTranslate {
 
 	private Value genAssertStatement(AssertStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "assert"));
+		pairList.add(Pair.build("kind", "AssertStatement"));
 		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("label", stmt.getStr()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
@@ -196,7 +227,7 @@ public class AgreeTranslate {
 
 	private Value genAssumeStatement(AssumeStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "assume"));
+		pairList.add(Pair.build("kind", "AssumeStatement"));
 		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("label", stmt.getStr()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
@@ -205,14 +236,19 @@ public class AgreeTranslate {
 
 	private Value genEqStatement(EqStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "eq"));
+		pairList.add(Pair.build("kind", "EqStatement"));
+		ArrayList<Value> args = new ArrayList<Value>();
+		for (Arg arg : stmt.getLhs()) {
+			args.add(genArg(arg));
+		}
+		pairList.add(Pair.build("left", ArrayValue.build(args)));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
 	}
 
 	private Value genGuaranteeStatement(GuaranteeStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "guarantee"));
+		pairList.add(Pair.build("kind", "GuaranteeStatement"));
 		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("label", stmt.getStr()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
@@ -221,84 +257,129 @@ public class AgreeTranslate {
 
 	private Value genAssignStatement(AssignStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "assign"));
+		pairList.add(Pair.build("kind", "AssignStatement"));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
 	}
 
 	private Value genPropertyStatement(PropertyStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "property"));
+		pairList.add(Pair.build("kind", "PropertyStatement"));
 		pairList.add(Pair.build("name", stmt.getName()));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
 	}
 
 	private Value genTypeID(TypeID typeID) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "typeId"));
-		String id = typeID.getBase().getName();
-		pairList.add(Pair.build("name", id));
-		return ObjectValue.build(pairList);
-
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "TypeID"));
+//		String id = typeID.getBase().getName();
+//		pairList.add(Pair.build("name", id));
+//		return ObjectValue.build(pairList);
+		return StringValue.build(typeID.getBase().getName());
 	}
 
 	private Value genRecordType(RecordType type) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "recordType"));
-		pairList.add(Pair.build("recordType", genTypeID(type.getRecord())));
-		return ObjectValue.build(pairList);
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "RecordType"));
+//		pairList.add(Pair.build("recordType", genTypeID(type.getRecord())));
+//		return ObjectValue.build(pairList);
+		return genTypeID(type.getRecord());
 	}
 
 	private Value genPrimType(PrimType type) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "primType"));
-		pairList.add(Pair.build("primType", type.getString()));
-		return ObjectValue.build(pairList);
+//		ArrayList<Pair> pairList = new ArrayList<Pair>();
+//		pairList.add(Pair.build("kind", "PrimType"));
+//		pairList.add(Pair.build("primType", type.getString()));
+//		return ObjectValue.build(pairList);
+		return StringValue.build(type.getString());
 	}
 
 	private Value genType(Type type) {
-		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "type"));
+		Value v = null;
 		if (type instanceof RecordType) {
-			pairList.add(Pair.build("type", genRecordType((RecordType) type)));
+			v = genRecordType((RecordType) type);
 		} else if (type instanceof PrimType) {
-			pairList.add(Pair.build("type", genPrimType((PrimType) type)));
+			v = genPrimType((PrimType) type);
 		} else {
-			pairList.add(Pair.build("type", "new_case/genType/" + type));
+			v = StringValue.build("new_case/genType/" + type);
 		}
-		return ObjectValue.build(pairList);
+		return v;
 	}
 
 
-	private Value genParam(Arg param) {
+	private Value genArg(Arg arg) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "param"));
-		pairList.add(Pair.build("name", param.getName()));
-		pairList.add(Pair.build("type", genType(param.getType())));
+//		pairList.add(Pair.build("kind", "Arg"));
+		pairList.add(Pair.build("name", arg.getName()));
+		pairList.add(Pair.build("type", genType(arg.getType())));
 		return ObjectValue.build(pairList);
 	}
 
 
 	private Value genFnDefExpr(FnDefExpr stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "funDef"));
+		pairList.add(Pair.build("kind", "FnDefExpr"));
 		pairList.add(Pair.build("name", stmt.getName()));
 
-		ArrayList<Value> paramList = new ArrayList<Value>();
-		for (Arg param : stmt.getArgs()) {
-			paramList.add(genParam(param));
+		ArrayList<Value> argList = new ArrayList<Value>();
+		for (Arg arg : stmt.getArgs()) {
+			argList.add(genArg(arg));
 		}
-		pairList.add(Pair.build("params", ArrayValue.build(paramList)));
+		pairList.add(Pair.build("args", ArrayValue.build(argList)));
+		pairList.add(Pair.build("type", genType(stmt.getType())));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
 		return ObjectValue.build(pairList);
 	}
 
 	private Value genConstStatement(ConstStatement stmt) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "constStatement"));
+		pairList.add(Pair.build("kind", "ConstStatement"));
 		pairList.add(Pair.build("name", stmt.getName()));
+		pairList.add(Pair.build("type", genType(stmt.getType())));
 		pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
+		return ObjectValue.build(pairList);
+	}
+
+	private Value genNodeStatement(NodeStmt stmt) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		if (stmt instanceof NodeEq) {
+			pairList.add(Pair.build("kind", "NodeEq"));
+			ArrayList<Value> args = new ArrayList<Value>();
+			for (Arg arg : ((NodeEq) stmt).getLhs()) {
+				args.add(genArg(arg));
+			}
+			pairList.add(Pair.build("left", ArrayValue.build(args)));
+			pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
+		} else if (stmt instanceof NodeLemma) {
+			pairList.add(Pair.build("kind", "NodeLemma"));
+			pairList.add(Pair.build("lemma", ((NodeLemma) stmt).getStr()));
+			pairList.add(Pair.build("expr", genExpr(stmt.getExpr())));
+		}
+
+		return ObjectValue.build(pairList);
+	}
+
+	private Value genNodeDefExpr(NodeDefExpr stmt) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "NodeDefExpr"));
+		pairList.add(Pair.build("name", stmt.getName()));
+		ArrayList<Value> argList = new ArrayList<Value>();
+		for (Arg arg : stmt.getArgs()) {
+			argList.add(genArg(arg));
+		}
+		pairList.add(Pair.build("args", ArrayValue.build(argList)));
+		ArrayList<Value> retList = new ArrayList<Value>();
+		for (Arg arg : stmt.getRets()) {
+			retList.add(genArg(arg));
+		}
+		pairList.add(Pair.build("returns", ArrayValue.build(retList)));
+		ArrayList<Value> exprList = new ArrayList<Value>();
+		for (NodeStmt nodeStmt : stmt.getNodeBody().getStmts()) {
+			exprList.add(genNodeStatement(nodeStmt));
+//			exprList.add(genExpr(nodeStmt.getExpr()));
+		}
+		pairList.add(Pair.build("body", ArrayValue.build(exprList)));
 		return ObjectValue.build(pairList);
 	}
 
@@ -320,7 +401,8 @@ public class AgreeTranslate {
 			return genFnDefExpr((FnDefExpr) stmt);
 		} else if (stmt instanceof ConstStatement) {
 			return genConstStatement((ConstStatement) stmt);
-
+		} else if (stmt instanceof NodeDefExpr) {
+			return genNodeDefExpr((NodeDefExpr) stmt);
 		} else {
 			return StringValue.build("new_case/genSpecStatement/" + stmt.toString());
 		}
@@ -382,6 +464,37 @@ public class AgreeTranslate {
 		}
 
 		return ArrayValue.build(components);
+	}
+
+	public ObjectValue genAadlPackageSection(PackageSection pkgSection) {
+
+		ObjectValue agreeLib = ObjectValue.build(new ArrayList<Pair>());
+
+		for (AnnexLibrary annexLib : pkgSection.getOwnedAnnexLibraries()) {
+			DefaultAnnexLibrary defaultAnnexLib = (DefaultAnnexLibrary) annexLib;
+			if (defaultAnnexLib.getParsedAnnexLibrary() instanceof AgreeContractLibrary) {
+				AgreeContract contr = (AgreeContract) ((AgreeContractLibrary) defaultAnnexLib.getParsedAnnexLibrary())
+						.getContract();
+				agreeLib = genContract(contr);
+				break;
+			}
+		}
+
+		return agreeLib;
+	}
+
+	public ObjectValue genAnnexLibrary(AnnexLibrary annexLib) {
+		DefaultAnnexLibrary defaultAnnexLib = (DefaultAnnexLibrary) annexLib;
+		AgreeContract contr = (AgreeContract) ((AgreeContractLibrary) defaultAnnexLib.getParsedAnnexLibrary())
+				.getContract();
+		return genContract(contr);
+	}
+
+	public ObjectValue genAnnexSubclause(AnnexSubclause annexSub) {
+		DefaultAnnexSubclause defaultAnnexSub = (DefaultAnnexSubclause) annexSub;
+		AgreeContract contr = (AgreeContract) ((AgreeContractSubclause) defaultAnnexSub.getParsedAnnexSubclause())
+				.getContract();
+		return genContract(contr);
 	}
 
 }
