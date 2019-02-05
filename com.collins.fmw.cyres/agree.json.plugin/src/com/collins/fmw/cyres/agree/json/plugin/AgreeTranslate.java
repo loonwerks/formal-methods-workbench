@@ -32,6 +32,7 @@ import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.Contract;
+import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -53,7 +54,6 @@ import com.rockwellcollins.atc.agree.agree.RecordExpr;
 import com.rockwellcollins.atc.agree.agree.RecordType;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
-import com.rockwellcollins.atc.agree.agree.TypeID;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 
 public class AgreeTranslate {
@@ -147,7 +147,7 @@ public class AgreeTranslate {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 
 		pairList.add(Pair.build("kind", "RecordExpr"));
-		pairList.add(Pair.build("recordType", genTypeID(expr.getRecord())));
+		pairList.add(Pair.build("recordType", genNestedDotID(expr.getRecord())));
 		ArrayList<Pair> fieldList = new ArrayList<Pair>();
 		int sz = expr.getArgs().size();
 		for (int i = 0; i < sz; i++) {
@@ -210,7 +210,7 @@ public class AgreeTranslate {
 	private Value genAADLEnumerator(AADLEnumerator expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "AadlEnumerator"));
-		pairList.add(Pair.build("type", genExpr(expr.getEnumType())));
+		pairList.add(Pair.build("type", genDoubleDotRef(expr.getEnumType())));
 		pairList.add(Pair.build("value", expr.getValue()));
 		return ObjectValue.build(pairList);
 	}
@@ -270,13 +270,13 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
-	private Value genTypeID(TypeID typeID) {
+	private Value genDoubleDotRef(DoubleDotRef typeID) {
 //		ArrayList<Pair> pairList = new ArrayList<Pair>();
 //		pairList.add(Pair.build("kind", "TypeID"));
 //		String id = typeID.getBase().getName();
 //		pairList.add(Pair.build("name", id));
 //		return ObjectValue.build(pairList);
-		return StringValue.build(typeID.getBase().getName());
+		return StringValue.build(typeID.getElm().getName());
 	}
 
 	private Value genRecordType(RecordType type) {
@@ -284,7 +284,7 @@ public class AgreeTranslate {
 //		pairList.add(Pair.build("kind", "RecordType"));
 //		pairList.add(Pair.build("recordType", genTypeID(type.getRecord())));
 //		return ObjectValue.build(pairList);
-		return genTypeID(type.getRecord());
+		return genDoubleDotRef(type.getRecord());
 	}
 
 	private Value genPrimType(PrimType type) {
