@@ -33,7 +33,7 @@ mvn clean install
 ```
 This will create the runnable IDE and package various plugin jars, each within a target directory, within its respective source code directory.
 
-The runnable IDE will be located at ###./com.collins.fmw.ide/target/products###.
+The runnable IDE will be located at __./com.collins.fmw.ide/target/products__.
 
 Note that the build depends on osate2 and smaccm, and their build configurations require that their repos have all changes commited.
 
@@ -48,22 +48,31 @@ formal-methods-workbench
 |- com.collins.fmw.cyres
 |  |- agree.json.plugin
 |  |  `- pom.xml
+|  |
 |  |- architecture.plugin
 |  |  `- pom.xml
+|  |
 |  |- feature
 |  |  `- pom.xml
+|  |
 |  |- repository
 |  |  `- pom.xml
+|  |
 |  |- splat.plugin
 |  |  `- pom.xml
+|  |
 |  |- toolcheck.plugin
 |  |  `- pom.xml
+|  |
 |  `- util.plugin
 |     `- pom.xml
+|   
 |- com.collins.fmw.ide
 |  `- pom.xml
+|   
 |- com.collins.fmw.json
 |  `- pom.xml
+|   
 `- pom.xml
 ```
 
