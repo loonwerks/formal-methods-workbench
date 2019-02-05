@@ -3,6 +3,7 @@ CASE_simple_example/AADL/.aadlbin-gen
 CASE_simple_example/AADL/instances
 CASE_simple_example/AADL/json-generated
 .DS_Store
+*~
 
 *Theory.sml
 *Theory.sig
