@@ -147,7 +147,7 @@ public class AgreeTranslate {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 
 		pairList.add(Pair.build("kind", "RecordExpr"));
-		pairList.add(Pair.build("recordType", genNestedDotID(expr.getRecord())));
+		pairList.add(Pair.build("recordType", genDoubleDotRef(expr.getRecord())));
 		ArrayList<Pair> fieldList = new ArrayList<Pair>();
 		int sz = expr.getArgs().size();
 		for (int i = 0; i < sz; i++) {
