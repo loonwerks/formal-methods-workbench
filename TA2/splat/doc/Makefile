@@ -2,7 +2,8 @@ update-footer := cat footer-head > footer; date >> footer; cat footer-tail >> fo
 mypandoc      := pandoc
 
 
-all: html pdf
+#all: html pdf
+all: html
 
 html: splat.html
 

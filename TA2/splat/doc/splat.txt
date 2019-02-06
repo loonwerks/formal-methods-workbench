@@ -1,6 +1,6 @@
 %<a href="splat.pdf" target="_blank">Semantic Properties for Language and Automata Theory (SPLAT)</a>
 % Konrad Slind, Trusted Systems Group, Rockwell Collins 
-% January 23, 2019
+% January 29, 2019
 
 
 \newcommand{\imp}{\;\Rightarrow\;}
@@ -22,7 +22,8 @@
 \newcommand{\sem}[1]{[ \! [ {#1} ] \! ]}
 \newcommand{\divk}[1]{{#1}\;\konst{div}\; 256}
 \newcommand{\modk}[1]{{#1}\;\konst{mod}\; 256}
-
+\newcommand{\wrap}[1]{#1}
+\newcommand{\bto}[1]{\mathbf{B}^{#1}}
 
 **Draft Status**. This document is a work in progress.
 
@@ -32,46 +33,48 @@ Introduction
 **SPLAT** (Semantic Properties for Language and Automata Theory)
 designates the application of language theory---which is based on
 *strings*---to help enforce, formulate and prove properties over a
-collection of useful types, such as numbers, enumerations, records,
-and arrays. In particular, our focus is in applying tools and concepts
-from language theory to help automate the specification and
-verification of practical programs.
-
-As one example of this approach, we employ regular expressions to
-model and implement arithmetic constraints. This has been applied to
-the task of automating the generation and proof of correctness of
-encoders and decoders for network message formats.
+collection of other useful types, such as numbers, enumerations,
+records, and arrays. In particular, our focus is on applying tools and
+concepts from language theory to help automate the specification,
+creation, and verification of practical programs. As one example of
+this approach, we employ regular expressions to model and implement
+arithmetic constraints. This has been applied to the task of
+automating the generation and proof of correctness of encoders and
+decoders for network message formats.
 
 Language Theory and Encoding
-============================
+-----------------------------
 
 The basic notions of theoretical computer science are often formulated
 in terms of strings of symbols drawn from an alphabet: automata,
 grammars, and Turing machines all use strings as their main data
-structure. Of more practical import, the theory of grammars and
-regular expressions provides a solid basis for tools such as lexer and
-parser generators. Encoding and decoding is employed in order to
-bridge the gap between strings and the rich universe of data
-structures used in computer science. For example, showing the
-existence of a universal Turing machine requires an encoding/decoding
-scheme for the strings (Turing machines) being taken as arguments. In
-fact, the activity of packing data into a string format and then
-unpacking it is pervasive, not only in theoretical computer science,
-but also in practical contexts, *e.g.* data compression, data
-encryption, sending structured data over a network, *etc*.
+structure. On the practical side, the theory of grammars and regular
+expressions provides a solid basis for tools such as lexer and parser
+generators. In order to bridge the gap between strings and the rich
+universe of data structures used in computer science, *encoding* and
+*decoding* is employed. For example, showing the existence of a
+universal Turing machine requires an encoding/decoding scheme for the
+strings (Turing machines) being taken as arguments. In fact, the
+activity of packing data into a string format and then unpacking it is
+pervasive, not only in theoretical computer science, but also in
+practical contexts, *e.g.* data compression, data encryption, sending
+structured data over a network, *etc*.
 
 Regular expressions
-===================
+---------------------
 
-We are building on previously reported [safecomp2016] work in HOL4
+(We are building on previously reported [safecomp2016] work in HOL4
 providing a theory of regular expressions and a verified translator of
 $\konst{regexp}$s to table-driven DFAs (deterministic finite state
-automata). The formalization is available in the HOL4 distribution.
+automata). The formalization is available in the HOL4 distribution.)
 
 Let $\mathbb{S}$ be the set of finite strings over an alphabet
-$\Sigma$.  A regular expression over the alphabet designates a set of
-strings $\mathbb{S} \to \konst{bool}$. We use the following datatype
-to represent regular expressions:
+$\Sigma$. Throughout, we assume $\Sigma$ is the 256 ASCII
+characters. This supports the use of $\konst{char}\;\konst{list}$ as a
+representation for $\mathbb{S}$, allowing the use of some list
+operations on elements of $\mathbb{S}$. A regular expression over the
+alphabet designates a set of strings $\mathbb{S} \to \konst{bool}$. We
+use the following datatype to represent regular expressions:
 
 $$
 \begin{array}{rcl}
@@ -83,7 +86,7 @@ $$
 \end{array}
 $$
 
-We set $\Sigma$ to be the 256 ASCII characters. $\konst{Chset}$
+$\konst{Chset}$
 represents a *charset*: a 256-wide bitset capable of representing any
 subset of $\Sigma$. We have chosen to represent bitsets with
 four-tuples of 64-bit numbers. $\konst{Cat}$ is the concatenation
@@ -93,7 +96,6 @@ operator.
 
 The semantics of regular expressions inteprets a $\konst{regexp}$ as a
 set of strings:
-
 $$
 \begin{array}{rcl}
 \Lang{\konst{Chset}\; \mathit{cset}} & = & \set{[c] \mid c \in \mathit{cset}} \\
@@ -103,27 +105,29 @@ $$
 \Lang{\konst{Neg}\; r} & = & \konst{COMPL}(\Lang{r})
 \end{array}
 $$
-
 where concatenation ($-\cdot-$), Kleene star $(-)^{*}$, and set
 complement $\konst{COMPL}(-)$ are pre-defined operators in a theory
 including sets and formal languages. It is also useful to have a
-function $\konst{charset\_of} : \konst{char}\;\konst{list} \to
-\mathit{cset}$ that creates a charset given a list of ASCII characters.
+function $\konst{charset\_of} : \mathbb{N}\;\konst{list} \to
+\mathit{cset}$ that creates a charset given a list of numbers less
+than 256.
 
-Some common regexps and derived operations in this representation:
-
+Some common notation and derived operations in this representation:
 $$
-\begin{array}{l}
-\Sigma = \konst{Chset}(\konst{charset\_of} \; [0,1,\ldots,255]) \\
-\emptyset = \konst{Chset}(\konst{charset\_of} \; []) \\
-\varepsilon = \konst{Star}(\emptyset) \\
-\konst{And}\;r_1\;r_2 = \konst{Neg}(\konst{Or}[\konst{Neg}\; r_1,  \konst{Neg}\; r_2] \\
-\konst{Diff}\;r_1\;r_2 = \konst{And}\;r_1\; (\konst{Neg}\;r_2)
+\begin{array}{rcl}
+r_1 + \cdots + r_n & = & \konst{Or}[r_1,\ldots,r_n] \\
+r_1 r_2 & = & \konst{Cat}\;r_1 \; r_2 \\
+[m-n] & = & \konst{Chset}(\konst{charset\_of} \; [m, m+1, \ldots, n-1,n]) \quad (\text{where}\; 0 \leq m \leq n \leq 255) \\
+\bullet & = & [0-255] \\
+\emptyset & = & \konst{Chset}(\konst{charset\_of} \; []) \\
+\varepsilon & = & \konst{Star}(\emptyset) \\
+\konst{And}\;r_1\;r_2 & = & \konst{Neg}(\konst{Or}[\konst{Neg}\; r_1,  \konst{Neg}\; r_2] \\
+\konst{Diff}\;r_1\;r_2 & = & \konst{And}\;r_1\; (\konst{Neg}\;r_2)
 \end{array}
 $$
-
-$\Sigma$ is the full charset, also known as "dot" ($\bullet$);
-$\emptyset$ matches no string; and $\varepsilon$ is the empty string.
+The "dot" charset ($\bullet$)) is the full charset that matches every
+one-element string; $\emptyset$ matches no string; and $\varepsilon$
+is the empty string.
 
 Properties and Encodings
 =========================
@@ -134,45 +138,55 @@ $$
 $$
 where $P:\tau\to\konst{bool}$ represents a predicate on type $\tau$,
 $\konst{encode} : \tau \to \mathbb{S}$ maps items of type $\tau$ to
-strings, and $\konst{regexp\_of}\;P$ denotes the regular expression
-resulting from an analysis of $P$. Stripping a bit of formula structure away
+strings, and $\konst{regexp\_of}\;P$ is an abstract operation that
+translates $P$ into an "equivalent" regular expression. Rephrasing the statement as:
 $$
   P: \tau\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
 $$
-our focus can be restated informally as asking "what happens when we
-stick an encoder in front of some formal language machinery?" Formula
-constructions on the left can be paralleled by regular expression
-constructions on the right. We haven't yet pursued this; it would
-presumably end up with something similar to B\"{u}chi's logic
-(swapping regular expressions in for automata). The main practical
-benefit for us comes from being able to compile the
-$\Lang{\konst{regexp\_of}\; P}$ expression to DFAs, thus giving an
-efficiently executable version of $P$.
+more directly expresses the setting, namely, "what happens when we
+stick an encoder in front of some formal language machinery?"  The
+main practical benefit for us comes from being able to compile the
+$\konst{regexp\_of}\; P$ expression to a DFA, thus giving an
+efficient, table-driven, implementation of $P$.
 
-**Remark** Whether $\konst{regexp\_of}$ is *shallowly* or *deeply*
-embedded is an important consideration, but we gloss over it for
-now.
+**Remark.** The $\konst{regexp\_of}$ operation depends on context. In
+some cases, *e.g.* intervals as below, there is a syntax-driven
+algorithm; in some cases it is a matter of human insight. Further, whether
+$\konst{regexp\_of}$ is *shallowly* or *deeply* embedded is an
+important consideration, one that we gloss over for now.
 
-**Remark** Certainly $\konst{regexp\_of}$ is limited to what
-  predicates can be expressed with regular languages. Moving up to
-  grammars, such as context-free grammars, gives more expressive
-  power, and would require a $\konst{grammar\_of}$ operator in the
-  statements of interest:
+**Remark.** $\konst{regexp\_of}$ is limited to predicates expressible
+  with regular languages. Moving up to grammars, such as context-free
+  grammars, gives more expressive power, and would require a
+  $\konst{grammar\_of}$ operator (along with a modified definition of
+  $\Lang{-}$) in the statement, *i.e.*:
+$$ 
+x \in P \iff \konst{encode}\;x \in \Lang{\konst{grammar\_of}\; P}
 $$
-  x \in P \iff \konst{encode}\;x \in \Lang{\konst{grammar\_of}\; P}
-$$
+
+**Question.** To what extent can formula constructions (conjunction,
+disjunction, implication, *etc*.) over the predicates be paralleled by
+regular expression constructions on the right? We haven't yet pursued
+this.
 
 ### Example
 
-Consider the "even-number" predicate $\konst{even}$ on natural
-numbers. Let $\mathit{cset} = \konst{charset\_of}\;[0,2,4, \ldots,
-254]$ be the character set corresponding to the non-negative even
-numbers less than 256. Suppose that $\konst{regexp\_of}\; \konst{even}
-= \konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;
-(\konst{Star}\;\bullet)$, and so we have $\konst{even}(n) \iff
-\konst{encode}(n) \in \Lang{\konst{Cat}\;
-(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}$. This can
-be proven with the encodings we define in this section.
+Consider the "even-number" predicate $\konst{even} :
+\mathbb{N}\to\konst{bool}$. Let $\mathit{cset} =
+\konst{charset\_of}\;[0,2,4, \ldots, 254]$ be the character set
+corresponding to the non-negative even numbers less than 256. Suppose
+that
+$$
+\konst{regexp\_of}\; \konst{even} = 
+\konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;(\konst{Star}\;\bullet)
+$$ from which we obtain the formula
+$$
+\konst{even}(n) \iff \konst{encode}(n) \in \Lang{\konst{Cat}\;
+(\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}
+$$
+This can be proven with the encodings we define below. Notice that
+$\konst{regexp\_of}(\konst{even})$ generates a regular expression that
+expects the encoding to be in LSB format.
 
 
 ## Encodings for common types
@@ -181,7 +195,7 @@ We now discuss a collection of common types and their encoding and
 decoding functions. Our approach is to reduce to a base
 encoder/decoder for natural numbers.
 
-- $\mathbb{N}$. First, define the map $\konst{n2l} : \mathbb{N}\to
+- **Natural numbers.** First, define the map $\konst{n2l} : \mathbb{N}\to
 \mathbb{N}\;\konst{list}$ from a number to its little-endian base-256
 representation, and the inverse.
 $$
@@ -189,7 +203,7 @@ $$
 \konst{n2l}(n) & = &
    \condB{n=0}{[]}{\cons{(\modk{n})}{\konst{n2l}\; (\divk{n})}} \\
 \konst{l2n}\;[] & = & 0 \\
-\konst{l2n}\;(\cons{h}{t}) & = & h + 256 * \konst{l2n}\; t \\
+\konst{l2n}\;(\cons{h}{t}) & = & h + 256 * \konst{l2n}(t) \\
 \end{array}
 $$
 Then we have $\vdash \forall n.\; \konst{l2n} (\konst{n2l}\; n) = n$.
@@ -209,15 +223,16 @@ $$
 $$
 Then we have $\vdash \forall n\;w.\; \konst{dec} (\konst{enc}\; w\; n) = n$.
 
-- $\mathbb{Z}$. Sets of integers can be expressed by
+- **Integers.** Sets of integers can be expressed by
 adding an encoding to map from integers to natural numbers.  Twos
 complement representation is most commonly used. At the word level,
 the twos complement operation on negative integers is "flip each bit
 and add 1". But it is expressible at the level of integers and natural
 numbers since an $(n-1)$-bit integer added to its twos complement equals
-$2^n$ Thus
+$2^n$. Thus
 $$
-\konst{i2n}_N : \set{i \in \mathbb{Z} \mid -2^{N-1} \leq i < 2^{N-1}} \to \set{k \in \mathbb{N} \mid 0 \leq k < 2^{N}}
+\konst{i2n}_N : \set{i \in \mathbb{Z} \mid -2^{N-1} \leq i < 2^{N-1}} 
+             \to \set{k \in \mathbb{N} \mid 0 \leq k < 2^{N}}
 $$
 specifies a map from an integer to its corresponding natural number defined by
 $$
@@ -225,56 +240,198 @@ $$
                            {\konst{Nat}(i)}
                            {2^{N} - \konst{Nat}(\konst{Abs}(i))}
 $$
+($\konst{Nat}$ maps from non-negative integers to $\mathbb{N}$;
+$\konst{Int}$ maps from $\mathbb{N}$ to non-negative integers; and
+$\konst{Abs}$ is an absolute value operator that maps integers to non-negative integers.) 
 The inverse function is
 $$
-\konst{n2i}_N n = \condB{n < 2 ^{N-1}}{\konst{Int}(n)}{-\konst{Int}(2^N - n)}
+\konst{n2i}_N (n) = \condB{n < 2 ^{N-1}}{\konst{Int}(n)}{-\konst{Int}(2^N - n)}
 $$
 An encoder and decoder for integers is then directly obtained:
 $$
 \begin{array}{l}
-\konst{enci}\; w\; i = \konst{enc}\; w\; (\konst{i2n}\; (8*w)\; i) \\
-\konst{deci}\;w\; s = \konst{n2i}\; (8*w)\; (\konst{dec}\; s)
+\konst{enci}\; w\; i = \konst{enc}\; w\; (\konst{i2n}\; (8w)\; i) \\
+\konst{deci}\;w\; s = \konst{n2i}\; (8w)\; (\konst{dec}\; s)
 \end{array}
 $$
-which enjoy the inversion property, under the constraint of the integer being 
-representable in $8 * w$ bits:
+which enjoy the inversion property, provided integer *i* is representable:
 $$
-\vdash \forall w\; i.\; 0 < w \land -(\konst{Int}(2^{8 * w - 1})) \leq i \land i < \konst{Int}(2^{8 * w - 1})
+\vdash 0 < w \land -\konst{Int}(2^{8w - 1}) \leq i \land i < \konst{Int}(2^{8w - 1})
        \imp \konst{deci}\; w\; (\konst{enci}\; w\; i) = i
 $$
+**Note.** $\konst{enci}(i)$ renders $i$ into twos complement
+representation, thus supporting the standard bit format for signed
+integers.
 
-- Enumerations. An enumerated type can be encoded by providing a map
-from elements of the type to $\mathbb{N}$. For example the type of booleans, with the map
+- **Enumerations.** An enumerated type can be encoded by providing a map
+from elements of the type to $\mathbb{N}$. For example the type of booleans, with maps
 $$
-\begin{array}{l}
-\konst{bool2n} \; \konst{false} = 0 \\
-\konst{bool2n} \; \konst{true} = 1 
+\begin{array}{ll}
+\konst{num\_of\_bool} \; \konst{false} = 0 & \konst{num\_of\_bool} \; \konst{true} = 1  \\
+\konst{bool\_of\_num} \; 0 = \konst{false} & \konst{bool\_of\_num} \; 1 = \konst{true}  \\
 \end{array}
 $$
+we define the encoders and decoders :
+$$
+\begin{array}{l} 
+\konst{enc\_bool}\; b = \konst{enc}\; 1\; (\konst{num\_of\_bool}\; b) \\
+ \konst{dec\_bool}\; s = \konst{bool\_of\_num}\; (\konst{dec}\; s)
+\end{array}
+$$
+Trivially, we have $\vdash \forall b.\; \konst{dec\_bool} (\konst{enc\_bool}\; b) = b$.
 
-- Records. Sets of records of a given type $\mathbb{R}$ can be encoded
-by fixing an order on the fields and concatenating their encodings.
+- **Records.** Sets of records of a given type $\konst{recd}$ can be encoded
+by fixing an order on the fields and concatenating their encodings. Thus given record type
+$$
+   \konst{recd} = \{ f_1 : \tau_1; \ldots ; f_n : \tau_n\}
+$$
+and encoders for $\tau_1,\ldots, \tau_n$, we can define
+$$
+   \konst{encode\_recd}(x) = \konst{encode}_{\tau_1}(x.f_1) \cdots \konst{encode}_{\tau_n}(x.f_n)
+$$
 
-- Pairs, Lists, Trees, etc.
+- **Arrays.** A $\tau\;\konst{array}$ of size $K$ can be encoded by
+ concatenating the result of applying the encoder for $\tau$ $K$
+ times. This is conceptually simple, the resulting regular expressions
+ for large or even medium size arrays will probably be too large for our tools.
 
-- Fixed- and variable-width encodings.
-
+- **Fixed- and variable-width encodings.** So far we have dealt solely
+    with data of fixed size. Techniques for encoding variable-width
+    data, such as lists or trees, and for handling polymorphic types,
+    have been explored in a variety of settings. For theorem proving,
+    focusing on polytypism, see "Applications of polytypism in theorem
+    proving" (Slind and Hurd, 2003) and similar work in other proof systems.
 
 Intervals
 ----------
 
-$[i..j] \to \konst{bool}$. Intervals provide a concise way to express
-numeric constraints. These can be directly mapped to regular
-expressions. 
+An interval $[\mathit{lo} ,\mathit{hi}] = \set{n \in \mathbb{N} \mid \mathit{lo} \leq n \leq
+\mathit{hi}}$. An interval is mapped to a regular expression by an
+algorithm that proceeds in parallel on the base-256 representations
+given by $\konst{reverse} \circ \konst{n2l}$, *i.e*, following the MSB
+(most significant byte leftmost) format. However, the algorithm on the
+representations is quite detailed, and better insight is obtained by
+describing the transformations at the level of numbers. Let $\mathbf{B} = 256$ so that 
+$$
+\begin{array}{ll}
+\mathit{lo} = p \bto{a} + r_1 & ; \quad r_1 < \bto{a} \\
+\mathit{hi} = q \bto{b} + r_2 & ; \quad r_2 < \bto{b}
+\end{array}
+$$
+The algorithm breaks large intervals down to unions of sub-intervals
+in such a way that regular expressions can be easily generated from
+the subintervals. Proceeding lexicographically, there are essentially
+four ways for $\mathit{lo} \leq \mathit{hi}$ to hold:
 
-Correctness Theorems
+1. $a < b$. The span between the exponents is split into one
+interval per intermediate exponent
+$$
+ [\mathit{lo}, \bto{a + 1} -1] \cup 
+\underbrace{[\bto{a + 1}, \bto{a + 2} -1] \cup \cdots \cup [\bto{b - 1}, \bto{b} -1]}_{\text{exponent slices}}
+ \cup [\bto{b} ,\mathit{hi}]
+$$
+An *exponent slice* interval $[\bto{k},\bto{k+1}-1]$ is represented by the
+regexp $[1-255]\bullet^k$. This leaves the endpoint intervals
+$[\mathit{lo}, \bto{a + 1} -1]$ and $[\bto{b} ,\mathit{hi}]$, each with
+a uniform exponent, which are dealt with by the next case.
+
+2. $a = b, p < q$. The span between factors can also lead to splits:
+$$
+[p\bto{a} + r_1,(p + 1)\bto{a} -1 ] \cup\
+ \underbrace{[(p + 1)\bto{a},q\bto{a} -1]}_{\text{factor slice}} \cup\ 
+[q \bto{a} ,q \bto{a} + r_2]
+$$
+The *factor slice* interval $[(p+1) \bto{k},q\bto{k}-1]$ is only
+defined when $p+1 < q$ and is represented by the charset
+$[(p+1)-(q-1)]$ followed by $k$ dots:
+$$
+[(p+1)-(q-1)]\bullet^k .
+$$
+This leaves the endpoint intervals $[p\bto{a} + r_1,(p + 1)\bto{a} -1
+]$ and $[q \bto{a} ,q \bto{a} + r_2]$, each with a uniform factor,
+which takes us to the next case.
+
+3. $a = b, p = q, r_1 \leq r_2$. In this case, the algorithm recurses on $[r_1,r_2]$, yielding
+regexps $s_1, \ldots , s_k$, and we return $[p]s_1 + \cdots + [p]s_k$.
+
+4. The recursion bottoms out when $\mathit{lo}$ and $\mathit{hi}$ are
+less than 256, in which case the charset regexp $[\mathit{lo}-\mathit{hi}]$ is
+returned.
+
+**Integer Intervals.** Translation of integer intervals is accomplished
+  by reduction to natural number intervals, based on the following case split:
+
+1. $0 \leq \mathit{lo} \leq \mathit{hi}$. No translation needed; the
+interval is $\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}]$.
+
+2. $\mathit{lo} < 0 \leq \mathit{hi}$. 
+$$
+\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] =
+\konst{regexp\_of}\;[2^{8w} + \mathit{lo}, 2^{8w} - 1] + \konst{regexp\_of}\;[0, \mathit{hi}]
+$$
+There is a special case here, where $\mathit{lo} = -2^{8w-1}$ and
+$\mathit{hi} = 2^{8w-1} - 1$, in which case 
+$\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] = \bullet^{w}$. 
+
+3. $\mathit{lo} \leq \mathit{hi} < 0$.
+$$
+\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] =
+\konst{regexp\_of}\;[2^{8w} + \mathit{lo}, 2^{8w} + \mathit{hi}]
+$$
+
+### Examples
+
+In the following the implementation prints regexps out in a format
+similar to the one used in this document. A charset may be expressed
+as a sequence of ranges $[(m_1 - n_1), ... , (m_k - n_k)]$, where $m$
+and $n$ are written as decimal ASCII codes or as printable
+characters. Also, disjunction is expressed with $(- \mid -)$. The
+following are in MSB format.
+
+The interval $[-90,90]$ generates the regexp 
+
+       [\166-\255] | [\000-Z]
+
+This disjunction is on single charsets, so can be replaced by
+
+       [\000-Z\166-\255]
+    
+The interval $[-180,180]$ is recognized by the regexp
+
+       [\255][L-\255] | [\000][\000-\180]
+
+The interval $[0,14000]$ maps to
+
+       [\000]. | [\001-5]. | [6][\000-\176]
+
+The interval $[-2^{63}, 2^{63}-1]$ maps to
+
+       ........
+
+The interval $[123456789,9876543210]$ generates the regexp:
+
+       [\000][\007][[][\205][\021-\255] |
+       [\000][\007][[][\206-\255]. |
+       [\000][\007][\-\255].. |
+       [\000][\008-\255]... |
+       [\001].... |
+       [\002][\000]... |
+       [\002][\001-K]... |
+       [\002][L][\000].. |
+       [\002][L][\001-\175].. |
+       [\002][L][\176][\000]. |
+       [\002][L][\176][\001-\021]. |
+       [\002][L][\176][\022][\000-\234]
+
+
+Correctness Theorems 
 ====================
 
 Given a declaration of record type $\konst{recd}$ plus a predicate $P :
 \konst{recd} \to \konst{bool}$ over the fields of the record, we
 generate the following artifacts:
 
-- a regexp $\mathcal{R}$
+- a regexp $\mathcal{R} = \konst{regexp\_of}\;P$
 - an encoding function $\konst{encode} : \konst{recd} \to \mathbb{S}$
 - a decoding function $\konst{decode} : \mathbb{S} \to \konst{recd}\;\konst{option}$
 - an inversion theorem showing that decoding inverts encoding
@@ -333,6 +490,9 @@ about a generated encoding/decoding pair are of limited utility, so
 separate properties about the encoder and decoder are valuable, whence
 the importance of the well-formedness specification.
 
+Proofs and Automation
+=====================
+
 Packed Record Formats
 =====================
 
@@ -355,7 +515,8 @@ with respect to arithmetic specifications.
 
 The details about encoding higher data in regexps are probably not
 novel, given the huge amount of work expended on transition system
-encodings for model-checking and in applying SAT algorithms. However,
-I haven't yet come across any literature focusing on intervals.
+encodings for model-checking and in applying BDD and SAT
+algorithms. However, I haven't yet come across any literature focusing
+on intervals.
 
-
+Check BDD encodings of numbers, etc.

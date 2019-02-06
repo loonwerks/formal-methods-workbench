@@ -684,63 +684,6 @@ fun mk_correctness_goals (info as (pkgName,enums,recds,fn_defs)) thm =
  end
  handle e => raise wrap_exn "splatLib" "mk_correctness_goals" e;
 
-
-(*---------------------------------------------------------------------------*)
-(* Reasoner for character sets. charset_conv converts terms of the form      *)
-(*                                                                           *)
-(*   regexp_lang (Chset cs)                                                  *)
-(*                                                                           *)
-(* into theorems of the form                                                 *)
-(*                                                                           *)
-(*   |- regexp_lang (Chset cs) = {#"c1", ..., #"cn"}                         *)
-(*                                                                           *)
-(* where c1 ... cn are the elements of cs.                                   *)
-(*---------------------------------------------------------------------------*)
-
-fun charset_term_elts (cs:term) = 
-  Regexp_Type.charset_elts (regexpSyntax.term_to_charset cs);
-
-val csvar = mk_var("cs",regexpSyntax.charset_ty);
-val regexp_chset_pat = ``regexp$regexp_lang ^(regexpSyntax.mk_chset csvar)``;
-
-fun char_tac (asl,c) = 
-    let val ctm = fst(dest_eq (last (strip_conj (snd (dest_exists c)))))
-    in Q.EXISTS_TAC `ORD ^ctm` >> EVAL_TAC
-    end
-
-val tactic = 
-   RW_TAC (list_ss ++ pred_setLib.PRED_SET_ss)
-          [pred_setTheory.EXTENSION,
-           regexpTheory.regexp_lang_def,
-           charsetTheory.charset_mem_def,
-           charsetTheory.alphabet_size_def,EQ_IMP_THM]
-    >> TRY (ntac 2 (pop_assum mp_tac)
-            >> Q.ID_SPEC_TAC `c`
-            >> REPEAT (CONV_TAC (numLib.BOUNDED_FORALL_CONV EVAL))
-            >> rw_tac bool_ss []
-            >> NO_TAC)
-    >> W char_tac;
-
-fun charset_conv tm = 
- case total (match_term regexp_chset_pat) tm
-  of NONE => raise ERR "charset_conv" 
-                    "expected ``regexp_lang (Chset cs)`` term"
-  | SOME (theta, _) => 
-     let open pred_setSyntax
-         val chars = charset_term_elts (subst theta csvar)
-         val char_tms = map fromMLchar chars
-         val string_tms = map (fromMLstring o String.str) chars
-         val the_goal = mk_eq(tm, mk_set string_tms)
-  in
-     prove(the_goal,tactic)
-  end
-
-val charset_conv_ss = 
-  simpLib.std_conv_ss
-    {name="charset_conv",
-     conv = charset_conv, 
-     pats = [regexp_chset_pat]}
-
 (*---------------------------------------------------------------------------*)
 (* Proves goals of the form                                                  *)
 (*                                                                           *)
@@ -750,7 +693,7 @@ val charset_conv_ss =
 (*---------------------------------------------------------------------------*)
 
 val IN_CHARSET_NUM_TAC =
- rw_tac (list_ss ++ charset_conv_ss) [EQ_IMP_THM,strlen_eq,LE_LT1]
+ rw_tac (list_ss ++ regexpLib.charset_conv_ss) [EQ_IMP_THM,strlen_eq,LE_LT1]
   >> TRY EVAL_TAC 
   >> rule_assum_tac 
         (SIMP_RULE list_ss [dec_def, numposrepTheory.l2n_def, ord_mod_256])

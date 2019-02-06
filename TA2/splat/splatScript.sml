@@ -677,7 +677,7 @@ val chop_aux_lem = Q.prove
           >> rw_tac list_ss [])))
 ;
 
-val chop_thm = Q.prove
+val chop_thm = Q.store_thm
 ("chop_thm",
  `!nlist s lists. 
     (chop nlist s = SOME lists)

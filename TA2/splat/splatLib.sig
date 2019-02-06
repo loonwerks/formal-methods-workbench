@@ -71,8 +71,6 @@ sig
                   correctness:term,
 		  implicit_constraints: thm option}
 
-  val charset_conv_ss : simpLib.ssfrag
-
   val IN_CHARSET_NUM_TAC : tactic
 
   val prove_constraints 
