@@ -1,6 +1,5 @@
 package com.collins.fmw.cyres.architecture;
 
-import com.collins.fmw.cyres.util.plugin.Filesystem;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,6 +15,8 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.util.plugin.Filesystem;
 
 public class CaseClaimsManager {
 
@@ -62,7 +63,7 @@ public class CaseClaimsManager {
 				if (!file.exists()) {
 					// Create it
 					String pkg = "package " + claimFileName + System.lineSeparator() + "public" + System.lineSeparator()
-							+ System.lineSeparator() + "\twith Model_Transformations;" + System.lineSeparator()
+							+ System.lineSeparator() + "\twith CASE_Model_Transformations;" + System.lineSeparator()
 							+ System.lineSeparator() + "\tannex resolute {**" + System.lineSeparator()
 							+ System.lineSeparator() + "\t**};"
 							+ System.lineSeparator() + "end " + claimFileName + ";";

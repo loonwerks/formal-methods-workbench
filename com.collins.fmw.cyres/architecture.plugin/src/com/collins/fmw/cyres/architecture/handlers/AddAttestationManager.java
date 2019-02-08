@@ -30,7 +30,6 @@ import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.Feature;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
@@ -175,49 +174,56 @@ public class AddAttestationManager extends AadlHandler {
 					return;
 				}
 
-				// TODO: Should this be part of AadlHandler?
-				// CASE Model Transformations file
-				// CASE Property file
-				// First check if CASE Property file has already been imported in the model
-				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySet casePropSet = null;
-				AadlPackage caseModelTransformationsPkg = null;
-				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySet) {
-						if (modelUnit.getName().equalsIgnoreCase(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySet) modelUnit;
-						}
-					}
-					else if (modelUnit instanceof AadlPackage) {
-						if (modelUnit.getName().equalsIgnoreCase(CASE_MODEL_TRANSFORMATIONS_NAME)) {
-							caseModelTransformationsPkg = (AadlPackage) modelUnit;
-						}
-					}
-				}
+//				// TODO: Should this be part of AadlHandler?
+//				// CASE Model Transformations file
+//				// CASE Property file
+//				// First check if CASE Property file has already been imported in the model
+//				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
+//				PropertySet casePropSet = null;
+//				AadlPackage caseModelTransformationsPkg = null;
+//				for (ModelUnit modelUnit : importedUnits) {
+//					if (modelUnit instanceof PropertySet) {
+//						if (modelUnit.getName().equalsIgnoreCase(CASE_PROPSET_NAME)) {
+//							casePropSet = (PropertySet) modelUnit;
+//						}
+//					}
+//					else if (modelUnit instanceof AadlPackage) {
+//						if (modelUnit.getName().equalsIgnoreCase(CASE_MODEL_TRANSFORMATIONS_NAME)) {
+//							caseModelTransformationsPkg = (AadlPackage) modelUnit;
+//						}
+//					}
+//				}
+//
+//				if (casePropSet == null) {
+//					// Try importing the resource
+//					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
+//					if (casePropSet == null) {
+//						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
+//								"Property set " + CASE_PROPSET_NAME + " could not be found.");
+//						return;
+//					}
+//					// Add as "importedUnit" to package section
+//					pkgSection.getImportedUnits().add(casePropSet);
+//				}
+//				if (caseModelTransformationsPkg == null) {
+//					// Try importing the resource
+//					caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
+//							CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
+//					if (caseModelTransformationsPkg == null) {
+//						Dialog.showError("Could not import " + CASE_MODEL_TRANSFORMATIONS_NAME,
+//								"AADL package " + CASE_MODEL_TRANSFORMATIONS_NAME + " could not be found.");
+//						return;
+//					}
+//				}
 
-				if (casePropSet == null) {
-					// Try importing the resource
-					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-					if (casePropSet == null) {
-						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
-								"Property set " + CASE_PROPSET_NAME + " could not be found.");
-						return;
-					}
-					// Add as "importedUnit" to package section
-					pkgSection.getImportedUnits().add(casePropSet);
+				// Import CASE_Properties file
+				if (!addCasePropertyImport(pkgSection)) {
+					return;
 				}
-				if (caseModelTransformationsPkg == null) {
-					// Try importing the resource
-					caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
-							CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
-					if (caseModelTransformationsPkg == null) {
-						Dialog.showError("Could not import " + CASE_MODEL_TRANSFORMATIONS_NAME,
-								"AADL package " + CASE_MODEL_TRANSFORMATIONS_NAME + " could not be found.");
-						return;
-					}
+				// Import CASE_Model_Transformations file
+				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+					return;
 				}
-
-				// TODO: Add CASE_Model_Transformations rename, if not already present
 
 				// TODO: check to see if the comm driver already has an attestation manager?
 
@@ -365,6 +371,8 @@ public class AddAttestationManager extends AadlHandler {
 				// Get the request and response message types from the CASE_Model_Transformations package
 				DataImplementation requestMsgImpl = null;
 				DataImplementation responseMsgImpl = null;
+				AadlPackage caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
+						CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
 				for (Classifier classifier : caseModelTransformationsPkg.getOwnedPublicSection()
 						.getOwnedClassifiers()) {
 					if (classifier.getName().equalsIgnoreCase("CASE_AttestationRequestMsg.Impl")) {
@@ -398,6 +406,8 @@ public class AddAttestationManager extends AadlHandler {
 				commRes.setOut(true);
 
 				// Add Attestation Manager properties
+				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
+						resource.getResourceSet());
 				// CASE_Properties::COMP_TYPE Property
 				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerThreadType,
 						casePropSet)) {
