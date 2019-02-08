@@ -76,32 +76,33 @@ public class AgreeTranslate {
 	}
 
 	private Value genIntLitExpr(IntLitExpr expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "IntLitExpr"));
-//		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-		return StringValue.build(expr.getVal());
-//		return ObjectValue.build(pairList);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "IntLitExpr"));
+		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
+//		return StringValue.build(expr.getVal());
+		return ObjectValue.build(pairList);
 	}
 
 	private Value genRealLitExpr(RealLitExpr expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "RealLitExpr"));
-//		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-		return StringValue.build(expr.getVal());
-//		return ObjectValue.build(pairList);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "RealLitExpr"));
+		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
+//		return StringValue.build(expr.getVal());
+		return ObjectValue.build(pairList);
 	}
 
 	private Value genBoolLitExpr(BoolLitExpr expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "BoolLitExpr"));
-//		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
-		return StringValue.build(expr.getVal().getValue() + "");
-//		return ObjectValue.build(pairList);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "BoolLitExpr"));
+		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
+//		return StringValue.build(expr.getVal().getValue() + "");
+		return ObjectValue.build(pairList);
 	}
 
 	private Value genNestedDotID(NestedDotID expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "NestedDotID"));
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "NestedDotID"));
+
 		String id = expr.getBase().getName();
 		NestedDotID sub = expr.getSub();
 
@@ -112,14 +113,13 @@ public class AgreeTranslate {
 			}
 		}
 
-
 		if (expr.getTag() != null) {
 			id += "." + expr.getTag();
 		}
 
-//		pairList.add(Pair.build("name", id));
-//		return ObjectValue.build(pairList);
-		return StringValue.build(id);
+		pairList.add(Pair.build("name", id));
+		return ObjectValue.build(pairList);
+//		return StringValue.build(id);
 	}
 
 	private Value genFnCallExpr(FnCallExpr expr) {
@@ -271,12 +271,11 @@ public class AgreeTranslate {
 	}
 
 	private Value genDoubleDotRef(DoubleDotRef typeID) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "TypeID"));
-//		String id = typeID.getBase().getName();
-//		pairList.add(Pair.build("name", id));
-//		return ObjectValue.build(pairList);
-		return StringValue.build(typeID.getElm().getName());
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "DoubleDotRef"));
+		pairList.add(Pair.build("name", typeID.getElm().getName()));
+		return ObjectValue.build(pairList);
+//		return StringValue.build(typeID.getElm().getName());
 	}
 
 	private Value genRecordType(RecordType type) {
@@ -288,11 +287,11 @@ public class AgreeTranslate {
 	}
 
 	private Value genPrimType(PrimType type) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "PrimType"));
-//		pairList.add(Pair.build("primType", type.getString()));
-//		return ObjectValue.build(pairList);
-		return StringValue.build(type.getString());
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "PrimType"));
+		pairList.add(Pair.build("primType", type.getString()));
+		return ObjectValue.build(pairList);
+//		return StringValue.build(type.getString());
 	}
 
 	private Value genType(Type type) {
