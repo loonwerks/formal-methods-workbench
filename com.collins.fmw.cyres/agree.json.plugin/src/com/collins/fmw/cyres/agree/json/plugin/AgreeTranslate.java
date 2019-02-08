@@ -76,27 +76,27 @@ public class AgreeTranslate {
 	}
 
 	private Value genIntLitExpr(IntLitExpr expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "IntLitExpr"));
-//		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-		return StringValue.build(expr.getVal());
-//		return ObjectValue.build(pairList);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "IntLitExpr"));
+		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
+//		return StringValue.build(expr.getVal());
+		return ObjectValue.build(pairList);
 	}
 
 	private Value genRealLitExpr(RealLitExpr expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "RealLitExpr"));
-//		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-		return StringValue.build(expr.getVal());
-//		return ObjectValue.build(pairList);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "RealLitExpr"));
+		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
+//		return StringValue.build(expr.getVal());
+		return ObjectValue.build(pairList);
 	}
 
 	private Value genBoolLitExpr(BoolLitExpr expr) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "BoolLitExpr"));
-//		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
-		return StringValue.build(expr.getVal().getValue() + "");
-//		return ObjectValue.build(pairList);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "BoolLitExpr"));
+		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
+//		return StringValue.build(expr.getVal().getValue() + "");
+		return ObjectValue.build(pairList);
 	}
 
 	private Value genProjectionExpr(ProjectionExpr expr) {
@@ -265,23 +265,23 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
-	private Value genDoubleDotRef(DoubleDotRef typeID) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "TypeID"));
-//		String id = typeID.getBase().getName();
-//		pairList.add(Pair.build("name", id));
-//		return ObjectValue.build(pairList);
-		return StringValue.build(typeID.getElm().getName());
+	private Value genDoubleDotRef(DoubleDotRef ref) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "DoubleDotRef"));
+		String id = ref.getElm().getName();
+		pairList.add(Pair.build("name", id));
+		return ObjectValue.build(pairList);
+//		return StringValue.build(typeID.getElm().getName());
 	}
 
 
 
 	private Value genPrimType(PrimType type) {
-//		ArrayList<Pair> pairList = new ArrayList<Pair>();
-//		pairList.add(Pair.build("kind", "PrimType"));
-//		pairList.add(Pair.build("primType", type.getString()));
-//		return ObjectValue.build(pairList);
-		return StringValue.build(type.getName());
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "PrimType"));
+		pairList.add(Pair.build("primType", type.getName()));
+		return ObjectValue.build(pairList);
+//		return StringValue.build(type.getName());
 	}
 
 	private Value genType(Type type) {
