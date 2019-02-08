@@ -121,7 +121,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 			packageRenames.add(doSwitch(packageRename));
 		}
 		if (!packageRenames.isEmpty()) {
-			pkgBuilder.add(Pair.build("renames", ArrayValue.build(packageRenames)));
+			pkgBuilder.add(Pair.build("packageRenames", ArrayValue.build(packageRenames)));
 		}
 
 		// Get components
@@ -263,8 +263,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		if (c instanceof PortConnection) {
 			kind = "port";
 		} else if (c instanceof AccessConnection) {
-			kind = ((AccessConnection) c).getAccessCategory().getName();
-			kind += "Access";
+			kind = ((AccessConnection) c).getAccessCategory().getName() + "Access";
 		}
 		if (!kind.isEmpty()) {
 			pairList.add(Pair.build("kind", kind));
@@ -282,7 +281,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", al.getName()));
-
+		pairList.add(Pair.build("kind", "AnnexLibrary"));
 		if (al.getName().equalsIgnoreCase("agree")) {
 			// AGREE annex will be parsed
 			pairList.add(Pair.build("parsedAnnexLibrary", agreeTranslate.genAnnexLibrary(al)));
@@ -298,7 +297,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", as.getName()));
-
+		pairList.add(Pair.build("kind", "AnnexSubclause"));
 		if (as.getName().equalsIgnoreCase("agree")) {
 			// AGREE annex will be parsed
 			pairList.add(Pair.build("parsedAnnexSubclause", agreeTranslate.genAnnexSubclause(as)));
@@ -314,6 +313,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	public Value caseSubcomponent(Subcomponent sc) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", sc.getName()));
+		pairList.add(Pair.build("kind", "Subcomponent"));
 		pairList.add(Pair.build("category", sc.getCategory().getName()));
 		pairList.add(Pair.build("classifier", sc.getClassifier().getQualifiedName()));
 		return ObjectValue.build(pairList);
@@ -478,6 +478,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 
 		pairList.add(Pair.build("name", p.getQualifiedName()));
+		pairList.add(Pair.build("kind", "Property"));
 		pairList.add(Pair.build("inherit", p.isInherit() ? "true" : "false"));
 		pairList.add(Pair.build("propertyType", doSwitch(p.getPropertyType())));
 		ArrayList<Value> appliesTo = new ArrayList<Value>();
@@ -500,6 +501,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 
 		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("kind", "Property"));
 		pairList.add(Pair.build("inherit", p.isInherit() ? "true" : "false"));
 		pairList.add(Pair.build("propertyType", doSwitch(p.getPropertyType())));
 		ArrayList<Value> appliesTo = new ArrayList<Value>();
@@ -521,6 +523,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	public Value casePropertyConstant(PropertyConstant p) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("kind", "PropertyConstant"));
 		pairList.add(Pair.build("propertyType", doSwitch(p.getPropertyType())));
 		pairList.add(Pair.build("value", genPropertyExpression(p.getConstantValue())));
 		return ObjectValue.build(pairList);
@@ -529,6 +532,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	public Value buildPropertyType(PropertyType p) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("kind", "PropertyType"));
 		pairList.add(Pair.build("type", doSwitch(p)));
 		return ObjectValue.build(pairList);
 	}
@@ -611,6 +615,7 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	public Value casePropertyAssociation(PropertyAssociation pa) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", pa.getProperty().getQualifiedName()));
+		pairList.add(Pair.build("kind", "PropertyAssociation"));
 
 		// Seems like the list always has exactly one element
 		ModalPropertyValue v = pa.getOwnedValues().get(0);
