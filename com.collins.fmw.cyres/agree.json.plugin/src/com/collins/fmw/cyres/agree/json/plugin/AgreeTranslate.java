@@ -48,10 +48,10 @@ import com.rockwellcollins.atc.agree.agree.NodeLemma;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.ProjectionExpr;
 import com.rockwellcollins.atc.agree.agree.PropertyStatement;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordLitExpr;
+import com.rockwellcollins.atc.agree.agree.SelectionExpr;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
@@ -99,13 +99,13 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
-	private Value genProjectionExpr(ProjectionExpr expr) {
+	private Value genSelectionExpr(SelectionExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("kind", "RecordSelection"));
+		pairList.add(Pair.build("kind", "Selection"));
 		String selection = expr.getField().getName();
 
-		pairList.add(Pair.build("target", genExpr(expr.getExpr())));
-		pairList.add(Pair.build("selection", selection));
+		pairList.add(Pair.build("target", genExpr(expr.getTarget())));
+		pairList.add(Pair.build("field", selection));
 		return ObjectValue.build(pairList);
 	}
 
@@ -180,8 +180,8 @@ public class AgreeTranslate {
 			return genBinaryExpr((BinaryExpr) expr);
 		} else if (expr instanceof UnaryExpr) {
 			return genUnaryExpr((UnaryExpr) expr);
-		} else if (expr instanceof ProjectionExpr) {
-			return genProjectionExpr((ProjectionExpr) expr);
+		} else if (expr instanceof SelectionExpr) {
+			return genSelectionExpr((SelectionExpr) expr);
 		} else if (expr instanceof NamedElmExpr) {
 			return genNamedElmExpr((NamedElmExpr) expr);
 		} else if (expr instanceof EnumLitExpr) {
