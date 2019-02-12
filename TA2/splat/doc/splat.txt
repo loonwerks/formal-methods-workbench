@@ -1,7 +1,6 @@
 %<a href="splat.pdf" target="_blank">Semantic Properties for Language and Automata Theory (SPLAT)</a>
-% Konrad Slind, Trusted Systems Group, Rockwell Collins 
-% January 29, 2019
-
+% Konrad Slind, Trusted Systems Group, Collins Aerospace
+% February 7, 2019
 
 \newcommand{\imp}{\;\Rightarrow\;}
 \newcommand{\valid}{\mathsf{Valid}}
@@ -117,7 +116,7 @@ $$
 \begin{array}{rcl}
 r_1 + \cdots + r_n & = & \konst{Or}[r_1,\ldots,r_n] \\
 r_1 r_2 & = & \konst{Cat}\;r_1 \; r_2 \\
-[m-n] & = & \konst{Chset}(\konst{charset\_of} \; [m, m+1, \ldots, n-1,n]) \quad (\text{where}\; 0 \leq m \leq n \leq 255) \\
+{[m-n]} & = & \konst{Chset}(\konst{charset\_of} \; [m, m+1, \ldots, n-1,n]) \quad (\text{where}\; 0 \leq m \leq n \leq 255) \\
 \bullet & = & [0-255] \\
 \emptyset & = & \konst{Chset}(\konst{charset\_of} \; []) \\
 \varepsilon & = & \konst{Star}(\emptyset) \\
@@ -129,7 +128,7 @@ The "dot" charset ($\bullet$)) is the full charset that matches every
 one-element string; $\emptyset$ matches no string; and $\varepsilon$
 is the empty string.
 
-Properties and Encodings
+Properties meet Encodings
 =========================
 
 Now we come to our main focus: statements of the form
@@ -174,22 +173,23 @@ this.
 Consider the "even-number" predicate $\konst{even} :
 \mathbb{N}\to\konst{bool}$. Let $\mathit{cset} =
 \konst{charset\_of}\;[0,2,4, \ldots, 254]$ be the character set
-corresponding to the non-negative even numbers less than 256. Suppose
+corresponding to the non-negative even numbers less than 256. Supposing
 that
 $$
 \konst{regexp\_of}\; \konst{even} = 
-\konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;(\konst{Star}\;\bullet)
-$$ from which we obtain the formula
+\konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;(\konst{Star}\;\bullet),
+$$ (the encoding is in LSB format), from which we construct the formula
 $$
 \konst{even}(n) \iff \konst{encode}(n) \in \Lang{\konst{Cat}\;
 (\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}
 $$
-This can be proven with the encodings we define below. Notice that
-$\konst{regexp\_of}(\konst{even})$ generates a regular expression that
-expects the encoding to be in LSB format.
+This can be proven by reasoning with the regular language semantics, plus
+the encodings defined below. The regular expression compiles to a
+3-state DFA.
 
 
-## Encodings for common types
+Encodings for common types
+==========================
 
 We now discuss a collection of common types and their encoding and
 decoding functions. Our approach is to reduce to a base
@@ -292,7 +292,7 @@ $$
 
 - **Arrays.** A $\tau\;\konst{array}$ of size $K$ can be encoded by
  concatenating the result of applying the encoder for $\tau$ $K$
- times. This is conceptually simple, the resulting regular expressions
+ times. While this is conceptually simple, the resulting regular expressions
  for large or even medium size arrays will probably be too large for our tools.
 
 - **Fixed- and variable-width encodings.** So far we have dealt solely
@@ -302,16 +302,26 @@ $$
     focusing on polytypism, see "Applications of polytypism in theorem
     proving" (Slind and Hurd, 2003) and similar work in other proof systems.
 
-Intervals
-----------
+Interval Properties and Regexps
+================================
 
-An interval $[\mathit{lo} ,\mathit{hi}] = \set{n \in \mathbb{N} \mid \mathit{lo} \leq n \leq
-\mathit{hi}}$. An interval is mapped to a regular expression by an
-algorithm that proceeds in parallel on the base-256 representations
-given by $\konst{reverse} \circ \konst{n2l}$, *i.e*, following the MSB
-(most significant byte leftmost) format. However, the algorithm on the
-representations is quite detailed, and better insight is obtained by
-describing the transformations at the level of numbers. Let $\mathbf{B} = 256$ so that 
+Now that we have surveyed how to encode data, we can move to the
+encoding of properties by regular expressions. The $\konst{even}(n)$
+predicate from our initial example was created in an *ad hoc* manner,
+but we seek some properties that can be algorithmically translated to
+regexps. One of the most useful for us so far has been *intervals*.
+
+An interval $[\mathit{lo} ,\mathit{hi}] = \set{n \in \mathbb{N} \mid
+\mathit{lo} \leq n \leq \mathit{hi}}$; another way of expressing it is
+as a property $\lambda n. \mathit{lo} \leq n \land n \leq \mathit{hi}$.
+An interval is mapped to a regular expression by an algorithm
+$\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}]$ that proceeds in
+parallel on the base-256 representations given by $\konst{reverse}
+\circ \konst{n2l}$, *i.e*, following the MSB (most significant byte
+leftmost) format. However, the algorithm on the representations is
+quite detailed, and better insight is obtained by describing the
+transformations at the level of numbers. Let $\mathbf{B} = 256$ so
+that
 $$
 \begin{array}{ll}
 \mathit{lo} = p \bto{a} + r_1 & ; \quad r_1 < \bto{a} \\
@@ -359,12 +369,13 @@ less than 256, in which case the charset regexp $[\mathit{lo}-\mathit{hi}]$ is
 returned.
 
 **Integer Intervals.** Translation of integer intervals is accomplished
-  by reduction to natural number intervals, based on the following case split:
+  by reduction to natural number intervals, based on the following case split 
+  (number of bytes is $w$):
 
 1. $0 \leq \mathit{lo} \leq \mathit{hi}$. No translation needed; the
 interval is $\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}]$.
 
-2. $\mathit{lo} < 0 \leq \mathit{hi}$. 
+2. $\mathit{lo} < 0 \leq \mathit{hi}$. A disjunction is made around 0.
 $$
 \konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] =
 \konst{regexp\_of}\;[2^{8w} + \mathit{lo}, 2^{8w} - 1] + \konst{regexp\_of}\;[0, \mathit{hi}]
@@ -373,7 +384,8 @@ There is a special case here, where $\mathit{lo} = -2^{8w-1}$ and
 $\mathit{hi} = 2^{8w-1} - 1$, in which case 
 $\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] = \bullet^{w}$. 
 
-3. $\mathit{lo} \leq \mathit{hi} < 0$.
+3. $\mathit{lo} \leq \mathit{hi} < 0$. Both numbers are negative; we generate the interval from their
+   twos complements.
 $$
 \konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] =
 \konst{regexp\_of}\;[2^{8w} + \mathit{lo}, 2^{8w} + \mathit{hi}]
@@ -392,7 +404,7 @@ The interval $[-90,90]$ generates the regexp
 
        [\166-\255] | [\000-Z]
 
-This disjunction is on single charsets, so can be replaced by
+This disjunction is on single charsets, so can be replaced by (and is, in the translation to DFA):
 
        [\000-Z\166-\255]
     
@@ -404,11 +416,11 @@ The interval $[0,14000]$ maps to
 
        [\000]. | [\001-5]. | [6][\000-\176]
 
-The interval $[-2^{63}, 2^{63}-1]$ maps to
+A 5-state DFA is generated. The interval $[-2^{63}, 2^{63}-1]$ maps to
 
        ........
 
-The interval $[123456789,9876543210]$ generates the regexp:
+A 10-state machine is generated. The interval $[123456789,9876543210]$ generates the regexp:
 
        [\000][\007][[][\205][\021-\255] |
        [\000][\007][[][\206-\255]. |
@@ -423,11 +435,23 @@ The interval $[123456789,9876543210]$ generates the regexp:
        [\002][L][\176][\001-\021]. |
        [\002][L][\176][\022][\000-\234]
 
+which translates to a DFA with 15 states.
 
-Correctness Theorems 
-====================
 
-Given a declaration of record type $\konst{recd}$ plus a predicate $P :
+A record message package
+========================
+
+Given the ability to construct regular expressions corresponding to
+numeric intervals, we can build regular expressions for compound data,
+such as records. As outline above, encoding a record simply requires
+concatenating the field encodings. Similarly, we can define
+$\konst{regexp\_of}$ for a record by concatenating the results of
+calling $\konst{regexp\_of}$ on the fields of the record. This gives
+us a useful level of abstraction for a package that takes high level
+specifications of records and generates encoder/decoder/filter
+implementations plus associated correctness proofs.
+
+In particular, given a declaration of record type $\konst{recd}$ plus a predicate $P :
 \konst{recd} \to \konst{bool}$ over the fields of the record, we
 generate the following artifacts:
 
