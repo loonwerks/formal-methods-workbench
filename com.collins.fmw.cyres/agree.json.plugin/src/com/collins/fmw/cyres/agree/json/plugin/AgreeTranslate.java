@@ -79,7 +79,7 @@ public class AgreeTranslate {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "IntLitExpr"));
 		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-//		return StringValue.build(expr.getVal());
+
 		return ObjectValue.build(pairList);
 	}
 
@@ -87,7 +87,6 @@ public class AgreeTranslate {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "RealLitExpr"));
 		pairList.add(Pair.build("value", StringValue.build(expr.getVal())));
-//		return StringValue.build(expr.getVal());
 		return ObjectValue.build(pairList);
 	}
 
@@ -95,10 +94,9 @@ public class AgreeTranslate {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "BoolLitExpr"));
 		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
-//		return StringValue.build(expr.getVal().getValue() + "");
 		return ObjectValue.build(pairList);
 	}
-
+					
 	private Value genSelectionExpr(SelectionExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "Selection"));
@@ -265,6 +263,7 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
+
 	private Value genDoubleDotRef(DoubleDotRef ref) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "DoubleDotRef"));
@@ -279,9 +278,9 @@ public class AgreeTranslate {
 	private Value genPrimType(PrimType type) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "PrimType"));
+
 		pairList.add(Pair.build("primType", type.getName()));
 		return ObjectValue.build(pairList);
-//		return StringValue.build(type.getName());
 	}
 
 	private Value genType(Type type) {

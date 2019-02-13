@@ -10,7 +10,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -61,7 +60,7 @@ public class AgreeJson {
 		}
 
 		EObject original = xtextEditor.getDocument().readOnly(resource -> resource.getContents().get(0));
-		ModelUnit model = (ModelUnit) EcoreUtil.copy(original);
+		ModelUnit model = (ModelUnit) original;
 
 		AadlTranslate aadlTranslate = new AadlTranslate();
 
