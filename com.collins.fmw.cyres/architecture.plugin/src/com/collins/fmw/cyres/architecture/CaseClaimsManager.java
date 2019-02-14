@@ -1,6 +1,5 @@
 package com.collins.fmw.cyres.architecture;
 
-import com.collins.fmw.cyres.util.plugin.Filesystem;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,12 +14,20 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AnnexLibrary;
+import org.osate.aadl2.DefaultAnnexLibrary;
+import org.osate.aadl2.PrivatePackageSection;
 import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.util.plugin.Filesystem;
 
 public class CaseClaimsManager {
 
 	private static CaseClaimsManager instance = null;
 	private static Resource caseClaimsResource = null;
+//	private static PrivatePackageSection priv = null;
+	private static DefaultAnnexLibrary resoluteLib = null;
 
 	private CaseClaimsManager() {
 
@@ -33,6 +40,37 @@ public class CaseClaimsManager {
 		// Make sure the resource is current
 		updateResource();
 		return instance;
+	}
+
+	public static CaseClaimsManager getInstance(AadlPackage pkg) {
+		if (instance == null) {
+			instance = new CaseClaimsManager();
+		}
+		// Make sure the private section is initialized
+		initPrivateSection(pkg);
+		return instance;
+	}
+
+	private static void initPrivateSection(AadlPackage pkg) {
+		PrivatePackageSection priv = pkg.getOwnedPrivateSection();
+		if (priv == null) {
+			priv = pkg.createOwnedPrivateSection();
+		}
+		boolean resoluteFound = false;
+		for (AnnexLibrary annexLib : priv.getOwnedAnnexLibraries()) {
+			DefaultAnnexLibrary annex = (DefaultAnnexLibrary) annexLib;
+			if (annex.getName().equalsIgnoreCase("resolute")) {
+				resoluteLib = annex;
+				resoluteFound = true;
+				break;
+			}
+		}
+		if (!resoluteFound) {
+			resoluteLib = (DefaultAnnexLibrary) priv.createOwnedAnnexLibrary();
+//			DefaultAnnexLibrary annex = (DefaultAnnexLibrary) annexLib;
+			resoluteLib.setName("resolute");
+			resoluteLib.setSourceText("{** **}");
+		}
 	}
 
 	private static void updateResource() {
@@ -62,7 +100,7 @@ public class CaseClaimsManager {
 				if (!file.exists()) {
 					// Create it
 					String pkg = "package " + claimFileName + System.lineSeparator() + "public" + System.lineSeparator()
-							+ System.lineSeparator() + "\twith Model_Transformations;" + System.lineSeparator()
+							+ System.lineSeparator() + "\twith CASE_Model_Transformations;" + System.lineSeparator()
 							+ System.lineSeparator() + "\tannex resolute {**" + System.lineSeparator()
 							+ System.lineSeparator() + "\t**};"
 							+ System.lineSeparator() + "end " + claimFileName + ";";
@@ -99,6 +137,7 @@ public class CaseClaimsManager {
 	public void addFilter(String reqName) {
 
 		String annex = readClaimsFile();
+//		String annex = readPrivateSectionClaims();
 
 		int startIdx = annex.indexOf("**", annex.indexOf(reqName + "("));
 		String descriptor = "\t\t\t" + annex.substring(startIdx, annex.indexOf("**", startIdx + 2) + 2)
@@ -110,19 +149,21 @@ public class CaseClaimsManager {
 		if (annex.contains(basic)) {
 			annex = annex.replace(basic, funSig + descriptor + funDef);
 		} else {
-			annex = annex.replace("\t**};",
-					"\t\t" + funSig + funDef + System.lineSeparator() + "\t**};");
+			annex = annex.replace("\t**};", "\t\t" + funSig + funDef + System.lineSeparator() + "\t**};");
+//			annex = annex.replace("**};", "\t\t" + funSig + funDef + System.lineSeparator() + "**};");
 		}
 
 		// Write back to file
 		// The contents of the file will be overwritten
 		writeClaimsFile(annex);
+//		writePrivateSectionClaims(annex);
 
 	}
 
 	public void addAttestationManager(String reqName) {
 
 		String annex = readClaimsFile();
+//		String annex = readPrivateSectionClaims();
 
 		int startIdx = annex.indexOf("**", annex.indexOf(reqName + "("));
 		String descriptor = "\t\t\t" + annex.substring(startIdx, annex.indexOf("**", startIdx + 2) + 2)
@@ -137,9 +178,11 @@ public class CaseClaimsManager {
 			annex = annex.replace(basic, funSig + descriptor + funDef);
 		} else {
 			annex = annex.replace("\t**};", "\t\t" + funSig + funDef + System.lineSeparator() + "\t**};");
+//			annex = annex.replace("**};", "\t\t" + funSig + funDef + System.lineSeparator() + "**};");
 		}
 
 		writeClaimsFile(annex);
+//		writePrivateSectionClaims(annex);
 	}
 
 	public void addLegacyComponentVerification() {
@@ -160,13 +203,16 @@ public class CaseClaimsManager {
 	private void addToResoluteAnnex(String clause) {
 
 		String annex = readClaimsFile();
+//		String annex = readPrivateSectionClaims();
 
 		// Add clause to end of annex
 		annex = annex.replace("\t**};", clause + System.lineSeparator() + "\t**};");
+//		annex = annex.replace("**};", clause + System.lineSeparator() + "**};");
 
 		// Write back to file
 		// The contents of the file will be overwritten
 		writeClaimsFile(annex);
+//		writePrivateSectionClaims(annex);
 
 	}
 
@@ -197,6 +243,32 @@ public class CaseClaimsManager {
 		} catch (CoreException e) {
 			Dialog.showError("CASE Claims file", "Error writing the CASE Claims file.");
 		}
+	}
+
+	private String readPrivateSectionClaims() {
+		String annex = resoluteLib.getSourceText();
+//		for (AnnexLibrary annexLib : priv.getOwnedAnnexLibraries()) {
+//			DefaultAnnexLibrary defAnnexLib = (DefaultAnnexLibrary) annexLib;
+//			if (defAnnexLib.getName().equalsIgnoreCase("resolute")) {
+//				annex = defAnnexLib.getSourceText();
+//				break;
+//			}
+//		}
+		if (annex.isEmpty()) {
+			annex = "{** **}";
+		}
+		return annex;
+	}
+
+	private void writePrivateSectionClaims(String annex) {
+//		for (AnnexLibrary annexLib : priv.getOwnedAnnexLibraries()) {
+//			DefaultAnnexLibrary defAnnexLib = (DefaultAnnexLibrary) annexLib;
+//			if (defAnnexLib.getName().equalsIgnoreCase("resolute")) {
+//				defAnnexLib.setSourceText(annex);
+//				break;
+//			}
+//		}
+		resoluteLib.setSourceText(annex);
 	}
 
 }

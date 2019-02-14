@@ -16,7 +16,6 @@ import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation;
@@ -24,13 +23,10 @@ import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
-import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
-import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.Feature;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
@@ -175,148 +171,96 @@ public class AddAttestationManager extends AadlHandler {
 					return;
 				}
 
-				// TODO: Should this be part of AadlHandler?
-				// CASE Model Transformations file
-				// CASE Property file
-				// First check if CASE Property file has already been imported in the model
-				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySet casePropSet = null;
-				AadlPackage caseModelTransformationsPkg = null;
-				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySet) {
-						if (modelUnit.getName().equalsIgnoreCase(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySet) modelUnit;
-						}
-					}
-					else if (modelUnit instanceof AadlPackage) {
-						if (modelUnit.getName().equalsIgnoreCase(CASE_MODEL_TRANSFORMATIONS_NAME)) {
-							caseModelTransformationsPkg = (AadlPackage) modelUnit;
-						}
-					}
+				// Import CASE_Properties file
+				if (!addCasePropertyImport(pkgSection)) {
+					return;
+				}
+				// Import CASE_Model_Transformations file
+				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+					return;
 				}
 
-				if (casePropSet == null) {
-					// Try importing the resource
-					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-					if (casePropSet == null) {
-						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
-								"Property set " + CASE_PROPSET_NAME + " could not be found.");
-						return;
-					}
-					// Add as "importedUnit" to package section
-					pkgSection.getImportedUnits().add(casePropSet);
-				}
-				if (caseModelTransformationsPkg == null) {
-					// Try importing the resource
-					caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
-							CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
-					if (caseModelTransformationsPkg == null) {
-						Dialog.showError("Could not import " + CASE_MODEL_TRANSFORMATIONS_NAME,
-								"AADL package " + CASE_MODEL_TRANSFORMATIONS_NAME + " could not be found.");
-						return;
-					}
-				}
+//				// TODO: Should this be part of AadlHandler?
+//				// CASE Model Transformations file
+//				// CASE Property file
+//				// First check if CASE Property file has already been imported in the model
+//				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
+//				PropertySet casePropSet = null;
+//				AadlPackage caseModelTransformationsPkg = null;
+//				for (ModelUnit modelUnit : importedUnits) {
+//					if (modelUnit instanceof PropertySet) {
+//						if (modelUnit.getName().equalsIgnoreCase(CASE_PROPSET_NAME)) {
+//							casePropSet = (PropertySet) modelUnit;
+//						}
+//					}
+//					else if (modelUnit instanceof AadlPackage) {
+//						if (modelUnit.getName().equalsIgnoreCase(CASE_MODEL_TRANSFORMATIONS_NAME)) {
+//							caseModelTransformationsPkg = (AadlPackage) modelUnit;
+//						}
+//					}
+//				}
+//
+//				if (casePropSet == null) {
+//					// Try importing the resource
+//					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
+//					if (casePropSet == null) {
+//						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
+//								"Property set " + CASE_PROPSET_NAME + " could not be found.");
+//						return;
+//					}
+//					// Add as "importedUnit" to package section
+//					pkgSection.getImportedUnits().add(casePropSet);
+//				}
+//				if (caseModelTransformationsPkg == null) {
+//					// Try importing the resource
+//					caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
+//							CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
+//					if (caseModelTransformationsPkg == null) {
+//						Dialog.showError("Could not import " + CASE_MODEL_TRANSFORMATIONS_NAME,
+//								"AADL package " + CASE_MODEL_TRANSFORMATIONS_NAME + " could not be found.");
+//						return;
+//					}
+//				}
 
 				// TODO: Add CASE_Model_Transformations rename, if not already present
 
 				// TODO: check to see if the comm driver already has an attestation manager?
 
-//				// Create Attestation Request and Response message types, if they don't already exist
-//				DataImplementation requestMsgImpl = null;
-//				DataImplementation responseMsgImpl = null;
-//				for (Classifier classifier : pkgSection.getOwnedClassifiers()) {
-//					if (classifier.getName().equalsIgnoreCase(AM_REQUEST_MSG_NAME + ".Impl")) {
-//						requestMsgImpl = (DataImplementation) classifier;
-//					} else if (classifier.getName().equalsIgnoreCase(AM_RESPONSE_MSG_NAME + ".Impl")) {
-//						responseMsgImpl = (DataImplementation) classifier;
+//				// Add AGREE to Comm Driver implementation
+//				String commAgree = "";
+//				ThreadImplementation commImpl = (ThreadImplementation) commDriver.getComponentImplementation();
+//				for (AnnexSubclause annexSubclause : commImpl.getOwnedAnnexSubclauses()) {
+//					if (annexSubclause.getName().equalsIgnoreCase("agree")) {
+//						DefaultAnnexSubclause commSubclause = (DefaultAnnexSubclause) annexSubclause;
+//						commAgree = commSubclause.getSourceText();
+//						break;
 //					}
 //				}
-//				if (requestMsgImpl == null) {
-//					// Data type
-//					final DataType requestMsg = (DataType) pkgSection
-//							.createOwnedClassifier(Aadl2Package.eINSTANCE.getDataType());
-//					// Give it a name
-//					requestMsg.setName(AM_REQUEST_MSG_NAME);
-//					// Move it to the top
-//					pkgSection.getOwnedClassifiers().move(0, pkgSection.getOwnedClassifiers().size() - 1);
-//					// Data implementation
-//					requestMsgImpl = (DataImplementation) pkgSection
-//							.createOwnedClassifier(Aadl2Package.eINSTANCE.getDataImplementation());
-//					// Give it a name
-//					requestMsgImpl.setName(AM_REQUEST_MSG_NAME + ".Impl");
-//					// Assign realization
-//					final Realization r = requestMsgImpl.createOwnedRealization();
-//					r.setImplemented(requestMsg);
-//					// Set data subcomponents
-//					DataSubcomponent data = requestMsgImpl.createOwnedDataSubcomponent();
-//					data.setName("problem");
-//					DataType dataType = Aadl2Factory.eINSTANCE.createDataType();
-//					dataType.setName("Base_Types::String");
-//					data.setDataSubcomponentType(dataType);
-//					// Move it under data type
-//					pkgSection.getOwnedClassifiers().move(1, pkgSection.getOwnedClassifiers().size() - 1);
+//
+//				if (commAgree.isEmpty()) {
+//					commAgree = "{**" + System.lineSeparator();
+//				} else {
+//					commAgree = commAgree.replace("**}", "").trim() + System.lineSeparator() + System.lineSeparator();
 //				}
-//				if (responseMsgImpl == null) {
-//					// Data type
-//					final DataType responseMsg = (DataType) pkgSection
-//							.createOwnedClassifier(Aadl2Package.eINSTANCE.getDataType());
-//					// Give it a name
-//					responseMsg.setName(AM_RESPONSE_MSG_NAME);
-//					// Move it under request
-//					pkgSection.getOwnedClassifiers().move(2, pkgSection.getOwnedClassifiers().size() - 1);
-//					// Data implementation
-//					responseMsgImpl = (DataImplementation) pkgSection
-//							.createOwnedClassifier(Aadl2Package.eINSTANCE.getDataImplementation());
-//					// Give it a name
-//					responseMsgImpl.setName(AM_RESPONSE_MSG_NAME + ".Impl");
-//					// Assign realization
-//					final Realization r = responseMsgImpl.createOwnedRealization();
-//					r.setImplemented(responseMsg);
-//					// Set data subcomponents
-//					DataSubcomponent data = responseMsgImpl.createOwnedDataSubcomponent();
-//					data.setName("solution");
-//					DataType dataType = Aadl2Factory.eINSTANCE.createDataType();
-//					dataType.setName("Base_Types::String");
-//					data.setDataSubcomponentType(dataType);
-//					// Move it under data type
-//					pkgSection.getOwnedClassifiers().move(3, pkgSection.getOwnedClassifiers().size() - 1);
-//				}
-
-				// Add AGREE to Comm Driver implementation
-				String commAgree = "";
-				ThreadImplementation commImpl = (ThreadImplementation) commDriver.getComponentImplementation();
-				for (AnnexSubclause annexSubclause : commImpl.getOwnedAnnexSubclauses()) {
-					if (annexSubclause.getName().equalsIgnoreCase("agree")) {
-						DefaultAnnexSubclause commSubclause = (DefaultAnnexSubclause) annexSubclause;
-						commAgree = commSubclause.getSourceText();
-						break;
-					}
-				}
-
-				if (commAgree.isEmpty()) {
-					commAgree = "{**" + System.lineSeparator();
-				} else {
-					commAgree = commAgree.replace("**}", "").trim() + System.lineSeparator() + System.lineSeparator();
-				}
-
-				commAgree = commAgree + System.lineSeparator();
-				commAgree = commAgree + "\t\t\t-- a request will trigger a response" + System.lineSeparator();
-				commAgree = commAgree + "\t\t\teq response_header : CASE_MsgHeader.Impl = " + System.lineSeparator();
-				commAgree = commAgree + "\t\t\t\tif radio_msg then" + System.lineSeparator();
-				commAgree = commAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_HEADER"
-						+ System.lineSeparator();
-				commAgree = commAgree + "\t\t\t\telse" + System.lineSeparator();
-				commAgree = commAgree
-						+ "\t\t\t\t\tCASE_MsgHeader.Impl {src = am_response.header.dst; dst = CASE_UAV_ID; HMAC = true};"
-						+ System.lineSeparator() + System.lineSeparator();
-				commAgree = commAgree + "\t\t\t-- assign header info to am_response message" + System.lineSeparator();
-				commAgree = commAgree + "\t\t\tassert(am_response.header = response_header);" + System.lineSeparator();
-				commAgree = commAgree + System.lineSeparator() + "\t\t**}";
-
-				commImpl.getOwnedAnnexSubclauses().removeIf(subclause -> subclause.getName().equalsIgnoreCase("agree"));
-				DefaultAnnexSubclause commImplSubclause = commImpl.createOwnedAnnexSubclause();
-				commImplSubclause.setName("agree");
-				commImplSubclause.setSourceText(commAgree);
+//
+//				commAgree = commAgree + System.lineSeparator();
+//				commAgree = commAgree + "\t\t\t-- a request will trigger a response" + System.lineSeparator();
+//				commAgree = commAgree + "\t\t\teq response_header : CASE_MsgHeader.Impl = " + System.lineSeparator();
+//				commAgree = commAgree + "\t\t\t\tif radio_msg then" + System.lineSeparator();
+//				commAgree = commAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_HEADER"
+//						+ System.lineSeparator();
+//				commAgree = commAgree + "\t\t\t\telse" + System.lineSeparator();
+//				commAgree = commAgree
+//						+ "\t\t\t\t\tCASE_MsgHeader.Impl {src = am_response.header.dst; dst = CASE_UAV_ID; HMAC = true};"
+//						+ System.lineSeparator() + System.lineSeparator();
+//				commAgree = commAgree + "\t\t\t-- assign header info to am_response message" + System.lineSeparator();
+//				commAgree = commAgree + "\t\t\tassert(am_response.header = response_header);" + System.lineSeparator();
+//				commAgree = commAgree + System.lineSeparator() + "\t\t**}";
+//
+//				commImpl.getOwnedAnnexSubclauses().removeIf(subclause -> subclause.getName().equalsIgnoreCase("agree"));
+//				DefaultAnnexSubclause commImplSubclause = commImpl.createOwnedAnnexSubclause();
+//				commImplSubclause.setName("agree");
+//				commImplSubclause.setSourceText(commAgree);
 
 				// Create Attestation Manager thread type
 				final ThreadType attestationManagerThreadType = (ThreadType) pkgSection
@@ -365,6 +309,8 @@ public class AddAttestationManager extends AadlHandler {
 				// Get the request and response message types from the CASE_Model_Transformations package
 				DataImplementation requestMsgImpl = null;
 				DataImplementation responseMsgImpl = null;
+				AadlPackage caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
+						CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
 				for (Classifier classifier : caseModelTransformationsPkg.getOwnedPublicSection()
 						.getOwnedClassifiers()) {
 					if (classifier.getName().equalsIgnoreCase("CASE_AttestationRequestMsg.Impl")) {
@@ -398,6 +344,8 @@ public class AddAttestationManager extends AadlHandler {
 				commRes.setOut(true);
 
 				// Add Attestation Manager properties
+				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
+						resource.getResourceSet());
 				// CASE_Properties::COMP_TYPE Property
 				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerThreadType,
 						casePropSet)) {
@@ -460,179 +408,179 @@ public class AddAttestationManager extends AadlHandler {
 				final Realization r = attestationManagerThreadImpl.createOwnedRealization();
 				r.setImplemented(attestationManagerThreadType);
 
-				// Add AGREE
-				String amImplAgree = "{**" + System.lineSeparator() + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t-- Determine if it is a response message" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\teq am_response_msg : bool = not " + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".NULL_MESSAGE(am_response.header);" + System.lineSeparator() + System.lineSeparator();
-
-				amImplAgree = amImplAgree
-						+ "\t\t\t-- Attestation Manager will not process more than one regular message at a time"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tfun MSG_CTR (null_msg : bool) : int = if null_msg then 0 else 1;"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tproperty one_incoming_message = (";
-				for (int i = 0; i < amPortNames.size(); i++) {
-					if (i > 0) {
-						amImplAgree = amImplAgree + "\t\t\t\t";
-					}
-					amImplAgree = amImplAgree + "MSG_CTR(" + CASE_MODEL_TRANSFORMATIONS_NAME
-							+ ".NULL_MESSAGE(am_" + amPortNames.get(i) + "_in.header))" + " + "
-							+ System.lineSeparator();
-//					if (i < amPortNames.size() - 1) {
-//						amImplAgree = amImplAgree + " + " + System.lineSeparator();
+//				// Add AGREE
+//				String amImplAgree = "{**" + System.lineSeparator() + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t-- Determine if it is a response message" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\teq am_response_msg : bool = not " + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".NULL_MESSAGE(am_response.header);" + System.lineSeparator() + System.lineSeparator();
+//
+//				amImplAgree = amImplAgree
+//						+ "\t\t\t-- Attestation Manager will not process more than one regular message at a time"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tfun MSG_CTR (null_msg : bool) : int = if null_msg then 0 else 1;"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tproperty one_incoming_message = (";
+//				for (int i = 0; i < amPortNames.size(); i++) {
+//					if (i > 0) {
+//						amImplAgree = amImplAgree + "\t\t\t\t";
 //					}
-				}
-				amImplAgree = amImplAgree + "\t\t\t\tMSG_CTR(" + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".NULL_MESSAGE(am_response.header))";
-				amImplAgree = amImplAgree + ") <= 1;" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tassert(one_incoming_message);" + System.lineSeparator()
-						+ System.lineSeparator();
-
-				amImplAgree = amImplAgree + "\t\t\t-- source of the transmitted message, if one was sent"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\teq msg_src : int = " + System.lineSeparator();
-				for (int i = 0; i < amPortNames.size(); i++) {
-					if (i == 0) {
-						amImplAgree = amImplAgree + "\t\t\t\tif not " + CASE_MODEL_TRANSFORMATIONS_NAME
-								+ ".NULL_MESSAGE(am_" + amPortNames.get(i) + "_in.header) then"
-								+ System.lineSeparator();
-						amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in.header.src"
-								+ System.lineSeparator();
-					} else {
-						amImplAgree = amImplAgree + "\t\t\t\telse if not " + CASE_MODEL_TRANSFORMATIONS_NAME
-								+ ".MESSAGE_HEADER(am_" + amPortNames.get(i) + "_in.header) then"
-								+ System.lineSeparator();
-						amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in.header.src"
-								+ System.lineSeparator();
-					}
-				}
-				amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_ID;"
-						+ System.lineSeparator() + System.lineSeparator();
-
-				amImplAgree = amImplAgree
-						+ "\t\t\t-- Helper function to get the header from the attestation manager inport with the specified ID"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tfun GET_HEADER(src : int) : CASE_MsgHeader.Impl = "
-						+ System.lineSeparator();
-				for (int i = 0; i < amPortNames.size(); i++) {
-					if (i == 0) {
-						amImplAgree = amImplAgree + "\t\t\t\tif am_" + amPortNames.get(i)
-								+ "_in.header.src = src then am_" + amPortNames.get(i) + "_in.header"
-								+ System.lineSeparator();
-					} else {
-						amImplAgree = amImplAgree + "\t\t\t\telse if am_" + amPortNames.get(i)
-								+ "_in.header.src = src then am_" + amPortNames.get(i) + "_in.header"
-								+ System.lineSeparator();
-					}
-				}
-				amImplAgree = amImplAgree + "\t\t\t\telse " + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_HEADER;"
-						+ System.lineSeparator() + System.lineSeparator();
-
-				amImplAgree = amImplAgree + "\t\t\t-- Set am_request message" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\teq am_request_msg : CASE_AttestationRequestMsg.Impl = "
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\tif am_response_msg then" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t-- it's a response message so no need to send a request"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_AM_REQUEST_MESSAGE"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\telse if " + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".NULL_MESSAGE(GET_HEADER(msg_src)) then" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t-- it's an empty message" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_AM_REQUEST_MESSAGE"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\telse if not " + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".IN_CACHE(msg_src) or " + CASE_MODEL_TRANSFORMATIONS_NAME + ".IS_STALE(msg_src) then"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree
-						+ "\t\t\t\t\t-- it's a transmitted message from a source not in the cache, so send an am_request"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree
-						+ "\t\t\t\t\t-- or it's a transmitted message from a source in the cache, but stale, so send a new am_request"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree
-						+ "\t\t\t\t\tCASE_AttestationRequestMsg.Impl {header = CASE_MsgHeader.Impl {src = CASE_UAV_ID; dst = msg_src; HMAC = true}}"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t-- it's a tramsmitted message from a source in the cache"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t-- regardless of the attestation status, we won't send a request"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_AM_REQUEST_MESSAGE;"
-						+ System.lineSeparator() + System.lineSeparator();
-
-				amImplAgree = amImplAgree + "\t\t\t-- set attestation manager out messages" + System.lineSeparator();
-				for (int i = 0; i < amPortNames.size(); i++) {
-					DataImplementation di = amPortTypes.get(i);
-					amImplAgree = amImplAgree + "\t\t\teq am_" + amPortNames.get(i) + "_out_msg : " + di.getName()
-							+ " = "
-							+ System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\tif am_response_msg then" + System.lineSeparator();
-					String nullMsg = di.getName() + " {header = " + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_HEADER";
-					for (DataSubcomponent sub : di.getOwnedDataSubcomponents()) {
-						if (sub.getName().equalsIgnoreCase("header")) {
-							continue;
-						}
-						nullMsg = nullMsg + "; " + sub.getName() + " = am_" + amPortNames.get(i) + "_out."
-								+ sub.getName();
-					}
-					nullMsg = nullMsg + "}";
-					amImplAgree = amImplAgree + "\t\t\t\t\t" + nullMsg + System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\telse if " + CASE_MODEL_TRANSFORMATIONS_NAME
-							+ ".NULL_MESSAGE(am_"
-							+ amPortNames.get(i) + "_in.header) then" + System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in" + System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\telse if not " + CASE_MODEL_TRANSFORMATIONS_NAME
-							+ ".IN_CACHE(msg_src) or " + CASE_MODEL_TRANSFORMATIONS_NAME + ".IS_STALE(msg_src) then"
-							+ System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\t\t" + nullMsg + System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\telse if " + CASE_MODEL_TRANSFORMATIONS_NAME
-							+ ".PASS_ATTESTATION(msg_src) then"
-							+ System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in"
-							+ System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
-					amImplAgree = amImplAgree + "\t\t\t\t\t" + nullMsg + ";" + System.lineSeparator()
-							+ System.lineSeparator();
-				}
-
-				amImplAgree = amImplAgree + "\t\t\t-- Update cache" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tconst AM_CACHE_SIZE : int = " + cacheSize + ";"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\teq was_response_requested : bool = am_response_msg and "
-						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".GET_STATUS(am_response.header.src) = "
-						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".AM_REQUESTING;" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\teq am_status : int = if am_response_msg and am_response.status then "
-						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".AM_PASS else " + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".AM_FAIL;" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\teq src_added : bool = " + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\tif was_response_requested then" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".ADD_RECORD(am_response.header.src, am_status, 0, AM_CACHE_SIZE)"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\telse if not (am_request_msg = " + CASE_MODEL_TRANSFORMATIONS_NAME
-						+ ".NULL_AM_REQUEST_MESSAGE) then" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".ADD_RECORD(msg_src, "
-						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".AM_REQUESTING, 0, AM_CACHE_SIZE)"
-						+ System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\t\t\tfalse;" + System.lineSeparator() + System.lineSeparator();
-
-				amImplAgree = amImplAgree + "\t\t\t-- assert outputs" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tassert(am_request = am_request_msg);" + System.lineSeparator();
-				amImplAgree = amImplAgree + "\t\t\tassert(was_response_requested => src_added);"
-						+ System.lineSeparator();
-				for (int i = 0; i < amPortNames.size(); i++) {
-					amImplAgree = amImplAgree + "\t\t\tassert(am_" + amPortNames.get(i) + "_out = am_"
-							+ amPortNames.get(i) + "_out_msg);" + System.lineSeparator();
-				}
-				amImplAgree = amImplAgree + System.lineSeparator() + "\t\t**}";
-
-				final DefaultAnnexSubclause amAgreeSubclause = attestationManagerThreadImpl.createOwnedAnnexSubclause();
-				amAgreeSubclause.setName("agree");
-				amAgreeSubclause.setSourceText(amImplAgree);
+//					amImplAgree = amImplAgree + "MSG_CTR(" + CASE_MODEL_TRANSFORMATIONS_NAME
+//							+ ".NULL_MESSAGE(am_" + amPortNames.get(i) + "_in.header))" + " + "
+//							+ System.lineSeparator();
+////					if (i < amPortNames.size() - 1) {
+////						amImplAgree = amImplAgree + " + " + System.lineSeparator();
+////					}
+//				}
+//				amImplAgree = amImplAgree + "\t\t\t\tMSG_CTR(" + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".NULL_MESSAGE(am_response.header))";
+//				amImplAgree = amImplAgree + ") <= 1;" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tassert(one_incoming_message);" + System.lineSeparator()
+//						+ System.lineSeparator();
+//
+//				amImplAgree = amImplAgree + "\t\t\t-- source of the transmitted message, if one was sent"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\teq msg_src : int = " + System.lineSeparator();
+//				for (int i = 0; i < amPortNames.size(); i++) {
+//					if (i == 0) {
+//						amImplAgree = amImplAgree + "\t\t\t\tif not " + CASE_MODEL_TRANSFORMATIONS_NAME
+//								+ ".NULL_MESSAGE(am_" + amPortNames.get(i) + "_in.header) then"
+//								+ System.lineSeparator();
+//						amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in.header.src"
+//								+ System.lineSeparator();
+//					} else {
+//						amImplAgree = amImplAgree + "\t\t\t\telse if not " + CASE_MODEL_TRANSFORMATIONS_NAME
+//								+ ".MESSAGE_HEADER(am_" + amPortNames.get(i) + "_in.header) then"
+//								+ System.lineSeparator();
+//						amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in.header.src"
+//								+ System.lineSeparator();
+//					}
+//				}
+//				amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_ID;"
+//						+ System.lineSeparator() + System.lineSeparator();
+//
+//				amImplAgree = amImplAgree
+//						+ "\t\t\t-- Helper function to get the header from the attestation manager inport with the specified ID"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tfun GET_HEADER(src : int) : CASE_MsgHeader.Impl = "
+//						+ System.lineSeparator();
+//				for (int i = 0; i < amPortNames.size(); i++) {
+//					if (i == 0) {
+//						amImplAgree = amImplAgree + "\t\t\t\tif am_" + amPortNames.get(i)
+//								+ "_in.header.src = src then am_" + amPortNames.get(i) + "_in.header"
+//								+ System.lineSeparator();
+//					} else {
+//						amImplAgree = amImplAgree + "\t\t\t\telse if am_" + amPortNames.get(i)
+//								+ "_in.header.src = src then am_" + amPortNames.get(i) + "_in.header"
+//								+ System.lineSeparator();
+//					}
+//				}
+//				amImplAgree = amImplAgree + "\t\t\t\telse " + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_HEADER;"
+//						+ System.lineSeparator() + System.lineSeparator();
+//
+//				amImplAgree = amImplAgree + "\t\t\t-- Set am_request message" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\teq am_request_msg : CASE_AttestationRequestMsg.Impl = "
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\tif am_response_msg then" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t-- it's a response message so no need to send a request"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_AM_REQUEST_MESSAGE"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\telse if " + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".NULL_MESSAGE(GET_HEADER(msg_src)) then" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t-- it's an empty message" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_AM_REQUEST_MESSAGE"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\telse if not " + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".IN_CACHE(msg_src) or " + CASE_MODEL_TRANSFORMATIONS_NAME + ".IS_STALE(msg_src) then"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree
+//						+ "\t\t\t\t\t-- it's a transmitted message from a source not in the cache, so send an am_request"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree
+//						+ "\t\t\t\t\t-- or it's a transmitted message from a source in the cache, but stale, so send a new am_request"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree
+//						+ "\t\t\t\t\tCASE_AttestationRequestMsg.Impl {header = CASE_MsgHeader.Impl {src = CASE_UAV_ID; dst = msg_src; HMAC = true}}"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t-- it's a tramsmitted message from a source in the cache"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t-- regardless of the attestation status, we won't send a request"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_AM_REQUEST_MESSAGE;"
+//						+ System.lineSeparator() + System.lineSeparator();
+//
+//				amImplAgree = amImplAgree + "\t\t\t-- set attestation manager out messages" + System.lineSeparator();
+//				for (int i = 0; i < amPortNames.size(); i++) {
+//					DataImplementation di = amPortTypes.get(i);
+//					amImplAgree = amImplAgree + "\t\t\teq am_" + amPortNames.get(i) + "_out_msg : " + di.getName()
+//							+ " = "
+//							+ System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\tif am_response_msg then" + System.lineSeparator();
+//					String nullMsg = di.getName() + " {header = " + CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_HEADER";
+//					for (DataSubcomponent sub : di.getOwnedDataSubcomponents()) {
+//						if (sub.getName().equalsIgnoreCase("header")) {
+//							continue;
+//						}
+//						nullMsg = nullMsg + "; " + sub.getName() + " = am_" + amPortNames.get(i) + "_out."
+//								+ sub.getName();
+//					}
+//					nullMsg = nullMsg + "}";
+//					amImplAgree = amImplAgree + "\t\t\t\t\t" + nullMsg + System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\telse if " + CASE_MODEL_TRANSFORMATIONS_NAME
+//							+ ".NULL_MESSAGE(am_"
+//							+ amPortNames.get(i) + "_in.header) then" + System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in" + System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\telse if not " + CASE_MODEL_TRANSFORMATIONS_NAME
+//							+ ".IN_CACHE(msg_src) or " + CASE_MODEL_TRANSFORMATIONS_NAME + ".IS_STALE(msg_src) then"
+//							+ System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\t\t" + nullMsg + System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\telse if " + CASE_MODEL_TRANSFORMATIONS_NAME
+//							+ ".PASS_ATTESTATION(msg_src) then"
+//							+ System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\t\tam_" + amPortNames.get(i) + "_in"
+//							+ System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
+//					amImplAgree = amImplAgree + "\t\t\t\t\t" + nullMsg + ";" + System.lineSeparator()
+//							+ System.lineSeparator();
+//				}
+//
+//				amImplAgree = amImplAgree + "\t\t\t-- Update cache" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tconst AM_CACHE_SIZE : int = " + cacheSize + ";"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\teq was_response_requested : bool = am_response_msg and "
+//						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".GET_STATUS(am_response.header.src) = "
+//						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".AM_REQUESTING;" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\teq am_status : int = if am_response_msg and am_response.status then "
+//						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".AM_PASS else " + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".AM_FAIL;" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\teq src_added : bool = " + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\tif was_response_requested then" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".ADD_RECORD(am_response.header.src, am_status, 0, AM_CACHE_SIZE)"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\telse if not (am_request_msg = " + CASE_MODEL_TRANSFORMATIONS_NAME
+//						+ ".NULL_AM_REQUEST_MESSAGE) then" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\t" + CASE_MODEL_TRANSFORMATIONS_NAME + ".ADD_RECORD(msg_src, "
+//						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".AM_REQUESTING, 0, AM_CACHE_SIZE)"
+//						+ System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\telse" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\t\t\tfalse;" + System.lineSeparator() + System.lineSeparator();
+//
+//				amImplAgree = amImplAgree + "\t\t\t-- assert outputs" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tassert(am_request = am_request_msg);" + System.lineSeparator();
+//				amImplAgree = amImplAgree + "\t\t\tassert(was_response_requested => src_added);"
+//						+ System.lineSeparator();
+//				for (int i = 0; i < amPortNames.size(); i++) {
+//					amImplAgree = amImplAgree + "\t\t\tassert(am_" + amPortNames.get(i) + "_out = am_"
+//							+ amPortNames.get(i) + "_out_msg);" + System.lineSeparator();
+//				}
+//				amImplAgree = amImplAgree + System.lineSeparator() + "\t\t**}";
+//
+//				final DefaultAnnexSubclause amAgreeSubclause = attestationManagerThreadImpl.createOwnedAnnexSubclause();
+//				amAgreeSubclause.setName("agree");
+//				amAgreeSubclause.setSourceText(amImplAgree);
 
 				// Add it to proper place
 				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 2,
@@ -825,6 +773,7 @@ public class AddAttestationManager extends AadlHandler {
 					// If the prove statement exists, the *_CASE_Claims file should also already
 					// exist, but double check just to be sure, and create it if it doesn't
 					CaseClaimsManager.getInstance().addAttestationManager(attestationResoluteClause);
+//					CaseClaimsManager.getInstance(aadlPkg).addAttestationManager(attestationResoluteClause);
 
 				}
 
@@ -843,11 +792,17 @@ public class AddAttestationManager extends AadlHandler {
 							AgreeContractSubclause agreeContract = (AgreeContractSubclause) annexSubclauseImpl
 									.getParsedAnnexSubclause();
 							AgreeAnnexUnparser unparser = new AgreeAnnexUnparser();
+							// TODO: use unparser to unparse just guarantee statements
 							String specs = unparser.unparseContract((AgreeContract) agreeContract.getContract(), "");
 							int gCtr = 1;
-							for (String line : specs.split(System.lineSeparator())) {
-								if (line.trim().toLowerCase().startsWith("guarantee")) {
-									String guarantee = line.trim();
+//							for (String line : specs.split(System.lineSeparator())) {
+							for (String spec : specs.split(";")) {
+								if (spec.trim().toLowerCase().startsWith("guarantee")) {
+//									String guarantee = line.trim();
+									String guarantee = "";
+									for (String line : spec.trim().concat(";").split(System.lineSeparator())) {
+										guarantee += line.trim() + " ";
+									}
 
 									String expr = guarantee
 											.substring(guarantee.lastIndexOf(":") + 1, guarantee.lastIndexOf(";"))
@@ -899,36 +854,36 @@ public class AddAttestationManager extends AadlHandler {
 					annexSubclauseImpl.setSourceText(agreeClauses);
 				}
 
-				// Add AGREE helper constants/functions to package annex library
-				String annexLibraryText = "";
-				for (AnnexLibrary annexLibrary : pkgSection.getOwnedAnnexLibraries()) {
-					if (annexLibrary.getName().equalsIgnoreCase("agree")) {
-						DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
-//						defaultAnnexLibrary.setSourceText(defaultAnnexLibrary.getSourceText()
-//								.replace("{**" + System.lineSeparator(), annexLibraryText));
-						annexLibraryText = defaultAnnexLibrary.getSourceText();
-//						agreeAnnexLibraryFound = true;
-						break;
-					}
-				}
-				if (annexLibraryText.isEmpty()) {
-					annexLibraryText = "{**" + System.lineSeparator();
-				} else {
-					annexLibraryText = annexLibraryText.replace("**}", "").trim() + System.lineSeparator()
-							+ System.lineSeparator();
-				}
-				// Cache size
-				annexLibraryText = annexLibraryText + "\t\t-- Size of the Attestation Manager cache as specified by the CASE_Properties::CACHE_SIZE property" + System.lineSeparator();
-				annexLibraryText = annexLibraryText + "\t\tconst AM_CACHE_SIZE : int = " + cacheSize + ";" + System.lineSeparator() + System.lineSeparator();
-				// TRUSTED function
-				annexLibraryText = annexLibraryText + "\t\t-- This function checks whether a message sender has passed attestation" + System.lineSeparator();
-				annexLibraryText = annexLibraryText + "\t\tfun TRUSTED_MESSAGE(header : CASE_MsgHeader.Impl) : bool = "
-						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_MESSAGE(header) or "
-						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".TRUSTED(header.src);" + System.lineSeparator()
-						+ System.lineSeparator();
-				annexLibraryText = annexLibraryText + "\t**}";
-
-				// TODO: Figure out how to write this to the package section annex library
+//				// Add AGREE helper constants/functions to package annex library
+//				String annexLibraryText = "";
+//				for (AnnexLibrary annexLibrary : pkgSection.getOwnedAnnexLibraries()) {
+//					if (annexLibrary.getName().equalsIgnoreCase("agree")) {
+//						DefaultAnnexLibrary defaultAnnexLibrary = (DefaultAnnexLibrary) annexLibrary;
+////						defaultAnnexLibrary.setSourceText(defaultAnnexLibrary.getSourceText()
+////								.replace("{**" + System.lineSeparator(), annexLibraryText));
+//						annexLibraryText = defaultAnnexLibrary.getSourceText();
+////						agreeAnnexLibraryFound = true;
+//						break;
+//					}
+//				}
+//				if (annexLibraryText.isEmpty()) {
+//					annexLibraryText = "{**" + System.lineSeparator();
+//				} else {
+//					annexLibraryText = annexLibraryText.replace("**}", "").trim() + System.lineSeparator()
+//							+ System.lineSeparator();
+//				}
+//				// Cache size
+//				annexLibraryText = annexLibraryText + "\t\t-- Size of the Attestation Manager cache as specified by the CASE_Properties::CACHE_SIZE property" + System.lineSeparator();
+//				annexLibraryText = annexLibraryText + "\t\tconst AM_CACHE_SIZE : int = " + cacheSize + ";" + System.lineSeparator() + System.lineSeparator();
+//				// TRUSTED function
+//				annexLibraryText = annexLibraryText + "\t\t-- This function checks whether a message sender has passed attestation" + System.lineSeparator();
+//				annexLibraryText = annexLibraryText + "\t\tfun TRUSTED_MESSAGE(header : CASE_MsgHeader.Impl) : bool = "
+//						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".NULL_MESSAGE(header) or "
+//						+ CASE_MODEL_TRANSFORMATIONS_NAME + ".TRUSTED(header.src);" + System.lineSeparator()
+//						+ System.lineSeparator();
+//				annexLibraryText = annexLibraryText + "\t**}";
+//
+//				// TODO: Figure out how to write this to the package section annex library
 
 			}
 		});
