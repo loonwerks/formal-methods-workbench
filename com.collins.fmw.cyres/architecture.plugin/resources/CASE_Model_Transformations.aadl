@@ -13,17 +13,18 @@ public
 		subcomponents
 			src: data Base_Types::Integer;
 			dst: data Base_Types::Integer;
+			msg_type: data Base_Types::Integer;
 			HMAC: data Base_Types::Boolean;
 	end CASE_MsgHeader.Impl;
 
-	-- RF Message structure
+	-- CASE RF Message structure
 	data CASE_RF_Msg
 	end CASE_RF_Msg;
 	
 	data implementation CASE_RF_Msg.Impl
 		subcomponents
 			header: data CASE_MsgHeader.Impl;
-			message: data Base_Types::String;
+			payload: data;
 	end CASE_RF_Msg.Impl;
 	
 	
@@ -87,8 +88,15 @@ public
 		-- Empty message header
 		-- This indicates that the rest of the message can be ignored
 		const NULL_ID : int = 0;
-		const NULL_HEADER : CASE_MsgHeader.Impl = CASE_MsgHeader.Impl {src = NULL_ID; dst = NULL_ID; HMAC = false};
+		const NULL_HEADER : CASE_MsgHeader.Impl = CASE_MsgHeader.Impl {src = NULL_ID; dst = NULL_ID; msg_type = NULL_MSG_TYPE; HMAC = false};
 		fun NULL_MESSAGE(header : CASE_MsgHeader.Impl) : bool = (header = NULL_HEADER);
+	
+		-- CASE message types
+		-- Users will add their own
+		const NULL_MSG_TYPE : int = 0;
+		const AM_REQUEST_MSG_TYPE : int = 1;
+		const AM_RESPONSE_MSG_TYPE : int = 2;
+		const FREE_MSG_TYPE : int = 3;
 	
 		---------------------------
 		-- MODEL TRANSFORMATIONS --
@@ -122,6 +130,7 @@ public
 		const AM_FAIL : int = 0;
 		const AM_PASS : int = 1;
 		const AM_REQUESTING : int = 2;
+--		enum AM_STATUS = {FAIL, PASS, REQUESTING};
 		
 		-- Returns whether the specified node is in the cache
 		node IN_CACHE(src : int) returns (result : bool);
@@ -131,6 +140,7 @@ public
 		
 		-- Returns the attestation status of the specified node
 		node GET_STATUS(src : int) returns (result : int);
+--		node GET_STATUS(src : int) returns (result : AM_STATUS);
 		var record : CASE_AttestationCacheRecord.Impl;
 		let
 			record = GET_RECORD_BY_NAME(src);

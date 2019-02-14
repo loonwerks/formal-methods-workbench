@@ -23,7 +23,6 @@ import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
@@ -151,30 +150,37 @@ public class AddFilter extends AadlHandler {
 					return;
 				}
 
-				// CASE Property file
-				// First check if CASE Property file has already been imported in the model
-				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySet casePropSet = null;
-				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySet) {
-						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySet) modelUnit;
-							break;
-						}
-					}
+				// Import CASE_Properties file
+				if (!addCasePropertyImport(pkgSection)) {
+					return;
 				}
-
-				if (casePropSet == null) {
-					// Try importing the resource
-					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-					if (casePropSet == null) {
-						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
-								"Property set " + CASE_PROPSET_NAME + " could not be found.");
-						return;
-					}
-					// Add as "importedUnit" to package section
-					pkgSection.getImportedUnits().add(casePropSet);
+				// Import CASE_Model_Transformations file
+				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+					return;
 				}
+//				// First check if CASE Property file has already been imported in the model
+//				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
+//				PropertySet casePropSet = null;
+//				for (ModelUnit modelUnit : importedUnits) {
+//					if (modelUnit instanceof PropertySet) {
+//						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
+//							casePropSet = (PropertySet) modelUnit;
+//							break;
+//						}
+//					}
+//				}
+//
+//				if (casePropSet == null) {
+//					// Try importing the resource
+//					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
+//					if (casePropSet == null) {
+//						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
+//								"Property set " + CASE_PROPSET_NAME + " could not be found.");
+//						return;
+//					}
+//					// Add as "importedUnit" to package section
+//					pkgSection.getImportedUnits().add(casePropSet);
+//				}
 
 				// Create Filter thread type
 //				EClass componentClass;
@@ -245,6 +251,8 @@ public class AddFilter extends AadlHandler {
 				portOut.setName(FILTER_PORT_OUT_NAME);
 
 				// Add filter properties
+				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
+						resource.getResourceSet());
 				// CASE::COMP_TYPE Property
 				if (!addPropertyAssociation("COMP_TYPE", "FILTER", filterThreadType, casePropSet)) {
 //					return;
@@ -474,10 +482,16 @@ public class AddFilter extends AadlHandler {
 					AgreeContractSubclause agreeContract = (AgreeContractSubclause) annexSubclauseImpl
 							.getParsedAnnexSubclause();
 					AgreeAnnexUnparser unparser = new AgreeAnnexUnparser();
+					// TODO: unparse just guarantee statements
 					String specs = unparser.unparseContract((AgreeContract) agreeContract.getContract(), "");
-					for (String line : specs.split(System.lineSeparator())) {
-						if (line.trim().toLowerCase().startsWith("guarantee")) {
-							guarantees.add(line.trim());
+					for (String spec : specs.split(";")) {
+						if (spec.trim().toLowerCase().startsWith("guarantee")) {
+							String guarantee = "";
+							for (String line : spec.trim().concat(";").split(System.lineSeparator())) {
+								guarantee += line.trim() + " ";
+							}
+
+							guarantees.add(guarantee.trim());
 						}
 					}
 					break;

@@ -153,8 +153,8 @@ public class AddRequirement extends AbstractHandler {
 
 				// Delete and re-insert this component from package section
 				// This seems to be the only way to get the formatting (mostly) correct
-				pkgSection.getOwnedClassifiers().remove(idx);
-				pkgSection.getOwnedClassifiers().add(idx, classifier);
+//				pkgSection.getOwnedClassifiers().remove(idx);
+//				pkgSection.getOwnedClassifiers().add(idx, classifier);
 			}
 		});
 	}
@@ -163,6 +163,16 @@ public class AddRequirement extends AbstractHandler {
 
 		// Add requirement
 		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqID, reqText);
+
+//		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+//		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
+//			@Override
+//			public void process(final XtextResource resource) throws Exception {
+//				// Get the package in the model
+//				final AadlPackageImpl aadlPkg = (AadlPackageImpl) resource.getContents().get(0);
+//				CaseClaimsManager.getInstance(aadlPkg).addFunctionDefinition(reqName, reqID, reqText);
+//			}
+//		});
 	}
 
 	/**

@@ -6,7 +6,6 @@ import java.util.TreeSet;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -34,8 +33,10 @@ import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListType;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.ModalPropertyValue;
+import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertySet;
@@ -246,8 +247,7 @@ public abstract class AadlHandler extends AbstractHandler {
 
 		// Check if the property is already present in the component.
 		// If so, we don't need to create a new property association, just overwrite the existing one
-		EList<PropertyAssociation> propAssociations = componentType.getOwnedPropertyAssociations();
-		for (PropertyAssociation propAssoc : propAssociations) {
+		for (PropertyAssociation propAssoc : componentType.getOwnedPropertyAssociations()) {
 			if (propAssoc.getProperty().getName().equalsIgnoreCase(propName)) {
 				propAssocImpl = propAssoc;
 				break;
@@ -353,6 +353,98 @@ public abstract class AadlHandler extends AbstractHandler {
 					"Could not determine property type of " + propName + ".");
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Adds the CASE_Properties file to the list of imported model units via the 'with' statement
+	 * to the specified package section
+	 * @param pkgSection - The package section (public or private) to add the imported file to
+	 * @return success of add operation
+	 */
+	protected boolean addCasePropertyImport(PackageSection pkgSection) throws Exception {
+
+		// First check if CASE Property file has already been imported in the model
+		PropertySet casePropSet = null;
+		for (ModelUnit modelUnit : pkgSection.getImportedUnits()) {
+			if (modelUnit instanceof PropertySet) {
+				if (modelUnit.getName().equalsIgnoreCase(CASE_PROPSET_NAME)) {
+					casePropSet = (PropertySet) modelUnit;
+					break;
+				}
+			}
+		}
+
+		if (casePropSet == null) {
+			// Try importing the resource
+			casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, pkgSection.eResource().getResourceSet());
+			if (casePropSet == null) {
+				Dialog.showError("Could not import " + CASE_PROPSET_NAME,
+						"Property set " + CASE_PROPSET_NAME + " could not be found.");
+				return false;
+			}
+			// Add as "importedUnit" to package section
+			pkgSection.getImportedUnits().add(casePropSet);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Adds the CASE_Model_Transformations file to the list of imported model units via the 'with' statement
+	 * to the specified package section
+	 * @param pkgSection - The package section (public or private) to add the imported file to
+	 * @param addRenameAll - If true, will add a rename::all for the package
+	 * @return success of add operation
+	 */
+	protected boolean addCaseModelTransformationsImport(PackageSection pkgSection, boolean addRenameAll)
+			throws Exception {
+
+		// First check if CASE_Model_Transformations file has already been imported in the model
+		AadlPackage casePackage = null;
+		for (ModelUnit modelUnit : pkgSection.getImportedUnits()) {
+			if (modelUnit instanceof AadlPackage) {
+				if (modelUnit.getName().equalsIgnoreCase(CASE_MODEL_TRANSFORMATIONS_NAME)) {
+					casePackage = (AadlPackage) modelUnit;
+					break;
+				}
+			}
+		}
+
+		if (casePackage == null) {
+			// Try importing the resource
+			casePackage = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME, CASE_MODEL_TRANSFORMATIONS_FILE,
+					pkgSection.eResource().getResourceSet());
+			if (casePackage == null) {
+				Dialog.showError("Could not import " + CASE_MODEL_TRANSFORMATIONS_NAME,
+						"Package " + CASE_MODEL_TRANSFORMATIONS_NAME + " could not be found.");
+				return false;
+			}
+			// Add as "importedUnit" to package section
+			pkgSection.getImportedUnits().add(casePackage);
+		}
+
+//		if (addRenameAll) {
+//			// Check if the rename already exists
+//			PackageRename pkgRename = null;
+//			for (PackageRename pr : pkgSection.getOwnedPackageRenames()) {
+//				if (pr.getRenamedPackage().getName().equalsIgnoreCase(CASE_MODEL_TRANSFORMATIONS_NAME)) {
+//					pkgRename = pr;
+//					break;
+//				}
+//			}
+//
+//			if (pkgRename == null) {
+//				// Add the rename
+//				pkgRename = pkgSection.createOwnedPackageRename();
+////				pkgRename = Aadl2Factory.eINSTANCE.createPackageRename();
+//				pkgRename.setRenameAll(true);
+//				pkgRename.setRenamedPackage(casePackage);
+////				pkgSection.getOwnedPackageRenames().add(pkgRename);
+//			}
+//
+//		}
 
 		return true;
 	}
