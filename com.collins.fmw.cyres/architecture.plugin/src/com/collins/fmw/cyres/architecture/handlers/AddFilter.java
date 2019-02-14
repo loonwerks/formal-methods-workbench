@@ -482,10 +482,16 @@ public class AddFilter extends AadlHandler {
 					AgreeContractSubclause agreeContract = (AgreeContractSubclause) annexSubclauseImpl
 							.getParsedAnnexSubclause();
 					AgreeAnnexUnparser unparser = new AgreeAnnexUnparser();
+					// TODO: unparse just guarantee statements
 					String specs = unparser.unparseContract((AgreeContract) agreeContract.getContract(), "");
-					for (String line : specs.split(System.lineSeparator())) {
-						if (line.trim().toLowerCase().startsWith("guarantee")) {
-							guarantees.add(line.trim());
+					for (String spec : specs.split(";")) {
+						if (spec.trim().toLowerCase().startsWith("guarantee")) {
+							String guarantee = "";
+							for (String line : spec.trim().concat(";").split(System.lineSeparator())) {
+								guarantee += line.trim() + " ";
+							}
+
+							guarantees.add(guarantee.trim());
 						}
 					}
 					break;
