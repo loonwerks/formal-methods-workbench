@@ -19,6 +19,7 @@ import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusType;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierType;
+import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
@@ -315,7 +316,12 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		pairList.add(Pair.build("name", sc.getName()));
 		pairList.add(Pair.build("kind", "Subcomponent"));
 		pairList.add(Pair.build("category", sc.getCategory().getName()));
-		pairList.add(Pair.build("classifier", sc.getClassifier().getQualifiedName()));
+		ComponentClassifier c = sc.getClassifier();
+		if (c == null) {
+			pairList.add(Pair.build("classifier", "null"));
+		} else {
+			pairList.add(Pair.build("classifier", sc.getClassifier().getQualifiedName()));
+		}
 		return ObjectValue.build(pairList);
 	}
 
@@ -323,17 +329,17 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 
 	@Override
 	public Value caseDataPort(DataPort port) {
-		return buildPort(port.getName(), "DataPort", port.isIn(), port.isOut());
+		return buildPort(port.getName(), "DataPort", port.getClassifier(), port.isIn(), port.isOut());
 	}
 
 	@Override
 	public Value caseEventDataPort(EventDataPort port) {
-		return buildPort(port.getName(), "EventDataPort", port.isIn(), port.isOut());
+		return buildPort(port.getName(), "EventDataPort", port.getClassifier(), port.isIn(), port.isOut());
 	}
 
 	@Override
 	public Value caseEventPort(EventPort port) {
-		return buildPort(port.getName(), "EventPort", port.isIn(), port.isOut());
+		return buildPort(port.getName(), "EventPort", port.getClassifier(), port.isIn(), port.isOut());
 	}
 
 	@Override
@@ -358,15 +364,17 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		return ObjectValue.build(pairList);
 	}
 
-	private Value buildPort(String name, String kind, boolean in, boolean out) {
+	private Value buildPort(String name, String kind, Classifier classifier, boolean in, boolean out) {
 
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("name", name));
 		pairList.add(Pair.build("kind", kind));
-		String s = getInOutString(in, out);
-		if (!s.isEmpty()) {
-			pairList.add(Pair.build("direction", getInOutString(in, out)));
+		if (classifier == null) {
+			pairList.add(Pair.build("classifier", "null"));
+		} else {
+			pairList.add(Pair.build("classifier", classifier.getQualifiedName()));
 		}
+		pairList.add(Pair.build("direction", getInOutString(in, out)));
 
 		return ObjectValue.build(pairList);
 	}
