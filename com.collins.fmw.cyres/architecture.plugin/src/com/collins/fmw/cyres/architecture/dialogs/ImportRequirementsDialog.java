@@ -26,6 +26,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	List<String> lblReqTexts = new ArrayList<>();
 	List<Text> txtIDs = new ArrayList<>();
 	List<String> lblComponents = new ArrayList<>();
+	List<Button> btnAgreeProps = new ArrayList<>();
 	List<Text> txtRationales = new ArrayList<>();
 	List<CASE_Requirement> existingRequirements = new ArrayList<>();
 	List<CASE_Requirement> importRequirements = new ArrayList<>();
@@ -50,7 +51,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		GridLayout layout = new GridLayout(5, false);
+		GridLayout layout = new GridLayout(6, false);
 		container.setLayout(layout);
 
 		// Add filter information fields
@@ -76,10 +77,15 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		lblHeaderField.setText("Component");
 		lblHeaderField.setFont(font);
 		lblHeaderField = new Label(container, SWT.WRAP);
+		lblHeaderField.setText("AGREE Property");
+		lblHeaderField.setFont(font);
+		lblHeaderField = new Label(container, SWT.WRAP);
 		lblHeaderField.setText("Rationale for Omission");
 		lblHeaderField.setFont(font);
 
 		Label separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
+		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -133,12 +139,21 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		lblCompName.setText(compName);
 		lblComponents.add(compName);
 
+		Button btnAgree = new Button(container, SWT.CHECK);
+		btnAgree.setText("");
+		btnAgree.setSelection(false);
+		GridData agreePropInfoField = new GridData(SWT.CENTER, SWT.FILL, true, false);
+		btnAgree.setLayoutData(agreePropInfoField);
+		btnAgreeProps.add(btnAgree);
+
 		Text txtRationale = new Text(container, SWT.BORDER);
 		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
 		txtRationale.setLayoutData(dataInfoField);
 		txtRationales.add(txtRationale);
 
 		Label separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
+		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -176,10 +191,12 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 					return false;
 				}
 				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), lblComponents.get(i), txtRationales.get(i).getText()));
+						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
+						txtRationales.get(i).getText()));
 			} else {
 				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), lblComponents.get(i), txtRationales.get(i).getText()));
+						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
+						txtRationales.get(i).getText()));
 			}
 		}
 		return true;

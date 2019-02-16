@@ -41,13 +41,16 @@ public class AddRequirement extends AbstractHandler {
 		public String id = "";
 		public String text = "";
 		public String component = "";
+		public boolean agree = false;
 		public String rationale = "";
 
-		public CASE_Requirement(String name, String id, String text, String component, String rationale) {
+		public CASE_Requirement(String name, String id, String text, String component, boolean agree,
+				String rationale) {
 			this.name = name;
 			this.id = id;
 			this.text = text;
 			this.component = component;
+			this.agree = agree;
 			this.rationale = rationale;
 		}
 	}
@@ -82,9 +85,9 @@ public class AddRequirement extends AbstractHandler {
 //				// Add corresponding resolute clauses to *_CASE_Claims.aadl
 //				addClaims(reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
 				// Insert requirements into model
-				addRequirement(req.component, req.name, req.id, req.text);
+				addRequirement(req.component, req.name, req.id, req.text, req.agree);
 				// Add corresponding resolute clauses to *_CASE_Claims.aadl
-				addClaims(req.name, req.id, req.text);
+				addClaims(req.name, req.id, req.text, req.agree);
 			}
 
 			// TODO: Write omitted requirements to log
@@ -93,7 +96,7 @@ public class AddRequirement extends AbstractHandler {
 		return null;
 	}
 
-	private void addRequirement(String componentName, String reqName, String reqID, String reqText) {
+	private void addRequirement(String componentName, String reqName, String reqID, String reqText, boolean agreeProp) {
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
@@ -119,7 +122,7 @@ public class AddRequirement extends AbstractHandler {
 					DefaultAnnexSubclauseImpl annexSubclauseImpl = (DefaultAnnexSubclauseImpl) annexSubclause.next();
 					String sourceText = annexSubclauseImpl.getSourceText();
 
-					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree")) {
+					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree") && agreeProp) {
 						// Add AGREE assume statement
 						assumeStatement = sourceText.replace("{**", assumeStatement);
 						// Delete annex subclause from owned subclauses. Will add it back later.
@@ -134,13 +137,15 @@ public class AddRequirement extends AbstractHandler {
 					}
 				}
 
-				DefaultAnnexSubclauseImpl agreeSubclause = (DefaultAnnexSubclauseImpl) threadType
-						.createOwnedAnnexSubclause();
-				agreeSubclause.setName("agree");
-				if (!assumeStatement.contains("**}")) {
-					assumeStatement = assumeStatement + System.lineSeparator() + "\t\t**}";
+				if (agreeProp) {
+					DefaultAnnexSubclauseImpl agreeSubclause = (DefaultAnnexSubclauseImpl) threadType
+							.createOwnedAnnexSubclause();
+					agreeSubclause.setName("agree");
+					if (!assumeStatement.contains("**}")) {
+						assumeStatement = assumeStatement + System.lineSeparator() + "\t\t**}";
+					}
+					agreeSubclause.setSourceText(assumeStatement);
 				}
-				agreeSubclause.setSourceText(assumeStatement);
 
 				DefaultAnnexSubclauseImpl resoluteSubclause = (DefaultAnnexSubclauseImpl) threadType
 						.createOwnedAnnexSubclause();
@@ -159,10 +164,10 @@ public class AddRequirement extends AbstractHandler {
 		});
 	}
 
-	private void addClaims(String reqName, String reqID, String reqText) {
+	private void addClaims(String reqName, String reqID, String reqText, boolean agreeProp) {
 
 		// Add requirement
-		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqID, reqText);
+		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqID, reqText, agreeProp);
 
 //		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 //		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
@@ -228,7 +233,7 @@ public class AddRequirement extends AbstractHandler {
 									if (fnCall.getFn().getName() != null
 											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
 										resoluteClauses.add(new CASE_Requirement(fnCall.getFn().getName(), "", "",
-												compType.getName(), ""));
+												compType.getName(), false, ""));
 									}
 								}
 							}

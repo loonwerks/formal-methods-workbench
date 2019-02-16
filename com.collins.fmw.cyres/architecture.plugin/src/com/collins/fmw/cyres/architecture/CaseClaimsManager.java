@@ -123,18 +123,25 @@ public class CaseClaimsManager {
 	}
 
 
-	public void addFunctionDefinition(String reqName, String reqID, String reqText) {
+	public void addFunctionDefinition(String reqName, String reqID, String reqText, boolean agreeProp) {
 
 		// Add basic function body to resolute annex
-		String clause = "\t\t" + reqName + "(c : component, property_id : string) <=" + System.lineSeparator()
+		String clause = "";
+		if (agreeProp) {
+			clause = "\t\t" + reqName + "(c : component, property_id : string) <=" + System.lineSeparator()
 				+ "\t\t\t** \"" + reqID + ": " + reqText + "\" **" + System.lineSeparator()
 				+ "\t\t\tagree_prop_checked(c, property_id)" + System.lineSeparator();
-
+		} else {
+			clause = "\t\t" + reqName + "(c : component) <=" + System.lineSeparator() + "\t\t\t** \"" + reqID + ": "
+					+ reqText + "\" **" + System.lineSeparator() + "\t\t\tfalse" + System.lineSeparator();
+		}
 		addToResoluteAnnex(clause);
 
 	}
 
 	public void addFilter(String reqName) {
+
+		// TODO: make sure to check if agree property exists
 
 		String annex = readClaimsFile();
 //		String annex = readPrivateSectionClaims();
@@ -161,6 +168,8 @@ public class CaseClaimsManager {
 	}
 
 	public void addAttestationManager(String reqName) {
+
+		// TODO: make sure to check if agree property exists
 
 		String annex = readClaimsFile();
 //		String annex = readPrivateSectionClaims();

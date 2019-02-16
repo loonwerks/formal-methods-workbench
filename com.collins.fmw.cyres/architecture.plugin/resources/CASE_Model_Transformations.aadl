@@ -112,16 +112,35 @@ public
 																					src5 = NULL_RECORD;
 																					src6 = NULL_RECORD};
 		
-		const NULL_RECORD : CASE_AttestationCacheRecord.Impl = CASE_AttestationCacheRecord.Impl {src = 0; trusted = AM_FAIL; timeout = 0};
+		const NULL_RECORD : CASE_AttestationCacheRecord.Impl = CASE_AttestationCacheRecord.Impl {src = NULL_ID; trusted = AM_FAIL; timeout = 0};
+		
+		
+		const req1 : CASE_AttestationCacheRecord.Impl = 
+			CASE_AttestationCacheRecord.Impl {src = 1; trusted = AM_FAIL; timeout = 0};
+		const req2 : CASE_AttestationCacheRecord.Impl = 
+			CASE_AttestationCacheRecord.Impl {src = 2; trusted = AM_PASS; timeout = 0};
+		const req3 : CASE_AttestationCacheRecord.Impl = 
+			CASE_AttestationCacheRecord.Impl {src = 3; trusted = AM_REQUESTING; timeout = 0};
+		const req4 : CASE_AttestationCacheRecord.Impl = 
+			CASE_AttestationCacheRecord.Impl {src = 4; trusted = AM_PASS; timeout = 0};
+		const req5 : CASE_AttestationCacheRecord.Impl = NULL_RECORD;
+		const req6 : CASE_AttestationCacheRecord.Impl = NULL_RECORD;
+		
+		const const_cache : CASE_AttestationCache.Impl =
+			CASE_AttestationCache.Impl {src1 = req1; src2 = req2; src3 = req3; src4 = req4; src5 = req5; src6 = req6};
+		
+		
+		
 		
 		-- This maintains the cache state
 		node CACHE(new_cache : CASE_AttestationCache.Impl) returns (cache : CASE_AttestationCache.Impl);
 		let
-			cache = NULL_CACHE ->
-				if new_cache = NULL_CACHE then
-					pre(cache)
-				else
-					new_cache;
+--			cache = NULL_CACHE ->
+--				if new_cache = NULL_CACHE then
+--					pre(cache)
+--				else
+--					new_cache;
+			cache = const_cache;
 		tel;
 		
 		fun TRUSTED(src : Base_Types::Integer) : bool = 
