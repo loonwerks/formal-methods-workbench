@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="ASCII"?>
 <instance:SystemInstance xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" name="SW_Impl_Instance" category="process">
   <featureInstance name="radio_recv" category="eventDataPort">
-    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.25/@ownedEventDataPort.0"/>
+    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.26/@ownedEventDataPort.0"/>
   </featureInstance>
   <featureInstance name="radio_send" category="eventDataPort" direction="out">
-    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.25/@ownedEventDataPort.1"/>
+    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.26/@ownedEventDataPort.1"/>
   </featureInstance>
   <featureInstance name="uart_recv" category="eventDataPort">
-    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.25/@ownedEventDataPort.2"/>
+    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.26/@ownedEventDataPort.2"/>
   </featureInstance>
   <featureInstance name="uart_send" category="eventDataPort" direction="out">
-    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.25/@ownedEventDataPort.3"/>
+    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.26/@ownedEventDataPort.3"/>
   </featureInstance>
   <featureInstance name="wifi_recv" category="eventDataPort">
-    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.25/@ownedEventDataPort.4"/>
+    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.26/@ownedEventDataPort.4"/>
   </featureInstance>
   <featureInstance name="wifi_send" category="eventDataPort" direction="out">
-    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.25/@ownedEventDataPort.5"/>
+    <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.26/@ownedEventDataPort.5"/>
   </featureInstance>
   <componentInstance name="RADIO" category="thread">
     <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
@@ -26,25 +26,19 @@
           <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../plugin/com.collins.fmw.cyres.architecture.plugin/resources/CASE_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.5"/>
         </ownedValue>
       </ownedValue>
-      <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.0"/>
+      <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPropertyAssociation.0"/>
     </ownedPropertyAssociation>
     <featureInstance name="recv_data" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="send_data" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.1"/>
     </featureInstance>
     <featureInstance name="mission_command" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedEventDataPort.2"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.2"/>
     </featureInstance>
     <featureInstance name="status" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedEventDataPort.3"/>
-    </featureInstance>
-    <featureInstance name="am_request" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedEventDataPort.4"/>
-    </featureInstance>
-    <featureInstance name="am_response" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedEventDataPort.5"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedEventDataPort.3"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.0"/>
     <index>0</index>
@@ -59,7 +53,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Base_Type"/>
@@ -70,7 +64,7 @@
             </ownedListElement>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Dimension"/>
@@ -79,12 +73,12 @@
             <ownedListElement xsi:type="aadl2:IntegerLiteral" value="10"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:DataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.15/@ownedDataPort.0"/>
+      <feature xsi:type="aadl2:DataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.16/@ownedDataPort.0"/>
     </featureInstance>
     <featureInstance name="recv_map" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.15/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.16/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="request_nofly_zones" category="eventDataPort" direction="out">
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
@@ -116,7 +110,7 @@
         </ownedValue>
         <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.15/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.16/@ownedEventDataPort.1"/>
     </featureInstance>
     <featureInstance name="nofly_zones" category="eventDataPort">
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
@@ -148,10 +142,10 @@
         </ownedValue>
         <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.15/@ownedEventDataPort.2"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.16/@ownedEventDataPort.2"/>
     </featureInstance>
     <featureInstance name="position_status" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.15/@ownedEventDataPort.3"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.16/@ownedEventDataPort.3"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.1"/>
     <index>0</index>
@@ -166,7 +160,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Base_Type"/>
@@ -177,7 +171,7 @@
             </ownedListElement>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Dimension"/>
@@ -186,9 +180,9 @@
             <ownedListElement xsi:type="aadl2:IntegerLiteral" value="10"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:DataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.19/@ownedDataPort.0"/>
+      <feature xsi:type="aadl2:DataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.20/@ownedDataPort.0"/>
     </featureInstance>
     <featureInstance name="mission_window" category="eventDataPort" direction="out">
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
@@ -198,7 +192,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Base_Type"/>
@@ -209,7 +203,7 @@
             </ownedListElement>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Dimension"/>
@@ -218,12 +212,12 @@
             <ownedListElement xsi:type="aadl2:IntegerLiteral" value="4"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.19/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.20/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="position_status" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.19/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.20/@ownedEventDataPort.1"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.2"/>
     <index>0</index>
@@ -238,7 +232,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Base_Type"/>
@@ -249,7 +243,7 @@
             </ownedListElement>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Dimension"/>
@@ -258,15 +252,15 @@
             <ownedListElement xsi:type="aadl2:IntegerLiteral" value="10"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:DataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.21/@ownedDataPort.0"/>
+      <feature xsi:type="aadl2:DataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.22/@ownedDataPort.0"/>
     </featureInstance>
     <featureInstance name="position_status" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.21/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.22/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="gimbal_command" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.21/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.22/@ownedEventDataPort.1"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.3"/>
     <index>0</index>
@@ -274,7 +268,7 @@
   </componentInstance>
   <componentInstance name="UART" category="thread">
     <featureInstance name="status" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.23/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.24/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="mission_window" category="eventDataPort">
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
@@ -284,7 +278,7 @@
             <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.0"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.0"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Base_Type"/>
@@ -295,7 +289,7 @@
             </ownedListElement>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.1"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.1"/>
       </ownedPropertyAssociation>
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
         <property href="../../../plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Dimension"/>
@@ -304,15 +298,15 @@
             <ownedListElement xsi:type="aadl2:IntegerLiteral" value="4"/>
           </ownedValue>
         </ownedValue>
-        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedPropertyAssociation.2"/>
+        <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.23/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.24/@ownedEventDataPort.1"/>
     </featureInstance>
     <featureInstance name="recv_data" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.23/@ownedEventDataPort.2"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.24/@ownedEventDataPort.2"/>
     </featureInstance>
     <featureInstance name="send_data" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.23/@ownedEventDataPort.3"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.24/@ownedEventDataPort.3"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.4"/>
     <index>0</index>
@@ -320,13 +314,13 @@
   </componentInstance>
   <componentInstance name="WIFI" category="thread">
     <featureInstance name="gimbal_command" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="send_data" category="eventDataPort" direction="out">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.1"/>
     </featureInstance>
     <featureInstance name="recv_data" category="eventDataPort">
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.2"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedEventDataPort.2"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.5"/>
     <index>0</index>
@@ -363,7 +357,7 @@
         </ownedValue>
         <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.17/@ownedEventDataPort.0"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.18/@ownedEventDataPort.0"/>
     </featureInstance>
     <featureInstance name="zones" category="eventDataPort" direction="out">
       <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
@@ -395,7 +389,7 @@
         </ownedValue>
         <propertyAssociation href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPropertyAssociation.2"/>
       </ownedPropertyAssociation>
-      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.17/@ownedEventDataPort.1"/>
+      <feature xsi:type="aadl2:EventDataPort" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.18/@ownedEventDataPort.1"/>
     </featureInstance>
     <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../SW.aadl#/0/@ownedPublicSection/@ownedClassifier.27/@ownedThreadSubcomponent.6"/>
     <index>0</index>
