@@ -34,6 +34,12 @@ fun parse_args args =
       | otherwise => fail()
  end
 
+(* 
+val jsonfile = "examples/SW_AM.json";
+val ([jpkg],ss) = Json.fromFile jsonfile;
+
+*)
+     
 fun main () =
  let val _ = stdErr_print "splat: \n"
      val (justify,jsonfile) = parse_args(CommandLine.arguments())

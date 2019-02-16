@@ -146,130 +146,100 @@ fun dest_exp e =
 
 fun dest_param param =
  case param
-  of AList [("kind", String "param"),
-            ("name", String pname), ("type", ty)] => (pname,dest_ty ty)
+  of AList [("name", String pname), 
+            ("type", ty)] => (pname,dest_ty ty)
    | otherwise => raise ERR "dest_param" "unexpected input";
 
-fun build_fndef (fname,params,body) =
+fun build_fndef (fname,params,ty,body) =
  let val params' = map dest_param params
      val body' = dest_exp body
- in (fname,params',body')
+     val ty' = dest_ty ty
+ in (fname,params',ty',body')
  end;
 
 fun mangle body =
  case body 
-  of AList [("kind", _), ("left",_), ("op",_),("right",e)] => e
-   | otherwise => raise ERR "mengle" "unexpected input format"
+  of AList [("kind", _), ("left",_),("op",_),("right",e)] => e
+   | otherwise => raise ERR "mangle" "unexpected input format"
 			
 fun mk_fun_def json =
  case json
-  of AList [("kind", String "funDef"),
+  of AList [("kind", String "fnDefExpr"),
             ("name", String fname),
-            ("params", List params),
+            ("args", List params),
+            ("type", ty),
             ("expr", body)] => 
-     build_fndef (fname,params,
+     build_fndef (fname,params,ty,
       if fname = "WELL_FORMED_MESSAGE" then mangle body else body)
   |  otherwise => raise ERR "mk_fun_def" "unexpected input";
 
-fun get_fndefs elt2 =
- case elt2
-  of ("agree",
-      List [AList [("statements", List fundefs)]]) => mapfilter mk_fun_def fundefs
-   |  otherwise => raise ERR "get_fndefs" "unexpected input";
+fun mk_const_def json =
+ case json
+  of AList [("kind", String "ConstStatement"),
+            ("name", String cname),
+            ("type", ty),
+            ("expr", body)] => (cname,[],dest_ty ty, dest_exp body)
+  |  otherwise => raise ERR "mk_const_def" "unexpected input";
+
+fun mk_def json = mk_const_def json handle HOL_ERR _ => mk_fun_def json;
+
+fun get_agree_annex 
+     [AList [("name", String "agree"),
+             ("parsedAnnexSubclause", 
+              AList [("statements", List stmts)])]] = SOME stmts
+  | get_agree_annex 
+     [AList [("name", String "Agree"),
+             ("parsedAnnexLibrary", 
+              AList [("statements", List stmts)])]] = SOME stmts
+  | get_agree_annex 
+     [AList [("name", String "agree"),
+             ("parsedAnnexLibrary", 
+              AList [("statements", List stmts)])]] = SOME stmts
+  | get_agree_annex otherwise = NONE;
+
+fun get_fndefs comp =
+ case comp
+  of AList [("name", String threadName),
+            ("kind", String "ComponentImplementation"), 
+            ("category", String "thread"),
+            ("annexes", List annexes)] =>
+     case get_agree_annex annexes
+      of NONE => []
+      |  SOME stmts => mapfilter mk_def stmts
+
+fun grab_fndefs comp =
+ case comp
+  of AList [("name", String threadName),
+            ("kind", String "ComponentType"), 
+            ("category", String "thread"),
+            ("features", List features),
+            ("properties", List properties),
+            ("annexes", List annexes)] =>
+              (case get_agree_annex annexes
+                of NONE => raise ERR "grab_fndefs" ""
+                 | SOME stmts => stmts)
+   | AList [("name", String threadName),
+            ("kind", String "ComponentImplementation"), 
+            ("category", String "thread"),
+            ("annexes", List annexes)] =>
+              (case get_agree_annex annexes
+                of NONE => raise ERR "grab_fndefs" ""
+                 | SOME stmts => stmts)
+   | AList [("name", String "agree"), ("parsedAnnexLibrary", _)] => 
+       (case get_agree_annex [comp]
+         of NONE => raise ERR "grab_fndefs" ""
+          | SOME stmts => stmts)
+   | otherwise => raise ERR "grab_fndefs" "";
+
+
+mapfilter grab_fndefs complist;
+
 
 (*---------------------------------------------------------------------------*)
 (* ad hoc                                                                    *)
 (*---------------------------------------------------------------------------*)
 
 val _ = defaultNumKind := AST.Int NONE;
-
-fun fldty pkgName str =
- case str
-  of "Base_Types::Integer" => BaseTy(IntTy (!defaultNumKind))
-   | "Base_Types::Boolean" => BaseTy(BoolTy)
-   | other =>
-      let val chunks = String.tokens (fn ch => (ch = #":" orelse ch = #".")) str
-          val chunks' = if last chunks = "Impl" then butlast chunks else chunks
-          val ty_pkgName = 
-              hd chunks' handle _ => raise ERR "fldty" "malformed type"
-	  val chunks'' = tl chunks'
-(*          val chunks'' = if hd chunks' = pkgName then tl chunks' else chunks' *)
-      in case chunks''
-          of [name] => NamedTy("",name)
-           | other => raise ERR "fldty" ("unknown field type"^Lib.quote str)
-      end;
-
-fun dest_subcomp pkgName sc =
- case sc
-  of AList [("name", String fldname), ("category", String "data"),
-            ("classifier", String tystr)]
-      => (fldname,fldty pkgName tystr)
-   | otherwise => raise ERR "dest_subcomp" "expected a record field";
-
-fun is_recd names decl = 
- case decl
-  of AList ((name, String name_impl)::("subcomponents", List subs)::_)
-      => name^".Impl" = name_impl andalso mem name names
-  |  otherwise => false;
-
-fun recd_decl pkgName names decl =
- case decl
-  of AList ((name, String name_impl)::("subcomponents", List subs)::_)
-      => if name^".Impl" = name_impl andalso mem name names
-          then (name, map (dest_subcomp pkgName) subs)
-          else raise ERR "recd_decl" "expected a record implementation"
-  | other => raise ERR "recd_decl" "expected a record declaration";
-
-fun dropString (String s) = s
-  | dropString otherwise = raise ERR "dropString" "not a json String application";
-
-fun enum_decl decl =
- case decl
-  of AList [("name", String ename), ("type", String "data"), ("features", _),
-            ("properties",
-             List [AList [("name", String "Data_Representation"),
-                          ("value", String "Enum")],
-                   AList [("name", String "Enumerators"),
-                          ("value", List names)]]),
-            ("agree",_)]
-      => (ename, map dropString names)
-  | other => raise ERR "enum_decl" "expected an enum declaration";
-
-fun mk_enum_decl (name,ids) =
-    DatatypeDecl(name, map (fn c => (c,[])) ids);
-
-fun data_decl_name
-  (AList(("name", String dname)::("type", String "data"):: _)) = dname
-
-fun get_tydecls pkgName elt3 =
- case elt3
-  of ("components", List comps) =>
-    let val data_tynames = mapfilter data_decl_name comps;
-        val recd_decls = mapfilter (recd_decl pkgName data_tynames) comps
-        val enum_decls = mapfilter enum_decl comps
-    in (map RecdDecl recd_decls,
-        map mk_enum_decl enum_decls)
-    end;
-
-fun get_decls jpkg =
- case jpkg
-  of AList [("package", String pkgName),
-            elt2 as ("agree", _),
-            elt3 as ("components",List comps)]
-      => let val fndecls = get_fndefs elt2
-             val (recd_decls, enum_decls) = get_tydecls pkgName elt3
-         in (enum_decls,recd_decls,fndecls)
-         end
-  | otherwise => raise ERR "get_decls" "unexpected format";
-
-(*
-val AList [("package", String "SW"),
-           elt2 as ("agree", _),
-           elt3 as ("components",List comps)] = jpkg;
-
-val [c1, c2, c3, c4, c5, c6, c7, c8, c9,
-     c10, c11, c12, c13, c14, c15, c16, c17, c18] = comps
-*)
 
 
 fun fldty pkgName tystr =
@@ -288,42 +258,55 @@ fun fldty pkgName tystr =
 
 fun dest_subcomp pkgName subcomp =
  case subcomp
-  of AList [("name", String fldname), ("category", String "data"),
-            ("classifier", String tystr)]
-      => (fldname,fldty pkgName tystr)
+  of AList [("name", String fldname), 
+            ("category", String "data"),
+            ("classifier", String tystr)] => (fldname,fldty pkgName tystr)
    | otherwise => raise ERR "dest_subcomp" "expected a record field";
-
-fun recd_decl pkgName names decl =
- case decl
-  of AList ((name, String name_impl)::("subcomponents", List subcomps)::_)
-      => if name^".Impl" = name_impl 
-            andalso mem name names 
-            andalso not(null subcomps)
-              then (name, map (dest_subcomp pkgName) subcomps)
-              else raise ERR "recd_decl" "expected a record implementation"
-  | other => raise ERR "recd_decl" "expected a record declaration";
 
 fun dropString (String s) = s
   | dropString otherwise = raise ERR "dropString" "not a json String application";
 
+fun dropImpl s =
+     case String.tokens (equal #".") s
+      of [x,"Impl"] => SOME x
+       | otherwise => NONE;
+
+fun recd_decl pkgName names decl =
+ case decl
+  of AList (("name", String name_impl) ::
+            ("kind",String "ComponentImplementation") ::
+            ("category", String "data") ::
+	    ("subcomponents", List subcomps)::_)
+     => (case dropImpl name_impl
+	  of NONE => raise ERR "recd_decl" "expected .Impl suffix"
+           | SOME name =>
+	      if mem name names andalso not(null subcomps)
+              then (name, map (dest_subcomp pkgName) subcomps)
+              else raise ERR "recd_decl" "expected a record implementation"
+	)
+  | other => raise ERR "recd_decl" "expected a record declaration";
+
 fun enum_decl decl =
  case decl
-  of AList [("name", String ename), ("type", String "data"), ("features", _),
+  of AList [("name", String ename), 
+            ("kind",String "ComponentType"),
+            ("category", String "data"), 
             ("properties",
-             List [AList [("name", String "Data_Representation"),
+             List [AList [("name", String "Data_Model::Data_Representation"),
                           ("value", String "Enum")],
-                   AList [("name", String "Enumerators"),
-                          ("value", List names)]]),
-            ("agree",_)]
+                   AList [("name", String "Data_Model::Enumerators"),
+                          ("value", List names)]])]
       => (ename, map dropString names)
   | other => raise ERR "enum_decl" "expected an enum declaration";
 
-fun data_decl_name (AList(("name", String dname)::("type", String "data"):: _)) = dname
+fun data_decl_name (AList(("name", String dname) ::
+                          ("kind", String "ComponentType") ::
+                          ("category", String "data") :: _)) = dname
 
-fun get_tydecls pkgName comps =
- let val data_tynames = mapfilter data_decl_name comps
-     val recd_decls = mapfilter (recd_decl pkgName data_tynames) comps
-     val enum_decls = mapfilter enum_decl comps
+fun get_tydecls pkgName complist =
+ let val data_tynames = mapfilter data_decl_name complist
+     val recd_decls = mapfilter (recd_decl pkgName data_tynames) complist
+     val enum_decls = mapfilter enum_decl complist
  in 
    (recd_decls, enum_decls)
  end;
@@ -368,21 +351,100 @@ fun get_filter decl =
           mk_filter_guarantee (mapfilter (get_filter_guarantee rname) guarantees))
    | otherwise => raise ERR "get_filter" "not a filter thread";
 
-fun get_pkg_decls jpkg =
- case jpkg
-  of AList [("kind", String "package"),
-            ("name", String pkgName),
-            elt2 as ("agree", _),
-            elt3 as ("components",List comps)]
-     => let val _ = if current_theory() = pkgName then () else new_theory pkgName
-	    val fndecls = get_fndefs elt2
-            val (recd_decls, enum_decls) = get_tydecls pkgName comps
-            val filters = mapfilter get_filter comps
+fun dest_publist plist =
+ let fun dest_with ("with", List wlist) = wlist
+       | dest_with other = raise ERR "dest_with" ""
+     fun dest_renames ("renames", List rlist) = rlist
+       | dest_renames other = raise ERR "dest_renames" ""
+     fun dest_comps ("components", List clist) = clist
+       | dest_comps other = raise ERR "dest_comps" ""
+     fun dest_annexes ("annexes", List alist) = alist
+       | dest_annexes other = raise ERR "dest_annexes" ""
+ in 
+    (List.concat (mapfilter dest_with plist), 
+     List.concat (mapfilter dest_renames plist), 
+     List.concat (mapfilter dest_comps plist),
+     List.concat (mapfilter dest_annexes plist))
+ end
+
+(* HOL things should not happen in get_pkg_decls, but in gen_hol below
+   val _ = if current_theory() = pkgName then () else new_theory pkgName
+*)
+
+fun get_data_model pkg =
+ case pkg 
+  of AList [("name", String dmName), 
+            ("kind", String "PropertySet"),
+            ("properties", proplist)] => (dmName,proplist)
+  |  otherwise => raise ERR "get_data_model" "unexpected format"
+;
+	    
+fun get_pkg_decls pkg =
+ case pkg
+  of AList [("name", String pkgName),
+            ("kind", String "AadlPackage"),
+            ("public", AList publist)]
+     => let val (withs, renamings, complist,annexlist) = dest_publist publist
+            val (recd_decls, enum_decls) = get_tydecls pkgName complist
+(*	    val fndecls = mapfilter get_fndefs complist *)
+	    val comp_fndecls = mapfilter grab_fndefs complist
+	    val annex_fndecls = mapfilter grab_fndefs annexlist
+        in (pkgName,(enum_decls,recd_decls,comp_fndecls @ annex_fndecls))
+        end
+(*	    val fndecls = get_fndefs complist
+            val filters = mapfilter get_filter (pkgName,complist)
          in (pkgName,enum_decls,recd_decls,fndecls,filters)
          end
+*)
   | otherwise => raise ERR "get_pkg_decls" "unexpected format";
 
+fun get_pkgs (List pkgs) =
+    let val declist = mapfilter get_pkg_decls pkgs
+        val datalist = mapfilter get_data_model pkgs
+    in
+       if length pkgs = length declist + length datalist
+       then print "all packages accounted for\n"
+       else print "discrepancy\n"
+    end
+  | get_pkgs otherwise = raise ERR "get_pkgs" "unexpected format";
+
 (*
+val List pkgs = jpkg;
+val pkgs = tl pkgs;  (* dropping first pkg SW_AM *)
+val [pkg1,pkg2,pkg3,pkg4,pkg5,pkg6,pkg7,pkg8,pkg9,pkg10] = pkgs;
+
+val declist = mapfilter get_pkg_decls pkgs;
+val [d1,d2,d3,d4,d5,d6,d7,d8] = declist;
+
+val ("UAV",(enum_decls,recd_decls,fndecls)) = d1;
+val ("MC",(enum_decls,recd_decls,fndecls)) = d2;
+val ("SW",(enum_decls,recd_decls,fndecls)) = d3;
+val [fd1,fd2,fd3,fd4,fd5] = fndecls;
+
+val ("Base_Types",(enum_decls,recd_decls,fndecls)) = d4;
+val ("CASE_Model_Transformations",(enum_decls,recd_decls,fndecls)) = d5;
+val ("UAS",(enum_decls,recd_decls,fndecls)) = d6;
+val ("GS",(enum_decls,recd_decls,fndecls)) = d7;
+val ("FC",(enum_decls,recd_decls,fndecls)) = d8;
+
+val AList
+  [("name", String pkgName),
+   ("kind", String "AadlPackage"),
+   ("public", AList publist)] = pkg11;
+val (("with",withstuff)::
+     ("components",List complist)::publist') = publist;
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
+     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
+     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33] = complist;
+
+
+val [c1,c2,c3,c4] = complist;
+
+
+elt2 as ("agree", _),
+elt3 as ("components",List comps)]
+
 val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
      c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
      c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34,c35] = comps;

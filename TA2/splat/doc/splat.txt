@@ -1,4 +1,6 @@
-%<a href="splat.pdf" target="_blank">Semantic Properties for Language and Automata Theory (SPLAT)</a>
+%<a href="splat.pdf" target="_blank">Semantic Properties \
+for \
+Language and Automata Theory (SPLAT)</a>
 % Konrad Slind, Trusted Systems Group, Collins Aerospace
 % February 7, 2019
 
@@ -117,6 +119,7 @@ $$
 r_1 + \cdots + r_n & = & \konst{Or}[r_1,\ldots,r_n] \\
 r_1 r_2 & = & \konst{Cat}\;r_1 \; r_2 \\
 {[m-n]} & = & \konst{Chset}(\konst{charset\_of} \; [m, m+1, \ldots, n-1,n]) \quad (\text{where}\; 0 \leq m \leq n \leq 255) \\
+{[m]} & = & [m-m] \\
 \bullet & = & [0-255] \\
 \emptyset & = & \konst{Chset}(\konst{charset\_of} \; []) \\
 \varepsilon & = & \konst{Star}(\emptyset) \\
@@ -124,14 +127,14 @@ r_1 r_2 & = & \konst{Cat}\;r_1 \; r_2 \\
 \konst{Diff}\;r_1\;r_2 & = & \konst{And}\;r_1\; (\konst{Neg}\;r_2)
 \end{array}
 $$
-The "dot" charset ($\bullet$)) is the full charset that matches every
+The "dot" charset ($\bullet$) is the full charset that matches every
 one-element string; $\emptyset$ matches no string; and $\varepsilon$
 is the empty string.
 
 Properties meet Encodings
 =========================
 
-Now we come to our main focus: statements of the form
+Now we come to the main focus of this paper: statements of the form
 $$
   x \in P \iff \konst{encode}\;x \in \Lang{\konst{regexp\_of}\; P}
 $$
@@ -142,7 +145,7 @@ translates $P$ into an "equivalent" regular expression. Rephrasing the statement
 $$
   P: \tau\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
 $$
-more directly expresses the setting, namely, "what happens when we
+more directly expresses the **SPLAT** setting, namely, "what happens when we
 stick an encoder in front of some formal language machinery?"  The
 main practical benefit for us comes from being able to compile the
 $\konst{regexp\_of}\; P$ expression to a DFA, thus giving an
@@ -173,12 +176,12 @@ this.
 Consider the "even-number" predicate $\konst{even} :
 \mathbb{N}\to\konst{bool}$. Let $\mathit{cset} =
 \konst{charset\_of}\;[0,2,4, \ldots, 254]$ be the character set
-corresponding to the non-negative even numbers less than 256. Supposing
-that
+corresponding to the non-negative even numbers less than 256. Assuming
 $$
 \konst{regexp\_of}\; \konst{even} = 
 \konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;(\konst{Star}\;\bullet),
-$$ (the encoding is in LSB format), from which we construct the formula
+$$ 
+(the encoding is in LSB format), we construct the formula
 $$
 \konst{even}(n) \iff \konst{encode}(n) \in \Lang{\konst{Cat}\;
 (\konst{Chset}\;\mathit{cset})\; (\konst{Star}\;\bullet)}
@@ -223,7 +226,7 @@ $$
 $$
 Then we have $\vdash \forall n\;w.\; \konst{dec} (\konst{enc}\; w\; n) = n$.
 
-- **Integers.** Sets of integers can be expressed by
+- **Integers.** Encoding of integers can be expressed by
 adding an encoding to map from integers to natural numbers.  Twos
 complement representation is most commonly used. At the word level,
 the twos complement operation on negative integers is "flip each bit
@@ -264,14 +267,14 @@ representation, thus supporting the standard bit format for signed
 integers.
 
 - **Enumerations.** An enumerated type can be encoded by providing a map
-from elements of the type to $\mathbb{N}$. For example the type of booleans, with maps
+from elements of the type to $\mathbb{N}$. For example the type of booleans give rise to maps
 $$
 \begin{array}{ll}
 \konst{num\_of\_bool} \; \konst{false} = 0 & \konst{num\_of\_bool} \; \konst{true} = 1  \\
 \konst{bool\_of\_num} \; 0 = \konst{false} & \konst{bool\_of\_num} \; 1 = \konst{true}  \\
 \end{array}
 $$
-we define the encoders and decoders :
+which gives the basis for the encoder and decoder:
 $$
 \begin{array}{l} 
 \konst{enc\_bool}\; b = \konst{enc}\; 1\; (\konst{num\_of\_bool}\; b) \\
@@ -311,7 +314,7 @@ predicate from our initial example was created in an *ad hoc* manner,
 but we seek some properties that can be algorithmically translated to
 regexps. One of the most useful for us so far has been *intervals*.
 
-An interval $[\mathit{lo} ,\mathit{hi}] = \set{n \in \mathbb{N} \mid
+An interval $[\mathit{lo} ,\mathit{hi}]$ is defined to be $\set{n \in \mathbb{N} \mid
 \mathit{lo} \leq n \leq \mathit{hi}}$; another way of expressing it is
 as a property $\lambda n. \mathit{lo} \leq n \land n \leq \mathit{hi}$.
 An interval is mapped to a regular expression by an algorithm
@@ -330,8 +333,9 @@ $$
 $$
 The algorithm breaks large intervals down to unions of sub-intervals
 in such a way that regular expressions can be easily generated from
-the subintervals. Proceeding lexicographically, there are essentially
-four ways for $\mathit{lo} \leq \mathit{hi}$ to hold:
+the subintervals. Proceeding lexicographically on exponents, then
+factors, then remainders, there are essentially four ways for
+$\mathit{lo} \leq \mathit{hi}$ to hold:
 
 1. $a < b$. The span between the exponents is split into one
 interval per intermediate exponent
@@ -437,18 +441,29 @@ A 10-state machine is generated. The interval $[123456789,9876543210]$ generates
 
 which translates to a DFA with 15 states.
 
+Record properties
+------------------
+
+Given record type
+$$
+   \konst{recd} = \{ f_1 : \tau_1; \ldots ; f_n : \tau_n\}
+$$
+and property $P : \konst{recd} \to \konst{bool}$ defined with field properties $P_1, \ldots, P_n$ by
+$$
+   P(r) \Leftrightarrow P_1(r.f_1) \land \ldots \land P_1(r.f_n),
+$$
+we can build $\konst{regexp\_of}(P)$ as the concatenation
+$$
+   \konst{regexp\_of}(P_1) \cdots \konst{regexp\_of}(P_n)
+$$
+In our examples so far, the field properties have been intervals.
 
 A record message package
 ========================
 
-Given the ability to construct regular expressions corresponding to
-numeric intervals, we can build regular expressions for compound data,
-such as records. As outline above, encoding a record simply requires
-concatenating the field encodings. Similarly, we can define
-$\konst{regexp\_of}$ for a record by concatenating the results of
-calling $\konst{regexp\_of}$ on the fields of the record. This gives
-us a useful level of abstraction for a package that takes high level
-specifications of records and generates encoder/decoder/filter
+The modelling of record properties via regexps, as just outlined,
+gives us a useful level of abstraction for a package that takes high
+level specifications of records and generates encoder/decoder/filter
 implementations plus associated correctness proofs.
 
 In particular, given a declaration of record type $\konst{recd}$ plus a predicate $P :
@@ -458,7 +473,7 @@ generate the following artifacts:
 - a regexp $\mathcal{R} = \konst{regexp\_of}\;P$
 - an encoding function $\konst{encode} : \konst{recd} \to \mathbb{S}$
 - a decoding function $\konst{decode} : \mathbb{S} \to \konst{recd}\;\konst{option}$
-- an inversion theorem showing that decoding inverts encoding
+- an inversion theorem showing that decoding inverts encoding for wellformed records
 
    $~~~~~~~~~~~~~~~~~\vdash \forall r:\konst{recd}.\; P(r) \imp \konst{decode}(\konst{encode}\; r) = \konst{SOME}\;r$
 
@@ -481,7 +496,7 @@ package produces implementations for an encoder and decoder, a DFA
 that checks wellformedness of encoded records, along with correctness
 proofs.
 
-Property Discussion
+Property discussion
 --------------------
 
 A variety of theorems can be proved in this setting, and it is worth
@@ -497,9 +512,9 @@ well-formed. One version of this is
 
  $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp P(r)$
 
-Another (where $\mathit{regexp}$ is the regexp generated from $P$):
+Another version:
 
- $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp s \in \Lang{\mathcal{R}}$
+ $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp s \in \Lang{\konst{regexp\_of}\;P}$
 
 Both of these fail to exclude an incorrect encoder that (say) maps all
 records into one (well-formed) value. To forbid that, one could demand
