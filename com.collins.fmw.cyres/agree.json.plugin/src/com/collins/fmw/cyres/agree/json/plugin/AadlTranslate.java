@@ -19,6 +19,7 @@ import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusType;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierType;
+import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
@@ -472,6 +473,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 			return StringValue.build(((ReferenceValue) v).getPath().getNamedElement().getName());
 		} else if (v instanceof RangeValue) {
 			return genRangeValue((RangeValue) v);
+		} else if (v instanceof ClassifierValue) {
+			return StringValue.build(((ClassifierValue) v).getClassifier().getName());
 		}
 		return StringValue.build("new_case/genPropertyExpression/" + v.toString());
 	}

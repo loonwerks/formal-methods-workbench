@@ -36,8 +36,10 @@ import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
+import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.FnDef;
+import com.rockwellcollins.atc.agree.agree.ForallExpr;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
@@ -96,7 +98,7 @@ public class AgreeTranslate {
 		pairList.add(Pair.build("value", StringValue.build(expr.getVal().getValue() + "")));
 		return ObjectValue.build(pairList);
 	}
-					
+
 	private Value genSelectionExpr(SelectionExpr expr) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 		pairList.add(Pair.build("kind", "Selection"));
@@ -166,6 +168,24 @@ public class AgreeTranslate {
 		return ObjectValue.build(pairList);
 	}
 
+	private Value genForallExpr(ForallExpr expr) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "ForallExpr"));
+		pairList.add(Pair.build("binding", expr.getBinding().getName()));
+		pairList.add(Pair.build("array", genExpr(expr.getArray())));
+		pairList.add(Pair.build("expr", genExpr(expr.getExpr())));
+		return ObjectValue.build(pairList);
+	}
+
+	private Value genExistsExpr(ExistsExpr expr) {
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "ExistsExpr"));
+		pairList.add(Pair.build("binding", expr.getBinding().getName()));
+		pairList.add(Pair.build("array", genExpr(expr.getArray())));
+		pairList.add(Pair.build("expr", genExpr(expr.getExpr())));
+		return ObjectValue.build(pairList);
+	}
+
 	private Value genExpr(Expr expr) {
 
 		if (expr instanceof IntLitExpr) {
@@ -194,6 +214,10 @@ public class AgreeTranslate {
 			return genEventExpr((EventExpr) expr);
 		} else if (expr instanceof PreExpr) {
 			return genPreExpr((PreExpr) expr);
+		} else if (expr instanceof ForallExpr) {
+			return genForallExpr((ForallExpr) expr);
+		} else if (expr instanceof ExistsExpr) {
+			return genExistsExpr((ExistsExpr) expr);
 		} else {
 			return StringValue.build("new_case/genExpr/" + (expr == null ? "null" : expr.toString()));
 		}
