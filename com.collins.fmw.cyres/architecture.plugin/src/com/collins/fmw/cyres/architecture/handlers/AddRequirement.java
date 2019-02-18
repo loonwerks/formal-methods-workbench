@@ -41,10 +41,13 @@ public class AddRequirement extends AbstractHandler {
 		public String id = "";
 		public String text = "";
 		public String component = "";
-		public boolean agree = false;
+//		public boolean agree = false;
+		public String agree = "";
 		public String rationale = "";
 
-		public CASE_Requirement(String name, String id, String text, String component, boolean agree,
+//		public CASE_Requirement(String name, String id, String text, String component, boolean agree,
+//				String rationale) {
+		public CASE_Requirement(String name, String id, String text, String component, String agree,
 				String rationale) {
 			this.name = name;
 			this.id = id;
@@ -96,7 +99,9 @@ public class AddRequirement extends AbstractHandler {
 		return null;
 	}
 
-	private void addRequirement(String componentName, String reqName, String reqID, String reqText, boolean agreeProp) {
+//	private void addRequirement(String componentName, String reqName, String reqID, String reqText, boolean agreeProp) {
+	private void addRequirement(String componentName, String reqName, String reqID, String reqText, String agreeProp) {
+
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
@@ -113,7 +118,7 @@ public class AddRequirement extends AbstractHandler {
 				ThreadType threadType = (ThreadType) classifier;
 				EList<AnnexSubclause> annexSubclauses = threadType.getOwnedAnnexSubclauses();
 				String assumeStatement = "{**" + System.lineSeparator() + "\t\t\tassume " + reqID + " \"" + reqText
-						+ "\" : FALSE;";
+						+ "\" : " + agreeProp + ";";
 				String proveStatement = "{**" + System.lineSeparator() + "\t\t\tprove(" + reqName + "(this, \"" + reqID
 						+ "\"))";
 
@@ -122,7 +127,8 @@ public class AddRequirement extends AbstractHandler {
 					DefaultAnnexSubclauseImpl annexSubclauseImpl = (DefaultAnnexSubclauseImpl) annexSubclause.next();
 					String sourceText = annexSubclauseImpl.getSourceText();
 
-					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree") && agreeProp) {
+//					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree") && agreeProp) {
+					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree") && !agreeProp.isEmpty()) {
 						// Add AGREE assume statement
 						assumeStatement = sourceText.replace("{**", assumeStatement);
 						// Delete annex subclause from owned subclauses. Will add it back later.
@@ -137,7 +143,8 @@ public class AddRequirement extends AbstractHandler {
 					}
 				}
 
-				if (agreeProp) {
+//				if (agreeProp) {
+				if (!agreeProp.isEmpty()) {
 					DefaultAnnexSubclauseImpl agreeSubclause = (DefaultAnnexSubclauseImpl) threadType
 							.createOwnedAnnexSubclause();
 					agreeSubclause.setName("agree");
@@ -164,10 +171,11 @@ public class AddRequirement extends AbstractHandler {
 		});
 	}
 
-	private void addClaims(String reqName, String reqID, String reqText, boolean agreeProp) {
+//	private void addClaims(String reqName, String reqID, String reqText, boolean agreeProp) {
+	private void addClaims(String reqName, String reqID, String reqText, String agreeProp) {
 
 		// Add requirement
-		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqID, reqText, agreeProp);
+		CaseClaimsManager.getInstance().addFunctionDefinition(reqName, reqID, reqText, !agreeProp.isEmpty());
 
 //		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 //		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
@@ -232,8 +240,10 @@ public class AddRequirement extends AbstractHandler {
 									FnCallExpr fnCall = (FnCallExpr) expr;
 									if (fnCall.getFn().getName() != null
 											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
+//										resoluteClauses.add(new CASE_Requirement(fnCall.getFn().getName(), "", "",
+//												compType.getName(), false, ""));
 										resoluteClauses.add(new CASE_Requirement(fnCall.getFn().getName(), "", "",
-												compType.getName(), false, ""));
+												compType.getName(), "", ""));
 									}
 								}
 							}

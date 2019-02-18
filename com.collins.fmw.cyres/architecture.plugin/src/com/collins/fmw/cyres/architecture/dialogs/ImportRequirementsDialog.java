@@ -27,6 +27,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	List<Text> txtIDs = new ArrayList<>();
 	List<String> lblComponents = new ArrayList<>();
 	List<Button> btnAgreeProps = new ArrayList<>();
+	List<Text> txtAgreeProps = new ArrayList<>();
 	List<Text> txtRationales = new ArrayList<>();
 	List<CASE_Requirement> existingRequirements = new ArrayList<>();
 	List<CASE_Requirement> importRequirements = new ArrayList<>();
@@ -97,7 +98,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Add requirements
-		addRequirement("remote_attestation",
+		addRequirement("trusted_source",
 				"The FlightPlanner shall only accept messages from a trusted GroundStation", "FlightPlanner",
 				container);
 		addRequirement("well_formed", "The FlightPlanner shall receive a well-formed command from the GroundStation",
@@ -139,12 +140,17 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		lblCompName.setText(compName);
 		lblComponents.add(compName);
 
-		Button btnAgree = new Button(container, SWT.CHECK);
-		btnAgree.setText("");
-		btnAgree.setSelection(false);
-		GridData agreePropInfoField = new GridData(SWT.CENTER, SWT.FILL, true, false);
-		btnAgree.setLayoutData(agreePropInfoField);
-		btnAgreeProps.add(btnAgree);
+//		Button btnAgree = new Button(container, SWT.CHECK);
+//		btnAgree.setText("");
+//		btnAgree.setSelection(false);
+//		GridData agreePropInfoField = new GridData(SWT.CENTER, SWT.FILL, true, false);
+//		btnAgree.setLayoutData(agreePropInfoField);
+//		btnAgreeProps.add(btnAgree);
+
+		Text txtAgree = new Text(container, SWT.BORDER);
+		GridData agreeInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
+		txtAgree.setLayoutData(agreeInfoField);
+		txtAgreeProps.add(txtAgree);
 
 		Text txtRationale = new Text(container, SWT.BORDER);
 		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -190,12 +196,18 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.");
 					return false;
 				}
+//				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
+//						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
+//						txtRationales.get(i).getText()));
 				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
+						lblReqTexts.get(i), lblComponents.get(i), txtAgreeProps.get(i).getText(),
 						txtRationales.get(i).getText()));
 			} else {
+//				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
+//						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
+//						txtRationales.get(i).getText()));
 				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
+						lblReqTexts.get(i), lblComponents.get(i), txtAgreeProps.get(i).getText(),
 						txtRationales.get(i).getText()));
 			}
 		}

@@ -13,7 +13,8 @@ public
 		subcomponents
 			src: data Base_Types::Integer;
 			dst: data Base_Types::Integer;
-			msg_type: data Base_Types::Integer;
+--			msg_type: data Base_Types::Integer;
+			trusted: data Base_Types::Boolean;
 			HMAC: data Base_Types::Boolean;
 	end CASE_MsgHeader.Impl;
 
@@ -88,7 +89,8 @@ public
 		-- Empty message header
 		-- This indicates that the rest of the message can be ignored
 		const NULL_ID : int = 0;
-		const NULL_HEADER : CASE_MsgHeader.Impl = CASE_MsgHeader.Impl {src = NULL_ID; dst = NULL_ID; msg_type = NULL_MSG_TYPE; HMAC = false};
+--		const NULL_HEADER : CASE_MsgHeader.Impl = CASE_MsgHeader.Impl {src = NULL_ID; dst = NULL_ID; msg_type = NULL_MSG_TYPE; HMAC = false};
+		const NULL_HEADER : CASE_MsgHeader.Impl = CASE_MsgHeader.Impl {src = NULL_ID; dst = NULL_ID; trusted = false; HMAC = false};
 		fun NULL_MESSAGE(header : CASE_MsgHeader.Impl) : bool = (header = NULL_HEADER);
 	
 		-- CASE message types
@@ -114,33 +116,14 @@ public
 		
 		const NULL_RECORD : CASE_AttestationCacheRecord.Impl = CASE_AttestationCacheRecord.Impl {src = NULL_ID; trusted = AM_FAIL; timeout = 0};
 		
-		
-		const req1 : CASE_AttestationCacheRecord.Impl = 
-			CASE_AttestationCacheRecord.Impl {src = 1; trusted = AM_FAIL; timeout = 0};
-		const req2 : CASE_AttestationCacheRecord.Impl = 
-			CASE_AttestationCacheRecord.Impl {src = 2; trusted = AM_PASS; timeout = 0};
-		const req3 : CASE_AttestationCacheRecord.Impl = 
-			CASE_AttestationCacheRecord.Impl {src = 3; trusted = AM_REQUESTING; timeout = 0};
-		const req4 : CASE_AttestationCacheRecord.Impl = 
-			CASE_AttestationCacheRecord.Impl {src = 4; trusted = AM_PASS; timeout = 0};
-		const req5 : CASE_AttestationCacheRecord.Impl = NULL_RECORD;
-		const req6 : CASE_AttestationCacheRecord.Impl = NULL_RECORD;
-		
-		const const_cache : CASE_AttestationCache.Impl =
-			CASE_AttestationCache.Impl {src1 = req1; src2 = req2; src3 = req3; src4 = req4; src5 = req5; src6 = req6};
-		
-		
-		
-		
 		-- This maintains the cache state
 		node CACHE(new_cache : CASE_AttestationCache.Impl) returns (cache : CASE_AttestationCache.Impl);
 		let
---			cache = NULL_CACHE ->
---				if new_cache = NULL_CACHE then
---					pre(cache)
---				else
---					new_cache;
-			cache = const_cache;
+			cache = 
+				if new_cache = NULL_CACHE then
+					NULL_CACHE -> pre(cache)
+				else
+					new_cache;
 		tel;
 		
 		fun TRUSTED(src : Base_Types::Integer) : bool = 
