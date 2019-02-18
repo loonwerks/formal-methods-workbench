@@ -34,6 +34,7 @@ import org.osate.aadl2.EnumerationType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.ImplementationExtension;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListType;
 import org.osate.aadl2.ListValue;
@@ -57,6 +58,7 @@ import org.osate.aadl2.RealLiteral;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.TypeExtension;
 import org.osate.aadl2.util.Aadl2Switch;
 
 import com.collins.fmw.json.ArrayValue;
@@ -72,7 +74,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public ObjectValue casePackageRename(PackageRename packageRename) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("package", packageRename.getRenamedPackage().getName()));
+//		pairList.add(Pair.build("package", packageRename.getRenamedPackage().getName()));
+		pairList.add(Pair.build("package", packageRename.getRenamedPackage().getQualifiedName()));
 		if (packageRename.isRenameAll()) {
 			pairList.add(Pair.build("rename", "all"));
 		} else {
@@ -84,7 +87,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public ObjectValue caseAadlPackage(AadlPackage pkg) {
 		ArrayList<Pair> pkgBuilder = new ArrayList<Pair>();
-		pkgBuilder.add(Pair.build("name", pkg.getName()));
+//		pkgBuilder.add(Pair.build("name", pkg.getName()));
+		pkgBuilder.add(Pair.build("name", pkg.getQualifiedName()));
 		pkgBuilder.add(Pair.build("kind", "AadlPackage"));
 
 		// Build Package Sections
@@ -180,9 +184,14 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public Value caseComponentType(ComponentType ct) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("name", ct.getName()));
+//		pairList.add(Pair.build("name", ct.getName()));
+		pairList.add(Pair.build("name", ct.getQualifiedName()));
 		pairList.add(Pair.build("kind", "ComponentType"));
 		pairList.add(Pair.build("category", ct.getCategory().getName()));
+		TypeExtension te = ct.getOwnedExtension();
+		if (te != null) {
+			pairList.add(Pair.build("extends", doSwitch(te.getExtended())));
+		}
 
 		ArrayList<Value> features = new ArrayList<Value>();
 		for (Feature feature : ct.getOwnedFeatures()) {
@@ -215,9 +224,14 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public Value caseComponentImplementation(ComponentImplementation ci) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("name", ci.getName()));
+//		pairList.add(Pair.build("name", ci.getName()));
+		pairList.add(Pair.build("name", ci.getQualifiedName()));
 		pairList.add(Pair.build("kind", "ComponentImplementation"));
 		pairList.add(Pair.build("category", ci.getCategory().getName()));
+		ImplementationExtension ie = ci.getOwnedExtension();
+		if (ie != null) {
+			pairList.add(Pair.build("extends", doSwitch(ie.getExtended())));
+		}
 
 		ArrayList<Value> subcomponents = new ArrayList<Value>();
 		for (Subcomponent sc : ci.getOwnedSubcomponents()) {
@@ -474,7 +488,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 		} else if (v instanceof RangeValue) {
 			return genRangeValue((RangeValue) v);
 		} else if (v instanceof ClassifierValue) {
-			return StringValue.build(((ClassifierValue) v).getClassifier().getName());
+//			return StringValue.build(((ClassifierValue) v).getClassifier().getName());
+			return StringValue.build(((ClassifierValue) v).getClassifier().getQualifiedName());
 		}
 		return StringValue.build("new_case/genPropertyExpression/" + v.toString());
 	}
@@ -511,7 +526,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	public Value buildProperty(Property p) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
 
-		pairList.add(Pair.build("name", p.getName()));
+//		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("name", p.getQualifiedName()));
 		pairList.add(Pair.build("kind", "Property"));
 		pairList.add(Pair.build("inherit", p.isInherit() ? "true" : "false"));
 		pairList.add(Pair.build("propertyType", doSwitch(p.getPropertyType())));
@@ -533,7 +549,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 	@Override
 	public Value casePropertyConstant(PropertyConstant p) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("name", p.getName()));
+//		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("name", p.getQualifiedName()));
 		pairList.add(Pair.build("kind", "PropertyConstant"));
 		pairList.add(Pair.build("propertyType", doSwitch(p.getPropertyType())));
 		pairList.add(Pair.build("value", genPropertyExpression(p.getConstantValue())));
@@ -542,7 +559,8 @@ public class AadlTranslate extends Aadl2Switch<Value> {
 
 	public Value buildPropertyType(PropertyType p) {
 		ArrayList<Pair> pairList = new ArrayList<Pair>();
-		pairList.add(Pair.build("name", p.getName()));
+//		pairList.add(Pair.build("name", p.getName()));
+		pairList.add(Pair.build("name", p.getQualifiedName()));
 		pairList.add(Pair.build("kind", "PropertyType"));
 		pairList.add(Pair.build("type", doSwitch(p)));
 		return ObjectValue.build(pairList);

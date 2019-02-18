@@ -110,8 +110,11 @@ public class AgreeTranslate {
 	}
 
 	private Value genNamedElmExpr(NamedElmExpr expr) {
-		String id = expr.getElm().getName();
-		return StringValue.build(id);
+		ArrayList<Pair> pairList = new ArrayList<Pair>();
+		pairList.add(Pair.build("kind", "NamedElmExpr"));
+		pairList.add(Pair.build("name", expr.getElm().getName()));
+		return ObjectValue.build(pairList);
+//		return StringValue.build(id);
 	}
 
 
