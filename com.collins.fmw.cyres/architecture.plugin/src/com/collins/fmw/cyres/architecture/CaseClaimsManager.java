@@ -200,7 +200,7 @@ public class CaseClaimsManager {
 
 		String funDef = "\t\tLegacyComponentVerificationCheck(c : component) <=" + System.lineSeparator()
 				+ "\t\t\t** c \" legacy component has been verified\" **" + System.lineSeparator()
-				+ "\t\t\tanalysis(\"ToolCheck\", \"SuitCASE\")" + System.lineSeparator();
+				+ "\t\t\tanalysis(\"ToolCheck\", \"IVALDI\")" + System.lineSeparator();
 		annex = annex.replace("\t**};", funDef + System.lineSeparator() + "\t**};");
 
 		// Write back to file

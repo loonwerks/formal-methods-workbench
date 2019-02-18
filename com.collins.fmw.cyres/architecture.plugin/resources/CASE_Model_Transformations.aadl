@@ -28,6 +28,25 @@ public
 			payload: data;
 	end CASE_RF_Msg.Impl;
 	
+	-- UART Message structure
+	data CASE_UART_Msg
+	end CASE_UART_Msg;
+	
+	data implementation CASE_UART_Msg.Impl
+		subcomponents
+			crc: data Base_Types::Boolean;
+			message: data Base_Types::String;
+	end CASE_UART_Msg.Impl;
+	
+	-- WIFI Message structure
+	data CASE_WIFI_Msg
+	end CASE_WIFI_Msg;
+	
+	data implementation CASE_WIFI_Msg.Impl
+		subcomponents
+			crc: data Base_Types::Boolean;
+			message: data Base_Types::String;
+	end CASE_WIFI_Msg.Impl;
 	
 	-- ATTESTATION MANAGER
 		
