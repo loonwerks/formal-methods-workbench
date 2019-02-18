@@ -36,12 +36,7 @@
    <feature id="org.osate.utils.feature">
       <category name="osate2"/>
    </feature>
-   <feature id="org.osate.alisa.workbench.sdk">
-      <category name="alisa"/>
-   </feature>
-   <feature id="org.osate.alisa.workbench.sdk.source">
-      <category name="alisa.source"/>
-   </feature>
+
    <feature url="features/com.collins.fmw.cyres.feature_0.0.0.jar" id="com.collins.fmw.cyres.feature" version="0.0.0">
       <category name="cyres"/>
    </feature>

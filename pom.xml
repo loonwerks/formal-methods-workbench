@@ -11,18 +11,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>../osate2/core/osate2-core.releng/modules</module>
-		<module>../osate2/analyses/osate2-plugins.releng/modules</module>
-		<module>../osate2/emv2/emv2.releng/modules</module>
-		<module>../osate2/alisa/alisa.releng/modules</module>
-		<module>../osate2/ge/osate-ge.releng/modules</module>
-
-		<module>../osate2/ba/org.osate.ba</module>
-		<module>../osate2/ba/org.osate.ba.contrib</module>
-		<module>../osate2/ba/org.osate.ba.feature</module>
-		<module>../osate2/ba/org.osate.ba.edit</module>
-		<module>../osate2/ba/org.osate.utils</module>
-		<module>../osate2/ba/org.osate.utils.feature</module>
+    <module>../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
 		<module>com.collins.fmw.cyres</module>
 		<module>com.collins.fmw.ide</module>
 	</modules>
@@ -32,39 +21,22 @@
 		<tycho.version>1.0.0</tycho.version>
 		<tycho-extras.version>1.0.0</tycho-extras.version>
 		<xtext.version>2.12.0</xtext.version>
-		<xsemantics.version>1.12.1</xsemantics.version>
+		<xsemantics.version>1.16.0-SNAPSHOT</xsemantics.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<osate.version>2.4.0-SNAPSHOT</osate.version>
 
-		<jacoco.version>0.7.9</jacoco.version>
+		<jacoco.version>0.8.2</jacoco.version>
 		<test.logging.1>-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog</test.logging.1>
 		<test.logging.2>-Dorg.apache.commons.logging.simplelog.defaultlog=error</test.logging.2>
 		<test.logging>${test.logging.1} ${test.logging.2}</test.logging>
 
 		<!-- The following are for use in poms for test plugins -->
-		<eclipse.repo.url>http://download.eclipse.org/releases/oxygen/201804111000/</eclipse.repo.url>
+		<eclipse.repo.url>http://download.eclipse.org/releases/2018-12</eclipse.repo.url>
 		<xtext-testing.repo.url>https://dl.bintray.com/itemis/generic/xtext-testing/updates/0.2/</xtext-testing.repo.url>
 
-		<!-- Used in pull request build -->
-		<fm-workbench.repo.url>http://osate-build.sei.cmu.edu/p2/fm-workbench/</fm-workbench.repo.url>
-		<ocarina.repo.url>http://osate-build.sei.cmu.edu/p2/ocarina/</ocarina.repo.url>
 	</properties>
 
 	<profiles>
-
-		<profile>
-			<activation>
-				<property>
-					<name>pr.build</name>
-					<value>!true</value>
-				</property>
-			</activation>
-			<modules>
-				<module>../osate2-ocarina/osate2-ocarina.releng/modules</module>
-				<module>../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
-			</modules>
-		</profile>
-
 		<profile>
 			<id>pr-build</id>
 			<activation>
@@ -89,7 +61,7 @@
 		<profile>
 			<id>full</id>
 			<properties>
-				<jgit.dirtyWorkingTree>error</jgit.dirtyWorkingTree>
+				<jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
 			</properties>
 			<build>
 				<plugins>
@@ -103,11 +75,6 @@
 									<os>linux</os>
 									<ws>gtk</ws>
 									<arch>x86_64</arch>
-								</environment>
-								<environment>
-									<os>win32</os>
-									<ws>win32</ws>
-									<arch>x86</arch>
 								</environment>
 								<environment>
 									<os>win32</os>
@@ -349,6 +316,46 @@
 						<artifactId>org.eclipse.equinox.common</artifactId>
 						<version>3.10.0</version>
 					</dependency>
+					<dependency>
+						<groupId>org.eclipse.jdt</groupId>
+						<artifactId>org.eclipse.jdt.core</artifactId>
+						<version>3.13.102</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.jdt</groupId>
+						<artifactId>org.eclipse.jdt.compiler.apt</artifactId>
+						<version>1.3.110</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.jdt</groupId>
+						<artifactId>org.eclipse.jdt.compiler.tool</artifactId>
+						<version>1.2.101</version>
+					</dependency>
+                    <dependency>
+                        <groupId>org.eclipse.emf</groupId>
+                        <artifactId>org.eclipse.emf.common</artifactId>
+                        <version>2.12.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.emf</groupId>
+                        <artifactId>org.eclipse.emf.ecore</artifactId>
+                        <version>2.12.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.emf</groupId>
+                        <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
+                        <version>2.12.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.emf</groupId>
+                        <artifactId>org.eclipse.emf.codegen</artifactId>
+                        <version>2.11.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.emf</groupId>
+                        <artifactId>org.eclipse.emf.codegen.ecore</artifactId>
+                        <version>2.12.0</version>
+                    </dependency>
 				</dependencies>
 			</plugin>
 			<plugin>
@@ -425,7 +432,7 @@
 					<configuration>
 						<languages>
 							<language>
-								<setup>it.xsemantics.dsl.XsemanticsStandaloneSetup</setup>
+								<setup>org.eclipse.xsemantics.dsl.XsemanticsStandaloneSetup</setup>
 								<outputConfigurations>
 									<outputConfiguration>
 										<outputDirectory>${basedir}/xsemantics-gen</outputDirectory>
@@ -436,8 +443,8 @@
 					</configuration>
 					<dependencies>
 						<dependency>
-							<groupId>net.sf.xsemantics</groupId>
-							<artifactId>it.xsemantics.dsl</artifactId>
+							<groupId>org.eclipse.xsemantics</groupId>
+							<artifactId>org.eclipse.xsemantics.dsl</artifactId>
 							<version>${xsemantics.version}</version>
 						</dependency>
 					</dependencies>
