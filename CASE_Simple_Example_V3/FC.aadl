@@ -1,7 +1,7 @@
 package FC
 public
 	
-	with UAV;
+	with UAS_Buses;
 	with CASE_Properties;
 	
 	-- GPS receiver hardware
@@ -20,12 +20,12 @@ public
 		features
 			uart_recv: in event data port;
 			uart_send: out event data port;
-			UARTA: requires bus access UAV::Serial.Impl;
+			UARTA: requires bus access UAS_Buses::Serial_Bus.Impl;
 		properties
 			CASE_Properties::CONFIDENTIALITY => MEDIUM;
-			CASE_Properties::INTEGRITY => MEDIUM;
+			CASE_Properties::INTEGRITY => HIGH;
 			CASE_Properties::AVAILABILITY => HIGH;
-			CASE_Properties::BOUNDARY => (PHYSICAL, TRUSTED);
+			CASE_Properties::BOUNDARY => (TRUSTED, PHYSICAL);
 	end FlightController;
 	
 	

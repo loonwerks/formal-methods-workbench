@@ -2,8 +2,7 @@ package MC
 public
 	
 	with SW;
-	with UAV;
-	with UAS;
+	with UAS_Buses;
 	with CASE_Model_Transformations;
 	
 	
@@ -11,7 +10,7 @@ public
 	device Radio
 		features
 			MCA: requires bus access MC_Bus.Impl;
-			RFA: requires bus access UAS::RF.Impl;
+			RFA: requires bus access UAS_Buses::RF_Bus.Impl;
 			recv_data_in: in event data port;
 			recv_data_out: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
 			send_data_in: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
@@ -26,10 +25,10 @@ public
 	device UART
 		features
 			MCA: requires bus access MC_Bus.Impl;
-			UARTA: requires bus access UAV::Serial.Impl;
+			UARTA: requires bus access UAS_Buses::Serial_Bus.Impl;
 			recv_data_in: in event data port;
-			recv_data_out: out event data port UAV::UART_Msg.Impl;
-			send_data_in: in event data port UAV::UART_Msg.Impl;
+			recv_data_out: out event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
+			send_data_in: in event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
 			send_data_out: out event data port;
 	end UART;
 	
@@ -41,10 +40,10 @@ public
 	device Wifi
 		features
 			MCA: requires bus access MC_Bus.Impl;
-			WIFIA: requires bus access UAV::Wifi.Impl;
+			WIFIA: requires bus access UAS_Buses::Wifi_Bus.Impl;
 			recv_data_in: in event data port;
-			recv_data_out: out event data port UAV::WIFI_Msg.Impl;
-			send_data_in: in event data port UAV::WIFI_Msg.Impl;
+			recv_data_out: out event data port CASE_Model_Transformations::CASE_WIFI_Msg.Impl;
+			send_data_in: in event data port CASE_Model_Transformations::CASE_WIFI_Msg.Impl;
 			send_data_out: out event data port;
 	end Wifi;
 	
@@ -90,9 +89,9 @@ public
 			uart_send: out event data port;
 			wifi_recv: in event data port;
 			wifi_send: out event data port;
-			UARTA: requires bus access UAV::Serial.Impl;
-			RFA: requires bus access UAS::RF.Impl;
-			WIFIA: requires bus access UAV::Wifi.Impl;
+			UARTA: requires bus access UAS_Buses::Serial_Bus.Impl;
+			RFA: requires bus access UAS_Buses::RF_Bus.Impl;
+			WIFIA: requires bus access UAS_Buses::Wifi_Bus.Impl;
 
 	end MissionComputer;
 	
