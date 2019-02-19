@@ -10,6 +10,68 @@
 	<version>0.0.0</version>
 	<packaging>pom</packaging>
 
+	<properties>
+		<tycho.version>1.0.0</tycho.version>
+		<tycho-extras.version>1.0.0</tycho-extras.version>
+		<xtext.version>2.12.0</xtext.version>
+		<xsemantics.version>1.16.0-SNAPSHOT</xsemantics.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--
+		<osate.version>2.3.7</osate.version>
+    -->
+
+		<jacoco.version>0.8.2</jacoco.version>
+		<test.logging.1>-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog</test.logging.1>
+		<test.logging.2>-Dorg.apache.commons.logging.simplelog.defaultlog=error</test.logging.2>
+		<test.logging>${test.logging.1} ${test.logging.2}</test.logging>
+
+
+		<!-- The following are for use in poms for test plugins -->
+    <!--
+		<eclipse.repo.url>http://download.eclipse.org/releases/2018-12</eclipse.repo.url>
+		<xtext-testing.repo.url>https://dl.bintray.com/itemis/generic/xtext-testing/updates/0.2/</xtext-testing.repo.url>
+    -->
+
+	</properties>
+
+
+  <repositories>
+
+		<repository>
+			<id>eclipse</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/oxygen</url>
+		</repository>
+
+
+		<repository>
+			<id>Xsemantics</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/xsemantics/milestones/</url>
+		</repository>
+
+		<repository>
+			<id>Xtext</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/${xtext.version}</url>
+    </repository>
+
+   <repository>
+     <id>osate</id>
+     <layout>p2</layout>
+     <url>https://osate-build.sei.cmu.edu/download/osate/stable/latest/updates</url>
+   </repository>
+
+   <!--
+		<repository>
+			<id>Sireum ACT Update Site</id>
+			<layout>p2</layout>
+			<url>https://raw.githubusercontent.com/sireum/act-plugin-update-site/master</url>
+		</repository>
+    -->
+
+  </repositories>
+
 	<modules>
     <module>../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
 		<module>com.collins.fmw.cyres</module>
@@ -17,47 +79,7 @@
 	</modules>
 
 
-	<properties>
-		<tycho.version>1.0.0</tycho.version>
-		<tycho-extras.version>1.0.0</tycho-extras.version>
-		<xtext.version>2.12.0</xtext.version>
-		<xsemantics.version>1.16.0-SNAPSHOT</xsemantics.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<osate.version>2.4.0-SNAPSHOT</osate.version>
-
-		<jacoco.version>0.8.2</jacoco.version>
-		<test.logging.1>-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog</test.logging.1>
-		<test.logging.2>-Dorg.apache.commons.logging.simplelog.defaultlog=error</test.logging.2>
-		<test.logging>${test.logging.1} ${test.logging.2}</test.logging>
-
-		<!-- The following are for use in poms for test plugins -->
-		<eclipse.repo.url>http://download.eclipse.org/releases/2018-12</eclipse.repo.url>
-		<xtext-testing.repo.url>https://dl.bintray.com/itemis/generic/xtext-testing/updates/0.2/</xtext-testing.repo.url>
-
-	</properties>
-
 	<profiles>
-		<profile>
-			<id>pr-build</id>
-			<activation>
-				<property>
-					<name>pr.build</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<repositories>
-				<repository>
-					<id>fm-workbench.repo</id>
-					<url>${fm-workbench.repo.url}</url>
-					<layout>p2</layout>
-				</repository>
-				<repository>
-					<id>ocarina.repo</id>
-					<url>${ocarina.repo.url}</url>
-					<layout>p2</layout>
-				</repository>
-			</repositories>
-		</profile>
 		<profile>
 			<id>full</id>
 			<properties>
@@ -366,6 +388,7 @@
 					<compilerArgument>-err:-forbidden</compilerArgument>
 				</configuration>
 			</plugin>
+    <!--
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
@@ -383,6 +406,7 @@
 					<ignoreTychoRepositories>true</ignoreTychoRepositories>
 				</configuration>
 			</plugin>
+    -->
 		</plugins>
 
 		<pluginManagement>

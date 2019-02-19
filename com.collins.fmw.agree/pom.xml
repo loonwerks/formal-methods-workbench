@@ -18,11 +18,6 @@
   <packaging>pom</packaging>
 
   <modules>
-	  <module>../../osate2/core/osate2-core.releng/modules</module>
-  	<module>../../osate2/ge/osate-ge.releng/modules</module>
-  	<module>../../osate2/emv2/emv2.releng/modules</module>
-  	<module>../../osate2/analyses/osate2-plugins.releng/modules</module>
-	  <module>../../osate2-ocarina/osate2-ocarina.releng/modules</module>
 	  <module>../../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
   	<module>command</module>	
   </modules>

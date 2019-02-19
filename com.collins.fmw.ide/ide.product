@@ -39,15 +39,15 @@
    </plugins>
 
    <features>
+     <!--
+      <feature id="org.sireum.aadl.osate.act.feature"/>
+      -->
       <feature id="com.collins.fmw.cyres.feature"/>
       <feature id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier"/>
+      <feature id="com.rockwellcollins.atc.resolute.feature" version="1.0.0.qualifier"/>
       <feature id="org.osate.core.feature"/>
       <feature id="org.osate.plugins.feature"/>
       <feature id="org.osate.xtext.aadl2.errormodel.feature" installMode="root"/>
-      <feature id="org.osate.ge.feature" installMode="root"/>
-      <feature id="org.osate.ba.feature" installMode="root"/>
-      <feature id="org.osate.utils.feature" installMode="root"/>
-      <feature id="org.osate.ocarina.feature" installMode="root"/>
       <feature id="org.eclipse.xsemantics.runtime.feature"/>
       <feature id="org.eclipse.birt"/>
       <feature id="org.eclipse.egit"/>
@@ -59,6 +59,7 @@
       <feature id="org.eclipse.elk.feature"/>
       <feature id="org.eclipse.elk.algorithms.feature"/>
       <feature id="org.eclipse.ease.feature"/>
+      <!--
       <feature id="org.eclipse.ease.lang.python.py4j.feature"/>
       <feature id="org.eclipse.ease.lang.scriptarchive.feature"/>
       <feature id="org.eclipse.ease.lang.unittest.feature"/>
@@ -66,6 +67,7 @@
       <feature id="org.eclipse.ease.modules.modeling.feature"/>
       <feature id="org.eclipse.ease.ui.feature"/>
       <feature id="org.py4j.feature"/>
+      -->
    </features>
 
    <configurations>
