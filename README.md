@@ -5,12 +5,9 @@ This includes a complete IDE as well as plugins.
 
 ## Getting Started
 Clone this repository on your machine.
-Clone the smaccm and osate2 repos to the same location as your local copy of this repo.
 
 ```
 git clone https://github.com/loonwerks/formal-methods-workbench.git
-git clone https://github.com/smaccm/smaccm.git
-git clone https://github.com/osate/osate2.git
 ```
 
 ### Prerequisites
