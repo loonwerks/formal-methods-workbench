@@ -1,0 +1,226 @@
+package GCS
+public
+  with Base_Types;
+  with TowerArrays;
+  with gcsstream_timing;
+  with mavlink_veh_commsec_msg;
+  with att_control_dbg_type;
+  with alt_control_dbg_type;
+  with radio_stat_type;
+  with motors_type;
+  with controloutput_type;
+  with gps_type;
+  with sensors_type;
+  with control_law_type;
+  with mavlink_rc_channels_override_msg;
+  with control_law_request_type;
+  with mavlink_hil_state_msg;
+  with SMACCM;
+  with SMACCM_SYS;
+  with FeatureGroups;
+  with SMACCM_DATA;
+
+  thread group GCS
+    features
+      gcsTxToEncSrc: out event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl{
+        Queue_Size => 16;
+      };
+      mavStream: in event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+        Queue_Size => 16;
+      };
+      rc_override_tx: out event data port mavlink_rc_channels_override_msg::rc_channels_override_msg.impl {
+        Queue_Size => 16;
+      };
+      control_law_request: out event data port control_law_request_type::control_law_request.impl {
+        Queue_Size => 16;
+      };
+      
+      radioEvent5: in event data port radio_stat_type::radio_stat.impl {
+        Queue_Size => 2;
+      };
+    
+      radioData5: requires data access radio_stat_type::radio_stat.impl {
+        Access_Right => write_only;
+      };
+      
+      --params
+    transmit : requires data access SMACCM_DATA::control_params.impl;
+    receiveParamsRead : requires data access SMACCM_DATA::control_params.impl;
+    receiveParamsWrite : requires data access SMACCM_DATA::control_params.impl;
+    transCons : feature group FeatureGroups::data_conns;
+    
+  end GCS;
+  
+  thread group implementation GCS.Impl
+  	subcomponents
+	  gcsTransmitTask_inst : thread gcsTransmitTask;
+      gcsReceiveTask_inst : thread gcsReceiveTask;
+      radio_status_inst : thread radio_status;
+      
+    connections
+      conn_322 : port gcsReceiveTask_inst.streamperiods -> gcsTransmitTask_inst.streamPeriod;
+      conn_533 : port gcsReceiveTask_inst.param_req -> gcsTransmitTask_inst.paramReqs;
+      txuart5 : port gcsTransmitTask_inst.gcsTxToEncSrc -> gcsTxToEncSrc;
+      mavlink5 : port mavStream -> gcsReceiveTask_inst.mavStream;
+      rc : port gcsReceiveTask_inst.rc_override_tx -> rc_override_tx;
+      ctrlrq: port gcsReceiveTask_inst.control_law_request -> control_law_request;
+      radEvent5: port radioEvent5 -> radio_status_inst.proxyEvent;
+      radData5: data access radio_status_inst.proxyData -> radioData5;
+     
+      --paramater connections
+     transmit_params : data access gcsTransmitTask_inst.controL_params -> transmit;
+     recieve_params_write : data access gcsReceiveTask_inst.control_params -> receiveParamsWrite;
+     recieve_params_read : data access gcsReceiveTask_inst.control_params -> receiveParamsRead;
+    
+      conn_220 : data access gcsTransmitTask_inst.commsecInfo -> transCons.commsecInfo;
+      conn_221 : data access gcsTransmitTask_inst.att_control -> transCons.att_control;
+      conn_222 : data access gcsTransmitTask_inst.alt_control -> transCons.alt_control;
+      conn_223 : data access gcsTransmitTask_inst.radio -> transCons.radio;
+      conn_224 : data access gcsTransmitTask_inst.motors -> transCons.motors;
+      conn_225 : data access gcsTransmitTask_inst.control -> transCons.control;
+      conn_226 : data access gcsTransmitTask_inst.position -> transCons.position;
+      conn_227 : data access gcsTransmitTask_inst.sensors -> transCons.sensors;
+      conn_228: data access gcsTransmitTask_inst.controllaw -> transCons.controllaw;
+
+  end GCS.Impl;
+  
+  thread gcsTransmitTask
+  features
+    gcsTxToEncSrc: out event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_gcsTransmitTask_1003_chan775_1021";
+    };
+    streamPeriod: in event data port gcsstream_timing::gcsstream_timing.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_gcsTransmitTask_1003_chan778_1103";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_gcsTransmitTask_1003_chan778_1106");
+    };
+    paramReqs: in event data port Base_Types::Integer_16 {
+      Queue_Size => 512;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_gcsTransmitTask_1003_chan779_1028";
+    };
+    control_params: requires data access SMACCM_DATA::control_params.impl;
+    commsecInfo: requires data access mavlink_veh_commsec_msg::veh_commsec_msg.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport777_1023";
+    };
+    att_control: requires data access att_control_dbg_type::att_control_dbg.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport40_1019";
+    };
+    alt_control: requires data access alt_control_dbg_type::alt_control_dbg.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport39_1017";
+    };
+    radio: requires data access radio_stat_type::radio_stat.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport817_1015";
+    };
+    motors: requires data access motors_type::motors.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport306_1013";
+    };
+    control: requires data access controloutput_type::controloutput.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport297_1011";
+    };
+    position: requires data access gps_type::position.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport341_1009";
+    };
+    sensors: requires data access sensors_type::sensors_result.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport0_1007";
+    };
+    controllaw: requires data access control_law_type::control_law.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsTransmitTask_1003.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_gcsTransmitTask_1003_dataport140_1005";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_gcsTransmitTask_1003.c");
+    Priority => 0;
+    Stack_Size => 1024 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Hybrid;
+    Period => 50 ms;
+    SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_gcsTransmitTask_1003_per50_1110");
+  end gcsTransmitTask;
+  
+  thread gcsReceiveTask
+  features
+    streamperiods: out event data port gcsstream_timing::gcsstream_timing.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsReceiveTask_839.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_gcsReceiveTask_839_chan778_987";
+    };
+    rc_override_tx: out event data port mavlink_rc_channels_override_msg::rc_channels_override_msg.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsReceiveTask_839.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_gcsReceiveTask_839_chan2_983";
+    };
+    param_req: out event data port Base_Types::Integer_16 {
+      Queue_Size => 512;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsReceiveTask_839.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_gcsReceiveTask_839_chan779_981";
+    };
+    control_law_request: out event data port control_law_request_type::control_law_request.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsReceiveTask_839.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_gcsReceiveTask_839_chan1_843";
+    };
+    hil_src: out event data port mavlink_hil_state_msg::hil_state_msg.impl {
+      Queue_Size => 4;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsReceiveTask_839.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_gcsReceiveTask_839_chan780_841";
+      SMACCM::Unimplemented => true;
+    };
+    mavStream: in event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_gcsReceiveTask_839.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_gcsReceiveTask_839_chan776_991";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_gcsReceiveTask_839_chan776_994");
+    };
+   control_params: requires data access SMACCM_DATA::control_params.impl;
+  properties
+    Source_Text => ("tower_task_usercode_gcsReceiveTask_839.c");
+    Priority => 2;
+    Stack_Size => 1024 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+    SMACCM::Always_Sends_Message => true;
+end gcsReceiveTask;
+
+thread radio_status
+  features
+    proxyEvent: in event data port radio_stat_type::radio_stat.impl {
+      Queue_Size => 2;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_radio_status_818.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_radio_status_818_chan783_822";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_radio_status_818_chan783_825");
+    };
+    proxyData: requires data access radio_stat_type::radio_stat.impl {
+      Access_Right => write_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_radio_status_818.h";
+      SMACCM_SYS::CommPrim_Source_Text => "write_radio_status_818_dataport817_820";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_radio_status_818.c");
+    Priority => 4;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+end radio_status;
+
+end GCS;

@@ -1,0 +1,94 @@
+package Commsec
+public
+  with SMACCM_SYS;
+  with TowerArrays;
+  with mavlink_veh_commsec_msg;
+  with SMACCM;
+  
+	thread group Commsec
+	  features
+	    encToHxSrc: out event data port TowerArrays::ArrTy_96TyBase_Types_Unsigned_8.impl {
+          Queue_Size => 8;
+        };
+        gcsTxToEnc: in event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+          Queue_Size => 16;
+        };
+        decToGcsRxSrc: out event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+         Queue_Size => 16;
+        };
+        hxToDecRcv: in event data port TowerArrays::ArrTy_96TyBase_Types_Unsigned_8.impl {
+          Queue_Size => 8;
+        };
+        commsec_info_src: requires data access mavlink_veh_commsec_msg::veh_commsec_msg.impl;
+        encToHxSrc_uart1: out event data port TowerArrays::ArrTy_96TyBase_Types_Unsigned_8.impl {
+          Queue_Size => 8;
+        };
+       
+	end Commsec;
+	
+	thread group implementation Commsec.Impl
+	  subcomponents
+        encryptTask_inst : thread encryptTask;
+        decryptTask_inst : thread decryptTask;
+      connections
+        encToHx5: port encryptTask_inst.encToHxSrc -> encToHxSrc;
+        gcsTxEnc5: port gcsTxToEnc -> encryptTask_inst.gcsTxToEnc;
+        decToGcs5: port decryptTask_inst.decToGcsRxSrc -> decToGcsRxSrc;
+        hxToDec5: port hxToDecRcv -> decryptTask_inst.hxToDecRcv;
+        decAcces5: data access decryptTask_inst.commsec_info_src -> commsec_info_src;
+      
+	end Commsec.Impl;
+	
+  thread encryptTask
+  features
+    encToHxSrc: out event data port TowerArrays::ArrTy_96TyBase_Types_Unsigned_8.impl {
+      Queue_Size => 8;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_encryptTask_995.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_encryptTask_995_chan781_997";
+    };
+    gcsTxToEnc: in event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_encryptTask_995.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_encryptTask_995_chan775_999";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_encryptTask_995_chan775_1002");
+    };
+  properties
+    Source_Text => ("tower_task_usercode_encryptTask_995.c");
+    Priority => 1;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+  end encryptTask;
+
+
+thread decryptTask
+  features
+    decToGcsRxSrc: out event data port TowerArrays::ArrTy_80TyBase_Types_Unsigned_8.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_decryptTask_826.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_decryptTask_826_chan776_828";
+    };
+    hxToDecRcv: in event data port TowerArrays::ArrTy_96TyBase_Types_Unsigned_8.impl {
+      Queue_Size => 8;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_decryptTask_826.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_decryptTask_826_chan782_835";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_decryptTask_826_chan782_838");
+    };
+    commsec_info_src: requires data access mavlink_veh_commsec_msg::veh_commsec_msg.impl {
+      Access_Right => write_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_decryptTask_826.h";
+      SMACCM_SYS::CommPrim_Source_Text => "write_decryptTask_826_dataport777_830";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_decryptTask_826.c");
+    Priority => 3;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+    SMACCM::Encryption_Algorthim => "AES-128-GCM";
+    SMACCM::Always_Sends_Message => true;
+    
+end decryptTask;
+
+	
+end Commsec;

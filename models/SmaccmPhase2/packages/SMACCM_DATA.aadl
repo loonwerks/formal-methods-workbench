@@ -1,0 +1,147 @@
+package SMACCM_DATA
+public
+  with Base_Types;
+  with mavlink_veh_commsec_msg;
+  with att_control_dbg_type;
+  with alt_control_dbg_type;
+  with radio_stat_type;
+  with motors_type;
+  with controloutput_type;
+  with gps_type;
+  with sensors_type;
+  with control_law_type;
+  with mavlink_rc_channels_override_msg;
+  with control_law_request_type;
+  with mavlink_hil_state_msg;
+  with radio_info_type;
+  with userinput_type;
+  with FeatureGroups;
+  
+  
+data control_params
+end control_params;
+
+data implementation control_params.impl
+  subcomponents
+      FS_ALT_OFFS: data Base_Types::Float ;
+      FS_ALT_OFFS_292: data Base_Types::Float;
+      POS_UI_SENS: data Base_Types::Float;
+      POS_THRUST_IMAX: data Base_Types::Float;
+      POS_THRUST_D: data Base_Types::Float;
+      POS_THRUST_I: data Base_Types::Float;
+      POS_THRUST_P: data Base_Types::Float;
+      ALT_UI_DEAD: data Base_Types::Float ;
+      ALT_UI_SENS: data Base_Types::Float ;
+      ALT_POS_IMAX: data Base_Types::Float ;
+      ALT_POS_D: data Base_Types::Float ;
+      ALT_POS_I: data Base_Types::Float ;
+      ALT_POS_P: data Base_Types::Float ;
+      ALT_RATE_IMAX: data Base_Types::Float ;
+      ALT_RATE_D: data Base_Types::Float ;
+      ALT_RATE_I: data Base_Types::Float ;
+      ALT_RATE_P: data Base_Types::Float ;
+      YAW_STAB_IMAX: data Base_Types::Float ;
+      YAW_STAB_D: data Base_Types::Float ;
+      YAW_STAB_I: data Base_Types::Float ;
+      YAW_STAB_P: data Base_Types::Float ;
+      YAW_RATE_IMAX: data Base_Types::Float ;
+      YAW_RATE_D: data Base_Types::Float ;
+      YAW_RATE_I: data Base_Types::Float ;
+      YAW_RATE_P: data Base_Types::Float ;
+      PIT_STAB_IMAX: data Base_Types::Float ;
+      PIT_STAB_D: data Base_Types::Float ;
+      PIT_STAB_I: data Base_Types::Float ;
+      PIT_STAB_P: data Base_Types::Float ;
+      PIT_RATE_IMAX: data Base_Types::Float ;
+      PIT_RATE_D: data Base_Types::Float ;
+      PIT_RATE_I: data Base_Types::Float ;
+      PIT_RATE_P: data Base_Types::Float ;
+      RLL_STAB_IMAX: data Base_Types::Float ;
+      RLL_STAB_D: data Base_Types::Float ;
+      RLL_STAB_I: data Base_Types::Float ;
+      RLL_STAB_P: data Base_Types::Float ;
+      RLL_RATE_IMAX: data Base_Types::Float ;
+      RLL_RATE_D: data Base_Types::Float ;
+      RLL_RATE_I: data Base_Types::Float ;
+      RLL_RATE_P: data Base_Types::Float ;
+end control_params.impl;
+
+  
+data proc_data
+  features
+    control_params : provides data access control_params.impl;
+    transCons5 : feature group inverse of FeatureGroups::data_conns;
+    transCons1 : feature group inverse of FeatureGroups::data_conns;
+    
+    commsecInfo1: provides data access mavlink_veh_commsec_msg::veh_commsec_msg.impl;
+    commsecInfo5: provides data access mavlink_veh_commsec_msg::veh_commsec_msg.impl;
+    
+    att_control: provides data access att_control_dbg_type::att_control_dbg.impl;
+    alt_control: provides data access alt_control_dbg_type::alt_control_dbg.impl;
+    radio: provides data access radio_stat_type::radio_stat.impl;
+    motors: provides data access motors_type::motors.impl;
+    control: provides data access controloutput_type::controloutput.impl;
+    position: provides data access gps_type::position.impl;
+    sensors: provides data access sensors_type::sensors_result.impl;
+    controllaw: provides data access control_law_type::control_law.impl;
+    userinput: provides data access userinput_type::userinput_result.impl;
+end proc_data;
+
+data implementation proc_data.impl
+  subcomponents
+    control_params_data : data control_params.impl;
+    dataport817 : data radio_stat_type::radio_stat.impl;
+    dataport777 : data mavlink_veh_commsec_msg::veh_commsec_msg.impl;
+    dataport474 : data radio_stat_type::radio_stat.impl;
+    dataport434 : data mavlink_veh_commsec_msg::veh_commsec_msg.impl;
+    dataport341 : data gps_type::position.impl;
+    dataport306 : data motors_type::motors.impl;
+    dataport297 : data controloutput_type::controloutput.impl;
+    dataport140 : data control_law_type::control_law.impl;
+    dataport131 : data userinput_type::userinput_result.impl;
+    dataport40 : data att_control_dbg_type::att_control_dbg.impl;
+    dataport39 : data alt_control_dbg_type::alt_control_dbg.impl;
+    dataport0 : data sensors_type::sensors_result.impl;
+      
+  connections  
+    
+    connComm1: data access dataport434 -> commsecInfo1;
+    connComm5: data access dataport777 -> commsecInfo5;
+        
+    connAtt: data access dataport40 -> att_control;
+    connAlt: data access dataport39 -> alt_control;
+  
+    connRadio: data access dataport817 -> radio;
+    connMotor: data access dataport306 -> motors;
+    connControl: data access dataport297 -> control;
+    connPosition: data access dataport341 -> position;
+    connSensors: data access dataport0 -> sensors;
+    connControlLaw: data access dataport140 -> controllaw;
+  
+    conn_40 : data access control_params_data -> control_params; 
+     
+    conn_187 : data access dataport434 -> transCons1.commsecInfo;
+    conn_188 : data access dataport40 -> transCons1.att_control;
+    conn_189 : data access dataport39 -> transCons1.alt_control;
+    conn_190 : data access dataport474 -> transCons1.radio;
+    conn_191 : data access dataport306 -> transCons1.motors;
+    conn_192 : data access dataport297 -> transCons1.control;
+    conn_193 : data access dataport341 -> transCons1.position;
+    conn_194 : data access dataport0 -> transCons1.sensors;
+    conn_195 : data access dataport140 -> transCons1.controllaw;
+    
+    conn_74 : data access dataport777 -> transCons5.commsecInfo;
+    conn_75 : data access dataport40 -> transCons5.att_control;
+    conn_76 : data access dataport39 -> transCons5.alt_control;
+    conn_77 : data access dataport817 -> transCons5.radio;
+    conn_78 : data access dataport306 -> transCons5.motors;
+    conn_79 : data access dataport297 -> transCons5.control;
+    conn_80 : data access dataport341 -> transCons5.position;
+    conn_81 : data access dataport0 -> transCons5.sensors;
+    conn_82 : data access dataport140 -> transCons5.controllaw;   
+    conn_user : data access dataport131 -> userinput;
+ 
+end proc_data.impl;
+
+
+end SMACCM_DATA;

@@ -1,0 +1,83 @@
+package AGREE_PID
+public
+
+annex agree {**
+	
+	type PIDState = struct {
+    	pid_iState : real,
+    	pid_dState : real,
+    	pid_dReset : int,
+    	pid_pLast : real,
+    	pid_d_Last : real
+    };
+    
+    type PIDConfig = struct {
+    	pid_TODOFOO : real
+    };
+    
+    type PosRatePID = struct {
+    	pos : PIDState,
+    	rate : PIDState
+    };
+    
+    type PitchRollPID = struct {
+    	pitch : PosRatePID,
+    	roll : PosRatePID 
+    };
+    
+    node pid_reset (pid : PIDState) returns (res : PIDState); 
+    let
+	  res = pid {pid_dReset := 0}
+	            {pid_iState := 0.0}; 
+	tel;
+	
+	node pos_rate_reset(prp : PosRatePID) returns (res : PosRatePID); 
+	let 
+	  res = prp {pos := AGREE_PID.pid_reset(prp.pos)}
+	            {rate := AGREE_PID.pid_reset(prp.rate)};
+	tel;
+	
+	node prc_reset(prc : PitchRollPID) returns (res : PitchRollPID);
+	let
+	  res = prc {pitch := AGREE_PID.pos_rate_reset(prc.pitch)}
+	            {roll := AGREE_PID.pos_rate_reset(prc.roll)};
+	tel;
+	
+	node stab_f_a(angle_pid : PIDState,
+		angle_cfg : PIDConfig,
+		rate_pid : PIDState,
+		rate_cfg : PIDConfig,
+		stick_angle_rad : real,
+		sensor_angle_rad : real,
+		sensor_rate_rad_s : real,
+		max_servo_rate_deg_s : real
+	) returns(ret : PosRatePID)
+	let
+	
+	tel;
+	
+	
+	node ac_run(prpid : PosRatePID, 
+		setpt : real, 
+		est : real, 
+		deriv_est : real
+	) returns (res : PosRatePID);
+	let
+	  res = prpid;
+	tel;
+	
+	node prc_run(prc_control : PitchRollPID, 
+		pitch_setpt : real, 
+		roll_setpt : real, 
+		sens : sensors_type::sensors_result.impl)
+    returns (ret : PitchRollPID);
+    let
+      ret = prc_control 
+        {pitch := AGREE_PID.ac_run(prc_control.pitch, -1.0*pitch_setpt, sens.pitch, sens.omega_y)}
+      	{roll := AGREE_PID.ac_run(prc_control.roll, roll_setpt, sens.roll, sens.omega_x)};
+    tel;
+	
+**};
+
+
+end AGREE_PID;

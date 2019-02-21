@@ -73,7 +73,7 @@
   </repositories>
 
 	<modules>
-    <module>../smaccm/fm-workbench/releng/fm-workbench.build/modules</module>
+    <module>smaccm/releng/fm-workbench.build/modules</module>
 		<module>com.collins.fmw.cyres</module>
 		<module>com.collins.fmw.ide</module>
 	</modules>

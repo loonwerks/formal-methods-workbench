@@ -1,0 +1,55 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AGREE Analysis
+Bundle-SymbolicName: com.rockwellcollins.atc.agree.analysis; singleton:=true
+Bundle-Version: 2.4.0.qualifier
+Bundle-Activator: com.rockwellcollins.atc.agree.analysis.Activator
+Bundle-Vendor: Rockwell Collins, Inc.
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.emf.transaction;bundle-version="1.9.0",
+ org.eclipse.core.runtime,
+ org.osate.aadl2.modelsupport;bundle-version="1.0.0",
+ org.eclipse.ui.console;bundle-version="3.5.100",
+ org.eclipse.core.expressions;bundle-version="3.4.401",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.ui;bundle-version="1.0.0",
+ org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
+ com.rockwellcollins.atc.agree;bundle-version="1.0.0",
+ com.rockwellcollins.atc.agree.ui;bundle-version="1.0.0",
+ com.rockwellcollins.atc.z3;resolution:=optional,
+ org.osate.ge,
+ org.eclipse.emf.ecore
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+ dependencies/jkind-api.jar,
+ dependencies/jxl.jar,
+ dependencies/antlr-runtime-4.4.jar,
+ dependencies/gson-2.8.5.jar
+Import-Package: 
+ org.apache.commons.lang;version="2.6.0",
+ org.osate.aadl2.instantiation,
+ org.osate.annexsupport
+Export-Package: com.rockwellcollins.atc.agree.analysis,
+ com.rockwellcollins.atc.agree.analysis.ast,
+ com.rockwellcollins.atc.agree.analysis.ast.visitors,
+ com.rockwellcollins.atc.agree.analysis.extentions,
+ com.rockwellcollins.atc.agree.analysis.handlers,
+ com.rockwellcollins.atc.agree.analysis.lustre.visitors,
+ com.rockwellcollins.atc.agree.analysis.preferences,
+ com.rockwellcollins.atc.agree.analysis.saving,
+ com.rockwellcollins.atc.agree.analysis.translation,
+ com.rockwellcollins.atc.agree.analysis.views,
+ jkind,
+ jkind.api,
+ jkind.api.results,
+ jkind.api.ui.results,
+ jkind.lustre,
+ jkind.lustre.builders,
+ jkind.lustre.values,
+ jkind.lustre.visitors,
+ jkind.results,
+ jkind.results.layout,
+ jkind.translation,
+ jkind.util
+Automatic-Module-Name: com.rockwellcollins.atc.agree.analysis

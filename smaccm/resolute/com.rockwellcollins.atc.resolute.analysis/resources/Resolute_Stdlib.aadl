@@ -1,0 +1,75 @@
+package Resolute_Stdlib
+public
+annex resolute {**
+
+------------
+-- Binding
+------------
+bound(logical : aadl, physical : component) : bool =
+  memory_bound(logical, physical) or
+  connection_bound(logical, physical) or
+  processor_bound(logical, physical)
+  
+memory_bound(logical : aadl, physical : component) : bool =
+  has_property(logical, Deployment_Properties::Actual_Memory_Binding) and
+  member(physical, property(logical, Deployment_Properties::Actual_Memory_Binding))
+
+connection_bound(logical : aadl, physical : component) : bool =
+  has_property(logical, Deployment_Properties::Actual_Connection_Binding) and
+  member(physical, property(logical, Deployment_Properties::Actual_Connection_Binding))
+
+processor_bound(logical : aadl, physical : component) : bool =
+  has_property(logical, Deployment_Properties::Actual_Processor_Binding) and
+  member(physical, property(logical, Deployment_Properties::Actual_Processor_Binding))
+
+----------------
+-- Connections
+----------------
+connected(a : component, conn : connection, b : component) : bool =
+  contained(source(conn), a) and contained(destination(conn), b)
+
+source_component(c : connection) : component =
+  containing_component(source(c))
+
+destination_component(c : connection) : component =
+  containing_component(destination(c))
+
+is_port_connection(c : connection) : bool =
+  is_data_port_connection(c) or
+  is_event_port_connection(c) or
+  is_event_data_port_connection(c)
+
+is_data_port_connection(c : connection) : bool =
+  source(c) instanceof data_port or destination(c) instanceof data_port
+
+is_event_port_connection(c : connection) : bool =
+  source(c) instanceof event_port or destination(c) instanceof event_port
+
+is_event_data_port_connection(c : connection) : bool =
+  source(c) instanceof event_data_port or destination(c) instanceof event_data_port
+
+is_data_access_connection(c : connection) : bool =
+  (source(c) instanceof data) or (destination(c) instanceof data)
+
+-------------
+-- Features
+-------------
+flatten_features(feats : {feature}) : {feature} =
+  {f2 for (f1 : feats) (f2 : flatten_feature(f1))}
+   
+flatten_feature(f : feature) : {feature} =
+  if f instanceof feature_group
+  then flatten_features(features(f))
+  else {f} 
+
+----------------
+-- Containment
+----------------
+contained(a : aadl, b : component) : bool =
+  has_parent(a) and (parent(a) = b or contained(parent(a), b))
+
+containing_component(a : aadl) : component =
+  if a instanceof component then (component) a else containing_component(parent(a))
+
+**};
+end Resolute_Stdlib;

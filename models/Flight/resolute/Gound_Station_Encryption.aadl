@@ -1,0 +1,34 @@
+package Gound_Station_Encryption
+public
+
+annex resolute {**
+	
+all_outgoing_through_trusted(gs : component) <=
+	** "All connections from " gs " to any process or thread are encrypted or travel through a hardware bus" **
+	forall (z : connected_comps_via_untrusted_channel(gs)).
+		(not (z instanceof process or z instanceof thread)) and
+		all_outgoing_trusted_helper(z, connected_comps_via_untrusted_channel(gs))
+
+all_outgoing_trusted_helper(gs : component, v : {component}) <=
+	** "All connections from " gs " to any process or thread are encrypted or travel through a hardware bus" **
+	forall (z : connected_comps_via_untrusted_channel(gs)) .
+		(not member(z, v)) =>
+		(not (z instanceof process or z instanceof thread)) and
+		 all_outgoing_trusted_helper(z, union(connected_comps_via_untrusted_channel(gs), v))	
+
+connected_comps_via_untrusted_channel(x : component) : {component} =
+	{destination_component(c) for (c : connections(x)) |
+		conn_is_not_trusted(c) and not_hardware_bus(destination_component(c))
+	}
+
+not_hardware_bus(comp: component) : bool =
+	type(comp) <> CORTEX::AHB_Bus_Matrix
+
+conn_is_not_trusted(conn : connection) : bool =
+	(not has_type(conn)) or 
+	(type(conn) <> DATATYPES::EncryptMAVLink)
+
+**};
+
+
+end Gound_Station_Encryption;

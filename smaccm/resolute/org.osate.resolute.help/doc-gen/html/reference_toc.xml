@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<toc label="Resolute Reference Guide" topic="doc-gen/html/reference.html">
+	<topic label="Introduction" href="doc-gen/html/reference.html#introduction">
+	</topic>
+	<topic label="Claim Functions" href="doc-gen/html/reference.html#claim-functions">
+		<topic label="Application of Claim Functions" href="doc-gen/html/reference.html#application-of-claim-functions">
+		</topic>
+		<topic label="Uses of Claim Functions" href="doc-gen/html/reference.html#uses-of-claim-functions">
+		</topic>
+	</topic>
+	<topic label="Computational Functions and Constants" href="doc-gen/html/reference.html#computational-functions-and-constants">
+		<topic label="Computational Functions" href="doc-gen/html/reference.html#computational-functions">
+		</topic>
+		<topic label="Global Constants" href="doc-gen/html/reference.html#global-constants">
+		</topic>
+		<topic label="Local Constants" href="doc-gen/html/reference.html#local-constants">
+		</topic>
+	</topic>
+	<topic label="Predicate Expressions and Computational Expressions" href="doc-gen/html/reference.html#predicate-expressions-and-computational-expressions">
+		<topic label="Predicate Expressions" href="doc-gen/html/reference.html#predicate-expressions">
+		</topic>
+		<topic label="Computational Expressions" href="doc-gen/html/reference.html#computational-expressions">
+			<topic label="Type-related operators" href="doc-gen/html/reference.html#type-related-operators">
+			</topic>
+			<topic label="Atomic expressions" href="doc-gen/html/reference.html#atomic-expressions">
+			</topic>
+			<topic label="Collection-related operators" href="doc-gen/html/reference.html#collection-related-operators">
+			</topic>
+			<topic label="The  expression" href="doc-gen/html/reference.html#the-fail-expression">
+			</topic>
+		</topic>
+	</topic>
+	<topic label="Resolute Type System" href="doc-gen/html/reference.html#resolute-type-system">
+		<topic label="Built-in Base Types" href="doc-gen/html/reference.html#built-in-base-types">
+		</topic>
+		<topic label="Arithmetic with Integers and Reals" href="doc-gen/html/reference.html#arithmetic-with-integers-and-reals">
+		</topic>
+		<topic label="AADL Model Element Types" href="doc-gen/html/reference.html#aadl-model-element-types">
+		</topic>
+	</topic>
+	<topic label="Built-in Functions" href="doc-gen/html/reference.html#built-in-functions">
+		<topic label="Built-in Functions for Collections" href="doc-gen/html/reference.html#built-in-functions-for-collections">
+		</topic>
+		<topic label="Built-in Functions for Ranges" href="doc-gen/html/reference.html#built-in-functions-for-ranges">
+		</topic>
+		<topic label="Built-in Functions for Properties" href="doc-gen/html/reference.html#built-in-functions-for-properties">
+		</topic>
+		<topic label="Built-in Functions for Any Model Element and Components" href="doc-gen/html/reference.html#built-in-functions-for-any-model-element-and-components">
+		</topic>
+		<topic label="Built-in Functions for Features" href="doc-gen/html/reference.html#built-in-functions-for-features">
+		</topic>
+		<topic label="Built-in Functions for Connections" href="doc-gen/html/reference.html#built-in-functions-for-connections">
+		</topic>
+		<topic label="Built-in Functions for Bindings" href="doc-gen/html/reference.html#built-in-functions-for-bindings">
+		</topic>
+		<topic label="Built-in Functions for Sets and Lists" href="doc-gen/html/reference.html#built-in-functions-for-sets-and-lists">
+		</topic>
+		<topic label="Built-in Functions for Flows" href="doc-gen/html/reference.html#built-in-functions-for-flows">
+		</topic>
+		<topic label="Built-in Functions for Error Models" href="doc-gen/html/reference.html#built-in-functions-for-error-models">
+		</topic>
+		<topic label="External Functions" href="doc-gen/html/reference.html#external-functions">
+		</topic>
+		<topic label="Debug Functions" href="doc-gen/html/reference.html#debug-functions">
+		</topic>
+	</topic>
+	<topic label="Common Resolute Function Library" href="doc-gen/html/reference.html#common-resolute-function-library">
+		<topic label="Binding Related Functions" href="doc-gen/html/reference.html#binding-related-functions">
+		</topic>
+		<topic label="Connection Related Functions" href="doc-gen/html/reference.html#connection-related-functions">
+		</topic>
+		<topic label="Model Element Containment" href="doc-gen/html/reference.html#model-element-containment">
+		</topic>
+		<topic label="Handling of Feature Groups" href="doc-gen/html/reference.html#handling-of-feature-groups">
+		</topic>
+	</topic>
+	<topic label="Resolute Examples" href="doc-gen/html/reference.html#resolute-examples">
+		<topic label="Debugging Models with Resolute" href="doc-gen/html/reference.html#debugging-models-with-resolute">
+		</topic>
+		<topic label="Reachable Model Elements" href="doc-gen/html/reference.html#reachable-model-elements">
+		</topic>
+	</topic>
+	<topic label="Copyright" href="doc-gen/html/reference.html#copyright">
+	</topic>
+</toc>

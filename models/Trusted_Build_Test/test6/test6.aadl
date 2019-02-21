@@ -1,0 +1,183 @@
+-- AADL Test 6: active -> active threads using array read/write.
+-- Also tests 'fan out' dispatch to multiple active threads on send.
+
+package test6
+public 
+   with Base_Types;
+   with TB_SYS;   
+   with Data_Model;
+
+
+
+data a_array
+  
+end a_array;
+
+
+data implementation a_array.impl
+  properties
+    Data_Model::Data_Representation => Array;
+    Data_Model::Base_Type => (classifier (Base_Types::Unsigned_32));
+    Data_Model::Dimension => (4);
+end a_array.impl;
+
+-- Example of a periodically dispatched "Active" thread.   
+thread sender
+	features
+		Output1: out event data port a_array.impl {
+	      TB_SYS::CommPrim_Source_Text => "ping_Output1";		
+		};
+	
+	properties 
+	    Dispatch_Protocol => Periodic;
+	    TB_SYS::Thread_Type => Active ;
+	    Period => 1000 ms;
+		Source_Text => ("user_code/opt_main.c", "user_code/user_sender.c");
+	    TB_SYS::Compute_Entrypoint_Source_Text => ("periodic_ping");
+	    Priority => 10;
+	    Stack_Size => 256 bytes;
+	    Compute_Execution_Time => 10 us .. 50 us;
+	    TB_SYS::Sends_Events_To => "{{1 Output1}}";
+end sender ; 
+
+-- Example of a periodically dispatched "Active" thread.   
+thread receiver1
+	features
+		Input1: in event data port a_array.impl {
+	      TB_SYS::Compute_Entrypoint_Source_Text => ("ping_received1");
+	      Queue_Size => 4;
+		}; 
+		
+	properties 
+	    Dispatch_Protocol => Periodic;
+	    TB_SYS::Thread_Type => Active ;
+	    Period => 1000 ms;
+		Source_Text => ("user_code/user_receiver1.c");
+	    TB_SYS::Compute_Entrypoint_Source_Text => ("periodic_ping1");
+	    Priority => 8;
+	    Stack_Size => 256 bytes;
+	    Compute_Execution_Time => 10 us .. 50 us;
+	    TB_SYS::Sends_Events_To => "{{}}";
+end receiver ; 
+
+-- Example of a periodically dispatched "Active" thread.   
+thread receiver2
+	features
+		Input1: in event data port a_array.impl {
+	      TB_SYS::Compute_Entrypoint_Source_Text => ("ping_received2");
+	      Queue_Size => 2;
+		}; 
+		
+	properties 
+	    Dispatch_Protocol => Periodic;
+	    TB_SYS::Thread_Type => Active ;
+	    Period => 1000 ms;
+		Source_Text => ("user_code/user_receiver2.c");
+	    TB_SYS::Compute_Entrypoint_Source_Text => ("periodic_ping2");
+	    Priority => 8;
+	    Stack_Size => 256 bytes;
+	    Compute_Execution_Time => 10 us .. 50 us;
+	    TB_SYS::Sends_Events_To => "{{}}";
+end receiver2 ; 
+
+-- Example of an aperiodically dispatched active thread.   
+thread receiver3
+	features
+		Input1: in event data port a_array.impl {
+		  Queue_Size => 1;
+	      TB_SYS::Compute_Entrypoint_Source_Text => ("ping_received3");
+		  Source_Text => ("user_code/user_receiver3.c");
+	      TB_SYS::Sends_Events_To => "{{}}";
+		}; 
+
+				
+	properties 
+	    Dispatch_Protocol => Sporadic;
+	    Period => 1000 ms;
+		Source_Text => ("user_code/user_receiver3.c");
+	    Priority => 11;
+	    Stack_Size => 16384 bytes;
+	    Compute_Execution_Time => 10 us .. 50 us;
+	    TB_SYS::Sends_Events_To => "{{}}";
+end receiver3 ; 
+
+process proc
+
+end proc;
+
+process implementation proc.Impl
+	subcomponents
+		s:  thread sender;
+		r:  thread receiver1;
+		r2: thread receiver2;
+		r3: thread receiver3;
+	connections
+		s_to_r1 : port s.Output1 -> r.Input1;
+		s_to_r2 : port s.Output1 -> r2.Input1;
+		s_to_r3 : port s.Output1 -> r3.Input1;
+end proc.Impl;
+
+processor main     
+end main;
+
+processor implementation main.camkes
+   properties
+      TB_SYS::OS => camkes;
+      TB_SYS::HW => QEMU;
+end main.camkes;
+
+processor implementation main.linux
+   properties
+      TB_SYS::OS => linux;
+      TB_SYS::HW => X86;
+end main.linux;
+
+processor implementation main.vxworks
+   properties
+      TB_SYS::OS => vxworks;
+      TB_SYS::HW => x86;
+end main.vxworks;
+
+processor implementation main.echronos
+   properties
+      TB_SYS::OS => echronos;
+      TB_SYS::HW => pixhawk;
+end main.echronos;
+
+system test
+end test;
+
+system implementation test.camkes
+   subcomponents
+      tl: process proc.Impl;
+      toplevel: processor main.camkes;
+   properties
+      actual_processor_binding => (reference (toplevel)) applies to tl;     
+end test.camkes;
+
+system implementation test.echronos
+   subcomponents
+      tl: process proc.Impl;
+      toplevel: processor main.echronos;
+   properties
+      actual_processor_binding => (reference (toplevel)) applies to tl;     
+end test.echronos;
+
+system implementation test.vxworks
+   subcomponents
+      tl: process proc.Impl;
+      toplevel: processor main.vxworks;
+   properties
+      actual_processor_binding => (reference (toplevel)) applies to tl;     
+end test.vxworks;
+
+system implementation test.linux
+   subcomponents
+      tl: process proc.Impl;
+      toplevel: processor main.linux;
+   properties
+      actual_processor_binding => (reference (toplevel)) applies to tl;     
+end test.linux;
+
+
+end test6;

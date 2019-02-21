@@ -1,0 +1,315 @@
+grammar com.rockwellcollins.atc.resolute.Resolute with org.osate.xtext.aadl2.properties.Properties
+
+generate resolute "http://www.rockwellcollins.com/atc/resolute/Resolute"
+
+import "http://aadl.info/AADL/2.0" as aadl2
+
+AnnexLibrary returns aadl2::AnnexLibrary:
+	ResoluteLibrary
+;
+
+AnnexSubclause returns aadl2::AnnexSubclause:
+	ResoluteSubclause
+;
+
+Namespace returns aadl2::Namespace:
+	FunctionDefinition 
+;
+
+NamedElement returns aadl2::NamedElement:
+	Definition
+|	Arg
+|   LetBinding
+;
+
+Element returns aadl2::Element:
+	Expr
+|	ProveStatement
+|   ClaimText
+|   DefinitionBody
+;
+
+ResoluteLibrary:
+	{ResoluteLibrary}
+	definitions+=Definition*
+;
+
+Definition:
+	ConstantDefinition | FunctionDefinition
+;
+
+Type:
+	{ListType} '[' type=Type ']'
+|	{SetType} '{' type=Type '}'
+|	BaseType ('<' paramType=Type '>')?
+|	{LibraryFnType} libName=ID '.' fnType=ID
+;
+
+BaseType:
+	type=( 'int'
+         | 'real'
+         | 'string'
+         | 'bool'
+         | 'range'
+         | 'aadl'
+         | 'component'
+         | 'abstract'
+         | 'bus'
+         | 'data'
+         | 'device'
+         | 'memory'
+         | 'processor'
+         | 'process'
+         | 'subprogram_group'
+         | 'subprogram'
+         | 'system'
+         | 'thread_group'
+         | 'thread'
+         | 'virtual_bus'
+         | 'virtual_processor'
+         | 'connection'
+         | 'property'
+         | 'feature'
+         | 'port'
+         | 'data_port'
+         | 'event_port'
+         | 'event_data_port'
+         | 'feature_group'
+         | 'access'
+         | 'bus_access'
+         | 'provides_bus_access'
+         | 'requires_bus_access'
+         | 'data_access'
+         | 'provides_data_access'
+         | 'requires_data_access'
+         | 'subprogram_access'
+         | 'provides_subprogram_access'
+         | 'requires_subprogram_access'
+         | 'subprogram_group_access'
+         | 'provides_subprogram_group_access'
+         | 'requires_subprogram_group_access'
+         | 'flow_specification'
+         | 'end_to_end_flow'
+         );
+
+//Arg types are used for functions, claims, and quantifiers
+Arg returns Arg: 
+	=>(name=ID ':' type=Type)
+|	{QuantArg} name=ID ':' expr=Expr
+;
+
+ConstantDefinition:
+	name=ID ':' type=Type '=' expr=Expr
+;
+
+FunctionDefinition:
+	name=ID '(' (args+=Arg (',' args+=Arg)*)? ')' body=DefinitionBody
+;
+
+DefinitionBody:
+	 {FunctionBody} ':' type=Type '=' expr=Expr
+|	 {ClaimBody} '<=' ('**'(claim+=ClaimText)+'**') expr=Expr
+;
+
+ClaimText:
+	 {ClaimString} str=STRING 
+| 	 {ClaimArg} arg=[ClaimTextVar] ('%' unit=[aadl2::UnitLiteral])?
+;
+
+
+
+ClaimTextVar: Arg | ConstantDefinition | LetBinding;
+
+Expr:
+	ImpliesExpr
+;
+
+ImpliesExpr returns Expr:
+	OrExpr (=>({BinaryExpr.left=current} op='=>') right=ImpliesExpr)?
+;
+
+OrExpr returns Expr:
+	AndExpr (=>({BinaryExpr.left=current} (op='or'|op='orelse')) right=AndExpr)*
+;
+
+AndExpr returns Expr:
+	InstanceOfExpr (=>({BinaryExpr.left=current} (op='and'|op='andthen')) right=InstanceOfExpr)*
+;
+
+InstanceOfExpr returns Expr:
+	RelationalExpr (=>({InstanceOfExpr.expr=current} 'instanceof') type=BaseType)?
+;
+
+RelationalOp:
+	'<' | '<=' | '>' | '>=' | '=' | '<>'
+;
+ 
+RelationalExpr returns Expr:
+	PlusExpr (=>({BinaryExpr.left=current} op=RelationalOp) right=PlusExpr)?
+;
+
+PlusExpr returns Expr:
+	TimesExpr (=>({BinaryExpr.left=current} op=('+' | '-')) right=TimesExpr)*
+;
+
+TimesExpr returns Expr:
+	ExpExpr (=>({BinaryExpr.left=current} op=('*' | '/' | '%')) right=ExpExpr)*	
+;
+
+ExpExpr returns Expr:
+	PrefixExpr (=>({BinaryExpr.left=current} op=('^')) right=PrefixExpr)*
+;
+
+PrefixExpr returns Expr:
+	{UnaryExpr} op=('-' | 'not') expr=PrefixExpr
+|   {CastExpr} '(' type=BaseType ')' expr=PrefixExpr
+|	AtomicExpr
+;
+
+AtomicExpr returns Expr:
+	{IdExpr} id=[aadl2::NamedElement | QCREF]
+|	{ThisExpr} 'this' ('.' sub=NestedDotID)?
+|   {FailExpr} 'fail' ( val=Expr | ( '**' (failmsg+=ClaimText)+  '**')) 
+|	{IntExpr} val=IntegerTerm
+|   {RealExpr} val=RealTerm
+|	{BoolExpr} val=BooleanLiteral
+|   {StringExpr} val=StringTerm
+|	{IfThenElseExpr} 'if' cond=Expr 'then' then=Expr 'else' else=Expr
+|   {QuantifiedExpr} quant=('forall' | 'exists') ('(' args+=Arg ')')+ '.' expr=Expr
+|	=> ({LibraryFnCallExpr} libName=ID '.' fnName=ID '(' (args+=(Expr) (',' args+=(Expr))*)? ')')
+|   {BuiltInFnCallExpr} fn=BuiltInFn '(' (args+=(Expr) (',' args+=(Expr))*)? ')'
+|	{FnCallExpr} fn=[FunctionDefinition] '(' (args+=(Expr) (',' args+=(Expr))*)? ')'
+|   '[' Expr ( ({ListFilterMapExpr.map=current} 'for' ('(' args+=Arg ')')+ ('|' filter=Expr)?)
+             | ({ListExpr.exprs+=current} (',' exprs+=Expr)*)) ']'
+|   '{' Expr ( ({SetFilterMapExpr.map=current} 'for' ('(' args+=Arg ')')+ ('|' filter=Expr)?)
+             | ({SetExpr.exprs+=current} (',' exprs+=Expr)*)) '}'
+|   {ListExpr} '[' ']'
+|   {SetExpr} '{' '}'
+|   {LetExpr} 'let' binding=LetBinding ';' expr=Expr
+|	'(' Expr ')'
+;
+
+LetBinding:
+	name=ID ':' type=Type '=' expr=Expr
+;
+
+BuiltInFn:
+// Primary type: aadl
+	'has_property'
+|	'property'
+|	'property_member'
+|	'has_parent'
+|	'parent'
+|	'name'
+|	'type'
+|	'has_type'
+|	'is_in_array'
+|	'has_prototypes'
+|	'has_modes'
+
+|	'is_processor'
+|	'is_virtual_processor'
+|	'is_system'
+|	'is_bus'
+|	'is_virtual_bus'
+|	'is_device'
+|	'is_memory'
+|	'is_thread'
+|	'is_process'
+|	'is_data'
+
+|	'is_subprogram'
+|   'is_of_type'
+|   'is_bound_to'
+|	'has_member'
+|   'features'
+|	'connections'
+
+// Primary type: property
+|   'enumerated_values'
+
+// Primary type: component
+|	'subcomponents'
+
+// Primary type: connection
+|	'source'
+|	'destination'
+
+// Primary type: feature
+|	'direction'
+|	'is_event_port'
+|	'is_abstract_feature'
+|	'is_data_port'
+|	'is_port'
+|	'is_data_access'
+
+// Primary type: range
+|	'lower_bound'
+|	'upper_bound'
+
+// Primary type: set or list
+|	'member'
+|   'length'
+| 	'size'
+
+// Primary type: list
+|	'sum'
+|	'append'
+|	'head'
+|	'tail'
+|	'as_set'
+
+// Primary type: set
+|	'union'
+|	'intersect'
+|	'as_list'
+
+// Other
+|	'instance'
+|	'instances'
+|	'debug'
+|	'analysis'
+
+// Error Annex
+|	'receive_error'           // the component can receive an incoming error
+|	'contain_error'           // the component contain the error
+|	'propagate_error'         // the component propagate an error
+|   'error_state_reachable'   // the error state is reachable
+
+|   'flow_source'
+|   'flow_destination'
+|   'flow_elements'
+|   'flow_specifications'
+|   'end_to_end_flows'
+;
+
+@Override
+RealTerm returns aadl2::RealLiteral:
+	value=UnsignedReal (unit=[aadl2::UnitLiteral|ID])?
+;
+
+UnsignedReal returns aadl2::Real:
+	REAL_LIT
+;
+
+@Override
+IntegerTerm returns aadl2::IntegerLiteral:
+	value=UnsignedInt (unit=[aadl2::UnitLiteral|ID])?
+;
+
+UnsignedInt returns aadl2::Integer:
+	INTEGER_LIT
+;
+
+ResoluteSubclause:
+	{ResoluteSubclause}
+	proves+=ProveStatement*
+;
+
+NestedDotID:
+	base=[aadl2::NamedElement | ID] ('.' sub=NestedDotID)?
+;
+
+ProveStatement:
+	'prove' expr=Expr
+;

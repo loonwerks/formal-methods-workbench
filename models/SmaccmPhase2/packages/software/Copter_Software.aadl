@@ -1,0 +1,393 @@
+package Copter_Software
+public
+  with SMACCM_SYS;
+  with Base_Types;
+  with TowerArrays;
+  with gcsstream_timing;
+  with mavlink_veh_commsec_msg;
+  with att_control_dbg_type;
+  with alt_control_dbg_type;
+  with radio_stat_type;
+  with motors_type;
+  with controloutput_type;
+  with gps_type;
+  with sensors_type;
+  with control_law_type;
+  with mavlink_rc_channels_override_msg;
+  with control_law_request_type;
+  with mavlink_hil_state_msg;
+  with radio_info_type;
+  with userinput_type;
+  with UserInput;
+  with UAV;
+  with SMACCM;
+  with DATATYPES;
+  with GCS;
+  with Commsec;
+  with Datalink;
+  with FeatureGroups;
+  with Control;
+  with Sensors;
+  with UARTS;
+  with SMACCM_DATA;
+	
+ 
+thread px4ioar
+  features
+    newstateEmitter: out event data port Base_Types::Unsigned_32 {
+      Queue_Size => 2;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_px4ioar_381.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_px4ioar_381_chan395_397";
+    };
+    uart_ostream: out event data port Base_Types::Unsigned_8 {
+      Queue_Size => 12;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_px4ioar_381.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_px4ioar_381_chan374_383";
+    };
+    newstateEvent: in event data port Base_Types::Unsigned_32 {
+      Queue_Size => 2;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_px4ioar_381.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_px4ioar_381_chan395_399";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_px4ioar_381_chan395_newstate_loop_424"
+      	, "eventhandler_px4ioar_381_chan395_newstate_bootCheckComplete_420",
+      	 "eventhandler_px4ioar_381_chan395_newstate_initMulti_417",
+      	  "eventhandler_px4ioar_381_chan395_newstate_init4_416",
+      	   "eventhandler_px4ioar_381_chan395_newstate_init3_413",
+      	    "eventhandler_px4ioar_381_chan395_newstate_init2_410",
+      	     "eventhandler_px4ioar_381_chan395_newstate_init1_407",
+      	      "eventhandler_px4ioar_381_chan395_newstate_bootBegin_404"
+      );
+    };
+    motor_istream: in event data port motors_type::motors.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_px4ioar_381.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_px4ioar_381_chan37_385";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_px4ioar_381_chan37_loop_423");
+    };
+    
+    --added by Backes
+    motor1 : out data port DATATYPES::Servo_Commands;
+    motor2 : out data port DATATYPES::Servo_Commands;
+    motor3 : out data port DATATYPES::Servo_Commands;
+    motor4 : out data port DATATYPES::Servo_Commands;
+    
+  properties
+    Source_Text => ("tower_task_usercode_px4ioar_381.c");
+    Priority => 12;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Hybrid;
+    Period => 1 ms;
+    SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_px4ioar_381_per1_loop_422", 
+    "eventhandler_px4ioar_381_per1_bootCheckComplete_419", 
+    "eventhandler_px4ioar_381_per1_init4_415", 
+    "eventhandler_px4ioar_381_per1_init3_412", 
+    "eventhandler_px4ioar_381_per1_init2_409", 
+    "eventhandler_px4ioar_381_per1_init1_406", 
+    "eventhandler_px4ioar_381_per1_bootBegin_403");
+end px4ioar;
+
+thread position_state
+  features
+    proxyEvent: in event data port gps_type::position.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_position_state_342.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_position_state_342_chan322_346";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_position_state_342_chan322_349");
+    };
+    proxyData: requires data access gps_type::position.impl {
+      Access_Right => write_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_position_state_342.h";
+      SMACCM_SYS::CommPrim_Source_Text => "write_position_state_342_dataport341_344";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_position_state_342.c");
+    Priority => 14;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+end position_state;
+
+thread motors_state
+  features
+    proxyEvent: in event data port motors_type::motors.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_motors_state_307.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_motors_state_307_chan37_311";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_motors_state_307_chan37_314");
+    };
+    proxyData: requires data access motors_type::motors.impl {
+      Access_Right => write_only; 
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_motors_state_307.h";
+      SMACCM_SYS::CommPrim_Source_Text => "write_motors_state_307_dataport306_309";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_motors_state_307.c");
+    Priority => 16;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+end motors_state;
+
+
+thread motmix
+  features
+    motors: out event data port motors_type::motors.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_motmix_287.h";
+      SMACCM_SYS::CommPrim_Source_Text => "emitFromTask_motmix_287_chan37_291";
+    };
+    control: in event data port controloutput_type::controloutput.impl {
+      Queue_Size => 16;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_motmix_287.h";
+      SMACCM_SYS::CommPrim_Source_Text => "receiveFromTask_motmix_287_chan38_293";
+      SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_motmix_287_chan38_296");
+    };
+    controllaw: in data port control_law_type::control_law.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_motmix_287.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_motmix_287_dataport140_289";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_motmix_287.c");
+    Priority => 18;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Sporadic;
+    
+  annex agree {**
+
+  	const idle : real = 0.15;  	
+  	eq throttle : real = control.throttle;
+  	eq p : real = control.pitch * 0.75;
+  	eq r : real = control.roll * 0.75;
+  	eq y : real = yaw_constrain(control.yaw, imax);
+  	
+  	node yaw_constrain(input : real, threshold : real) returns (res : real);
+  	var
+  	 over : real;
+  	 under : real;
+  	 inside : real;
+  	let
+  	  over = threshold;
+  	  under = (-1.0*threshold);
+  	  inside = input;
+  	  res = if(input > threshold) then
+  	          over
+  	        else if(input < -1.0*threshold) then
+  	          under
+  	        else
+  	          inside;
+  	tel;
+  	
+  	eq fl : real = throttle + p + r - y;
+  	eq fr : real = throttle + p - r + y;
+  	eq bl : real = throttle - p + r + y;
+  	eq br : real = throttle - p - r - y;
+  	
+  	eq fl_adj : real = fl + motor_adj;
+  	eq fr_adj : real = fr + motor_adj;
+  	eq bl_adj : real = bl + motor_adj;
+  	eq br_adj : real = br + motor_adj;
+  	
+  	eq fl_floor : real = if(throttle < idle) then idle else fl;
+  	eq fr_floor : real = if(throttle < idle) then idle else fr;
+  	eq bl_floor : real = if(throttle < idle) then idle else bl;
+  	eq br_floor : real = if(throttle < idle) then idle else br;
+  	
+  	eq fl_sane : real = if(fl < 0.0) then 0.0 else if(fl > 1.0) then 1.0 else fl;
+  	eq fr_sane : real = if(fr < 0.0) then 0.0 else if(fr > 1.0) then 1.0 else fr;
+  	eq bl_sane : real = if(bl < 0.0) then 0.0 else if(bl > 1.0) then 1.0 else bl;
+  	eq br_sane : real = if(br < 0.0) then 0.0 else if(br > 1.0) then 1.0 else br;
+  	
+  	eq imax : real =
+  	 if (throttle / 3.0 > 0.1) then
+  	   throttle / 3.0
+  	 else
+  	   0.1;
+  	
+  	eq max : real = 
+  	  if(fl >= fr and fl >= bl and fl >=br) then
+  	    fl
+  	  else if (fr >= fl and fr >= bl and fr >= br) then
+  	    fr
+  	  else if (bl >= fl and bl >= br and bl >= br) then
+  	    bl
+  	  else
+  	    br;
+  	   
+  	eq min : real = 
+  	  if(fl <= fr and fl <= bl and fl <=br) then
+  	    fl
+  	  else if (fr <= fl and fr <= bl and fr <= br) then
+  	    fr
+  	  else if (bl <= fl and bl <= br and bl <= br) then
+  	    bl
+  	  else
+  	    br;
+  	
+  	eq motor_adj : real =
+  	  if(max > 1.0) then
+  	    1.0 - max
+  	  else if(min < idle) then
+  	    idle - min
+  	  else
+  	    0.0;
+  	  
+  	guarantee "fl value armed" : controllaw.armed_mode = 2 => motors.frontleft = fl_sane;
+  	guarantee "fr value armed" : controllaw.armed_mode = 2 => motors.frontright = fr_sane;
+  	guarantee "bl value armed" : controllaw.armed_mode = 2 => motors.backleft = bl_sane;
+  	guarantee "br value armed" : controllaw.armed_mode = 2 => motors.backright = br_sane;
+  	
+  	guarantee "not armed means zero" : controllaw.armed_mode != 2 => 
+  	  (motors.backleft = 0.0 and
+  	   motors.backright = 0.0 and
+  	   motors.frontleft = 0.0 and
+  	   motors.frontright = 0.0
+  	  );
+  	
+  **};
+    
+end motmix;
+
+thread blink
+  features
+    controllaw: requires data access control_law_type::control_law.impl {
+      Access_Right => read_only;
+      SMACCM_SYS::CommPrim_Source_Header => "tower_task_loop_blink_149.h";
+      SMACCM_SYS::CommPrim_Source_Text => "read_blink_149_dataport140_151";
+    };
+  properties
+    Source_Text => ("tower_task_usercode_blink_149.c");
+    Priority => 20;
+    Stack_Size => 256 bytes;
+    SMACCM::Language => "Ivory";
+    Dispatch_Protocol => Hybrid;
+    Period => 125 ms;
+    SMACCM_SYS::Compute_Entrypoint_Source_Text => ("eventhandler_blink_149_per125_156");
+end blink;
+
+	
+  system Software
+    features
+      motors_and_radios: feature group UAV::motors_and_radios;
+      sensors: feature group UAV::sensors;
+      mission_rc_override_tx: in event data port mavlink_rc_channels_override_msg::rc_channels_override_msg.impl{Queue_Size => 16;};
+	  mission_control_law_request: in event data port control_law_request_type::control_law_request.impl{Queue_Size => 16;};
+      
+    annex agree {** guarantee "dummy" : true; **};
+  end Software;
+  
+  system implementation Software.Impl 
+    subcomponents
+      ML: process flight_gen_process.Impl;
+             
+    connections
+      conn0: feature group motors_and_radios <-> ML.motors_and_radios;
+      conn1: feature group sensors <-> ML.sensors;
+      conn2: port mission_rc_override_tx -> ML.mission_rc_override_tx;
+      conn3: port mission_control_law_request -> ML.mission_control_law_request;
+      
+    annex agree {**
+      assert ML.system_time >= 0;
+  	  assert true -> ML.system_time > pre(ML.system_time);
+    **};
+      
+  end Software.Impl;
+
+  process flight_gen_process
+	features
+      motors_and_radios: feature group UAV::motors_and_radios;
+      sensors: feature group UAV::sensors;
+      system_time : in data port Base_Types::Integer;
+
+      mission_rc_override_tx: in event data port mavlink_rc_channels_override_msg::rc_channels_override_msg.impl{Queue_Size => 16;};
+	  mission_control_law_request: in event data port control_law_request_type::control_law_request.impl{Queue_Size => 16;};
+      
+      
+    annex agree {**
+      
+      eq foobar : int;
+      
+    	assume "positive time" :
+  			system_time >= 0;
+  	
+  		assume "the time value is always increasing" :
+  			true -> system_time > pre(system_time);
+    **};
+      
+  end flight_gen_process;
+
+
+process implementation flight_gen_process.impl
+  subcomponents
+    threadData : data SMACCM_DATA::proc_data.impl;
+    px4ioar_inst : thread px4ioar;
+    Sensors_inst : thread group Sensors::Sensors.Impl;
+    position_state_inst : thread position_state;
+    motors_state_inst : thread motors_state;
+    motmix_inst : thread motmix;
+    blink_inst : thread blink;
+    UserInputThreads_inst : thread group UserInput::UserInputThreads.Impl;
+    Control_inst : thread group Control::ControlThreads.impl; 
+    UARTS_inst : thread group UARTS::UARTS.Impl;
+
+  connections 
+    conn_3 : port mission_rc_override_tx -> UserInputThreads_inst.rcoverride_tx;
+    conn_4 : port mission_control_law_request -> UserInputThreads_inst.control_law_request;
+    conn_21 : port px4ioar_inst.newstateEmitter -> px4ioar_inst.newstateEvent;
+    conn_22 : port px4ioar_inst.uart_ostream -> UARTS_inst.ostream_uart2;
+    conn_25 : port Sensors_inst.position -> position_state_inst.proxyEvent;
+    conn_26 : port motmix_inst.motors -> px4ioar_inst.motor_istream;
+    conn_27 : port motmix_inst.motors -> motors_state_inst.proxyEvent;
+    conn_29 : port control_inst.control -> motmix_inst.control;
+    conn_39 : port UARTS_inst.istream_uart6 -> Sensors_inst.istream;
+            
+    conn_266 : data access threadData.sensors -> Sensors_inst.sensors;
+    conn_267 : data access threadData.position -> position_state_inst.proxyData;
+    conn_268 : data access threadData.motors -> motors_state_inst.proxyData;
+    conn_269 : data access threadData.control -> Control_inst.proxyData;
+    conn_270 : port threadData.controllaw -> motmix_inst.controllaw;
+    conn_271 : data access threadData.att_control -> Control_inst.att_control;
+    conn_272 : data access threadData.alt_control -> Control_inst.alt_control;
+   
+    conn_307 : data access threadData.sensors -> Control_inst.sensors;
+    conn_308 : data access threadData.userinput -> Control_inst.userinput;
+    conn_309 : data access threadData.controllaw -> Control_inst.control_law;
+    conn_310 : data access threadData.controllaw -> blink_inst.controllaw;
+    conn_311 : data access threadData.controllaw -> UserInputThreads_inst.proxyControlData;
+    conn_312 : data access threadData.userinput -> UserInputThreads_inst.proxyUiData;
+    control_params : data access threadData.control_params -> Control_inst.contParams;
+    
+    --connections to hardware
+    --outgoing connections
+	  --ccs      : port motors_and_radios.flight_control_commands -> ppmInputTower_inst.flight_control_commands;
+  	mavconn  : port motors_and_radios.mavlink -> UARTS_inst.mavlink;
+  	motor1   : port px4ioar_inst.motor1 -> motors_and_radios.motor1;
+  	motor2   : port px4ioar_inst.motor2 -> motors_and_radios.motor2;
+  	motor3   : port px4ioar_inst.motor3 -> motors_and_radios.motor3;
+  	motor4   : port px4ioar_inst.motor4 -> motors_and_radios.motor4;
+  	sensor_conn: feature group sensors <-> Sensors_inst.sensors_in;
+    time_conn : port system_time -> UserInputThreads_inst.system_time;
+    
+  properties 
+    SMACCM::OS => "eChronos";
+    
+  annex agree {**
+  	
+  	node unit_range(value : real) returns (res : bool);
+  	let
+  	  res = 0.0 <= value and value <= 1.0;
+  	tel;
+  	
+  	lemma "motor ranges" : 
+  	  unit_range(motmix_inst.motors.frontleft) and
+  	  unit_range(motmix_inst.motors.frontright) and
+  	  unit_range(motmix_inst.motors.backleft) and
+  	  unit_range(motmix_inst.motors.backright);
+  **};
+
+end flight_gen_process.impl;
+	
+	
+end Copter_Software;

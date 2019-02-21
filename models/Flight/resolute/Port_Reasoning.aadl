@@ -1,0 +1,59 @@
+package Port_Reasoning
+public
+
+annex resolute {**
+
+all_features_bound() <=
+	** "All component features are bound to connections" **
+	forall (comp : component) . 
+		not((comp instanceof data) or (comp instanceof bus)) => conn_eq_feat(comp)
+
+conn_eq_feat(comp : component) <=
+	** "All the features of " comp " are connected" **
+	forall(feat : features(comp)). feat_is_connected(feat) or feat_is_unimplemented(feat)
+
+feat_is_connected(feat : feature) <= 
+	** "The feature: " feat " is connected" **
+	is_connected(feat) and print_connections(connections(feat))
+
+is_connected(feat : feature) : bool =
+  connections(feat) <> {}
+
+print_connections(conns : {connection}) <=
+	** "The connections are " conns **
+	true
+
+feat_is_unimplemented(feat : feature) <=
+	** "The feature: " feat " is unimplemented" **
+	has_property(feat, SMACCM::Unimplemented) and
+	property(feat, SMACCM::Unimplemented)
+
+print_all_unimplemented() <=
+	** "The following features are marked as unimplemented" **
+	forall (comp : component). forall (feat : features(comp)).
+		has_property(feat, SMACCM::Unimplemented) and  
+		property(feat, SMACCM::Unimplemented) =>
+		print_feature(feat)
+
+print_feature(feat : feature) <=
+	** feat **
+	true
+	
+all_through_connections(comp : component) <=
+  ** "Every feature of " comp " is not the final source or destination of "
+     "its connections" **
+  forall(feat : features(comp)).
+    not_final(feat, comp) or
+    name(feat) = "flight_control_commands" -- ignore RC controller
+	        
+not_final(feat : feature, comp : component) <=
+  ** feat " is not the final source or destination for any of its connections" **
+	is_connected(feat) 
+	and print_connections(connections(feat))
+	and {c for (c : connections(feat)) |
+		  parent(source(c)) = comp or parent(destination(c)) = comp}
+		= {}
+**};
+
+
+end Port_Reasoning;

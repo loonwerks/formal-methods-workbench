@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Commands related to AGREE Code Generation"
+            id="com.rockwellcollins.atc.agree.codegen.commands">
+      </category>
+     <command categoryId="com.rockwellcollins.atc.agree.codegen.commands"
+           description="Generate Simulink Models for the contracts and interface of the selected component"
+           id="com.rockwellcollins.atc.agree.codegen.commands.genCodeSingle"
+           name="Generate Simulink Models">
+     </command>    
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.osate.ui.analysesMenu?after=additions">
+         <menu
+               label="AGREE"
+               mnemonic="g"
+               id="com.rockwellcollins.atc.agree.analysis.menus.main">
+            <command
+                  commandId="com.rockwellcollins.atc.agree.codegen.commands.genCodeSingle"
+                  icon="icons/layer.png"
+                  id="com.rockwellcollins.atc.agree.codegen.menus.genCodeSingle"
+                  mnemonic="G"
+                  label = "Generate Simulink Models"
+                  style="push">       
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.rockwellcollins.atc.agree.codegen.toolbars.main">
+            <command
+                  commandId="com.rockwellcollins.atc.agree.codegen.commands.genCodeSingle"
+                  icon="icons/layer.png"
+                  tooltip="Generate Simulink Models"
+                  label = "Generate Simulink Models"
+                  id="com.rockwellcollins.atc.agree.codegen.menus.genCodeSingle"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.osate.ui.analysesOutlinePopup?after=additions">
+         <menu
+               id="com.rockwellcollins.atc.agree.analysis.popups.main"
+               label="AGREE"
+               mnemonic="g">
+            <command
+                  commandId="com.rockwellcollins.atc.agree.codegen.commands.genCodeSingle"
+                  icon="icons/layer.png"
+                  id="com.rockwellcollins.atc.agree.codegen.menus.genCodeSingle"
+                  label = "Generate Simulink Models"
+                  mnemonic="G"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextEditorContext?after=additions">
+         <menu
+               id="com.rockwellcollins.atc.agree.analysis.popups.texteditor"
+               label="AGREE"
+               mnemonic="g">
+            <command
+                  commandId="com.rockwellcollins.atc.agree.codegen.commands.genCodeSingle"
+                  icon="icons/layer.png"
+                  id="com.rockwellcollins.atc.agree.codegen.menus.genCodeSingle"
+                  mnemonic="G"
+                  label = "Generate Simulink Models"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="com.rockwellcollins.atc.agree.codegen.commands.genCodeSingle"
+            class="com.rockwellcollins.atc.agree.codegen.handlers.MATLABFunctionHandler">
+      	 <enabledWhen>
+            <reference
+                  definitionId="com.rockwellcollins.atc.agree.analysis.expressions.eObjectSelected">
+            </reference>
+         </enabledWhen>         
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.rockwellcollins.atc.agree.Agree"
+            class="com.rockwellcollins.atc.agree.codegen.preferences.MATLABCodeGenPreferencePage"
+            id="com.rockwellcollins.atc.agree.codegen.preferences.MATLABCodeGenPreferencePage"
+            name="Code Generation">
+            <keywordReference id="com.rockwellcollins.atc.agree.ui.keyword_Agree"/>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.rockwellcollins.atc.agree.codegen.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+</plugin>
