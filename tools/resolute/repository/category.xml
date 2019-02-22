@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="com.rockwellcollins.atc.resolute.feature">
+      <category name="fm.workbench"/>
+   </feature>
+   <feature id="com.rockwellcollins.atc.resolute.feature.source">
+      <category name="fm.workbench.source"/>
+   </feature>
+   <category-def name="fm.workbench" label="Resolute (by Rockwell Collins)"/>
+   <category-def name="fm.workbench.source" label="Resolute Source Code"/>
+</site>

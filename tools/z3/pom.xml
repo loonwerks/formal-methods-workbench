@@ -19,6 +19,7 @@
 	<modules>
 		<module>com.rockwellcollins.atc.z3</module>
 		<module>com.rockwellcollins.atc.z3.feature</module>
+		<module>repository</module>
   </modules>
 
 </project>

@@ -27,6 +27,7 @@
 		<module>com.rockwellcollins.atc.resolute.stringlib</module>
 		<module>org.osate.resolute.help</module>
 		<module>com.rockwellcollins.atc.resolute.feature</module>
+		<module>repository</module>
   </modules>
 
 </project>

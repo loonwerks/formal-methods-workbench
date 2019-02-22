@@ -24,6 +24,7 @@
 		<module>edu.uah.rsesc.aadlsimulator.xtext.ui</module>
 		<module>edu.uah.rsesc.aadlsimulator.feature</module>
 		<module>edu.uah.rsesc.aadlsimulator.agree.feature</module>
+		<module>repository</module>
 
   </modules>
 
