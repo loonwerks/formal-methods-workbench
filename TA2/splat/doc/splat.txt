@@ -145,11 +145,11 @@ translates $P$ into an "equivalent" regular expression. Rephrasing the statement
 $$
   P: \tau\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
 $$
-more directly expresses the **SPLAT** setting, namely, "what happens when we
-stick an encoder in front of some formal language machinery?"  The
-main practical benefit for us comes from being able to compile the
-$\konst{regexp\_of}\; P$ expression to a DFA, thus giving an
-efficient, table-driven, implementation of $P$.
+more directly expresses the **SPLAT** setting, namely, "what useful
+properties can be expressed when we stick an encoder in front of some
+formal language machinery?"  The main practical benefit for us comes
+from being able to compile the $\konst{regexp\_of}\; P$ expression to
+a DFA, thus giving an efficient, table-driven, implementation of $P$.
 
 **Remark.** The $\konst{regexp\_of}$ operation depends on context. In
 some cases, *e.g.* intervals as below, there is a syntax-driven
@@ -450,13 +450,13 @@ $$
 $$
 and property $P : \konst{recd} \to \konst{bool}$ defined with field properties $P_1, \ldots, P_n$ by
 $$
-   P(r) \Leftrightarrow P_1(r.f_1) \land \ldots \land P_1(r.f_n),
+   P(r) \Leftrightarrow P_1(r.f_1) \land \ldots \land P_n(r.f_n),
 $$
 we can build $\konst{regexp\_of}(P)$ as the concatenation
 $$
    \konst{regexp\_of}(P_1) \cdots \konst{regexp\_of}(P_n)
 $$
-In our examples so far, the field properties have been intervals.
+In our examples so far, the field properties have been intervals. 
 
 A record message package
 ========================

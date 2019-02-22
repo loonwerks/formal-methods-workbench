@@ -56,20 +56,17 @@ sig
 
   type precord = {fields : (string * fieldval) list, pred : term}
   
-  type decls = 
-  (* pkgName *)  string * 
-  (* enums *)    (string * string list) list *
-  (* recds *)    (string * (string * AST.ty) list) list *
-  (* fns *)      thm list
+  type filter_info 
+       = {name : string,
+          spec : thm,
+	  regexp : Regexp_Type.regexp,
+          encode_def : thm, 
+          decode_def : thm,
+          inversion : term,
+          correctness : term,
+          implicit_constraints : thm option}
 
-  val mk_correctness_goals 
-      : decls -> thm 
-              -> {regexp:Regexp_Type.regexp,
-                  encode_def:thm, 
-                  decode_def:thm,
-                  inversion:term,
-                  correctness:term,
-		  implicit_constraints: thm option}
+  val filter_correctness : thm -> filter_info
 
   val IN_CHARSET_NUM_TAC : tactic
 

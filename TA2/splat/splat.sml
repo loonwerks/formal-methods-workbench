@@ -34,22 +34,26 @@ fun parse_args args =
       | otherwise => fail()
  end
 
-(* 
-val jsonfile = "examples/SW_AM.json";
-val ([jpkg],ss) = Json.fromFile jsonfile;
+fun top_pkg_name [] = (stdErr_print "No packages found ... exiting\n"; MiscLib.fail())
+  | top_pkg_name ((pkgName,_)::t) = pkgName;
 
-*)
-     
 fun main () =
  let val _ = stdErr_print "splat: \n"
      val (justify,jsonfile) = parse_args(CommandLine.arguments())
-     val ([jpkg],ss) = 
-        apply_with_chatter Json.fromFile jsonfile
+     val ([jpkg],ss) = apply_with_chatter Json.fromFile jsonfile
 	   ("Parsing "^jsonfile^" ... ") "succeeded.\n"
-     val (pkgName,enums,recds,fns,filters) = 
-        apply_with_chatter AADL.get_pkg_decls jpkg
+     val pkgs = apply_with_chatter AADL.scrape_pkgs jpkg
 	   ("Converting Json to AST ...") "succeeded.\n"
+     val thyName = top_pkg_name pkgs
+     val _ = new_theory thyName
+     val logic_defs = apply_with_chatter (map (AADL.mk_aadl_defs thyName)) pkgs
+	   ("Converting AST to logic ...") "succeeded.\n"
+     val filter_defs_and_props = apply_with_chatter 
+           (splatLib.filter_correctness thyName) logic_defs
+	   ("Constructing filters and proving filter properties ...") 
+           "succeeded.\n"
+     val () = close_theory()
   in 
-    apply_with_chatter AADL.gen_hol (pkgName,enums,recds,fns,filters)
-	   ("Generating HOL theory ...") "splat run succeeded.\n"
+      stdErr_print "Finished.\n";
+      MiscLib.succeed()
  end;

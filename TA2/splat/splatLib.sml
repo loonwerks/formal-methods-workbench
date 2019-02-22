@@ -396,12 +396,6 @@ fun all_paths recdvar =
     genpaths [recdvar]
  end;
 
-type decls = 
-  (* pkgName *)  string * 
-  (* enums *)    (string * string list) list *
-  (* recds *)    (string * (string * AST.ty) list) list *
-  (* fns *)      thm list;
-
 (*---------------------------------------------------------------------------*)
 (* mk_interval is a convoluted mapping (to eventually be made simpler by     *)
 (* merging fieldval and Regexp_Type.tree) fron intervals to regexps:         *)
@@ -412,20 +406,20 @@ type decls =
 (*	  -->                                                                *)
 (*	  Interval(lo,hi,dir)     ; Regexp_Type.tree                         *)
 (*	  -->                                                                *)
-(*          regexp                ; Regexp_Type.tree_to_regexp               *)
+(*        regexp                  ; Regexp_Type.tree_to_regexp               *)
 (*	  -->                                                                *)
 (*	  term                    ; regexpSyntax.mk_regexp                   *)
 (*                                                                           *)
 (*---------------------------------------------------------------------------*)
 
-fun mk_correctness_goals (info as (pkgName,enums,recds,fn_defs)) thm =
+fun filter_correctness thm =
  let val (wfpred_app,expansion) = dest_eq(concl thm)
      val (wfpred,recdvar) = dest_comb wfpred_app
      val (wfpred_name,wfpred_ty) = dest_const wfpred
      val recdty = type_of recdvar
      val {Thy,Tyop=rtyname,Args} = dest_thy_type recdty
      val constraints = strip_conj expansion
-     fun has_recd_var t = mem recdvar (free_vars t)    
+     fun has_recd_var t = mem recdvar (free_vars t)
      fun proj_of t =
        filter has_recd_var
 	(if is_comparison t 
