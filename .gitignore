@@ -7,9 +7,9 @@ CASE_simple_example/AADL/json-generated
 
 *Theory.sml
 *Theory.sig
-*.uo
-*.ui
-*.dat
+*Theory.uo
+*Theory.ui
+*Theory.dat
 
 **/target/**
 **/splat/splat
