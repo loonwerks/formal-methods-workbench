@@ -1,0 +1,168 @@
+(* AADL.sml *)
+
+fun fldty pkgName str =
+ case str
+  of "Base_Types::Integer" => BaseTy(IntTy (!defaultNumKind))
+   | "Base_Types::Boolean" => BaseTy(BoolTy)
+   | other =>
+      let val chunks = String.tokens (fn ch => (ch = #":" orelse ch = #".")) str
+          val chunks' = if last chunks = "Impl" then butlast chunks else chunks
+          val ty_pkgName = 
+              hd chunks' handle _ => raise ERR "fldty" "malformed type"
+	  val chunks'' = tl chunks'
+(*          val chunks'' = if hd chunks' = pkgName then tl chunks' else chunks' *)
+      in case chunks''
+          of [name] => NamedTy("",name)
+           | other => raise ERR "fldty" ("unknown field type"^Lib.quote str)
+      end;
+
+fun dest_subcomp pkgName sc =
+ case sc
+  of AList [("name", String fldname), ("category", String "data"),
+            ("classifier", String tystr)]
+      => (fldname,fldty pkgName tystr)
+   | otherwise => raise ERR "dest_subcomp" "expected a record field";
+
+fun is_recd names decl = 
+ case decl
+  of AList ((name, String name_impl)::("subcomponents", List subs)::_)
+      => name^".Impl" = name_impl andalso mem name names
+  |  otherwise => false;
+
+fun recd_decl pkgName names decl =
+ case decl
+  of AList ((name, String name_impl)::("subcomponents", List subs)::_)
+      => if name^".Impl" = name_impl andalso mem name names
+          then (name, map (dest_subcomp pkgName) subs)
+          else raise ERR "recd_decl" "expected a record implementation"
+  | other => raise ERR "recd_decl" "expected a record declaration";
+
+fun dropString (String s) = s
+  | dropString otherwise = raise ERR "dropString" "not a json String application";
+
+fun enum_decl decl =
+ case decl
+  of AList [("name", String ename), ("type", String "data"), ("features", _),
+            ("properties",
+             List [AList [("name", String "Data_Representation"),
+                          ("value", String "Enum")],
+                   AList [("name", String "Enumerators"),
+                          ("value", List names)]]),
+            ("agree",_)]
+      => (ename, map dropString names)
+  | other => raise ERR "enum_decl" "expected an enum declaration";
+
+fun mk_enum_decl (name,ids) =
+    DatatypeDecl(name, map (fn c => (c,[])) ids);
+
+fun data_decl_name
+  (AList(("name", String dname)::("type", String "data"):: _)) = dname
+
+fun get_tydecls pkgName complist =
+ case elt3
+  of ("components", List comps) =>
+    let val data_tynames = mapfilter data_decl_name comps;
+        val recd_decls = mapfilter (recd_decl pkgName data_tynames) comps
+        val enum_decls = mapfilter enum_decl comps
+    in (map RecdDecl recd_decls,
+        map mk_enum_decl enum_decls)
+    end;
+    
+(*
+val AList [("package", String "SW"),
+           elt2 as ("agree", _),
+           elt3 as ("components",List comps)] = jpkg;
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9,
+     c10, c11, c12, c13, c14, c15, c16, c17, c18] = comps
+*)
+
+fun get_agree_annex 
+     [AList [("name", String "agree"),
+             ("parsedAnnexSubclause",
+              AList [("statements", List stmts)])]] = SOME stmts
+  | get_agree_annex 
+     [AList [("name", String "Agree"),
+             ("parsedAnnexLibrary", 
+              AList [("statements", List stmts)])]] = SOME stmts
+  | get_agree_annex 
+     [AList [("name", String "agree"),
+             ("parsedAnnexLibrary", 
+              AList [("statements", List stmts)])]] = SOME stmts
+  | get_agree_annex otherwise = NONE;
+
+fun get_fndefs annex =  (* package annex *)
+ case annex
+  of AList [("name", String agree),
+            ("kind", String "AnnexLibrary"), 
+            ("parsedAnnexLibrary",
+	     AList [("statements", List decls)])] => mapfilter mk_def decls
+   | otherwise => raise ERR "get_fndefs" "unexpected annex format";
+
+fun grab_fndefs comp =
+ case comp
+  of AList [("name", String threadName),
+            ("kind", String "ComponentType"), 
+            ("category", String "thread"),
+            ("features", List features),
+            ("properties", List properties),
+            ("annexes", List annexes)] =>
+              (case get_agree_annex annexes
+                of NONE => raise ERR "grab_fndefs" ""
+                 | SOME stmts => stmts)
+   | AList [("name", String threadName),
+            ("kind", String "ComponentImplementation"), 
+            ("category", String "thread"),
+            ("annexes", List annexes)] =>
+              (case get_agree_annex annexes
+                of NONE => raise ERR "grab_fndefs" ""
+                 | SOME stmts => stmts)
+   | AList [("name", String "agree"), ("parsedAnnexLibrary", _)] => 
+       (case get_agree_annex [comp]
+         of NONE => raise ERR "grab_fndefs" ""
+          | SOME stmts => stmts)
+   | otherwise => raise ERR "grab_fndefs" "";
+
+mapfilter grab_fndefs complist;
+
+(*---------------------------------------------------------------------------*)
+(* Make regexp string acceptable to Regexp_Type parser                       *)
+(*---------------------------------------------------------------------------*)
+
+fun drop_excess_backslashery s =
+    let open String
+    in concatWith "\\" (tokens (equal #"\\") s)
+    end;
+
+fun subst_uminus str =
+    let open Char
+	fun deal (ch1 :: #"-" :: ch2 :: t) =
+	    if isDigit ch2 andalso Lib.mem ch1 [#"{", #"(", #","] then
+		ch1 :: #"~" :: ch2 :: deal t
+	    else ch1:: #"-" :: deal (ch2::t)
+	  | deal (ch::t) = ch :: deal t
+	  | deal [] = []
+    in
+	String.implode (deal (String.explode str))
+    end;
+
+val revise_regexp_string = subst_uminus o drop_excess_backslashery;
+
+fun establish_type s e =
+    let val calls = exp_calls [e] []
+        fun spred exp =
+	    case exp
+	     of Fncall(c,args) => op_mem (curry eqExp) (VarExp s) args
+              | other => false
+    in case filter spred calls
+	of [] => raise ERR "establish_type" "can't resolve"
+         | (Fncall((thy,fname),elist)::t) =>
+	   let val const = prim_mk_const{Thy=thy,Name=fname}
+	       val ty = type_of const
+	       val (tyl,_) = strip_fun ty
+	       val alist = zip elist tyl
+	   in
+	       (s, mk_var(s,op_assoc (curry eqExp) (VarExp s) alist))
+           end
+         | otherwise => raise ERR "establish_type" "expected Fncall"
+    end;
