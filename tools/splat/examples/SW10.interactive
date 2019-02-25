@@ -1,0 +1,416 @@
+open AADL;
+
+val jsonfile = "examples/SW10.json";
+val ([jpkg],ss) = Json.fromFile jsonfile;
+val pkgs = scrape_pkgs jpkg;
+val thyName = fst (last pkgs);
+new_theory thyName;
+val logic_defs = pkgs2hol thyName pkgs;
+val [filter_spec] = #4 logic_defs
+val thm = filter_spec;
+
+val filter_defs_and_props = splatLib.filter_correctness logic_defs
+
+
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
+     c13, c14, c15, c16, c17] = rhs_info;
+
+
+open Lib Feedback HolKernel boolLib MiscLib AST Json
+     listTheory FormalLangTheory regexpLib regexpTheory splatTheory 
+
+structure Finmap = Redblackmap;
+
+max_print_depth := ~1;
+max_print_depth := 15;
+
+
+val [p1,p2,p3] = pkgs;
+fun top_pkg_name [] = (stdErr_print "No packages found ... exiting\n"; MiscLib.fail())
+  | top_pkg_name ((pkgName,_)::t) = pkgName;
+
+val List pkgs = jpkg;
+val [pkg1,pkg2,pkg3,pkg4,pkg5] = pkgs;
+val AList [("name", String pkgName),
+           ("kind", String "AadlPackage"),
+           ("public", AList publist)] = pkg1;
+
+val (withs, renamings, complist,annexlist) = dest_publist publist;
+
+val tydecls = get_tydecls pkgName complist
+val filters = mapfilter get_filter complist
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
+     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
+     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34] = complist;
+
+val [annex] = annexlist;
+val AList [("name", String agree),
+            ("kind", String "AnnexLibrary"), 
+            ("parsedAnnexLibrary",
+	     AList [("statements", List decls)])] = annex;
+
+val [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10] = decls;
+
+map mk_def decls;
+
+val AList [("name", String pkgName),
+           ("kind", String "AadlPackage"),
+           ("public", AList publist)] = pkg5;
+
+val (withs, renamings, complist,annexlist) = dest_publist publist;
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, 
+     c9, c10, c11, c12, c13, c14, c15, c16] = complist;
+
+val tydecls = get_tydecls pkgName complist
+val filters = mapfilter get_filter complist
+
+val [annex1,annex2] = annexlist;
+val AList [("name", String agree),
+            ("kind", String "AnnexLibrary"), 
+            ("parsedAnnexLibrary",
+	     AList [("statements", List decls)])] = annex1;
+
+val [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,
+     d11,d12,d13,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25,d26] = decls;
+
+mapfilter mk_def decls;
+
+val AList [("name", String agree),
+            ("kind", String "AnnexLibrary"), 
+            ("parsedAnnexLibrary",
+	     AList [("statements", List decls)])] = annex2;
+
+val (tydecls,fns,filters) = get_pkg_decls jpkg
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
+     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
+     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34] = complist;
+
+val [p1,p2,p3] = scrape jpkg;;
+val (pkgName,(tydecs,tmdecs,filters)) = p1;
+val (pkgName,(tydecs,tmdecs,filters)) = p2
+val (pkgName,(tydecs,tmdecs,filters)) = p3;
+
+MiscLib.mapfilter declare_hol_type tydecs;
+val [tyd1,tyd2,tyd3,tyd4,tyd5,tyd6,tyd7,tyd8] = tydecs;
+map declare_hol_type tydecs;
+
+val [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10] = topsort called_by tmdecs;
+
+val tmdecs' = topsort called_by tmdecs
+val fn_defs = MiscLib.mapfilter declare_hol_term tmdecs'
+
+gen_hol p3;
+gen_hol p2;
+gen_hol p1;
+
+
+(* OPEN AADL and go through gen_hol *)
+
+val int_ss = intLib.int_ss;
+
+infix byA;
+val op byA = BasicProvers.byA;
+
+val qpat_k_assum = Lib.C qpat_x_assum kall_tac;
+fun qspec q th = th |> Q.SPEC q 
+fun qspec_arith q th = qspec q th |> SIMP_RULE arith_ss [];
+val var_eq_tac = rpt BasicProvers.VAR_EQ_TAC;
+val subst_all_tac = SUBST_ALL_TAC;
+val decide = bossLib.DECIDE;
+val qdecide = decide o Parse.Term;
+
+val [filter_goal as 
+       (fname,regexp,encode_def, decode_def, 
+        inversion_tm, correctness_tm, iconstraint_opt)] = filter_goals;
+
+val SOME implicit_constraints_def = iconstraint_opt;
+
+val [good_coordinate_def, good_pattern_def, good_map_def, 
+     good_mission_def, good_mission_window_def, good_command_def, _] = fn_defs
+
+
+val FlightPattern_bound = Q.store_thm
+("FlightPattern_bound",
+`!p. num_of_FlightPattern p < 256`,
+ Cases >> rw_tac arith_ss [fetch "-" "num_of_FlightPattern_def"]);
+
+val dec_encs = map (#dec_enc o snd) (Finmap.listItems (splatLib.the_codingMap()));
+
+-- TODO: (a) autogenerate the destructor theorems in splatScript and install in codingMap
+--       (b) calculate all (sub-)records, find their component-equality theorems, and
+--           invoke them at the right place in the tactic scheme.
+--
+
+val inversion_thm = store_thm
+("inversion",
+ inversion_tm,
+ CONV_TAC (RENAME_VARS_CONV ["r"])
+ >> rw_tac list_ss [decode_def, encode_def,good_command_def,
+      implicit_constraints_def, good_map_def,good_coordinate_def,good_pattern_def]
+ >> `(?p1 p2 p3 p4 p5 p6 p7 p8. enci 8 r.header.src = [p1;p2;p3;p4;p5;p6;p7;p8]) /\
+     (?q1 q2 q3 q4 q5 q6 q7 q8. enci 8 r.header.dst = [q1;q2;q3;q4;q5;q6;q7;q8]) /\
+     (?u. enc_bool r.header.HMAC = [u]) /\
+     (?a.     enci 1 r.map.wp1.latitude  = [a])   /\
+     (?b c.   enci 2 r.map.wp1.longitude = [b;c]) /\
+     (?d e.   enci 2 r.map.wp1.altitude  = [d;e]) /\
+     (?a1.    enci 1 r.map.wp2.latitude  = [a1])  /\
+     (?b1 c1. enci 2 r.map.wp2.longitude = [b1;c1]) /\
+     (?d1 e1. enci 2 r.map.wp2.altitude  = [d1;e1]) /\
+     (?a2.    enci 1 r.map.wp3.latitude  = [a2])    /\
+     (?b2 c2. enci 2 r.map.wp3.longitude = [b2;c2]) /\
+     (?d2 e2. enci 2 r.map.wp3.altitude  = [d2;e2]) /\
+     (?a3.    enci 1 r.map.wp4.latitude  = [a3])    /\
+     (?b3 c3. enci 2 r.map.wp4.longitude = [b3;c3]) /\
+     (?d3 e3. enci 2 r.map.wp4.altitude  = [d3;e3]) /\
+     (?f.     enc_FlightPattern r.pattern = [f])`
+      by (rpt conj_tac 
+          >> ((FIRST (map match_mp_tac (CONJUNCTS enci_bytes))
+                   >> rw_tac int_ss [] >> intLib.ARITH_TAC)
+              ORELSE
+                (rw_tac std_ss [fetch "-" "enc_FlightPattern_def",
+                                splatTheory.enc_bool_def] 
+                    >> metis_tac [FlightPattern_bound,bool_bound,enc_bytes])))
+ >> rw_tac list_ss [fetch "-" "Command_component_equality",
+                    fetch "-" "CASE_MsgHeader_component_equality",
+                    fetch "-" "Map_component_equality",
+                    fetch "-" "Coordinate_component_equality"]
+ >> rpt (qpat_x_assum `_ = _` (SUBST_ALL_TAC o SYM))
+ >> FIRST (metis_tac dec_encs :: map match_mp_tac (CONJUNCTS deci_encis))
+ >> intLib.ARITH_TAC);
+		 
+val _ = Parse.overload_on("++",``list$APPEND``);
+
+val LEVI_LEMMA = Q.store_thm
+("LEVI_LEMMA",
+ `!u v x y. 
+     (u ++ v = x ++ y) 
+     <=> 
+     ?w. (u ++ w = x) /\ (v = w ++ y) \/
+         (u = x ++ w) /\ (w ++ v = y)`,
+ rw_tac bool_ss [APPEND_EQ_APPEND,EQ_IMP_THM] >> metis_tac []);
+
+
+val regexp_lang_cat = el 2 (CONJUNCTS regexp_lang_def);
+val regexp_lang_or = last (CONJUNCTS regexp_lang_def);
+
+open pred_setTheory;
+numLib.prefer_num();
+
+val regexp_lang_neg = Q.prove
+(`!s r. s IN regexp_lang(Neg r) <=> s NOTIN regexp_lang(r)`,
+ rw_tac list_ss [regexp_lang_def,IN_COMPL]);
+ 
+val sw_ss = (list_ss ++ pred_setLib.PRED_SET_ss ++ 
+             intSimps.INT_REDUCE_ss ++ intSimps.INT_RWTS_ss) ;
+
+val cat8_lem = Q.prove
+(`regexp_lang(Cat r1 (Cat r2 (Cat r3 (Cat r4 (Cat r5 (Cat r6 (Cat r7 (Cat r8 r))))))))
+   =
+ regexp_lang(Cat (Cat r1 (Cat r2 (Cat r3 (Cat r4 (Cat r5 (Cat r6 (Cat r7 r8))))))) r)`,
+rw_tac std_ss [regexp_lang_cat] >> metis_tac [DOT_ASSOC]);
+
+val cat2_lem = Q.prove
+(`regexp_lang(Cat r1 (Cat r2 r3)) = regexp_lang(Cat (Cat r1 r2) r3)`,
+rw_tac std_ss [regexp_lang_cat] >> metis_tac [DOT_ASSOC]);
+
+val regexp_lang_full_charset = Q.prove
+(`regexp_lang 
+    (Chset (Charset 0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw 
+                    0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw))
+  = {s | (STRLEN s = 1) /\ dec s < 256}`,
+ rw_tac sw_ss [EXTENSION] >> IN_CHARSET_NUM_TAC);
+
+val in_full_charset = Q.prove
+(`!c. [c] IN regexp_lang (Chset (Charset 
+                0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw 
+                0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw))`,
+ rw_tac sw_ss [regexp_lang_full_charset,dec_def,numposrepTheory.l2n_def])
+
+val regexp_lang_bool_charset = Q.prove
+(`regexp_lang 
+    (Chset (Charset 0x3w 0x0w 0x0w 0x0w))
+  = {s | (STRLEN s = 1) /\ dec s < 2}`,
+ rw_tac sw_ss [EXTENSION] >> IN_CHARSET_NUM_TAC);
+
+val strlen_enc_1 = Q.prove
+(`!n. STRLEN (enc 1 (n MOD 256)) = 1`,
+ rw_tac list_ss [enc_bytes]);
+
+val string_eq_strcat = Q.prove
+(`!t u c. (STRING c t = STRCAT (STRING c "") u) <=> (t = u)`,
+rw_tac list_ss [Once rich_listTheory.CONS_APPEND]);
+
+
+set_goal([],correctness_tm);
+Q.X_GEN_TAC `recd`
+ >> rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
+           [LIST_UNION_def, encode_def, EQ_IMP_THM]
+ >> simp_tac bool_ss [GSYM stringTheory.STRCAT_ASSOC]
+ >- (ONCE_REWRITE_TAC [cat8_lem]
+     >> ONCE_REWRITE_TAC [regexp_lang_cat]
+     >> match_mp_tac STRCAT_IN_dot
+     >> conj_tac
+     >- (rw_tac std_ss [regexp_lang_cat,regexp_lang_full_charset]
+         >> full_simp_tac sw_ss [implicit_constraints_def]
+	 >> qpat_x_assum `_ <= recd.header.dst` kall_tac
+	 >> qpat_x_assum `recd.header.dst < _` kall_tac
+         >> rw_tac sw_ss [enci_def,i2n_def]
+         >- (`(Num recd.header.src) < 18446744073709551616` by intLib.ARITH_TAC
+             >> rw_tac sw_ss [SIMP_RULE arith_ss [] (last (CONJUNCTS enc_bytes))]
+             >> rw_tac sw_ss [IN_dot,PULL_EXISTS]
+             >> rw_tac bool_ss [GSYM STRCAT_ASSOC]
+             >> map_every qexists_tac 
+                 [`enc 1 (Num recd.header.src MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 256) MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 65536) MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 16777216) MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 4294967296) MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 1099511627776) MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 281474976710656) MOD 256)`,
+                  `enc 1 ((Num recd.header.src DIV 72057594037927936) MOD 256)`]
+             >> rw_tac arith_ss [dec_enc,enc_bytes,strlen_enc_1,string_eq_strcat])
+	 >- (qabbrev_tac `k = 18446744073709551616 − Num (ABS recd.header.src)`
+             >> `k < 18446744073709551616` by (unabbrev_all_tac >> intLib.ARITH_TAC)
+             >> rw_tac sw_ss [SIMP_RULE arith_ss [] (last (CONJUNCTS enc_bytes))]
+             >> rw_tac sw_ss [IN_dot,PULL_EXISTS]
+             >> rw_tac bool_ss [GSYM STRCAT_ASSOC]
+             >> map_every qexists_tac 
+                 [`enc 1 (k MOD 256)`,
+                  `enc 1 ((k DIV 256) MOD 256)`,
+                  `enc 1 ((k DIV 65536) MOD 256)`,
+                  `enc 1 ((k DIV 16777216) MOD 256)`,
+                  `enc 1 ((k DIV 4294967296) MOD 256)`,
+                  `enc 1 ((k DIV 1099511627776) MOD 256)`,
+                  `enc 1 ((k DIV 281474976710656) MOD 256)`,
+                  `enc 1 ((k DIV 72057594037927936) MOD 256)`]
+             >> rw_tac arith_ss [dec_enc,enc_bytes,strlen_enc_1,string_eq_strcat]))
+     >- (ONCE_REWRITE_TAC [cat8_lem]
+         >> ONCE_REWRITE_TAC [regexp_lang_cat]
+         >> match_mp_tac STRCAT_IN_dot
+         >> conj_tac
+         >- (rw_tac std_ss [regexp_lang_cat,regexp_lang_full_charset]
+             >> full_simp_tac sw_ss [implicit_constraints_def]
+             >> qpat_x_assum `_ <= recd.header.src` kall_tac
+             >> qpat_x_assum `recd.header.src < _` kall_tac
+             >> rw_tac sw_ss [enci_def,i2n_def]
+             >- (`(Num recd.header.dst) < 18446744073709551616` by intLib.ARITH_TAC
+                 >> rw_tac sw_ss [SIMP_RULE arith_ss [] (last (CONJUNCTS enc_bytes))]
+                 >> rw_tac sw_ss [IN_dot,PULL_EXISTS]
+                 >> rw_tac bool_ss [GSYM STRCAT_ASSOC]
+                 >> map_every qexists_tac 
+                     [`enc 1 (Num recd.header.dst MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 256) MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 65536) MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 16777216) MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 4294967296) MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 1099511627776) MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 281474976710656) MOD 256)`,
+                      `enc 1 ((Num recd.header.dst DIV 72057594037927936) MOD 256)`]
+                 >> rw_tac arith_ss [dec_enc,enc_bytes,strlen_enc_1,string_eq_strcat])
+	     >- (qabbrev_tac `k = 18446744073709551616 − Num (ABS recd.header.dst)`
+                 >> `k<18446744073709551616` by (unabbrev_all_tac >> intLib.ARITH_TAC)
+                 >> rw_tac sw_ss [SIMP_RULE arith_ss [] (last (CONJUNCTS enc_bytes))]
+                 >> rw_tac sw_ss [IN_dot,PULL_EXISTS]
+                 >> rw_tac bool_ss [GSYM STRCAT_ASSOC]
+                 >> map_every qexists_tac 
+                     [`enc 1 (k MOD 256)`,
+                      `enc 1 ((k DIV 256) MOD 256)`,
+                      `enc 1 ((k DIV 65536) MOD 256)`,
+                      `enc 1 ((k DIV 16777216) MOD 256)`,
+                      `enc 1 ((k DIV 4294967296) MOD 256)`,
+                      `enc 1 ((k DIV 1099511627776) MOD 256)`,
+                      `enc 1 ((k DIV 281474976710656) MOD 256)`,
+                      `enc 1 ((k DIV 72057594037927936) MOD 256)`]
+                 >> rw_tac arith_ss [dec_enc,enc_bytes,strlen_enc_1,string_eq_strcat]))
+         >- (ONCE_REWRITE_TAC [regexp_lang_cat]
+             >> match_mp_tac STRCAT_IN_dot
+             >> conj_tac
+             >- (`num_of_bool recd.header.HMAC < 2` by metis_tac [num_of_bool_bound]
+	         >> rw_tac sw_ss [regexp_lang_bool_charset,enc_bool_def, dec_enc]
+	         >> rw_tac sw_ss [enc_bytes])
+             >- (ONCE_REWRITE_TAC [regexp_lang_cat]
+                 >> match_mp_tac STRCAT_IN_dot
+		 >> conj_tac
+		 >- (full_simp_tac sw_ss [good_command_def,good_map_def,good_coordinate_def]
+                     >> qpat_x_assum `recd.map.wp1.latitude >= -90` mp_tac
+                     >> qpat_x_assum `recd.map.wp1.latitude <= 90` mp_tac
+                     >> rpt (WEAKEN_TAC (K true))
+		     >> rpt strip_tac
+                     >> rw_tac sw_ss [enci_def,i2n_def]
+		     >- (`(Num recd.map.wp1.latitude) < 256` by intLib.ARITH_TAC
+                         >> rw_tac sw_ss [SIMP_RULE arith_ss [] enc_bytes]
+                         >> rw_tac sw_ss [regexp_lang_or,LIST_UNION_def]
+			 >> disj1_tac 
+                         >> IN_CHARSET_NUM_TAC
+                         >> intLib.ARITH_TAC)
+                     >- (`166n <= 256 − Num (ABS recd.map.wp1.latitude) /\ 
+                          256 − Num (ABS recd.map.wp1.latitude) <= 255n` 
+                              by intLib.ARITH_TAC
+                          >> rpt (pop_assum mp_tac)
+                          >> qspec_tac (`256 − Num (ABS recd.map.wp1.latitude)`, `k`)
+                          >> gen_tac
+                          >> ntac 3 (disch_then kall_tac)
+                          >> rpt strip_tac
+                          >> rw_tac sw_ss [SIMP_RULE arith_ss [] enc_bytes]
+                          >> rw_tac sw_ss [regexp_lang_or,LIST_UNION_def]
+			  >> disj2_tac 
+                          >> rw_tac sw_ss 
+                             [regexp_lang_neg, regexp_lang_or,LIST_UNION_def]
+			 >- (rw_tac (sw_ss ++ charset_conv_ss) []
+                              >> disch_then (mp_tac o Q.AP_TERM `ORD`)
+			      >> rw_tac sw_ss [ORD_CHR_RWT])
+                         >- metis_tac [in_full_charset])
+(* getting dizzy *)
+     >- (ONCE_REWRITE_TAC [cat2_lem]
+         >> ONCE_REWRITE_TAC [regexp_lang_cat]
+         >> match_mp_tac STRCAT_IN_dot
+         >> conj_tac
+         >- (full_simp_tac sw_ss [good_command_def,good_map_def,good_coordinate_def]
+             >> qpat_x_assum `recd.map.wp1.longitude >= -180` mp_tac
+             >> qpat_x_assum `recd.map.wp1.longitude <= 180` mp_tac
+             >> rpt (WEAKEN_TAC (K true))
+	     >> rpt strip_tac
+             >> rw_tac sw_ss [enci_def,i2n_def]
+             >- (`(Num recd.map.wp1.longitude) < 256` by intLib.ARITH_TAC
+                   >> rw_tac sw_ss [Once regexp_lang_cat,Once regexp_lang_or,
+                                    LIST_UNION_def]
+                   >> rw_tac bool_ss [IN_UNION]
+                   >> rw_tac sw_ss [SIMP_RULE arith_ss [] enc_bytes]
+
+                   >> disj1_tac 
+                   >> IN_CHARSET_NUM_TAC
+                   >> intLib.ARITH_TAC)
+            >- 
+         >- 
+
+         >> full_simp_tac sw_ss [implicit_constraints_def]
+	 >> qpat_x_assum `_ <= recd.header.dst` kall_tac
+	 >> qpat_x_assum `recd.header.dst < _` kall_tac
+        
+ full_simp_tac std_ss 
+           ([implicit_constraints_def,
+	     fetch "-" "enc_FlightPattern_def",
+	     splatTheory.enc_bool_def, splatTheory.num_of_bool_def]
+	     @ fn_defs)
+ good_imp_accept_tac
+
+(*
+ rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
+	   [regexp_lang_cat,regexp_lang_or,LIST_UNION_def,
+            enc_dms_def, enc_degrees_def, enc_minutes_def, enc_seconds_def,EQ_IMP_THM]
+ >> full_simp_tac bool_ss [Once (GSYM STRCAT_ASSOC)]
+ >- good_imp_accept_tac
+ >- (imp_res_tac string_in_lang_len
+     >> full_simp_tac list_ss [in_chset]
+     >> full_simp_tac list_ss [list_len_lemA,lower_enc]
+     >> full_simp_tac list_ss [ilem1A,ilem2A,ilem3A,ilem4A,ilem5A,ilem6A]
+     >> `m.degrees <= 90 /\ m.minutes <= 59` by metis_tac [dec_enc,good_dms_def]
+     >> `m.seconds = dec (STRING c (STRING d ""))` by metis_tac [dec_enc]
+     >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,good_dms_def])
+);
+
+*)

@@ -3,7 +3,7 @@
 (* aimed at extracting filter properties, plus support definitions.          *)
 (*---------------------------------------------------------------------------*)
 
-open Lib Feedback HolKernel boolLib MiscLib regexpLib AADL;
+open Lib Feedback HolKernel boolLib MiscLib AADL;
 
 val justifyDefault = regexpLib.SML;
 
@@ -37,6 +37,8 @@ fun parse_args args =
 fun top_pkg_name [] = (stdErr_print "No packages found ... exiting\n"; MiscLib.fail())
   | top_pkg_name ((pkgName,_)::t) = pkgName;
 
+fun filters_of (a,b,c,d) = d
+
 fun main () =
  let val _ = stdErr_print "splat: \n"
      val (justify,jsonfile) = parse_args(CommandLine.arguments())
@@ -46,13 +48,14 @@ fun main () =
 	   ("Converting Json to AST ...") "succeeded.\n"
      val thyName = top_pkg_name pkgs
      val _ = new_theory thyName
-     val logic_defs = apply_with_chatter (map (AADL.mk_aadl_defs thyName)) pkgs
+     val logic_defs = apply_with_chatter (pkgs2hol thyName) pkgs
 	   ("Converting AST to logic ...") "succeeded.\n"
+     val filter_spec_thms = filters_of logic_defs
      val filter_defs_and_props = apply_with_chatter 
-           (splatLib.filter_correctness thyName) logic_defs
+           (List.map splatLib.filter_correctness) filter_spec_thms
 	   ("Constructing filters and proving filter properties ...") 
            "succeeded.\n"
-     val () = close_theory()
+     val () = Theory.export_theory()
   in 
       stdErr_print "Finished.\n";
       MiscLib.succeed()

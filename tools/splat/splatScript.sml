@@ -730,4 +730,10 @@ val FILTER_CORRECT_def =
  Define 
    `FILTER_CORRECT s (tm:bool) = tm`;
 
+val fcp_every_thm = save_thm
+("fcp_every_thm",
+ fcpTheory.FCP_EVERY_def 
+   |> SIMP_RULE (srw_ss()) 
+        [DECIDE ``!m n:num. m <= n <=> ~(n < m)``, Once (GSYM IMP_DISJ_THM)])
+
 val _ = export_theory();

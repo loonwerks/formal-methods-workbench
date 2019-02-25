@@ -14,6 +14,15 @@ open regexpSyntax pred_setSyntax Regexp_Type
 
 val ERR = Feedback.mk_HOL_ERR "splatLib";
 
+type filter_info
+   = {regexp : Regexp_Type.regexp,
+      encode_def : thm, 
+      decode_def : thm,
+      inversion : term,
+      correctness : term,
+      implicit_constraints : thm option};
+
+     
 structure Finmap = Redblackmap;
 
 type ('a, 'b) fmap = ('a, 'b) Finmap.dict;
@@ -386,7 +395,16 @@ fun all_paths recdvar =
 	  then let val pfns = map projfn_of (TypeBase.accessors_of ty)
 	       in map (Lib.C (curry mk_comb) tm) pfns
 	       end
-          else [tm]
+          else 
+          if fcpSyntax.is_cart_type ty then
+              let val (bty,dty) = fcpSyntax.dest_cart_type ty
+		  val d = fcpSyntax.dest_int_numeric_type dty
+                  val copies = map numSyntax.term_of_int (upto 0 (d-1))
+                  fun Aproj n = fcpSyntax.mk_fcp_index(tm,n)
+              in
+                 map Aproj copies
+              end
+	  else [tm]
        end
      fun genpaths paths =
        let val paths' = flatten (map grow paths)
@@ -420,6 +438,7 @@ fun filter_correctness thm =
      val {Thy,Tyop=rtyname,Args} = dest_thy_type recdty
      val constraints = strip_conj expansion
      fun has_recd_var t = mem recdvar (free_vars t)
+     val allprojs = all_paths recdvar
      fun proj_of t =
        filter has_recd_var
 	(if is_comparison t 
@@ -429,7 +448,6 @@ fun filter_correctness thm =
             else if is_eq t then snd (strip_comb t)
                  else raise ERR "proj_of" 
                    "expected a disjunction of equalities or an arithmetic inequality")
-     val allprojs = all_paths recdvar
      val projs = mk_set_lr (flatten (map proj_of constraints))
      val omitted_projs = set_diff allprojs projs
      fun in_group tmlist tm = (tm, filter (Lib.can (find_term (aconv tm))) tmlist)
@@ -598,19 +616,27 @@ fun filter_correctness thm =
      val chunked_vars_tms = map enlist chunked_vars
      val rhs_info = zip allprojs (map mk_comb (zip decs chunked_vars_tms))
      fun rev_strip t b acc = 
-         if is_var t
-	 then (rev acc, b)
-         else let val (M,N) = dest_comb t
-	      in rev_strip N b (M::acc)
-	      end;
-     val rhs_info' = map (fn (p,x) => rev_strip p x []) rhs_info
+         if is_var t then (rev acc, b) else
+         if fcpSyntax.is_fcp_index t then 
+          let val (A,i) = fcpSyntax.dest_fcp_index t
+              val Aty = type_of A
+              val Avar = mk_var("A",Aty)
+              val indexOp = mk_abs(Avar,fcpSyntax.mk_fcp_index(Avar,i))
+          in rev_strip A b (indexOp::acc)
+	  end
+         else 
+         let val (M,N) = dest_comb t
+	 in rev_strip N b (M::acc)
+	 end
+     fun booger (p,x) = rev_strip p x []
+     val rhs_info' = map booger rhs_info
 
      fun parts [] = []
        | parts ((p as ([_],v))::t) = [p]::parts t
        | parts ((h as (segs1,_))::t) = 
-	 let fun pred (segs2,_) = 
+	 let fun P (segs2,_) = 
                    if null segs1 orelse null segs2 then false else tl segs1 = tl segs2
-             val (L1,L2) = Lib.partition pred (h::t)
+             val (L1,L2) = Lib.partition P (h::t)
 	 in L1 :: parts L2
 	 end
 
@@ -669,12 +695,12 @@ fun filter_correctness thm =
                mk_eq(mk_comb(decodeFn,mk_comb(encodeFn,recdvar)),
                      optionSyntax.mk_some recdvar)))
  in
-   {regexp      = the_regexp,
-    encode_def  = encodeFn_def,
-    decode_def  = decodeFn_def,
-    inversion   = inversion_goal,
-    correctness = correctness_goal,
-    implicit_constraints = iconstraints_opt}
+     {regexp      = the_regexp,
+      encode_def  = encodeFn_def,
+      decode_def  = decodeFn_def,
+      inversion   = inversion_goal,
+      correctness = correctness_goal,
+      implicit_constraints = iconstraints_opt}
  end
  handle e => raise wrap_exn "splatLib" "mk_correctness_goals" e;
 

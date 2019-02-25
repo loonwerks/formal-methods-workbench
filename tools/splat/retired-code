@@ -166,3 +166,103 @@ fun establish_type s e =
            end
          | otherwise => raise ERR "establish_type" "expected Fncall"
     end;
+
+
+if fname = "WELL_FORMED_MESSAGE" then mangle body else body)
+
+fun mangle body =
+ case body 
+  of AList [("kind", _), ("left",_),("op",_),("right",e)] => e
+   | otherwise => raise ERR "mangle" "unexpected input format"
+
+			
+
+(*
+    | Fncall ((_,"Array_Forall"),[VarExp bv,e2,e3]) => 
+       let val A = transExp pkgName varE Unknown e2
+           val recdty = type_of A
+           val eltsProjName = fst(dest_type recdty)^"_elts"
+           val sizeProjName = fst(dest_type recdty)^"_size"
+           val elts_fld_proj = prim_mk_const{Name=eltsProjName,Thy=pkgName}
+           val size_fld_proj = prim_mk_const{Name=sizeProjName,Thy=pkgName}
+           val Aelts = mk_comb(elts_fld_proj,A)
+           val Asize = mk_comb(size_fld_proj,A)
+           val elty = listSyntax.dest_list_type (type_of Aelts)
+           val v = mk_var(bv,elty)
+           val varE' = (bv,v)::varE
+           val P = transExp pkgName varE' (Expected bool) e3
+       in
+	   mk_conj(listSyntax.mk_every(mk_abs(v,P), Aelts),
+                   mk_eq(Asize, listSyntax.mk_length Aelts))
+       end 
+*)
+
+(*---------------------------------------------------------------------------*)
+(* decls to decls transformation                                             *)
+(*---------------------------------------------------------------------------*)
+(*
+fun array_types_intro tyTheta (pkgName,(tydecs, tmdecs, filterdecs)) =
+    let val tydecs' = substTy tyTheta tydecs
+	val tmdecs' = substTm tyTheta tmdecs
+	val filterdecs' = substFilter tyTheta filterdecs
+    in (pkgName,tydecs',tmdecs',filterdecs')
+    end
+*)
+
+
+(*
+fun fill_ty 
+fun add_pkgName tyEnv (qid, params, ty, body) =
+  let fun fill_param (s,ty) = (s,fill_ty tyEnv ty)
+      val params' = map fill_param params		    
+      val ty' = fill_ty tyEnv ty
+      val body' = fill_exp tyEnv body
+  in 
+    FnDec(qid,params',ty',body')
+  end
+*)
+
+	 recdty = type_of A
+           val eltsProjName = fst(dest_type recdty)^"_elts"
+           val sizeProjName = fst(dest_type recdty)^"_size"
+           val elts_fld_proj = prim_mk_const{Name=eltsProjName,Thy=pkgName}
+           val size_fld_proj = prim_mk_const{Name=sizeProjName,Thy=pkgName}
+           val Aelts = mk_comb(elts_fld_proj,A)
+           val Asize = mk_comb(size_fld_proj,A)
+           val elty = listSyntax.dest_list_type (type_of Aelts)
+           val varE' = (bv,v)::varE
+           val P = transExp pkgName varE' (Expected bool) e3
+       in
+	   mk_conj(listSyntax.mk_every(mk_abs(v,P), Aelts),
+                   mk_eq(Asize, listSyntax.mk_length Aelts))
+       end
+
+(*
+fun pkgs_to_hol thyName pkgs =
+ let in
+     stdErr_print "\nGenerating HOL theory.\n\n"
+   ; List.app (mk_aadl_defs thyName) pkgs
+   ; export_theory()
+ end
+
+        val {regexp,encode_def,decode_def,
+             inversion, correctness, implicit_constraints} = 
+            splatLib.mk_correctness_goals info thm
+      (fname, regexp, encode_def, decode_def, 
+       inversion, correctness, implicit_constraints)
+
+fun declare_hol_filter_goal (fname,regexp_tm,encode_def, decode_def, inversion, correctness,iconstraints_opt) =
+  let val correctness_thm = 
+     store_thm(fname^"_correct", 
+       ``FILTER_CORRECT ^(stringSyntax.fromMLstring fname) ^correctness``,
+       cheat)
+   in 
+    stdErr_print 
+          (String.concat 
+               ["\nFilter ", Lib.quote fname, 
+                " is specified by property \n\n  ",
+                thm_to_string correctness_thm, "\n\n"])
+  end;
+
+        val _ =  List.app declare_hol_filter_goal filter_goals
+*)

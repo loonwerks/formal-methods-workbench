@@ -39,14 +39,12 @@ sig
   val insert_enum : string * (term * int) list -> unit
   val define_enum_encoding : hol_type -> unit
 					       
-
   type coding 
       = {enc : term, 
          dec : term,
          enc_def : thm, 
          dec_def : thm,
          dec_enc : thm}
-  
 
   type codingMap = (format, coding) fmap
   val the_codingMap : unit -> codingMap
@@ -57,9 +55,7 @@ sig
   type precord = {fields : (string * fieldval) list, pred : term}
   
   type filter_info 
-       = {name : string,
-          spec : thm,
-	  regexp : Regexp_Type.regexp,
+       = {regexp : Regexp_Type.regexp,
           encode_def : thm, 
           decode_def : thm,
           inversion : term,

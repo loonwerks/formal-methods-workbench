@@ -55,11 +55,11 @@ generators. In order to bridge the gap between strings and the rich
 universe of data structures used in computer science, *encoding* and
 *decoding* is employed. For example, showing the existence of a
 universal Turing machine requires an encoding/decoding scheme for the
-strings (Turing machines) being taken as arguments. In fact, the
-activity of packing data into a string format and then unpacking it is
-pervasive, not only in theoretical computer science, but also in
-practical contexts, *e.g.* data compression, data encryption, sending
-structured data over a network, *etc*.
+strings (Turing machines) being taken as arguments by the universal
+machine. In fact, the activity of packing data into a string format
+and then unpacking it is pervasive, not only in theoretical computer
+science, but also in practical contexts, *e.g.* data compression, data
+encryption, sending structured data over a network, *etc*.
 
 Regular expressions
 ---------------------
@@ -551,6 +551,9 @@ languages. G. Rosu and generation of runtime monitors from regexps (any property
 Note: unlike, say, Narcissus, we do not focus solely on encoding and
 decoding. We add verified compilation, and proof of well-formedness
 with respect to arithmetic specifications.
+
+Much work in auto-synthesis of encoder/decoder pairs from high-level
+specs, e.g., ASN.1 and Google Protocol Buffers.
 
 The details about encoding higher data in regexps are probably not
 novel, given the huge amount of work expended on transition system

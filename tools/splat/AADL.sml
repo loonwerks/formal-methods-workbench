@@ -15,23 +15,24 @@ in end;
  type qid = string * string;
  type ty = AST.ty;
  type exp = AST.exp;
-		 
+ type tyEnv = (ty * ty) list;
+
  datatype tydec
     = EnumDec of qid * string list
     | RecdDec of qid * (string * ty) list
     | ArrayDec of qid * ty;
 
  datatype tmdec
-    = ConstDec of string * ty * exp
-    | FnDec of string * (string * ty) list * ty * exp;
+    = ConstDec of qid * ty * exp
+    | FnDec of qid * (string * ty) list * ty * exp;
 
- datatype filter = FilterDec of string * (string * ty * string * string) list * (string * exp)
+ datatype filter = FilterDec of qid * (string * ty * string * string) list * (string * exp)
 								      
  type decls = 
   (* pkgName *)  string * 
-  (* types *)    tydec list * 
-  (* consts *)   tmdec list *
-  (* filters *)  filter list
+  (* types *)    (tydec list * 
+  (* consts *)    tmdec list *
+  (* filters *)   filter list)
   ;
 
 val ERR = Feedback.mk_HOL_ERR "AADL";
@@ -92,7 +93,7 @@ fun dest_ty ty =
 fun mk_dotid did =
   case Lib.front_last (String.tokens (equal #".") did)
   of ([],v) => VarExp v
-   | (v::t,proj) => rev_itlist (C (curry RecdProj)) (t @[proj]) (VarExp v)
+   | (v::t,proj) => rev_itlist (C (curry RecdProj)) (t @ [proj]) (VarExp v)
 ;
 
 fun mk_unop (opr,e) =
@@ -145,8 +146,6 @@ fun mk_nullary_constr(cname, ty) =
    |  otherwise => raise ERR "mk_nullary_constr"
        ("unable to determine type of constructor "^Lib.quote cname)
 
-fun mk_field (fname,e) = (fname, dest_exp e);
-
 (*---------------------------------------------------------------------------*)
 (* AADL scraping.                                                            *)
 (*---------------------------------------------------------------------------*)
@@ -196,50 +195,45 @@ fun dest_exp e =
             ("array", jarr),
             ("expr", jexp)]
        => mk_fncall ("Array_Forall",[VarExp bvarname, dest_exp jarr, dest_exp jexp])
-   | other => raise ERR "dest_exp" "unexpected expression form";
+   | other => raise ERR "dest_exp" "unexpected expression form"
+and
+mk_field (fname,e) = (fname, dest_exp e);
+
 
 fun dest_param param =
  case param
   of AList [("name", String pname), ("type", ty)] => (pname,dest_ty ty)
    | otherwise => raise ERR "dest_param" "unexpected input";
 
-(*
-      if fname = "WELL_FORMED_MESSAGE" then mangle body else body)
-fun mangle body =
- case body 
-  of AList [("kind", _), ("left",_),("op",_),("right",e)] => e
-   | otherwise => raise ERR "mangle" "unexpected input format"
-*)
-			
-fun mk_fun_def json =
+fun mk_fun_def pkgName json =
  case json
   of AList [("kind", String "FnDef"),
             ("name", String fname),
             ("args", List params),
             ("type", ty),
             ("expr", body)] => 
-     FnDec(fname, map dest_param params, dest_ty ty, dest_exp body)
+     FnDec((pkgName,fname), map dest_param params, dest_ty ty, dest_exp body)
    | otherwise => raise ERR "mk_fun_def" "unexpected input";
 
-fun mk_const_def json =
+fun mk_const_def pkgName json =
  case json
   of AList [("kind", String "ConstStatement"),
             ("name", String cname),
             ("type", ty),
-            ("expr", body)] => ConstDec(cname,dest_ty ty, dest_exp body)
+            ("expr", body)] => ConstDec((pkgName,cname), dest_ty ty, dest_exp body)
   |  otherwise => raise ERR "mk_const_def" "unexpected input";
 
-fun mk_def json = 
-  mk_const_def json handle HOL_ERR _ => 
-  mk_fun_def json   handle HOL_ERR _ => 
+fun mk_def pkgName json = 
+  mk_const_def pkgName json handle HOL_ERR _ => 
+  mk_fun_def pkgName json   handle HOL_ERR _ => 
   raise ERR "mk_def" "unexpected syntax"; 
 
-fun mk_defs annex =  (* package annex *)
+fun mk_defs pkgName annex =  (* package annex *)
  case annex
   of AList [("name", String agree),
             ("kind", String "AnnexLibrary"), 
             ("parsedAnnexLibrary",
-	     AList [("statements", List decls)])] => mapfilter mk_def decls
+	     AList [("statements", List decls)])] => mapfilter (mk_def pkgName) decls
    | otherwise => raise ERR "get_fndefs" "unexpected annex format";
 
 fun fldty tystr =
@@ -387,7 +381,7 @@ fun get_filter decl =
                                 ("kind", String "AnnexSubclause"),
                                 ("parsedAnnexSubclause",
                                  AList [("statements", List guarantees)])]])]
-      => FilterDec(fname, map get_port ports,
+      => FilterDec(dest_qid fname, map get_port ports,
           mk_filter_guarantee (mapfilter (get_filter_guarantee rname) guarantees))
    | otherwise => raise ERR "get_filter" "not a filter thread";
 
@@ -422,7 +416,7 @@ fun scrape pkg =
             ("public", AList publist)]
      => let val (withs, renamings, complist,annexlist) = dest_publist publist
             val tydecls = get_tydecls pkgName complist
-	    val fndecls = List.concat (mapfilter mk_defs annexlist)
+	    val fndecls = List.concat (mapfilter (mk_defs pkgName) annexlist)
             val filters = mapfilter get_filter complist
         in 
            (pkgName,(tydecls, fndecls, filters))
@@ -443,10 +437,10 @@ fun scrape_pkgs (List pkgs) =
              end
           | uses otherwise = false
         val opkgs = topsort (curry uses) pkgs
-        val declist = mapfilter get_pkg_decls opkgs
-        val datalist = mapfilter get_data_model opkgs
+        val declist = mapfilter scrape opkgs
+(*        val datalist = mapfilter get_data_model opkgs *)
     in
-	declist
+	rev declist
     end
   | scrape_pkgs otherwise = raise ERR "scrape_pkgs" "unexpected format";
 
@@ -461,16 +455,19 @@ fun list_mk_array_type(bty,dims) =
  in rev_itlist mk_arr dims bty
  end
 
-fun transTy ty =
+fun transTy tyEnv ty =
  let open AST
  in case ty 
   of NamedTy (pkg,id) => 
-     let val pkgName = current_theory()
-     in case TypeBase.read{Thy=pkgName,Tyop=id}
-        of NONE => raise ERR "transTy"
-                   ("Unable to find type "^id^" declared in theory "^Lib.quote pkg)
-         | SOME tyinfo => TypeBasePure.ty_of tyinfo
-     end
+      (case Lib.op_assoc1 (curry AST.eqTy) ty tyEnv
+        of SOME ty' => transTy tyEnv ty'
+         | NONE => 
+           let val pkgName = current_theory()
+           in case TypeBase.read{Thy=pkgName,Tyop=id}
+               of SOME tyinfo => TypeBasePure.ty_of tyinfo
+                | NONE => raise ERR "transTy"
+                  ("Unable to find type "^id^" declared in theory "^Lib.quote pkg)
+	   end)
    | BaseTy BoolTy   => Type.bool
    | BaseTy CharTy   => stringSyntax.char_ty
    | BaseTy StringTy => stringSyntax.string_ty
@@ -487,7 +484,7 @@ fun transTy ty =
              | transDim otherwise = raise ERR "transTy" 
                   "array bound must be a variable or number constant"
        in
-          list_mk_array_type(transTy ty, map transDim dims)
+          list_mk_array_type(transTy tyEnv ty, map transDim dims)
        end
    | otherwise => raise ERR "transTy" "unknown kind of ty"
  end
@@ -708,23 +705,27 @@ fun transExp pkgName varE ety exp =
     | ConstrExp(qid,id, NONE) => mk_constr_const pkgName qid id
     | ConstrExp(qid,id, SOME e) => undef "ConstrExp with arg"
     | Fncall ((_,"Array_Forall"),[VarExp bv,e2,e3]) => 
-       let val A = transExp pkgName varE Unknown e2
-           val recdty = type_of A
-           val eltsProjName = fst(dest_type recdty)^"_elts"
-           val sizeProjName = fst(dest_type recdty)^"_size"
-           val elts_fld_proj = prim_mk_const{Name=eltsProjName,Thy=pkgName}
-           val size_fld_proj = prim_mk_const{Name=sizeProjName,Thy=pkgName}
-           val Aelts = mk_comb(elts_fld_proj,A)
-           val Asize = mk_comb(size_fld_proj,A)
-           val elty = listSyntax.dest_list_type (type_of Aelts)
-           val v = mk_var(bv,elty)
-           val varE' = (bv,v)::varE
-           val P = transExp pkgName varE' (Expected bool) e3
-       in
-	   mk_conj(listSyntax.mk_every(mk_abs(v,P), Aelts),
-                   mk_eq(Asize, listSyntax.mk_length Aelts))
-       end 
+      let open fcpSyntax
+	  val A = transExp pkgName varE Unknown e2
+          val (elty,dimty) = dest_cart_type (type_of A)
+          val v = mk_var(bv,elty)
+          val varE' = (bv,v)::varE
+          val Pbody = transExp pkgName varE' (Expected bool) e3
+          val fcp_every_tm' = inst [alpha |-> dimty, beta |-> elty] fcp_every_tm
+      in list_mk_comb(fcp_every_tm',[mk_abs(v,Pbody), A])
+      end
     | Fncall ((_,"Array_Forall"),_) => raise ERR "transExp" "Array_Forall: unexpected syntax"
+    | Fncall ((_,"Array_Exists"),[VarExp bv,e2,e3]) => 
+      let open fcpSyntax
+	  val A = transExp pkgName varE Unknown e2
+          val (elty,dimty) = dest_cart_type (type_of A)
+          val v = mk_var(bv,elty)
+          val varE' = (bv,v)::varE
+          val Pbody = transExp pkgName varE' (Expected bool) e3
+          val fcp_exists_tm' = inst [alpha |-> dimty, beta |-> elty] fcp_exists_tm
+      in list_mk_comb(fcp_exists_tm',[mk_abs(v,Pbody), A])
+      end
+    | Fncall ((_,"Array_Exists"),_) => raise ERR "transExp" "Array_Exists: unexpected syntax"
     | Fncall ((thyname,cname),expl) => 
        (let val thyname' = if thyname = "" then pkgName else thyname
             val c = prim_mk_const{Thy=thyname',Name=cname}
@@ -753,12 +754,12 @@ fun exp_calls [] acc = acc
 
 (* TOPSORT GUNK : second thing mentions the first *)
 
-fun called_by (FnDec(id,_,_,_)) (FnDec(_,_,_,exp)) = 
+fun called_by (FnDec((_,id),_,_,_)) (FnDec(_,_,_,exp)) = 
       mem id (map snd (AST.exp_calls [exp] []))
-  | called_by (FnDec(id,_,_,_)) (ConstDec (_,_,exp)) = 
+  | called_by (FnDec((_,id),_,_,_)) (ConstDec (_,_,exp)) = 
       mem id (map snd (AST.exp_calls [exp] []))
-  | called_by (ConstDec(id,_,_)) (FnDec (_,_,_,exp)) = mem id (expIds exp [])
-  | called_by (ConstDec(id,_,_)) (ConstDec (_,_,exp)) = mem id (expIds exp []);
+  | called_by (ConstDec((_,id),_,_)) (FnDec (_,_,_,exp)) = mem id (expIds exp [])
+  | called_by (ConstDec((_,id),_,_)) (ConstDec (_,_,exp)) = mem id (expIds exp []);
 
 fun declare_hol_enum ((pkgName,ename),cnames) =
     if Lib.can mk_type (ename,[])
@@ -778,23 +779,29 @@ fun declare_hol_enum ((pkgName,ename),cnames) =
 (* in the current theory, so the pkgName is ignored.                         *)
 (*---------------------------------------------------------------------------*)
 
-fun declare_hol_record ((_,rname),fields) =
+fun declare_hol_record tyEnv ((_,rname),fields) =
     let open Datatype ParseDatatype
         fun ty2pretype ty =
 	    case ty
 	     of NamedTy ("","null") => dVartype "'a"
-              | NamedTy ("Base_Types",_) => dAQ (transTy ty)
-              | NamedTy (p,s) => dTyop{Tyop=s,Thy=NONE,Args=[]} 
-              | ty => dAQ (transTy ty)
+              | NamedTy ("Base_Types",_) => dAQ (transTy tyEnv ty)
+(*              | NamedTy qid => 
+                 (case op_assoc1 (curry tyEq) ty tyEnv
+                   of SOME ty' => dAQ (ty'
+                   |   => dTyop{Tyop=s,Thy=NONE,Args=[]} 
+*)
+              | ty => dAQ (transTy tyEnv ty)
         fun mk_field(s,ty) = (s,ty2pretype ty)
     in 
       astHol_datatype [(rname,Record (map mk_field fields))]
     ; stdErr_print ("Declared record "^Lib.quote rname^"\n")
     end
 
+(*
 fun declare_hol_array (name, ArrayTy(bty,[dim])) =
     let val dim_tm = transExp (current_theory()) [] Unknown dim
         val base_ty = transTy bty
+        open Datatype ParseDatatype
     in 
 	astHol_datatype
          [(name, Record [("size", dAQ numSyntax.num),
@@ -803,16 +810,28 @@ fun declare_hol_array (name, ArrayTy(bty,[dim])) =
         stdErr_print ("Declared array "^Lib.quote name^"\n")
     end
   | declare_hol_array otherwise = raise ERR "declare_hol_array" "unexpected syntax";
-							  
-fun declare_hol_type (EnumDec enum) = declare_hol_enum enum
-  | declare_hol_type (RecdDec recd) = declare_hol_record recd
-  | declare_hol_type (ArrayDec ((_,name),aty)) = declare_hol_array (name,aty)
+*)
 
-fun declare_hol_fn (name,params,ty,body) =
-    let fun mk_hol_param (s,ty) = (s, mk_var(s,transTy ty))
+(*---------------------------------------------------------------------------*)
+(* Array decs get added to a tyEnv (really just an arrayEnv for now). Hack:  *)
+(* the parser does not alway give a package name to named types, and this    *)
+(* matters when mapping named types to array types, so we just add the       *)
+(* anonymous pkgName qid to the domain of the env.                           *)
+(*---------------------------------------------------------------------------*)
+
+fun declare_hol_type (EnumDec enum) tyEnv = (declare_hol_enum enum; tyEnv)
+  | declare_hol_type (RecdDec recd) tyEnv = (declare_hol_record tyEnv recd; tyEnv)
+  | declare_hol_type (ArrayDec (qid,ty)) tyEnv = 
+      let val ty' = substTyTy (map op|-> tyEnv) ty
+          val anon_pkg_qid = ("",snd qid)
+      in (NamedTy qid, ty') :: (NamedTy anon_pkg_qid,ty') :: tyEnv
+      end
+
+fun declare_hol_fn tyEnv ((_,name),params,ty,body) =
+    let fun mk_hol_param (s,ty) = (s, mk_var(s,transTy tyEnv ty))
         val varE = map mk_hol_param params
         val param_vars = map snd varE
-        val ety = Expected (transTy ty)
+        val ety = Expected (transTy tyEnv ty)
         val pkgName = current_theory()
         val body_tm = transExp pkgName varE ety body
         val def_var = mk_var(name,
@@ -825,72 +844,56 @@ fun declare_hol_fn (name,params,ty,body) =
      ; def
     end
 
-fun declare_hol_term (ConstDec (s,ty,exp)) = declare_hol_fn (s,[],ty,exp)
-  | declare_hol_term (FnDec fninfo) = declare_hol_fn fninfo;
+fun declare_hol_term tyEnv (ConstDec (qid,ty,exp)) = declare_hol_fn tyEnv (qid,[],ty,exp)
+  | declare_hol_term tyEnv (FnDec fninfo) = declare_hol_fn tyEnv fninfo;
 
 fun underscore(a,b) = String.concat[a,"_",b];
 
-fun mk_filter_spec (thyName,fn_defs) 
-		   (FilterDec (fname, ports, (comment,prop))) = 
+fun mk_filter_spec (thyName,tyEnv,fn_defs) 
+		   (FilterDec ((pkgName,fname), ports, (comment,prop))) = 
     let val outport = Lib.first (fn (_,_,dir,_) => (dir = "out")) ports
 	val inport = Lib.first (fn (_,_,dir,_) => (dir = "in")) ports
         val iname = #1 inport
         val oname = #1 outport
-        val ty = transTy (#2 outport)
+        val ty = transTy tyEnv (#2 outport)
         val varIn = (iname,mk_var(iname,ty))
         val varOut = (oname,mk_var(oname,ty))
         val spec = transExp thyName [varIn,varOut] (Expected bool) prop
+        val wf_message_thm = PURE_REWRITE_CONV fn_defs spec
+        val array_forall_expanded = 
+             wf_message_thm
+               |> SIMP_RULE (srw_ss()) [splatTheory.fcp_every_thm]
+               |> SIMP_RULE arith_ss 
+                    [arithmeticTheory.BOUNDED_FORALL_THM, GSYM CONJ_ASSOC,GSYM DISJ_ASSOC]
     in
-      save_thm
-       (underscore(dest_qid fname), 
-        PURE_REWRITE_CONV (GSYM CONJ_ASSOC::GSYM DISJ_ASSOC::fn_defs) spec)
+      save_thm (underscore(pkgName,fname), 
+                array_forall_expanded)
     end
-    handle HOL_ERR _ => raise ERR "mk_filter_spec" ""
+    handle e => raise wrap_exn "AADL" "mk_filter_spec" e;
 ;
 
 val is_datatype = 
     same_const (prim_mk_const{Thy="bool",Name="DATATYPE"}) o rator o concl;
 
-fun mk_aadl_defs thyName (pkgName,(tydecs,tmdecs,filters)) =
-    let val _ = MiscLib.mapfilter declare_hol_type tydecs
-        val tydecls = filter (is_datatype o snd) (theorems thyName)
+fun mk_aadl_defs thyName tyEnv (pkgName,(tydecs,tmdecs,filters)) =
+    let val tyEnv' = rev_itlist declare_hol_type tydecs tyEnv
+        val tydecls = List.filter (is_datatype o snd) (theorems thyName)
         val tmdecs' = topsort called_by tmdecs
-        val fn_defs = MiscLib.mapfilter declare_hol_term tmdecs'
-        val info = (thyName,fn_defs)
+        val fn_defs = MiscLib.mapfilter (declare_hol_term tyEnv') tmdecs'
+        val info = (thyName,tyEnv',fn_defs)
         val filter_specs = map (mk_filter_spec info) filters
     in	  
-      (map snd tydecls,fn_defs,filter_specs)
+      (tyEnv', map snd tydecls, fn_defs, filter_specs)
     end;
 
+fun pkgs2hol thyName list =
+ let fun iter [] acc = acc
+       | iter (pkg::t) (tyE,tyD,tmD,fS) =
+          let val (tyEnv',tydefs,fndefs,filtspecs) = mk_aadl_defs thyName tyE pkg
+          in iter t (tyEnv', tydefs@tyD, fndefs@tmD, filtspecs@fS)
+          end
+ in iter list ([],[],[],[])
+ end;
 
-(*
-fun pkgs_to_hol thyName pkgs =
- let in
-     stdErr_print "\nGenerating HOL theory.\n\n"
-   ; List.app (mk_aadl_defs thyName) pkgs
-   ; export_theory()
- end
-
-        val {regexp,encode_def,decode_def,
-             inversion, correctness, implicit_constraints} = 
-            splatLib.mk_correctness_goals info thm
-      (fname, regexp, encode_def, decode_def, 
-       inversion, correctness, implicit_constraints)
-
-fun declare_hol_filter_goal (fname,regexp_tm,encode_def, decode_def, inversion, correctness,iconstraints_opt) =
-  let val correctness_thm = 
-     store_thm(fname^"_correct", 
-       ``FILTER_CORRECT ^(stringSyntax.fromMLstring fname) ^correctness``,
-       cheat)
-   in 
-    stdErr_print 
-          (String.concat 
-               ["\nFilter ", Lib.quote fname, 
-                " is specified by property \n\n  ",
-                thm_to_string correctness_thm, "\n\n"])
-  end;
-
-        val _ =  List.app declare_hol_filter_goal filter_goals
-*)
 
 end
