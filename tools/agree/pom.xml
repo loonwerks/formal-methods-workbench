@@ -21,6 +21,7 @@
 		<module>com.rockwellcollins.atc.agree.doc</module>
 		<module>com.rockwellcollins.atc.agree.ui</module>
 		<module>com.rockwellcollins.atc.agree.feature</module>
+		<module>repository</module>
 		<module>edu.uah.rsesc.agree.ge</module>
 		<module>edu.uah.rsesc.agree.ge.ui</module>
 		

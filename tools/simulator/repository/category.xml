@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="edu.uah.rsesc.aadlsimulator.agree.feature">
+      <category name="fm.workbench"/>
+   </feature>
+   <feature id="edu.uah.rsesc.aadlsimulator.feature">
+      <category name="fm.workbench"/>
+   </feature>
+   <feature id="edu.uah.rsesc.aadlsimulator.agree.feature.source">
+      <category name="fm.workbench.source"/>
+   </feature>
+   <feature id="edu.uah.rsesc.aadlsimulator.feature.source">
+      <category name="fm.workbench.source"/>
+   </feature>
+   <category-def name="fm.workbench" label="Simulator"/>
+   <category-def name="fm.workbench.source" label="Simulator Source Code"/>
+</site>
