@@ -30,18 +30,15 @@ fun parse_args args =
       | otherwise => fail()
  end
 
-fun top_pkg_name [] = (stdErr_print "No packages found ... exiting\n"; MiscLib.fail())
-  | top_pkg_name ((pkgName,_)::t) = pkgName;
+fun shortcut g = ACCEPT_TAC (mk_thm([],snd g)) g;
 
 fun filters_of (a,b,c,d) = d
-
-fun by_fiat_tac g = ACCEPT_TAC (mk_thm([],snd g)) g;
 
 fun prove_filter_props {name,regexp,encode_def,decode_def,
                         inversion, correctness, implicit_constraints} =
  let in
-     store_thm(name^"inversion",inversion,by_fiat_tac);
-     store_thm(name^"correctness",correctness,by_fiat_tac);
+     store_thm(name^"inversion",inversion,shortcut);
+     store_thm(name^"correctness",correctness,shortcut);
      ()
  end;
 
@@ -52,16 +49,17 @@ fun main () =
 	   ("Parsing "^jsonfile^" ... ") "succeeded.\n"
      val pkgs = apply_with_chatter AADL.scrape_pkgs jpkg
 	   ("Converting Json to AST ... ") "succeeded.\n"
-     val thyName = top_pkg_name pkgs
+     val thyName = fst (last pkgs)
      val _ = new_theory thyName
      val logic_defs = apply_with_chatter (pkgs2hol thyName) pkgs
 	   ("Converting AST to logic ...\n") "---> succeeded.\n"
      val filter_spec_thms = filters_of logic_defs
      val filter_defs_and_props = apply_with_chatter 
            (List.map splatLib.filter_correctness) filter_spec_thms
-	   ("Constructing filters and proving filter properties ...\n") 
-           "---> succeeded.\n"
-     val _ = List.app prove_filter_props filter_defs_and_props
+	   ("Constructing filters, encoders, and decoders ... ") 
+           "succeeded.\n"
+     val _ = apply_with_chatter (List.app prove_filter_props) filter_defs_and_props
+	   ("Proving filter properties ... ") "succeeded.\n"
   in 
       Theory.export_theory()
     ; stdErr_print "Finished.\n"
