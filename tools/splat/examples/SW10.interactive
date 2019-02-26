@@ -7,105 +7,15 @@ val thyName = fst (last pkgs);
 new_theory thyName;
 val logic_defs = pkgs2hol thyName pkgs;
 val [filter_spec] = #4 logic_defs
-val thm = filter_spec;
+val (fname,thm) = filter_spec;
 
-val filter_defs_and_props = splatLib.filter_correctness logic_defs
+val filter_defs_and_props = map splatLib.filter_correctness (#4 logic_defs);
 
-
-
-val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
-     c13, c14, c15, c16, c17] = rhs_info;
-
-
-open Lib Feedback HolKernel boolLib MiscLib AST Json
-     listTheory FormalLangTheory regexpLib regexpTheory splatTheory 
-
-structure Finmap = Redblackmap;
-
-max_print_depth := ~1;
-max_print_depth := 15;
-
-
-val [p1,p2,p3] = pkgs;
-fun top_pkg_name [] = (stdErr_print "No packages found ... exiting\n"; MiscLib.fail())
-  | top_pkg_name ((pkgName,_)::t) = pkgName;
-
-val List pkgs = jpkg;
-val [pkg1,pkg2,pkg3,pkg4,pkg5] = pkgs;
-val AList [("name", String pkgName),
-           ("kind", String "AadlPackage"),
-           ("public", AList publist)] = pkg1;
-
-val (withs, renamings, complist,annexlist) = dest_publist publist;
-
-val tydecls = get_tydecls pkgName complist
-val filters = mapfilter get_filter complist
 
 val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
      c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
      c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34] = complist;
 
-val [annex] = annexlist;
-val AList [("name", String agree),
-            ("kind", String "AnnexLibrary"), 
-            ("parsedAnnexLibrary",
-	     AList [("statements", List decls)])] = annex;
-
-val [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10] = decls;
-
-map mk_def decls;
-
-val AList [("name", String pkgName),
-           ("kind", String "AadlPackage"),
-           ("public", AList publist)] = pkg5;
-
-val (withs, renamings, complist,annexlist) = dest_publist publist;
-
-val [c1, c2, c3, c4, c5, c6, c7, c8, 
-     c9, c10, c11, c12, c13, c14, c15, c16] = complist;
-
-val tydecls = get_tydecls pkgName complist
-val filters = mapfilter get_filter complist
-
-val [annex1,annex2] = annexlist;
-val AList [("name", String agree),
-            ("kind", String "AnnexLibrary"), 
-            ("parsedAnnexLibrary",
-	     AList [("statements", List decls)])] = annex1;
-
-val [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,
-     d11,d12,d13,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25,d26] = decls;
-
-mapfilter mk_def decls;
-
-val AList [("name", String agree),
-            ("kind", String "AnnexLibrary"), 
-            ("parsedAnnexLibrary",
-	     AList [("statements", List decls)])] = annex2;
-
-val (tydecls,fns,filters) = get_pkg_decls jpkg
-
-val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
-     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
-     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34] = complist;
-
-val [p1,p2,p3] = scrape jpkg;;
-val (pkgName,(tydecs,tmdecs,filters)) = p1;
-val (pkgName,(tydecs,tmdecs,filters)) = p2
-val (pkgName,(tydecs,tmdecs,filters)) = p3;
-
-MiscLib.mapfilter declare_hol_type tydecs;
-val [tyd1,tyd2,tyd3,tyd4,tyd5,tyd6,tyd7,tyd8] = tydecs;
-map declare_hol_type tydecs;
-
-val [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10] = topsort called_by tmdecs;
-
-val tmdecs' = topsort called_by tmdecs
-val fn_defs = MiscLib.mapfilter declare_hol_term tmdecs'
-
-gen_hol p3;
-gen_hol p2;
-gen_hol p1;
 
 
 (* OPEN AADL and go through gen_hol *)

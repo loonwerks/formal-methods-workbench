@@ -15,7 +15,8 @@ open regexpSyntax pred_setSyntax Regexp_Type
 val ERR = Feedback.mk_HOL_ERR "splatLib";
 
 type filter_info
-   = {regexp : Regexp_Type.regexp,
+   = {name : string,
+      regexp : Regexp_Type.regexp,
       encode_def : thm, 
       decode_def : thm,
       inversion : term,
@@ -349,11 +350,9 @@ fun define_enum_encoding ety =
  handle e => raise wrap_exn "splatLib" "define_enum_encoding" e
 
 (*---------------------------------------------------------------------------*)
-(* A record description has the fields of the record, along with a predicate *)
-(* specifying the subset of records that are well-formed.                    *)
+(* Translate formula coming from AGREE specs to regexp. Create encoder and   *)
+(* decoder. Generate correctness formulas                                    *)
 (*---------------------------------------------------------------------------*)
-
-type precord = {fields : (string * fieldval) list, pred : term};
 
 fun is_comparison tm =
  let val (opr,args) = strip_comb tm
@@ -430,7 +429,7 @@ fun all_paths recdvar =
 (*                                                                           *)
 (*---------------------------------------------------------------------------*)
 
-fun filter_correctness thm =
+fun filter_correctness (fname,thm) =
  let val (wfpred_app,expansion) = dest_eq(concl thm)
      val (wfpred,recdvar) = dest_comb wfpred_app
      val (wfpred_name,wfpred_ty) = dest_const wfpred
@@ -608,6 +607,12 @@ fun filter_correctness thm =
 	     mk_comb(regexp_lang_tm,the_regexp_tm))))
 
      (* Define decoder *)
+     val decodeFn_name = "decode_"^rtyname
+     val decodeFn_ty = stringSyntax.string_ty --> optionSyntax.mk_option recdty
+     val decodeFn_var = mk_var(decodeFn_name,decodeFn_ty)
+     val fvar = mk_var("s",stringSyntax.string_ty)
+     val decodeFn_lhs = mk_comb(decodeFn_var, fvar)
+
      val vars = map (fn i => mk_var("v"^Int.toString i, stringSyntax.char_ty))
                     (upto 0 (List.foldl (op+) 0 fwidths - 1))
      val decs = map #dec codings
@@ -629,7 +634,7 @@ fun filter_correctness thm =
 	 in rev_strip N b (M::acc)
 	 end
      fun booger (p,x) = rev_strip p x []
-     val rhs_info' = map booger rhs_info
+     val paths = map booger rhs_info
 
      fun parts [] = []
        | parts ((p as ([_],v))::t) = [p]::parts t
@@ -649,13 +654,26 @@ fun filter_correctness thm =
        | maybe_shrink (partn as [([_],_)]) = partn  (* fully shrunk *)
        | maybe_shrink (partn as (apath::_)) = 
           let val segs = fst apath
-              val proj_ty = type_of (hd segs)
-              val recdty = dom proj_ty
               val args = map snd partn
-              val recd_app = mk_recd_app recdty args
-       in 
-           [(tl segs,recd_app)]
-       end
+              val ty = dom(type_of (hd segs))
+          in if TypeBase.is_record_type ty then 
+                let val fields = TypeBase.fields_of ty
+                in if length fields = length args
+                   then  [(tl segs,mk_recd_app ty args)]
+                   else partn
+                end
+             else 
+             if fcpSyntax.is_cart_type ty then 
+                let open fcpSyntax
+                    val (bty,dty) = dest_cart_type ty
+                    val dim = dest_int_numeric_type dty
+                in if dim = length args
+                   then [(tl segs, mk_l2v(listSyntax.mk_list(args,type_of (hd args))))]
+                   else raise ERR "maybe_shrink" 
+                        ("expected to construct array of size "^Int.toString dim)
+                end 
+             else raise ERR "maybe_shrink" "expected record or array"
+          end
        handle e => raise wrap_exn "splatLib" "maybe_shrink" e
 
      fun mk_recd paths =
@@ -676,26 +694,23 @@ fun filter_correctness thm =
             else raise ERR "mk_recd" "length of some path(s) increased"
       end
 
-     val decodeFn_name = "decode_"^rtyname
-     val decodeFn_ty = stringSyntax.string_ty --> optionSyntax.mk_option recdty
-     val decodeFn_var = mk_var(decodeFn_name,decodeFn_ty)
-     val fvar = mk_var("s",stringSyntax.string_ty)
-     val decodeFn_lhs = mk_comb(decodeFn_var, fvar)
-
      val pat = listSyntax.mk_list(vars,stringSyntax.char_ty)
-     val valid_rhs = optionSyntax.mk_some(mk_recd rhs_info')
+     val rhs_value = mk_recd paths
+     val valid_rhs = optionSyntax.mk_some rhs_value
      val rules = [(pat,valid_rhs), (``otherwise:string``,optionSyntax.mk_none recdty)]
      val rhs = TypeBase.mk_pattern_fn rules
      val decodeFn_rhs = Term.beta_conv (mk_comb(rhs,fvar))
      val decodeFn_def = Define `^(mk_eq(decodeFn_lhs,decodeFn_rhs))`
      val decodeFn = mk_const(decodeFn_name,decodeFn_ty)
 
+    (* Construct the formula of the inversion theorem *)
     val inversion_goal = mk_forall(recdvar,
         mk_imp(wfpred_app',
                mk_eq(mk_comb(decodeFn,mk_comb(encodeFn,recdvar)),
                      optionSyntax.mk_some recdvar)))
  in
-     {regexp      = the_regexp,
+     {name        = fname,
+      regexp      = the_regexp,
       encode_def  = encodeFn_def,
       decode_def  = decodeFn_def,
       inversion   = inversion_goal,
@@ -721,18 +736,5 @@ val IN_CHARSET_NUM_TAC =
   >> Q.SPEC_TAC (`ORD c`, `n`)
   >> REPEAT (CONV_TAC (numLib.BOUNDED_FORALL_CONV EVAL))
   >> rw_tac bool_ss [];
-
-
-(*---------------------------------------------------------------------------*)
-(* prove_constraints                                                         *)
-(*      : enumMap * codingMap                                                *)
-(*         -> record                                                         *)
-(*         -> {coders : coding,                                              *)
-(*             regexp : regexp,                                              *)
-(*             correctness : thm}                                            *)
-(*---------------------------------------------------------------------------*)
-
-fun prove_constraints (enumE,codingE) recd =
-    raise ERR "prove_constraints" "not implemented"
 
 end

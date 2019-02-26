@@ -865,9 +865,10 @@ fun mk_filter_spec (thyName,tyEnv,fn_defs)
                |> SIMP_RULE (srw_ss()) [splatTheory.fcp_every_thm]
                |> SIMP_RULE arith_ss 
                     [arithmeticTheory.BOUNDED_FORALL_THM, GSYM CONJ_ASSOC,GSYM DISJ_ASSOC]
+        val full_name = underscore(pkgName,fname)
     in
-      save_thm (underscore(pkgName,fname), 
-                array_forall_expanded)
+       (full_name, 
+        save_thm (full_name,array_forall_expanded))
     end
     handle e => raise wrap_exn "AADL" "mk_filter_spec" e;
 ;

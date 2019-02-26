@@ -52,24 +52,17 @@ sig
 
   val fieldval_to_tree : enumMap -> fieldval -> Regexp_Type.tree
 
-  type precord = {fields : (string * fieldval) list, pred : term}
-  
   type filter_info 
-       = {regexp : Regexp_Type.regexp,
+       = {name: string,
+	  regexp : Regexp_Type.regexp,
           encode_def : thm, 
           decode_def : thm,
           inversion : term,
           correctness : term,
           implicit_constraints : thm option}
 
-  val filter_correctness : thm -> filter_info
+  val filter_correctness : string * thm -> filter_info
 
   val IN_CHARSET_NUM_TAC : tactic
 
-  val prove_constraints 
-    : enumMap * codingMap 
-        -> precord
-        -> {coders : coding,
-	    regexp : regexp,
-	    correctness : thm}
 end

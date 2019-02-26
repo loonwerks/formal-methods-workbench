@@ -5,8 +5,6 @@
 
 open Lib Feedback HolKernel boolLib MiscLib AADL;
 
-val justifyDefault = regexpLib.SML;
-
 val ERR = Feedback.mk_HOL_ERR "splat";
 
 (*---------------------------------------------------------------------------*)
@@ -28,9 +26,7 @@ fun parse_args args =
             | otherwise => fail()
        end
  in case args
-     of ["-dfagen","SML",jsonfile] => (regexpLib.SML,checkFile jsonfile)
-      | ["-dfagen","HOL",jsonfile] => (regexpLib.HOL,checkFile jsonfile)
-      | [jsonfile]                 => (justifyDefault,checkFile jsonfile)
+     of [jsonfile] => checkFile jsonfile
       | otherwise => fail()
  end
 
@@ -39,24 +35,35 @@ fun top_pkg_name [] = (stdErr_print "No packages found ... exiting\n"; MiscLib.f
 
 fun filters_of (a,b,c,d) = d
 
+fun by_fiat_tac g = ACCEPT_TAC (mk_thm([],snd g)) g;
+
+fun prove_filter_props {name,regexp,encode_def,decode_def,
+                        inversion, correctness, implicit_constraints} =
+ let in
+     store_thm(name^"inversion",inversion,by_fiat_tac);
+     store_thm(name^"correctness",correctness,by_fiat_tac);
+     ()
+ end;
+
 fun main () =
  let val _ = stdErr_print "splat: \n"
-     val (justify,jsonfile) = parse_args(CommandLine.arguments())
+     val jsonfile = parse_args(CommandLine.arguments())
      val ([jpkg],ss) = apply_with_chatter Json.fromFile jsonfile
 	   ("Parsing "^jsonfile^" ... ") "succeeded.\n"
      val pkgs = apply_with_chatter AADL.scrape_pkgs jpkg
-	   ("Converting Json to AST ...") "succeeded.\n"
+	   ("Converting Json to AST ... ") "succeeded.\n"
      val thyName = top_pkg_name pkgs
      val _ = new_theory thyName
      val logic_defs = apply_with_chatter (pkgs2hol thyName) pkgs
-	   ("Converting AST to logic ...") "succeeded.\n"
+	   ("Converting AST to logic ...\n") "---> succeeded.\n"
      val filter_spec_thms = filters_of logic_defs
      val filter_defs_and_props = apply_with_chatter 
            (List.map splatLib.filter_correctness) filter_spec_thms
-	   ("Constructing filters and proving filter properties ...") 
-           "succeeded.\n"
-     val () = Theory.export_theory()
+	   ("Constructing filters and proving filter properties ...\n") 
+           "---> succeeded.\n"
+     val _ = List.app prove_filter_props filter_defs_and_props
   in 
-      stdErr_print "Finished.\n";
-      MiscLib.succeed()
+      Theory.export_theory()
+    ; stdErr_print "Finished.\n"
+    ; MiscLib.succeed()
  end;
