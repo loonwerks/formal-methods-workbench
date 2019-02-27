@@ -44,6 +44,7 @@ fun prove_filter_props {name,regexp,encode_def,decode_def,
 
 fun main () =
  let val _ = stdErr_print "splat: \n"
+     val _ = stdErr_print (String.concat ["working directory is ", FileSys.getDir(), "\n"])
      val jsonfile = parse_args(CommandLine.arguments())
      val ([jpkg],ss) = apply_with_chatter Json.fromFile jsonfile
 	   ("Parsing "^jsonfile^" ... ") "succeeded.\n"
