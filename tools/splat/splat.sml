@@ -16,7 +16,7 @@ fun failwithERR e =
 
 fun parse_args args =
  let fun printHelp() = stdErr_print
-          ("Usage: splat [-dfagen (HOL | SML)] <name>.json\n")
+          ("Usage: splat <name>.json\n")
      fun fail() = (printHelp(); MiscLib.fail())
      fun checkFile s =
        let val filename = FileSys.fullPath s
