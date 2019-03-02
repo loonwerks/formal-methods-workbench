@@ -54,6 +54,8 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		String outputFileName = Activator.getDefault()
 				.getPreferenceStore()
 				.getString(arg.getString().toLowerCase() + "OutputFileName");
+		// TODO: THIS CAN'T BE HARDCODED!!!! GET PREFERENCES WORKING AGAIN
+		outputFileName = "/home/collins/git/formal-methods-workbench/tools/ide/target/products/com.collins.fmw.ide/linux/gtk/x86_64/SWTheory.sml";
 		if (outputFileName.isEmpty()) {
 			throw new ResoluteFailException("Resolute ToolCheck could not determine the output file name of the "
 					+ arg.getString() + " tool.  It must be specified in the preferences.",
