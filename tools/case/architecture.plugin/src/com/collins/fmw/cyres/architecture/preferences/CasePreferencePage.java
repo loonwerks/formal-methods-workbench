@@ -39,7 +39,7 @@ public class CasePreferencePage extends FieldEditorPreferencePage implements IWo
 				if (!getTextControl().getText().isEmpty()) {
 					dlgSaveAs.setFileName(getTextControl().getText());
 				} else {
-					dlgSaveAs.setFileName("fooTheory.sml");
+					dlgSaveAs.setFileName("SWTheory.sml");
 				}
 				dlgSaveAs.setOverwrite(false);
 				dlgSaveAs.setFilterExtensions(new String[] { "*.sml", "*.*" });
@@ -62,76 +62,76 @@ public class CasePreferencePage extends FieldEditorPreferencePage implements IWo
 		};
 		addField(splatOutputFileFieldEditor);
 
-		baggageServerNameFieldEditor = new StringFieldEditor(CasePreferenceConstants.CASE_BAGGAGE_SERVER_NAME,
-				"Baggage Server Name:", getFieldEditorParent());
-		addField(baggageServerNameFieldEditor);
+//		baggageServerNameFieldEditor = new StringFieldEditor(CasePreferenceConstants.CASE_BAGGAGE_SERVER_NAME,
+//				"Baggage Server Name:", getFieldEditorParent());
+//		addField(baggageServerNameFieldEditor);
 
-		baggageServerPortFieldEditor = new StringFieldEditor(CasePreferenceConstants.CASE_BAGGAGE_SERVER_PORT,
-				"Baggage Server Port:", getFieldEditorParent());
-		addField(baggageServerPortFieldEditor);
+//		baggageServerPortFieldEditor = new StringFieldEditor(CasePreferenceConstants.CASE_BAGGAGE_SERVER_PORT,
+//				"Baggage Server Port:", getFieldEditorParent());
+//		addField(baggageServerPortFieldEditor);
 
-		baggageServerFileFieldEditor = new FileFieldEditor(
-				CasePreferenceConstants.CASE_BAGGAGE_SERVER_FILENAME,
-				"Baggage Server filename:", true, getFieldEditorParent()) {
+//		baggageServerFileFieldEditor = new FileFieldEditor(
+//				CasePreferenceConstants.CASE_BAGGAGE_SERVER_FILENAME,
+//				"Baggage Server filename:", true, getFieldEditorParent()) {
+//
+//			@Override
+//			protected String changePressed() {
+//
+//				FileDialog dlgSaveAs = new FileDialog(getShell());
+//				dlgSaveAs.setText("Baggage Server image");
+//				if (!getTextControl().getText().isEmpty()) {
+//					dlgSaveAs.setFileName(getTextControl().getText());
+//				} else {
+//					dlgSaveAs.setFileName("docker-image-baggage-server.tar.gz");
+//				}
+//				dlgSaveAs.setOverwrite(false);
+//				dlgSaveAs.setFilterExtensions(new String[] { "*.tar.gz", "*.*" });
+//				String fileName = dlgSaveAs.open();
+//				if (fileName == null) {
+//					return null;
+//				} else {
+//					fileName = fileName.trim();
+//				}
+//
+//				return fileName;
+//			}
+//
+//		};
+//		addField(baggageServerFileFieldEditor);
 
-			@Override
-			protected String changePressed() {
-
-				FileDialog dlgSaveAs = new FileDialog(getShell());
-				dlgSaveAs.setText("Baggage Server image");
-				if (!getTextControl().getText().isEmpty()) {
-					dlgSaveAs.setFileName(getTextControl().getText());
-				} else {
-					dlgSaveAs.setFileName("docker-image-baggage-server.tar.gz");
-				}
-				dlgSaveAs.setOverwrite(false);
-				dlgSaveAs.setFilterExtensions(new String[] { "*.tar.gz", "*.*" });
-				String fileName = dlgSaveAs.open();
-				if (fileName == null) {
-					return null;
-				} else {
-					fileName = fileName.trim();
-				}
-
-				return fileName;
-			}
-
-		};
-		addField(baggageServerFileFieldEditor);
-
-		suitCaseOutputFileFieldEditor = new FileFieldEditor(CasePreferenceConstants.CASE_SUITCASE_OUTPUT_FILENAME,
-				"SuitCASE output filename:", true, getFieldEditorParent()) {
-
-			@Override
-			protected String changePressed() {
-
-				FileDialog dlgSaveAs = new FileDialog(getShell(), SWT.SAVE | SWT.SHEET);
-				dlgSaveAs.setText("SuitCASE output file name");
-				if (!getTextControl().getText().isEmpty()) {
-					dlgSaveAs.setFileName(getTextControl().getText());
-				} else {
-					dlgSaveAs.setFileName("");
-				}
-				dlgSaveAs.setOverwrite(false);
-				dlgSaveAs.setFilterExtensions(new String[] { "*.out", "*.*" });
-				String fileName = dlgSaveAs.open();
-				if (fileName == null) {
-					return null;
-				} else {
-					fileName = fileName.trim();
-				}
-
-				return fileName;
-			}
-
-			@Override
-			protected boolean checkState() {
-				// Don't want to enforce proper path/filenaming
-				clearErrorMessage();
-				return true;
-			}
-		};
-		addField(suitCaseOutputFileFieldEditor);
+//		suitCaseOutputFileFieldEditor = new FileFieldEditor(CasePreferenceConstants.CASE_SUITCASE_OUTPUT_FILENAME,
+//				"SuitCASE output filename:", true, getFieldEditorParent()) {
+//
+//			@Override
+//			protected String changePressed() {
+//
+//				FileDialog dlgSaveAs = new FileDialog(getShell(), SWT.SAVE | SWT.SHEET);
+//				dlgSaveAs.setText("SuitCASE output file name");
+//				if (!getTextControl().getText().isEmpty()) {
+//					dlgSaveAs.setFileName(getTextControl().getText());
+//				} else {
+//					dlgSaveAs.setFileName("");
+//				}
+//				dlgSaveAs.setOverwrite(false);
+//				dlgSaveAs.setFilterExtensions(new String[] { "*.out", "*.*" });
+//				String fileName = dlgSaveAs.open();
+//				if (fileName == null) {
+//					return null;
+//				} else {
+//					fileName = fileName.trim();
+//				}
+//
+//				return fileName;
+//			}
+//
+//			@Override
+//			protected boolean checkState() {
+//				// Don't want to enforce proper path/filenaming
+//				clearErrorMessage();
+//				return true;
+//			}
+//		};
+//		addField(suitCaseOutputFileFieldEditor);
 
 	}
 

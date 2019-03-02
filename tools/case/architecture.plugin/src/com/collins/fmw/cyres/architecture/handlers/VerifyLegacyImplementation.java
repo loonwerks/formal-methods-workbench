@@ -4,10 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -26,9 +22,6 @@ import org.osate.aadl2.instance.impl.ComponentInstanceImpl;
 import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.Activator;
-import com.collins.fmw.cyres.architecture.preferences.CasePreferenceConstants;
-import com.collins.fmw.cyres.architecture.tools.DockerClient;
 import com.rockwellcollins.atc.agree.agree.impl.AssumeStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.GuaranteeStatementImpl;
 
@@ -56,80 +49,80 @@ public class VerifyLegacyImplementation extends AadlHandler {
 		// TODO: Get name of docker image from preferences
 
 		// TODO: Describe what I'm doing here
-		Job docker = new Job("Docker Client") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
+//		Job docker = new Job("Docker Client") {
+//			@Override
+//			protected IStatus run(IProgressMonitor monitor) {
 
 				// Start Docker Client
-				final String dockerImage = Activator.getDefault().getPreferenceStore()
-						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_FILENAME);
-				final String dockerContainerPort = Activator.getDefault().getPreferenceStore()
-						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_PORT);
-				final String dockerContainerName = Activator.getDefault().getPreferenceStore()
-						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_NAME);
-				if (dockerImage.isEmpty() || dockerContainerPort.isEmpty() || dockerContainerName.isEmpty()) {
-					Dialog.showError("Baggage Server", "Baggage Server details are missing in CASE preferences.");
-					return Status.CANCEL_STATUS;
-				}
-				DockerClient dockerClient = new DockerClient(dockerImage, dockerContainerPort, dockerContainerName,
-						executionEvent);
+//				final String dockerImage = Activator.getDefault().getPreferenceStore()
+//						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_FILENAME);
+//				final String dockerContainerPort = Activator.getDefault().getPreferenceStore()
+//						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_PORT);
+//				final String dockerContainerName = Activator.getDefault().getPreferenceStore()
+//						.getString(CasePreferenceConstants.CASE_BAGGAGE_SERVER_NAME);
+//				if (dockerImage.isEmpty() || dockerContainerPort.isEmpty() || dockerContainerName.isEmpty()) {
+//					Dialog.showError("Baggage Server", "Baggage Server details are missing in CASE preferences.");
+//					return Status.CANCEL_STATUS;
+//				}
+//				DockerClient dockerClient = new DockerClient(dockerImage, dockerContainerPort, dockerContainerName,
+//						executionEvent);
 
-				try {
-					dockerClient.schedule();
-
-					// Get components to verify
-					Set<ComponentType> components = getLegacyComponents(eObj);
-
-					// Make sure there is at least one legacy component to verify
-					if (components.isEmpty()) {
-						Dialog.showError("No legacy component in model",
-								"At least one component in the model must point to an implementation source or binary file.");
-						return Status.CANCEL_STATUS;
-					}
-
-					// Wait until Docker Client is started
-					while (!dockerClient.isStarted() && !monitor.isCanceled()) {
-						if (dockerClient.getResult() != null) {
-							// Could not launch docker client for some reason
-							return Status.CANCEL_STATUS;
-						}
-					}
-
-					for (ComponentType component : components) {
-
-						// TODO: Generate Manifest
-						String manifest = generateManifest(component);
-						if (manifest == null) {
-							return Status.CANCEL_STATUS;
-						}
-
-						// TODO: Generate Contract (including hash)
-						String contracts = generateContracts(component);
-						if (contracts == null) {
-							return Status.CANCEL_STATUS;
-						}
-
-						// TODO: Upload binary
-						if (!uploadBinary(component)) {
-							return Status.CANCEL_STATUS;
-						}
-
-						// TODO: Upload manifest
-
-						// TODO: Upload contract
-
-						// TODO: Poll for result
-
-					}
-				} finally {
-					// Stop docker client when complete
-					dockerClient.cancel();
-				}
-
-				return Status.OK_STATUS;
-			}
-		};
-		docker.schedule();
+//				try {
+//					dockerClient.schedule();
+//
+//					// Get components to verify
+//					Set<ComponentType> components = getLegacyComponents(eObj);
+//
+//					// Make sure there is at least one legacy component to verify
+//					if (components.isEmpty()) {
+//						Dialog.showError("No legacy component in model",
+//								"At least one component in the model must point to an implementation source or binary file.");
+//						return Status.CANCEL_STATUS;
+//					}
+//
+//					// Wait until Docker Client is started
+//					while (!dockerClient.isStarted() && !monitor.isCanceled()) {
+//						if (dockerClient.getResult() != null) {
+//							// Could not launch docker client for some reason
+//							return Status.CANCEL_STATUS;
+//						}
+//					}
+//
+//					for (ComponentType component : components) {
+//
+//						// TODO: Generate Manifest
+//						String manifest = generateManifest(component);
+//						if (manifest == null) {
+//							return Status.CANCEL_STATUS;
+//						}
+//
+//						// TODO: Generate Contract (including hash)
+//						String contracts = generateContracts(component);
+//						if (contracts == null) {
+//							return Status.CANCEL_STATUS;
+//						}
+//
+//						// TODO: Upload binary
+//						if (!uploadBinary(component)) {
+//							return Status.CANCEL_STATUS;
+//						}
+//
+//						// TODO: Upload manifest
+//
+//						// TODO: Upload contract
+//
+//						// TODO: Poll for result
+//
+//					}
+//				} finally {
+//					// Stop docker client when complete
+//					dockerClient.cancel();
+//				}
+//
+//				return Status.OK_STATUS;
+//			}
+//		};
+//		docker.schedule();
 
 		// TODO: Cancellation handler?
 
