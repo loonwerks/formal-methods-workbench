@@ -25,7 +25,8 @@ Language and Automata Theory (SPLAT)</a>
 \newcommand{\modk}[1]{{#1}\;\konst{mod}\; 256}
 \newcommand{\wrap}[1]{#1}
 \newcommand{\bto}[1]{\mathbf{B}^{#1}}
-
+\newcommand{\regexpof}[1]{\konst{regexp\_of}\;{#1}}
+\newcommand{\rexpof}{\konst{regexp\_of}}
 **Draft Status**. This document is a work in progress.
 
 Introduction
@@ -136,28 +137,28 @@ Properties meet Encodings
 
 Now we come to the main focus of this paper: statements of the form
 $$
-  x \in P \iff \konst{encode}\;x \in \Lang{\konst{regexp\_of}\; P}
+  x \in P \iff \konst{encode}\;x \in \Lang{\regexpof{P}}
 $$
 where $P:\tau\to\konst{bool}$ represents a predicate on type $\tau$,
 $\konst{encode} : \tau \to \mathbb{S}$ maps items of type $\tau$ to
 strings, and $\konst{regexp\_of}\;P$ is an abstract operation that
 translates $P$ into an "equivalent" regular expression. Rephrasing the statement as:
 $$
-  P: \tau\to\konst{bool} = \Lang{\konst{regexp\_of}\; P} \circ \konst{encode}
+  P: \tau\to\konst{bool} = \Lang{\regexpof{P}} \circ \konst{encode}
 $$
 more directly expresses the **SPLAT** setting, namely, "what useful
 properties can be expressed when we stick an encoder in front of some
 formal language machinery?"  The main practical benefit for us comes
-from being able to compile the $\konst{regexp\_of}\; P$ expression to
+from being able to compile the $\regexpof{(P)}$ expression to
 a DFA, thus giving an efficient, table-driven, implementation of $P$.
 
-**Remark.** The $\konst{regexp\_of}$ operation depends on context. In
-some cases, *e.g.* intervals as below, there is a syntax-driven
-algorithm; in some cases it is a matter of human insight. Further, whether
-$\konst{regexp\_of}$ is *shallowly* or *deeply* embedded is an
-important consideration, one that we gloss over for now.
+**Remark.** The $\rexpof$ operation depends on context. In some cases,
+*e.g.* intervals as below, there is a syntax-driven algorithm; in some
+cases it is a matter of human insight. Further, whether $\rexpof$ is
+*shallowly* or *deeply* embedded is an important consideration, one
+that we gloss over for now.
 
-**Remark.** $\konst{regexp\_of}$ is limited to predicates expressible
+**Remark.** $\rexpof$ is currently limited to predicates expressible
   with regular languages. Moving up to grammars, such as context-free
   grammars, gives more expressive power, and would require a
   $\konst{grammar\_of}$ operator (along with a modified definition of
@@ -178,7 +179,7 @@ Consider the "even-number" predicate $\konst{even} :
 \konst{charset\_of}\;[0,2,4, \ldots, 254]$ be the character set
 corresponding to the non-negative even numbers less than 256. Assuming
 $$
-\konst{regexp\_of}\; \konst{even} = 
+\regexpof{\konst{even}} = 
 \konst{Cat}\; (\konst{Chset}\;\mathit{cset})\;(\konst{Star}\;\bullet),
 $$ 
 (the encoding is in LSB format), we construct the formula
@@ -195,8 +196,9 @@ Encodings for common types
 ==========================
 
 We now discuss a collection of common types and their encoding and
-decoding functions. Our approach is to reduce to a base
-encoder/decoder for natural numbers.
+decoding functions. There is of course a wide variety of encoding
+schemes. Our approach is to use binary encodings, reducing higher
+level types to a base encoder/decoder for natural numbers.
 
 - **Natural numbers.** First, define the map $\konst{n2l} : \mathbb{N}\to
 \mathbb{N}\;\konst{list}$ from a number to its little-endian base-256
@@ -239,7 +241,7 @@ $$
 $$
 specifies a map from an integer to its corresponding natural number defined by
 $$
- \konst{i2n}_N (i) = \condB{0 \leq i < 2^{N-1}}
+\konst{i2n}_N (i) = \condB{0 \leq i < 2^{N-1}}
                            {\konst{Nat}(i)}
                            {2^{N} - \konst{Nat}(\konst{Abs}(i))}
 $$
@@ -308,17 +310,18 @@ $$
 Interval Properties and Regexps
 ================================
 
-Now that we have surveyed how to encode data, we can move to the
-encoding of properties by regular expressions. The $\konst{even}(n)$
-predicate from our initial example was created in an *ad hoc* manner,
-but we seek some properties that can be algorithmically translated to
-regexps. One of the most useful for us so far has been *intervals*.
+Now that we have covered an approach to data encoding, we discuss the
+encoding of data properties by regular expressions. The
+$\konst{even}(n)$ predicate from our initial example was created in an
+*ad hoc* manner, but we seek some properties that can be
+algorithmically translated to regexps. One of the most useful for us
+so far has been *intervals*.
 
 An interval $[\mathit{lo} ,\mathit{hi}]$ is defined to be $\set{n \in \mathbb{N} \mid
 \mathit{lo} \leq n \leq \mathit{hi}}$; another way of expressing it is
 as a property $\lambda n. \mathit{lo} \leq n \land n \leq \mathit{hi}$.
 An interval is mapped to a regular expression by an algorithm
-$\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}]$ that proceeds in
+$\regexpof{[\mathit{lo},\mathit{hi}]}$ that proceeds in
 parallel on the base-256 representations given by $\konst{reverse}
 \circ \konst{n2l}$, *i.e*, following the MSB (most significant byte
 leftmost) format. However, the algorithm on the representations is
@@ -377,22 +380,22 @@ returned.
   (number of bytes is $w$):
 
 1. $0 \leq \mathit{lo} \leq \mathit{hi}$. No translation needed; the
-interval is $\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}]$.
+interval is $\regexpof{[\mathit{lo},\mathit{hi}]}$.
 
 2. $\mathit{lo} < 0 \leq \mathit{hi}$. A disjunction is made around 0.
 $$
-\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] =
-\konst{regexp\_of}\;[2^{8w} + \mathit{lo}, 2^{8w} - 1] + \konst{regexp\_of}\;[0, \mathit{hi}]
+\regexpof{[\mathit{lo},\mathit{hi}]} =
+\regexpof{[2^{8w} + \mathit{lo}, 2^{8w} - 1]} + \regexpof{[0, \mathit{hi}]}
 $$
 There is a special case here, where $\mathit{lo} = -2^{8w-1}$ and
 $\mathit{hi} = 2^{8w-1} - 1$, in which case 
-$\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] = \bullet^{w}$. 
+$\regexpof{[\mathit{lo},\mathit{hi}]} = \bullet^{w}$. 
 
 3. $\mathit{lo} \leq \mathit{hi} < 0$. Both numbers are negative; we generate the interval from their
    twos complements.
 $$
-\konst{regexp\_of}\;[\mathit{lo},\mathit{hi}] =
-\konst{regexp\_of}\;[2^{8w} + \mathit{lo}, 2^{8w} + \mathit{hi}]
+\regexpof{[\mathit{lo},\mathit{hi}]} =
+\regexpof{[2^{8w} + \mathit{lo}, 2^{8w} + \mathit{hi}]}
 $$
 
 ### Examples
@@ -452,11 +455,11 @@ and property $P : \konst{recd} \to \konst{bool}$ defined with field properties $
 $$
    P(r) \Leftrightarrow P_1(r.f_1) \land \ldots \land P_n(r.f_n),
 $$
-we can build $\konst{regexp\_of}(P)$ as the concatenation
+we can build $\regexpof{(P)}$ as the concatenation
 $$
-   \konst{regexp\_of}(P_1) \cdots \konst{regexp\_of}(P_n)
+   \regexpof{(P_1)} \cdots \regexpof{(P_n)}
 $$
-In our examples so far, the field properties have been intervals. 
+In our examples so far, the field properties have been intervals and subsets of enumerations.
 
 A record message package
 ========================
@@ -470,7 +473,7 @@ In particular, given a declaration of record type $\konst{recd}$ plus a predicat
 \konst{recd} \to \konst{bool}$ over the fields of the record, we
 generate the following artifacts:
 
-- a regexp $\mathcal{R} = \konst{regexp\_of}\;P$
+- a regexp $\mathcal{R} = \regexpof{P}$
 - an encoding function $\konst{encode} : \konst{recd} \to \mathbb{S}$
 - a decoding function $\konst{decode} : \mathbb{S} \to \konst{recd}\;\konst{option}$
 - an inversion theorem showing that decoding inverts encoding for wellformed records
@@ -514,7 +517,7 @@ well-formed. One version of this is
 
 Another version:
 
- $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp s \in \Lang{\konst{regexp\_of}\;P}$
+ $~~~~~~~~~~~~~~~~~\konst{decode}(s) = \konst{SOME}\;r \imp s \in \Lang{\regexpof{P}}$
 
 Both of these fail to exclude an incorrect encoder that (say) maps all
 records into one (well-formed) value. To forbid that, one could demand
@@ -532,14 +535,35 @@ the importance of the well-formedness specification.
 Proofs and Automation
 =====================
 
+Property-enhanced lexing 
+=======================================
+
+(Speculative!)
+
+Lexing provides an interesting application of **SPLAT** notions. A
+typical lexer specification has the form $(r_1,f_1), \ldots , (r_n,f_n)$
+where an $(r,f)$ pair binds a regular expression $r$ with an
+*action* function $f : \mathbb{S}\to \tau$. From this specification
+a lexer of type $\mathbb{S}\to\tau\;\konst{list}$ can be automatically
+created. By connecting properties to regular expressions one can imagine
+a lexer specification enhanced with property information. Thus
+$$
+  (\regexpof{(P_1)},f_1,Q_1) \ldots (\regexpof{(P_n)},f_n,Q_n)
+$$
+can be leveraged to give a list of lexemes-with-properties where each
+$(\regexpof{P},f,Q)$ gives rise to a Hoare-triple
+$$
+(\konst{decode}\;s = \konst{SOME}\;d) \land P\; d \imp Q (f\; d)\ .
+$$
+... more to come ...
+
+Further Issues
+==============
+
 Packed Record Formats
-=====================
-
+---------------------
 Dependent Records
-=================
-
-Lexing
-=======
+-----------------
 
 Related Work
 =============

@@ -732,7 +732,7 @@ val IN_CHARSET_NUM_TAC =
   >> TRY EVAL_TAC 
   >> rule_assum_tac 
         (SIMP_RULE list_ss [dec_def, numposrepTheory.l2n_def, ord_mod_256])
-  >> pop_assum mp_tac
+  >> rpt (qpat_x_assum `_ < ORD c` mp_tac ORELSE qpat_x_assum `ORD c < _` mp_tac)
   >> Q.SPEC_TAC (`ORD c`, `n`)
   >> REPEAT (CONV_TAC (numLib.BOUNDED_FORALL_CONV EVAL))
   >> rw_tac bool_ss [];

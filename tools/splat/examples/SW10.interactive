@@ -1,30 +1,8 @@
-open AADL;
-
-val jsonfile = "examples/SW10.json";
-val ([jpkg],ss) = Json.fromFile jsonfile;
-val pkgs = scrape_pkgs jpkg;
-val thyName = fst (last pkgs);
-new_theory thyName;
-val logic_defs = pkgs2hol thyName pkgs;
-val [filter_spec] = #4 logic_defs
-val (fname,thm) = filter_spec;
-
-val filter_defs_and_props = map splatLib.filter_correctness (#4 logic_defs);
-
-
-val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
-     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
-     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34] = complist;
-
-
-
-(* OPEN AADL and go through gen_hol *)
-
+open splatLib AADL;
 val int_ss = intLib.int_ss;
 
 infix byA;
 val op byA = BasicProvers.byA;
-
 val qpat_k_assum = Lib.C qpat_x_assum kall_tac;
 fun qspec q th = th |> Q.SPEC q 
 fun qspec_arith q th = qspec q th |> SIMP_RULE arith_ss [];
@@ -33,22 +11,46 @@ val subst_all_tac = SUBST_ALL_TAC;
 val decide = bossLib.DECIDE;
 val qdecide = decide o Parse.Term;
 
-val [filter_goal as 
-       (fname,regexp,encode_def, decode_def, 
-        inversion_tm, correctness_tm, iconstraint_opt)] = filter_goals;
+(*---------------------------------------------------------------------------*)
 
-val SOME implicit_constraints_def = iconstraint_opt;
+val jsonfile = "examples/SW10.json";
+val ([jpkg],ss) = Json.fromFile jsonfile;
+val pkgs = scrape_pkgs jpkg;
+val thyName = fst (last pkgs);
+new_theory thyName;
+val logic_defs = pkgs2hol thyName pkgs;
+val fn_defs = #3 logic_defs;
+val [filter_spec] = #4 logic_defs
+val (fname,thm) = filter_spec;
 
-val [good_coordinate_def, good_pattern_def, good_map_def, 
-     good_mission_def, good_mission_window_def, good_command_def, _] = fn_defs
+val filter_defs_and_props = map splatLib.filter_correctness (#4 logic_defs);
 
+val [{name,regexp,encode_def,decode_def,
+      inversion, correctness, implicit_constraints}] = filter_defs_and_props;
+
+val SOME implicit_constraints_def = implicit_constraints;
+
+val (_ :: _ :: 
+     good_coordinate_def :: good_pattern_def :: valid_message_def :: good_map_def :: 
+     good_mission_def :: good_mission_window_def :: good_command_def :: well_formed_message_def
+     :: _) = fn_defs;
+
+open splatTheory;
 
 val FlightPattern_bound = Q.store_thm
 ("FlightPattern_bound",
 `!p. num_of_FlightPattern p < 256`,
  Cases >> rw_tac arith_ss [fetch "-" "num_of_FlightPattern_def"]);
 
-val dec_encs = map (#dec_enc o snd) (Finmap.listItems (splatLib.the_codingMap()));
+val enc_FlightPattern_def = fetch "-" "enc_FlightPattern_def";
+val num_of_FlightPattern_def = fetch "-" "num_of_FlightPattern_def";
+val dec_FlightPattern_def = fetch "-" "dec_FlightPattern_def";
+val FlightPattern_of_num_def = fetch "-" "FlightPattern_of_num_def";
+
+val dec_encs = map (#dec_enc o snd) (Redblackmap.listItems (splatLib.the_codingMap()));
+
+val option_case_eq = TypeBase.case_eq_of ``:'a option``;
+val list_case_eq = TypeBase.case_eq_of ``:'a list``;
 
 -- TODO: (a) autogenerate the destructor theorems in splatScript and install in codingMap
 --       (b) calculate all (sub-)records, find their component-equality theorems, and
@@ -57,7 +59,65 @@ val dec_encs = map (#dec_enc o snd) (Finmap.listItems (splatLib.the_codingMap())
 
 val inversion_thm = store_thm
 ("inversion",
- inversion_tm,
+ inversion,
+ CONV_TAC (RENAME_VARS_CONV ["r"])
+ >> rw_tac list_ss [decode_def, encode_def,good_command_def, well_formed_message_def,
+      implicit_constraints_def, good_map_def,good_coordinate_def,good_pattern_def]
+ >> full_simp_tac (srw_ss()) [fcp_every_thm,arithmeticTheory.BOUNDED_FORALL_THM]
+ >> rw_tac list_ss [list_case_eq, option_case_eq]
+ >> `(?p1 p2 p3 p4 p5 p6 p7 p8. enci 8 r.header.src = [p1;p2;p3;p4;p5;p6;p7;p8]) /\
+     (?q1 q2 q3 q4 q5 q6 q7 q8. enci 8 r.header.dst = [q1;q2;q3;q4;q5;q6;q7;q8]) /\
+     (?u. enc_bool r.header.trusted = [u]) /\
+     (?v. enc_bool r.header.HMAC = [v]) /\
+     (?a.     enci 1 ((r.payload.map ' 0).latitude)  = [a])   /\
+     (?b c.   enci 2 ((r.payload.map ' 0).longitude) = [b;c]) /\
+     (?d e.   enci 2 ((r.payload.map ' 0).altitude)  = [d;e]) /\
+     (?a1.    enci 1 ((r.payload.map ' 1).latitude)  = [a1])  /\
+     (?b1 c1. enci 2 ((r.payload.map ' 1).longitude) = [b1;c1]) /\
+     (?d1 e1. enci 2 ((r.payload.map ' 1).altitude)  = [d1;e1]) /\
+     (?a2.    enci 1 ((r.payload.map ' 2).latitude)  = [a2])    /\
+     (?b2 c2. enci 2 ((r.payload.map ' 2).longitude) = [b2;c2]) /\
+     (?d2 e2. enci 2 ((r.payload.map ' 2).altitude)  = [d2;e2]) /\
+     (?a3.    enci 1 ((r.payload.map ' 3).latitude)  = [a3])    /\
+     (?b3 c3. enci 2 ((r.payload.map ' 3).longitude) = [b3;c3]) /\
+     (?d3 e3. enci 2 ((r.payload.map ' 3).altitude)  = [d3;e3]) /\
+     (?f.     enc_FlightPattern r.payload.pattern = [f])`
+      by (rpt conj_tac 
+          >> ((FIRST (map match_mp_tac (CONJUNCTS enci_bytes))
+                   >> rw_tac int_ss [] >> intLib.ARITH_TAC)
+              ORELSE
+                (rw_tac std_ss [fetch "-" "enc_FlightPattern_def",
+                                splatTheory.enc_bool_def] 
+                    >> metis_tac [FlightPattern_bound,bool_bound,enc_bytes])))
+ >> rw_tac list_ss [option_case_eq,enc_FlightPattern_def,num_of_FlightPattern_def,enc_bytes]
+ >> rw_tac (srw_ss()) [fetch "-" "RF_Msg_component_equality",
+                       fetch "-" "Command_component_equality",
+                       fetch "-" "CASE_MsgHeader_component_equality",
+                       fetch "-" "Coordinate_component_equality"]
+ >> ((rpt (qpat_x_assum `_ = _` (SUBST_ALL_TAC o SYM))
+      >> FIRST (metis_tac dec_encs :: map match_mp_tac (CONJUNCTS deci_encis))
+      >> intLib.ARITH_TAC)
+     ORELSE
+     (rw_tac (srw_ss()) [fcpTheory.CART_EQ]
+      >> `(i=0) \/ (i=1) \/ (i=2) \/ (i=3)` by decide_tac
+      >> pop_assum SUBST_ALL_TAC >> rw_tac (srw_ss()) [fcpTheory.READ_L2V]
+      >> rw_tac list_ss [fetch "-" "Coordinate_component_equality"]
+      >> rpt (qpat_x_assum `_ = _` (SUBST_ALL_TAC o SYM))
+      >> FIRST (metis_tac dec_encs :: map match_mp_tac (CONJUNCTS deci_encis))
+      >> intLib.ARITH_TAC)
+     ORELSE 
+     EVAL_TAC)
+);
+
+
+-- TODO: (a) autogenerate the destructor theorems in splatScript and install in codingMap
+--       (b) calculate all (sub-)records, find their component-equality theorems, and
+--           invoke them at the right place in the tactic scheme.
+--
+
+val inversion_thm = store_thm
+("inversion",
+ inversion,
  CONV_TAC (RENAME_VARS_CONV ["r"])
  >> rw_tac list_ss [decode_def, encode_def,good_command_def,
       implicit_constraints_def, good_map_def,good_coordinate_def,good_pattern_def]
@@ -322,5 +382,10 @@ Q.X_GEN_TAC `recd`
      >> `m.seconds = dec (STRING c (STRING d ""))` by metis_tac [dec_enc]
      >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,good_dms_def])
 );
+
+
+val [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, 
+     c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, 
+     c23, c24, c25, c26, c27, c28, c29, c30, c31, c32,c33,c34] = complist;
 
 *)
