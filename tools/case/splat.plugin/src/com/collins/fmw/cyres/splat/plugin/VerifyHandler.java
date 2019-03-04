@@ -78,7 +78,7 @@ public class VerifyHandler extends AbstractHandler {
 
 			Bundle bundle = Platform.getBundle(bundleId);
 
-			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("static/splat"), null)))
+			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
 					.getFile();
 
 			Runtime rt = Runtime.getRuntime();
