@@ -1,0 +1,90 @@
+Hi Aaron,
+
+  Nice to see you again at the CASE meeting.
+
+ Here's the formalization I promised you. This is a simplified
+version. The goal (as I understand it from our chat) is to define
+idiomatic C versions of the encoder and decoder for records and show
+that they are equivalent to the purely functional versions here.
+
+
+Record declaration
+-------------------
+
+   dms = <| degrees : num ; 
+            minutes : num ; 
+            seconds : num |>
+
+(num denotes the natural numbers, but any standard number type, e.g. int32,
+would also be fine).
+
+Encoding and decoding the record
+---------------------------------
+
+Encoding a dms record just lays the encoded fields out in order as a string
+(string are represented as ASCII character lists in my formalization)
+
+   enc_dms recd = enc_degrees recd.degrees ++ 
+                  enc_minutes recd.minutes ++
+                  enc_seconds recd.seconds
+
+Decoding takes us back:
+
+   dec_dms s =
+     case s 
+      of [dch; mch; sch1; sch2] => 
+          SOME <| degrees := dec [dch]; 
+                  minutes := dec [mch]; 
+                  seconds := dec [sch1; sch2] |>
+       | otherwise => NONE
+
+
+Wellformedness
+---------------
+
+Not sure this is important here, but I'll include it anyway.
+
+    good_dms recd <=>
+         0 <= recd.degrees /\ recd.degrees <= 90 /\
+         0 <= recd.minutes /\ recd.minutes <= 59 /\
+         0 <= recd.seconds /\ recd.seconds <= 5999
+
+
+Encoding/Decoding details
+--------------------------
+
+Define encoding for each record field.
+
+    enc_degrees d = enc 1 d
+    enc_minutes m = enc 1 m
+    enc_seconds s = enc 2 s
+
+where "enc w n" is an LSB binary encoding for unsigned numbers, with
+padding to width w. Here's the formal definitions. The n2l operation
+maps a number to a list of numbers less than base b. n2l is the
+inverse.
+
+   n2l b n =
+     if n < b ∨ b < 2 then [n MOD b] else (n MOD b) :: n2l b (n DIV b)
+
+   (∀b. l2n b [] = 0) ∧ 
+   (∀b h t. l2n b (h::t) = h MOD b + b * l2n b t)
+
+There is also padding to deal with.
+
+   layout b n width = PAD_RIGHT 0n width (n2l b n)
+   
+   enc w n = MAP CHR (layout 256 n w)
+   dec s = l2n 256 (MAP ORD s)
+
+where "PAD_RIGHT c n list" puts copies of c at the end of list in
+order to make its length n.
+
+   PAD_RIGHT c n list = list ++ GENLIST (K c) (n − LENGTH s)
+
+(K is the K combinator, MAP is the list map function, and CHR maps
+numbers to ASCII characters).
+
+
+Thanks,
+Konrad.

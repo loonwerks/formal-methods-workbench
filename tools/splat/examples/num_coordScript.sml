@@ -10,6 +10,10 @@ open arithmeticTheory listTheory stringTheory pred_setLib
 
 val _ = numLib.prefer_num();
 
+overload_on ("++",``list$APPEND``);
+
+Globals.priming := SOME "";
+
 infix byA;
 val op byA = BasicProvers.byA;
 
@@ -32,6 +36,7 @@ fun strip_cat tm =
      of NONE => [tm]
       | SOME (r,s) => r :: strip_cat s
  end;
+
 
 (*---------------------------------------------------------------------------*)
 (* Declare simple record and define wellformedness                           *)
@@ -93,10 +98,6 @@ val dec_enc_dms = Q.store_thm
       by rw_tac list_ss [splatTheory.enc_bytes]
   >> rw_tac list_ss [fetch "-" "dms_component_equality"]
   >> metis_tac [splatTheory.dec_enc]);
-
-(*
-mapshape [1,1,2] [I,I,I] [0,1,2,3];
-*)
 
 (*---------------------------------------------------------------------------*)
 (* Regexp expressing the interval constraints                                *)
@@ -163,94 +164,34 @@ val ilem5A = Q.prove
      (LENGTH s = 1) /\ dec s < 112`,
  IN_CHARSET_NUM_TAC);
 
-val ilem5B = Q.prove
+val ilem6A = Q.prove
 (`!s. s IN regexp_lang (Chset (Charset 0x800000w 0w 0w 0w))
       <=> 
       (LENGTH s = 1) /\ (dec s = 23)`,
  IN_CHARSET_NUM_TAC);
 
-val ilems = [ilem1A,ilem2A,ilemDOT,ilemZERO,ilem4A,ilem5A,ilem5B]
+val ilems = [ilem1A,ilem2A,ilemDOT,ilemZERO,ilem4A,ilem5A,ilem6A]
 
-val ilem3B = Q.prove
-(`!s. s IN regexp_lang 
-             (Cat
-                 (Chset
-                    (Charset 0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw
-                       0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw))
-                 (Chset (Charset 0x7FFFFEw 0w 0w 0w)))
-      <=> 
-      (LENGTH s = 2) /\ dec s < 5888`,
- rw_tac list_ss (ilems @ [regexp_lang_cat,IN_dot,strlen_eq,EQ_IMP_THM,dec_def])
- >> rw_tac list_ss []
- >- full_simp_tac list_ss [l2n_def,ord_mod_256]
- >- (qexists_tac `[c1]` >> qexists_tac `[c2]`
-     >> full_simp_tac list_ss [l2n_def,ord_mod_256,ORD_BOUND]));
-
-val ilem3C = Q.prove
-(`!s. s IN regexp_lang 
-            (Cat (Chset
-                    (Charset 0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFw 0w 0w))
-                    (Chset (Charset 0x800000w 0w 0w 0w)))
-      <=> 
-      (LENGTH s = 2) /\ 5888 <= dec s /\ dec s < 6000`,
- rw_tac list_ss [regexp_lang_cat,IN_dot,ilem5A,ilem6A,strlen_eq,
-		 decide ``x:num < 6000 <=> x <= 5999``,dec_def,EQ_IMP_THM]
-  >> full_simp_tac list_ss [l2n_def,ord_mod_256]
-  >> (qexists_tac `[c1]` >> qexists_tac `[c2]`
-      >> full_simp_tac list_ss [l2n_def, ord_mod_256]
-      >> `ORD c1 < 256 /\ ORD c2 < 256` by metis_tac [ORD_BOUND]
-      >> `ORD c2 = 23` by decide_tac
-      >> decide_tac)
-);
-
-val list_len_lem = Q.prove
-(`!L1 L2 L3 h1 h2 h3 h4. 
-    1 <= LENGTH L1 /\ 1 <= LENGTH L2 /\ 2 <= LENGTH L3 
-    ==> 
-    ((L1 ++ L2 ++ L3 = [h1;h2;h3;h4])
-    <=>
-    (L1 = [h1]) /\
-    (L2 = [h2]) /\
-    (L3 = [h3;h4]))`,
- simp_tac list_ss [EQ_IMP_THM]
-  >> map_every Cases_on [`L1`, `L2`, `L3`]
-  >> full_simp_tac list_ss [qdecide `2 <= SUC n <=> 0 < n`]
-  >> Cases_on `t''` >> full_simp_tac list_ss []
-  >> rpt gen_tac
-  >> disch_then (fn th => assume_tac th >> assume_tac (Q.AP_TERM `LENGTH` th))
-  >> Cases_on `t` >> full_simp_tac list_ss []
-  >> Cases_on `t'` >> full_simp_tac list_ss []);
-
-val in_chset_str = Q.prove
-(`!s cs. s IN regexp_lang(Chset cs) ==> ?a. s = [a]`,
- rw_tac (list_ss ++ PRED_SET_ss) [regexp_lang_def]
- >> rw_tac list_ss []);
- 
 val in_chset = Q.prove
-(`!n cs s L . STRING c s IN regexp_lang (Chset cs) dot L
-              <=> 
-             (STRING c "") IN regexp_lang (Chset cs) /\ s IN L`,
+(`!n cs s L. 
+     STRING c s IN regexp_lang (Chset cs) dot L
+       <=> 
+     (STRING c "") IN regexp_lang (Chset cs) /\ s IN L`,
  rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
         [regexp_lang_def,EQ_IMP_THM,IN_dot]
  >> full_simp_tac list_ss []
  >> var_eq_tac
  >- metis_tac[]
- >- (qexists_tac `STRING (CHR c') ""`
+ >- (qexists_tac `STRING (CHR c1) ""`
      >> qexists_tac `s`
      >> rw_tac list_ss []
-     >> metis_tac[]));
+     >> metis_tac[])
+);
 
-val string_in_lang_len = Q.prove
-(`!s cs1 cs2 cs3 cs4 cs5 cs6.
-     s IN regexp_lang (Chset cs1) dot
-          regexp_lang (Chset cs2) dot
-          ((regexp_lang (Chset cs3) dot regexp_lang (Chset cs4))
-           UNION
-	   (regexp_lang (Chset cs5) dot regexp_lang (Chset cs6)))
-	 ==> ?a b c d. s = [a;b;c;d]`,
- rw_tac (list_ss ++ PRED_SET_ss) [IN_dot]
- >> imp_res_tac in_chset_str
- >> rw_tac list_ss []);
+val not_in_chset = Q.prove
+(`!cs. "" NOTIN regexp_lang (Chset cs)`,
+ rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
+        [regexp_lang_def,EQ_IMP_THM,IN_dot]);
 
 val strcat_enc1_in_chset = Q.prove
 (`!n cs s L. 
@@ -267,31 +208,35 @@ val strcat_enc1_in_chset = Q.prove
      >> rw_tac list_ss []
      >> metis_tac[]));
 
-val strcat_enc2_in_chset = Q.prove
-(`!n cs1 cs2 s L. 
-    n < 65536 ==>
-    (STRCAT (enc 2 n) s 
-       IN regexp_lang (Chset cs1) dot 
-          regexp_lang (Chset cs2) dot L
-       <=> 
-    enc 2 n IN regexp_lang (Chset cs1) dot regexp_lang (Chset cs2) 
-    /\ s IN L)`,
- rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
-        [regexp_lang_def,EQ_IMP_THM,IN_dot,enc_bytes]
- >> full_simp_tac list_ss []
- >- (qexists_tac `[CHR c]`
-     >> qexists_tac `[CHR c']`
-     >> rw_tac list_ss []
-     >> metis_tac [])
- >- (qexists_tac `[CHR c]`
-     >> qexists_tac `CHR c' :: s`
-     >> rw_tac list_ss []
-     >- metis_tac []
-     >- metis_tac [STRCAT_EQNS])
-);
+val lift_suc_thm = last (CONJUNCTS ADD_CLAUSES);
+		
+val lem = Q.prove
+(`!A B C. 1n <= LENGTH A /\ 1n <= LENGTH B /\ 2n <= LENGTH C /\
+          (A ++ B ++ C = [c1;c2;c3;c4]) 
+         ==> 
+          (A = [c1]) /\ (B = [c2]) /\ (C = [c3;c4])`,
+rpt gen_tac 
+ >> strip_tac
+ >> `LENGTH (A ++ B ++ C) = LENGTH [c1;c2;c3;c4]` by metis_tac[]
+ >> Cases_on `A` 
+ >> full_simp_tac list_ss [lift_suc_thm]
+ >> `LENGTH t = 0` by decide_tac
+ >> Cases_on `B` 
+ >> full_simp_tac list_ss [lift_suc_thm]
+ >> `LENGTH t1 = 0` by decide_tac
+ >> rw_tac list_ss []
+ >> metis_tac [listTheory.LENGTH_NIL,listTheory.APPEND]);
 
-val AGREE_PROP = Q.store_thm
-("AGREE_PROP",
+val lem_eq = Q.prove
+(`!A B C. 
+   1n <= LENGTH A /\ 1n <= LENGTH B /\ 2n <= LENGTH C
+    ==> 
+   ((A ++ B ++ C = [c1;c2;c3;c4]) <=> (A = [c1]) /\ (B = [c2]) /\ (C = [c3;c4]))`,
+ rw_tac list_ss [EQ_IMP_THM] >> metis_tac [lem]);
+
+
+val AGREE_ENCODE_PROP = Q.store_thm
+("AGREE_ENCODE_PROP",
  `!m:dms. good_dms m <=> enc_dms(m) IN regexp_lang ^dms_regexp_term`,
  rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
 	   [regexp_lang_cat,regexp_lang_or,LIST_UNION_def,
@@ -303,99 +248,43 @@ val AGREE_PROP = Q.store_thm
      >- rw_tac list_ss (dec_enc::enc_bytes::ilems)
      >- (rw_tac list_ss (in_chset::enc_bytes::ilems)
          >> Cases_on `m.seconds < 256`
-         >> (rw_tac list_ss [dec_enc,GSYM enc_bytes] >> intLib.ARITH_TAC))
+         >> (rw_tac list_ss [dec_enc,GSYM enc_bytes] >> intLib.ARITH_TAC)))
  >- (full_simp_tac list_ss 
-        ([regexp_lang_or,regexp_lang_cat,regexpTheory.LIST_UNION_def,IN_dot,strlen_eq]
-	 @ ilems)
+        ([regexp_lang_or,regexp_lang_cat,regexpTheory.LIST_UNION_def,IN_dot,strlen_eq] @ ilems)
      >> var_eq_tac
-     >> full_simp_tac list_ss [list_len_lem,lower_enc]
+     >> `(enc 1 m.degrees = [c]) /\ (enc 1 m.minutes = [c1]) /\ (enc 2 m.seconds = [c2 ; c3])`
+          by metis_tac [lem,lower_enc,STRCAT_ASSOC,STRCAT_EQNS]
      >> `m.degrees <= 90` by metis_tac [dec_enc,good_dms_def]
      >> `m.minutes <= 59` by metis_tac [dec_enc,good_dms_def]
-     >> `m.seconds = dec (STRING c'' (STRING c''' ""))` by metis_tac [dec_enc]
+     >> `m.seconds = dec [c2 ; c3]` by metis_tac [dec_enc]
      >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,good_dms_def])
 );
 
-          ilem1A,ilem2A,ilem3A,ilem4A,ilem5A,ilem6A,ilem3B,ilem3C,
 
-val good_imp_accept_tac =
- full_simp_tac bool_ss [good_dms_def]
- >> rw_tac list_ss [strcat_enc1_in_chset,ilem1A, ilem2A,  
-         ilem3B |> SIMP_RULE list_ss [regexp_lang_cat],
-         ilem3C |> SIMP_RULE list_ss [regexp_lang_cat],dec_enc,enc_bytes]
-
-val AGREE_PROP_AGAIN = Q.store_thm
-("AGREE_PROP_AGAIN",
- `!m:dms. good_dms m <=> enc_dms(m) IN regexp_lang ^dms_regexp_term`,
- rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
-	   [regexp_lang_cat,regexp_lang_or,LIST_UNION_def,
-            enc_dms_def, enc_degrees_def, enc_minutes_def, enc_seconds_def,EQ_IMP_THM]
- >> full_simp_tac bool_ss [Once (GSYM STRCAT_ASSOC)]
- >- good_imp_accept_tac
- >- (full_simp_tac list_ss 
-         [regexp_lang_or,regexp_lang_cat,regexpTheory.LIST_UNION_def,IN_dot,
-	  ilem1A,ilem2A,ilem3A,ilem4A,ilem5A,ilem6A,ilem3B,ilem3C,strlen_eq]
-     >> var_eq_tac
-     >> full_simp_tac list_ss [list_len_lem,lower_enc]
-     >> `m.degrees <= 90` by metis_tac [dec_enc,good_dms_def]
-     >> `m.minutes <= 59` by metis_tac [dec_enc,good_dms_def]
-     >> `m.seconds = dec (STRING c'' (STRING c''' ""))` by metis_tac [dec_enc]
-     >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,good_dms_def])
+val AGREE_DECODE_PROP = Q.store_thm
+("AGREE_DECODE_PROP",
+ `!s. s IN regexp_lang ^dms_regexp_term ==> good_dms (THE (dec_dms s))`,
+ rw_tac std_ss [AGREE_ENCODE_PROP]
+  >> Cases_on `s`
+  >> full_simp_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
+      (ilems @ [regexp_lang_cat,regexp_lang_or,LIST_UNION_def,IN_dot,not_in_chset,strlen_eq])
+  >> rw_tac list_ss [dec_dms_def,optionTheory.THE_DEF,PULL_EXISTS]
+  >> rw_tac list_ss [enc_dms_def, enc_degrees_def, enc_minutes_def, enc_seconds_def]
+  >> qexists_tac `[c2 ; c3]`
+  >> qexists_tac `c`
+  >> qexists_tac `c1`
+  >> rw_tac list_ss [lem_eq,lower_enc,enc_bytes]
+  >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,CHR_ORD]
+  >> rw_tac list_ss [enc_bytes,stringTheory.CHR_ORD,LESS_DIV_EQ_ZERO]
+  >- (pop_assum (mp_tac o Q.AP_TERM `CHR`) >> rw_tac list_ss [CHR_ORD])
+  >- (rw_tac bool_ss [Once ADD_SYM,Once MULT_SYM]
+      >> rw_tac arith_ss [MOD_MULT,CHR_ORD])
+  >- (rw_tac bool_ss [Once ADD_SYM,Once MULT_SYM]
+      >> rw_tac arith_ss [DIV_MULT,CHR_ORD])
+  >- rw_tac arith_ss [Once (GSYM MOD_PLUS),CHR_ORD]
+  >- (rw_tac arith_ss [ADD_DIV_RWT,LESS_DIV_EQ_ZERO,CHR_ORD]
+      >> pop_assum (mp_tac o Q.AP_TERM `CHR`) >> rw_tac list_ss [CHR_ORD])
 );
-
-val list_len_lemA = Q.prove
-(`!L1 L2 L3 h1 h2 h3 h4. 
-    1 <= LENGTH L1 /\ 1 <= LENGTH L2 /\ 2 <= LENGTH L3 
-    ==> 
-    ((L1 ++ L2 ++ L3 = [h1;h2;h3;h4])
-    <=>
-    ([h1] = L1) /\
-    ([h2] = L2) /\
-    ([h3;h4] = L3))`,
- metis_tac [list_len_lem]);
-
-
-val AGREE_PROP_AGAIN_A = Q.store_thm
-("AGREE_PROP_AGAIN_A",
- `!m:dms. good_dms m <=> enc_dms(m) IN regexp_lang ^dms_regexp_term`,
- rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
-	   [regexp_lang_cat,regexp_lang_or,LIST_UNION_def,
-            enc_dms_def, enc_degrees_def, enc_minutes_def, enc_seconds_def,EQ_IMP_THM]
- >> full_simp_tac bool_ss [Once (GSYM STRCAT_ASSOC)]
- >- good_imp_accept_tac
- >- (imp_res_tac string_in_lang_len
-     >> full_simp_tac list_ss [in_chset]
-     >> full_simp_tac list_ss [list_len_lemA,lower_enc]
-     >> full_simp_tac list_ss [ilem1A,ilem2A,ilem3A,ilem4A,ilem5A,ilem6A]
-     >> `m.degrees <= 90 /\ m.minutes <= 59` by metis_tac [dec_enc,good_dms_def]
-     >> `m.seconds = dec (STRING c (STRING d ""))` by metis_tac [dec_enc]
-     >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,good_dms_def])
-);
-
-val AGREE_PROP_AGAIN_B = Q.store_thm
-("AGREE_PROP_AGAIN_B",
- `!m:dms. good_dms m <=> enc_dms(m) IN regexp_lang ^dms_regexp_term`,
- rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
-	   [regexp_lang_cat,regexp_lang_or,LIST_UNION_def,
-            enc_dms_def, enc_degrees_def, enc_minutes_def, enc_seconds_def,EQ_IMP_THM]
- >> full_simp_tac bool_ss [Once (GSYM STRCAT_ASSOC)]
- >- good_imp_accept_tac
- >- (imp_res_tac string_in_lang_len
-     >> full_simp_tac list_ss [in_chset]
-     >> full_simp_tac list_ss [list_len_lemA,lower_enc]
-     >> full_simp_tac list_ss [ilem1A,ilem2A,ilem3A,ilem4A,ilem5A,ilem6A]
-     >> `m.degrees <= 90 /\ m.minutes <= 59` by metis_tac [dec_enc,good_dms_def]
-     >> `m.seconds = dec (STRING c (STRING d ""))` by metis_tac [dec_enc]
-     >> full_simp_tac list_ss [dec_def, l2n_def,ord_mod_256,good_dms_def])
-);
-
-rw_tac list_ss [IN_dot,ilem1A,ilem2A,ilemDOT,ilem3B,ilem4A,ilem5A,dec_enc];
-
-(*
-val AGREE_PROP = Q.store_thm
-("AGREE_PROP",
- `!s. s IN regexp_lang ^dms_regexp_term ==> good_dms (the (dec_dms s))`,
-);
-*)
 
 val _ = export_theory();
  

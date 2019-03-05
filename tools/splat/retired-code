@@ -266,3 +266,104 @@ fun declare_hol_filter_goal (fname,regexp_tm,encode_def, decode_def, inversion, 
 
         val _ =  List.app declare_hol_filter_goal filter_goals
 *)
+
+val ilem3B = Q.prove
+(`!s. s IN regexp_lang 
+             (Cat
+                 (Chset
+                    (Charset 0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw
+                       0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFFFFFw))
+                 (Chset (Charset 0x7FFFFEw 0w 0w 0w)))
+      <=> 
+      (LENGTH s = 2) /\ dec s < 5888`,
+ rw_tac list_ss (ilems @ [regexp_lang_cat,IN_dot,strlen_eq,EQ_IMP_THM,dec_def])
+ >> rw_tac list_ss []
+ >- full_simp_tac list_ss [l2n_def,ord_mod_256]
+ >- (qexists_tac `[c1]` >> qexists_tac `[c2]`
+     >> full_simp_tac list_ss [l2n_def,ord_mod_256,ORD_BOUND]));
+
+val ilem3C = Q.prove
+(`!s. s IN regexp_lang 
+            (Cat (Chset
+                    (Charset 0xFFFFFFFFFFFFFFFFw 0xFFFFFFFFFFFFw 0w 0w))
+                    (Chset (Charset 0x800000w 0w 0w 0w)))
+      <=> 
+      (LENGTH s = 2) /\ 5888 <= dec s /\ dec s < 6000`,
+ rw_tac list_ss [regexp_lang_cat,IN_dot,ilem5A,ilem6A,strlen_eq,
+		 decide ``x:num < 6000 <=> x <= 5999``,dec_def,EQ_IMP_THM]
+  >> full_simp_tac list_ss [l2n_def,ord_mod_256]
+  >> (qexists_tac `[c1]` >> qexists_tac `[c2]`
+      >> full_simp_tac list_ss [l2n_def, ord_mod_256]
+      >> `ORD c1 < 256 /\ ORD c2 < 256` by metis_tac [ORD_BOUND]
+      >> `ORD c2 = 23` by decide_tac
+      >> decide_tac)
+);
+
+val list_len_lem = Q.prove
+(`!L1 L2 L3 h1 h2 h3 h4. 
+    1 <= LENGTH L1 /\ 1 <= LENGTH L2 /\ 2 <= LENGTH L3 
+    ==> 
+    ((L1 ++ L2 ++ L3 = [h1;h2;h3;h4])
+    <=>
+    (L1 = [h1]) /\
+    (L2 = [h2]) /\
+    (L3 = [h3;h4]))`,
+ simp_tac list_ss [EQ_IMP_THM]
+  >> map_every Cases_on [`L1`, `L2`, `L3`]
+  >> full_simp_tac list_ss [qdecide `2 <= SUC n <=> 0 < n`]
+  >> Cases_on `t''` >> full_simp_tac list_ss []
+  >> rpt gen_tac
+  >> disch_then (fn th => assume_tac th >> assume_tac (Q.AP_TERM `LENGTH` th))
+  >> Cases_on `t` >> full_simp_tac list_ss []
+  >> Cases_on `t'` >> full_simp_tac list_ss []);
+
+val list_len_lemA = Q.prove
+(`!L1 L2 L3 h1 h2 h3 h4. 
+    1 <= LENGTH L1 /\ 1 <= LENGTH L2 /\ 2 <= LENGTH L3 
+    ==> 
+    ((L1 ++ L2 ++ L3 = [h1;h2;h3;h4])
+    <=>
+    ([h1] = L1) /\
+    ([h2] = L2) /\
+    ([h3;h4] = L3))`,
+ metis_tac [list_len_lem]);
+
+val in_chset_str = Q.prove
+(`!s cs. s IN regexp_lang(Chset cs) ==> ?a. s = [a]`,
+ rw_tac (list_ss ++ PRED_SET_ss) [regexp_lang_def]
+ >> rw_tac list_ss []);
+ 
+val string_in_lang_len = Q.prove
+(`!s cs1 cs2 cs3 cs4 cs5 cs6.
+     s IN regexp_lang (Chset cs1) dot
+          regexp_lang (Chset cs2) dot
+          ((regexp_lang (Chset cs3) dot regexp_lang (Chset cs4))
+           UNION
+	   (regexp_lang (Chset cs5) dot regexp_lang (Chset cs6)))
+	 ==> ?a b c d. s = [a;b;c;d]`,
+ rw_tac (list_ss ++ PRED_SET_ss) [IN_dot]
+ >> imp_res_tac in_chset_str
+ >> rw_tac list_ss []);
+
+val strcat_enc2_in_chset = Q.prove
+(`!n cs1 cs2 s L. 
+    n < 65536 ==>
+    (STRCAT (enc 2 n) s 
+       IN regexp_lang (Chset cs1) dot 
+          regexp_lang (Chset cs2) dot L
+       <=> 
+    enc 2 n IN regexp_lang (Chset cs1) dot regexp_lang (Chset cs2) 
+    /\ s IN L)`,
+ rw_tac (list_ss ++ pred_setLib.PRED_SET_ss) 
+        [regexp_lang_def,EQ_IMP_THM,IN_dot,enc_bytes]
+ >> full_simp_tac list_ss []
+ >- (qexists_tac `[CHR c]`
+     >> qexists_tac `[CHR c']`
+     >> rw_tac list_ss []
+     >> metis_tac [])
+ >- (qexists_tac `[CHR c]`
+     >> qexists_tac `CHR c' :: s`
+     >> rw_tac list_ss []
+     >- metis_tac []
+     >- metis_tac [STRCAT_EQNS])
+);
