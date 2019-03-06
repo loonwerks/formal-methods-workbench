@@ -28,6 +28,9 @@ val filter_defs_and_props = map splatLib.filter_correctness (#4 logic_defs);
 val [{name,regexp,encode_def,decode_def,
       inversion, correctness, implicit_constraints}] = filter_defs_and_props;
 
+val dfa = regexpLib.matcher regexpLib.SML regexp;
+PolyML.objSize (#table dfa);
+
 val SOME implicit_constraints_def = implicit_constraints;
 
 val (_ :: _ :: 
@@ -109,48 +112,6 @@ val inversion_thm = store_thm
      EVAL_TAC)
 );
 
-
--- TODO: (a) autogenerate the destructor theorems in splatScript and install in codingMap
---       (b) calculate all (sub-)records, find their component-equality theorems, and
---           invoke them at the right place in the tactic scheme.
---
-
-val inversion_thm = store_thm
-("inversion",
- inversion,
- CONV_TAC (RENAME_VARS_CONV ["r"])
- >> rw_tac list_ss [decode_def, encode_def,good_command_def,
-      implicit_constraints_def, good_map_def,good_coordinate_def,good_pattern_def]
- >> `(?p1 p2 p3 p4 p5 p6 p7 p8. enci 8 r.header.src = [p1;p2;p3;p4;p5;p6;p7;p8]) /\
-     (?q1 q2 q3 q4 q5 q6 q7 q8. enci 8 r.header.dst = [q1;q2;q3;q4;q5;q6;q7;q8]) /\
-     (?u. enc_bool r.header.HMAC = [u]) /\
-     (?a.     enci 1 r.map.wp1.latitude  = [a])   /\
-     (?b c.   enci 2 r.map.wp1.longitude = [b;c]) /\
-     (?d e.   enci 2 r.map.wp1.altitude  = [d;e]) /\
-     (?a1.    enci 1 r.map.wp2.latitude  = [a1])  /\
-     (?b1 c1. enci 2 r.map.wp2.longitude = [b1;c1]) /\
-     (?d1 e1. enci 2 r.map.wp2.altitude  = [d1;e1]) /\
-     (?a2.    enci 1 r.map.wp3.latitude  = [a2])    /\
-     (?b2 c2. enci 2 r.map.wp3.longitude = [b2;c2]) /\
-     (?d2 e2. enci 2 r.map.wp3.altitude  = [d2;e2]) /\
-     (?a3.    enci 1 r.map.wp4.latitude  = [a3])    /\
-     (?b3 c3. enci 2 r.map.wp4.longitude = [b3;c3]) /\
-     (?d3 e3. enci 2 r.map.wp4.altitude  = [d3;e3]) /\
-     (?f.     enc_FlightPattern r.pattern = [f])`
-      by (rpt conj_tac 
-          >> ((FIRST (map match_mp_tac (CONJUNCTS enci_bytes))
-                   >> rw_tac int_ss [] >> intLib.ARITH_TAC)
-              ORELSE
-                (rw_tac std_ss [fetch "-" "enc_FlightPattern_def",
-                                splatTheory.enc_bool_def] 
-                    >> metis_tac [FlightPattern_bound,bool_bound,enc_bytes])))
- >> rw_tac list_ss [fetch "-" "Command_component_equality",
-                    fetch "-" "CASE_MsgHeader_component_equality",
-                    fetch "-" "Map_component_equality",
-                    fetch "-" "Coordinate_component_equality"]
- >> rpt (qpat_x_assum `_ = _` (SUBST_ALL_TAC o SYM))
- >> FIRST (metis_tac dec_encs :: map match_mp_tac (CONJUNCTS deci_encis))
- >> intLib.ARITH_TAC);
 		 
 val _ = Parse.overload_on("++",``list$APPEND``);
 

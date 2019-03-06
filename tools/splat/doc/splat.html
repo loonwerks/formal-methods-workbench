@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Konrad Slind, Trusted Systems Group, Collins Aerospace" />
+  <title>Semantic Properties for Language and Automata Theory (SPLAT)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="mypandoc.css" type="text/css" />
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+<h1 class="title"><a href="splat.pdf" target="_blank">Semantic Properties<br />
+for<br />
+Language and Automata Theory (SPLAT)</a></h1>
+<h2 class="author">Konrad Slind, Trusted Systems Group, Collins Aerospace</h2>
+<h3 class="date">February 7, 2019</h3>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a><ul>
+<li><a href="#language-theory-and-encoding">Language Theory and Encoding</a></li>
+<li><a href="#regular-expressions">Regular expressions</a></li>
+</ul></li>
+<li><a href="#properties-meet-encodings">Properties meet Encodings</a><ul>
+<li><a href="#example">Example</a></li>
+</ul></li>
+<li><a href="#encodings-for-common-types">Encodings for common types</a></li>
+<li><a href="#interval-properties-and-regexps">Interval Properties and Regexps</a><ul>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#record-properties">Record properties</a></li>
+</ul></li>
+<li><a href="#a-record-message-package">A record message package</a><ul>
+<li><a href="#property-discussion">Property discussion</a></li>
+</ul></li>
+<li><a href="#proofs-and-automation">Proofs and Automation</a></li>
+<li><a href="#property-enhanced-lexing">Property-enhanced lexing</a></li>
+<li><a href="#further-issues">Further Issues</a><ul>
+<li><a href="#packed-record-formats">Packed Record Formats</a></li>
+<li><a href="#dependent-records">Dependent Records</a></li>
+</ul></li>
+<li><a href="#related-work">Related Work</a></li>
+</ul>
+</div>
+<p><strong>Draft Status</strong>. This document is a work in progress.</p>
+<h1 id="introduction">Introduction</h1>
+<p><strong>SPLAT</strong> (Semantic Properties for Language and Automata Theory) designates the application of language theory—which is based on <em>strings</em>—to help enforce, formulate and prove properties over a collection of other useful types, such as numbers, enumerations, records, and arrays. In particular, our focus is on applying tools and concepts from language theory to help automate the specification, creation, and verification of practical programs. As one example of this approach, we employ regular expressions to model and implement arithmetic constraints. This has been applied to the task of automating the generation and proof of correctness of encoders and decoders for network message formats.</p>
+<h2 id="language-theory-and-encoding">Language Theory and Encoding</h2>
+<p>The basic notions of theoretical computer science are often formulated in terms of strings of symbols drawn from an alphabet: automata, grammars, and Turing machines all use strings as their main data structure. On the practical side, the theory of grammars and regular expressions provides a solid basis for tools such as lexer and parser generators. In order to bridge the gap between strings and the rich universe of data structures used in computer science, <em>encoding</em> and <em>decoding</em> is employed. For example, showing the existence of a universal Turing machine requires an encoding/decoding scheme for the strings (Turing machines) being taken as arguments by the universal machine. In fact, the activity of packing data into a string format and then unpacking it is pervasive, not only in theoretical computer science, but also in practical contexts, <em>e.g.</em> data compression, data encryption, sending structured data over a network, <em>etc</em>.</p>
+<h2 id="regular-expressions">Regular expressions</h2>
+<p>(We are building on previously reported [safecomp2016] work in HOL4 providing a theory of regular expressions and a verified translator of <span class="math inline">\({\mathsf{regexp}}\)</span>s to table-driven DFAs (deterministic finite state automata). The formalization is available in the HOL4 distribution.)</p>
+<p>Let <span class="math inline">\(\mathbb{S}\)</span> be the set of finite strings over an alphabet <span class="math inline">\(\Sigma\)</span>. Throughout, we assume <span class="math inline">\(\Sigma\)</span> is the 256 ASCII characters. This supports the use of <span class="math inline">\({\mathsf{char}}\;{\mathsf{list}}\)</span> as a representation for <span class="math inline">\(\mathbb{S}\)</span>, allowing the use of some list operations on elements of <span class="math inline">\(\mathbb{S}\)</span>. A regular expression over the alphabet designates a set of strings <span class="math inline">\(\mathbb{S} \to {\mathsf{bool}}\)</span>. We use the following datatype to represent regular expressions:</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+{\mathsf{regexp}} &amp; ::= &amp; {\mathsf{Chset}}\; {\mathsf{w64}}\;{\mathsf{w64}}\;{\mathsf{w64}}\;{\mathsf{w64}} \\
+     &amp; \mid &amp; {\mathsf{Cat}}\; {\mathsf{regexp}}\; {\mathsf{regexp}} \\
+     &amp; \mid &amp; {\mathsf{Or}} \; {\mathsf{regexp}}\;{\mathsf{list}} \\
+     &amp; \mid &amp; {\mathsf{Star}}\; {\mathsf{regexp}} \\
+     &amp; \mid &amp; {\mathsf{Neg}}\;  {\mathsf{regexp}} 
+\end{array}
+\]</span></p>
+<p><span class="math inline">\({\mathsf{Chset}}\)</span> represents a <em>charset</em>: a 256-wide bitset capable of representing any subset of <span class="math inline">\(\Sigma\)</span>. We have chosen to represent bitsets with four-tuples of 64-bit numbers. <span class="math inline">\({\mathsf{Cat}}\)</span> is the concatenation operator, <span class="math inline">\({\mathsf{Star}}\)</span> is Kleene star, the <span class="math inline">\({\mathsf{Or}}\)</span> operator is an <em>n</em>-ary disjunction, and <span class="math inline">\({\mathsf{Neg}}\)</span> is a complement operator.</p>
+<p>The semantics of regular expressions inteprets a <span class="math inline">\({\mathsf{regexp}}\)</span> as a set of strings: <span class="math display">\[
+\begin{array}{rcl}
+{{\mathcal L}({{\mathsf{Chset}}\; \mathit{cset}})} &amp; = &amp; {\{ {[c] \mid c \in \mathit{cset}} \}} \\
+{{\mathcal L}({{\mathsf{Cat}}\; r_1\;r_2})}  &amp; = &amp; {{\mathcal L}({r_1})} \cdot {{\mathcal L}({r_2})} \\
+{{\mathcal L}({{\mathsf{Or}} \; [r_1,\ldots,r_n]})} &amp; = &amp; {{\mathcal L}({r_1})} \cup \cdots \cup {{\mathcal L}({r_n})}\\
+{{\mathcal L}({{\mathsf{Star}}\;r})} &amp; = &amp; ({{\mathcal L}({r})})^{*} \\
+{{\mathcal L}({{\mathsf{Neg}}\; r})} &amp; = &amp; {\mathsf{COMPL}}({{\mathcal L}({r})})
+\end{array}
+\]</span> where concatenation (<span class="math inline">\(-\cdot-\)</span>), Kleene star <span class="math inline">\((-)^{*}\)</span>, and set complement <span class="math inline">\({\mathsf{COMPL}}(-)\)</span> are pre-defined operators in a theory including sets and formal languages. It is also useful to have a function <span class="math inline">\({\mathsf{charset\_of}} : \mathbb{N}\;{\mathsf{list}} \to \mathit{cset}\)</span> that creates a charset given a list of numbers less than 256.</p>
+<p>Some common notation and derived operations in this representation: <span class="math display">\[
+\begin{array}{rcl}
+r_1 + \cdots + r_n &amp; = &amp; {\mathsf{Or}}[r_1,\ldots,r_n] \\
+r_1 r_2 &amp; = &amp; {\mathsf{Cat}}\;r_1 \; r_2 \\
+{[m-n]} &amp; = &amp; {\mathsf{Chset}}({\mathsf{charset\_of}} \; [m, m+1, \ldots, n-1,n]) \quad (\text{where}\; 0 \leq m \leq n \leq 255) \\
+{[m]} &amp; = &amp; [m-m] \\
+\bullet &amp; = &amp; [0-255] \\
+\emptyset &amp; = &amp; {\mathsf{Chset}}({\mathsf{charset\_of}} \; []) \\
+\varepsilon &amp; = &amp; {\mathsf{Star}}(\emptyset) \\
+{\mathsf{And}}\;r_1\;r_2 &amp; = &amp; {\mathsf{Neg}}({\mathsf{Or}}[{\mathsf{Neg}}\; r_1,  {\mathsf{Neg}}\; r_2] \\
+{\mathsf{Diff}}\;r_1\;r_2 &amp; = &amp; {\mathsf{And}}\;r_1\; ({\mathsf{Neg}}\;r_2)
+\end{array}
+\]</span> The “dot” charset (<span class="math inline">\(\bullet\)</span>) is the full charset that matches every one-element string; <span class="math inline">\(\emptyset\)</span> matches no string; and <span class="math inline">\(\varepsilon\)</span> is the empty string.</p>
+<h1 id="properties-meet-encodings">Properties meet Encodings</h1>
+<p>Now we come to the main focus of this paper: statements of the form <span class="math display">\[
+  x \in P \iff {\mathsf{encode}}\;x \in {{\mathcal L}({{{\mathsf{regexp\_of}}\;{P}}})}
+\]</span> where <span class="math inline">\(P:\tau\to{\mathsf{bool}}\)</span> represents a predicate on type <span class="math inline">\(\tau\)</span>, <span class="math inline">\({\mathsf{encode}} : \tau \to \mathbb{S}\)</span> maps items of type <span class="math inline">\(\tau\)</span> to strings, and <span class="math inline">\({\mathsf{regexp\_of}}\;P\)</span> is an abstract operation that translates <span class="math inline">\(P\)</span> into an “equivalent” regular expression. Rephrasing the statement as: <span class="math display">\[
+  P: \tau\to{\mathsf{bool}} = {{\mathcal L}({{{\mathsf{regexp\_of}}\;{P}}})} \circ {\mathsf{encode}}
+\]</span> more directly expresses the <strong>SPLAT</strong> setting, namely, “what useful properties can be expressed when we stick an encoder in front of some formal language machinery?” The main practical benefit for us comes from being able to compile the <span class="math inline">\({{\mathsf{regexp\_of}}\;{(P)}}\)</span> expression to a DFA, thus giving an efficient, table-driven, implementation of <span class="math inline">\(P\)</span>.</p>
+<p><strong>Remark.</strong> The <span class="math inline">\({{\mathsf{regexp\_of}}}\)</span> operation depends on context. In some cases, <em>e.g.</em> intervals as below, there is a syntax-driven algorithm; in some cases it is a matter of human insight. Further, whether <span class="math inline">\({{\mathsf{regexp\_of}}}\)</span> is <em>shallowly</em> or <em>deeply</em> embedded is an important consideration, one that we gloss over for now.</p>
+<p><strong>Remark.</strong> <span class="math inline">\({{\mathsf{regexp\_of}}}\)</span> is currently limited to predicates expressible with regular languages. Moving up to grammars, such as context-free grammars, gives more expressive power, and would require a <span class="math inline">\({\mathsf{grammar\_of}}\)</span> operator (along with a modified definition of <span class="math inline">\({{\mathcal L}({-})}\)</span>) in the statement, <em>i.e.</em>: <span class="math display">\[ 
+x \in P \iff {\mathsf{encode}}\;x \in {{\mathcal L}({{\mathsf{grammar\_of}}\; P})}
+\]</span></p>
+<p><strong>Question.</strong> To what extent can formula constructions (conjunction, disjunction, implication, <em>etc</em>.) over the predicates be paralleled by regular expression constructions on the right? As a start, we can prove the following theorems: <span class="math display">\[
+\begin{array}{rcl}
+\neg{P(x)} &amp; \iff &amp; {\mathsf{encode}}(x) \notin {{\mathcal L}({{{\mathsf{regexp\_of}}\;{P}}})} \\
+P(x) \land Q(x) &amp; \iff &amp; {\mathsf{encode}}(x) \in {{\mathcal L}({{\mathsf{And}}\;({{\mathsf{regexp\_of}}\;{P}})\;({{\mathsf{regexp\_of}}\;{Q}})})} \\
+P(x) \lor Q(x) &amp; \iff &amp; {\mathsf{encode}}(x) \in {{\mathcal L}({{\mathsf{Or}}\;[{{\mathsf{regexp\_of}}\;{P}},{{\mathsf{regexp\_of}}\;{Q}}]})} \\
+P(x) {\;\Rightarrow\;}Q(x) &amp; \iff &amp; {\mathsf{encode}}(x) \in {{\mathcal L}({{\mathsf{Or}}\;[{\mathsf{Neg}}({{\mathsf{regexp\_of}}\;{P}}),{{\mathsf{regexp\_of}}\;{Q}}]})} \\
+P(x) \land Q(y) &amp; \iff &amp; {\mathsf{encode}}(x){\mathsf{encode}}(y) \in {{\mathcal L}({{\mathsf{Cat}}\;({{\mathsf{regexp\_of}}\;{P}})\;({{\mathsf{regexp\_of}}\;{Q}})})}
+\end{array}
+\]</span> Further work is needed to see whether, <em>e.g.</em>, Presburger formulas could be encoded. (It is entirely plausible that this has already been reported in the vast literature on formal languages.)</p>
+<h3 id="example">Example</h3>
+<p>Consider the “even-number” predicate <span class="math inline">\({\mathsf{even}} : \mathbb{N}\to{\mathsf{bool}}\)</span>. Let <span class="math inline">\(\mathit{cset} = {\mathsf{charset\_of}}\;[0,2,4, \ldots, 254]\)</span> be the character set corresponding to the non-negative even numbers less than 256. Assuming <span class="math display">\[
+{{\mathsf{regexp\_of}}\;{{\mathsf{even}}}} = 
+{\mathsf{Cat}}\; ({\mathsf{Chset}}\;\mathit{cset})\;({\mathsf{Star}}\;\bullet),
+\]</span> (the encoding is in LSB format), we construct the formula <span class="math display">\[
+{\mathsf{even}}(n) \iff {\mathsf{encode}}(n) \in {{\mathcal L}({{\mathsf{Cat}}\;
+({\mathsf{Chset}}\;\mathit{cset})\; ({\mathsf{Star}}\;\bullet)})}
+\]</span> This can be proven by reasoning with the regular language semantics, plus the encodings defined below. The regular expression compiles to a 3-state DFA.</p>
+<h1 id="encodings-for-common-types">Encodings for common types</h1>
+<p>We now discuss a collection of common types and their encoding and decoding functions. There is of course a wide variety of encoding schemes. Our approach is to use binary encodings, reducing higher level types to a base encoder/decoder for natural numbers.</p>
+<ul>
+<li><p><strong>Natural numbers.</strong> First, define the map <span class="math inline">\({\mathsf{n2l}} : \mathbb{N}\to \mathbb{N}\;{\mathsf{list}}\)</span> from a number to its little-endian base-256 representation, and the inverse. <span class="math display">\[
+\begin{array}{lcl}
+{\mathsf{n2l}}(n) &amp; = &amp;
+   {{\mathsf{if}}\; {n=0} \;{\mathsf{then}}\; {[]} \;{\mathsf{else}}\; {{{({{n}\;{\mathsf{mod}}\; 256})}\, :: \,{{\mathsf{n2l}}\; ({{n}\;{\mathsf{div}}\; 256})}}}} \\
+{\mathsf{l2n}}\;[] &amp; = &amp; 0 \\
+{\mathsf{l2n}}\;({{h}\, :: \,{t}}) &amp; = &amp; h + 256 * {\mathsf{l2n}}(t) \\
+\end{array}
+\]</span> Then we have <span class="math inline">\(\vdash \forall n.\; {\mathsf{l2n}} ({\mathsf{n2l}}\; n) = n\)</span>. Big-endian versions are similarly defined. Another issue is <em>padding</em> to a specified width. Using a builtin operator, <span class="math inline">\({\mathsf{pad\_right}}\)</span>, we can define a basic number encoder <span class="math inline">\({\mathsf{enc}} : \mathbb{N} \to \mathbb{N} \to \mathbb{S}\)</span> and the corresponding decoder <span class="math inline">\({\mathsf{dec}} : \mathbb{S}\to\mathbb{N}\)</span>: <span class="math display">\[
+\begin{array}{rcl}
+{\mathsf{layout}}\; n \; \mathit{width} &amp; = &amp; 
+   {\mathsf{pad\_right}}\; 0\; \mathit{width}\; ({\mathsf{n2l}}\; n) \\
+{\mathsf{enc}}\; w\; n &amp; = &amp; 
+{\mathsf{map}}\; {\mathsf{chr}}\; ({\mathsf{layout}}\; n\; w) \\
+{\mathsf{dec}}\; s &amp; = &amp; {\mathsf{l2n}}\; ({\mathsf{map}}\; {\mathsf{ord}}\; s)
+\end{array}
+\]</span> Then we have <span class="math inline">\(\vdash \forall n\;w.\; {\mathsf{dec}} ({\mathsf{enc}}\; w\; n) = n\)</span>.</p></li>
+<li><p><strong>Integers.</strong> Encoding of integers can be expressed by adding an encoding to map from integers to natural numbers. Twos complement representation is most commonly used. At the word level, the twos complement operation on negative integers is “flip each bit and add 1”. But it is expressible at the level of integers and natural numbers since an <span class="math inline">\((n-1)\)</span>-bit integer added to its twos complement equals <span class="math inline">\(2^n\)</span>. Thus <span class="math display">\[
+{\mathsf{i2n}}_N : {\{ {i \in \mathbb{Z} \mid -2^{N-1} \leq i &lt; 2^{N-1}} \}} 
+         \to {\{ {k \in \mathbb{N} \mid 0 \leq k &lt; 2^{N}} \}}
+\]</span> specifies a map from an integer to its corresponding natural number defined by <span class="math display">\[
+{\mathsf{i2n}}_N (i) = {{\mathsf{if}}\; {0 \leq i &lt; 2^{N-1}} \;{\mathsf{then}}\; {{\mathsf{Nat}}(i)} \;{\mathsf{else}}\; {2^{N} - {\mathsf{Nat}}({\mathsf{Abs}}(i))}}
+\]</span> (<span class="math inline">\({\mathsf{Nat}}\)</span> maps from non-negative integers to <span class="math inline">\(\mathbb{N}\)</span>; <span class="math inline">\({\mathsf{Int}}\)</span> maps from <span class="math inline">\(\mathbb{N}\)</span> to non-negative integers; and <span class="math inline">\({\mathsf{Abs}}\)</span> is an absolute value operator that maps integers to non-negative integers.) The inverse function is <span class="math display">\[
+{\mathsf{n2i}}_N (n) = {{\mathsf{if}}\; {n &lt; 2 ^{N-1}} \;{\mathsf{then}}\; {{\mathsf{Int}}(n)} \;{\mathsf{else}}\; {-{\mathsf{Int}}(2^N - n)}}
+\]</span> An encoder and decoder for integers is then directly obtained: <span class="math display">\[
+\begin{array}{l}
+{\mathsf{enci}}\; w\; i = {\mathsf{enc}}\; w\; ({\mathsf{i2n}}\; (8w)\; i) \\
+{\mathsf{deci}}\;w\; s = {\mathsf{n2i}}\; (8w)\; ({\mathsf{dec}}\; s)
+\end{array}
+\]</span> which enjoy the inversion property, provided integer <em>i</em> is representable: <span class="math display">\[
+\vdash 0 &lt; w \land -{\mathsf{Int}}(2^{8w - 1}) \leq i \land i &lt; {\mathsf{Int}}(2^{8w - 1})
+   {\;\Rightarrow\;}{\mathsf{deci}}\; w\; ({\mathsf{enci}}\; w\; i) = i
+\]</span> <strong>Note.</strong> <span class="math inline">\({\mathsf{enci}}(i)\)</span> renders <span class="math inline">\(i\)</span> into twos complement representation, thus supporting the standard bit format for signed integers.</p></li>
+<li><p><strong>Enumerations.</strong> An enumerated type can be encoded by providing a map from elements of the type to <span class="math inline">\(\mathbb{N}\)</span>. For example the type of booleans give rise to maps <span class="math display">\[
+\begin{array}{ll}
+{\mathsf{num\_of\_bool}} \; {\mathsf{false}} = 0 &amp; {\mathsf{num\_of\_bool}} \; {\mathsf{true}} = 1  \\
+{\mathsf{bool\_of\_num}} \; 0 = {\mathsf{false}} &amp; {\mathsf{bool\_of\_num}} \; 1 = {\mathsf{true}}  \\
+\end{array}
+\]</span> which gives the basis for the encoder and decoder: <span class="math display">\[
+\begin{array}{l} 
+{\mathsf{enc\_bool}}\; b = {\mathsf{enc}}\; 1\; ({\mathsf{num\_of\_bool}}\; b) \\
+ {\mathsf{dec\_bool}}\; s = {\mathsf{bool\_of\_num}}\; ({\mathsf{dec}}\; s)
+\end{array}
+\]</span> Trivially, we have <span class="math inline">\(\vdash \forall b.\; {\mathsf{dec\_bool}} ({\mathsf{enc\_bool}}\; b) = b\)</span>.</p></li>
+<li><p><strong>Records.</strong> Sets of records of a given type <span class="math inline">\({\mathsf{recd}}\)</span> can be encoded by fixing an order on the fields and concatenating their encodings. Thus given record type <span class="math display">\[
+   {\mathsf{recd}} = \{ f_1 : \tau_1; \ldots ; f_n : \tau_n\}
+\]</span> and encoders for <span class="math inline">\(\tau_1,\ldots, \tau_n\)</span>, we can define <span class="math display">\[
+   {\mathsf{encode\_recd}}(x) = {\mathsf{encode}}_{\tau_1}(x.f_1) \cdots {\mathsf{encode}}_{\tau_n}(x.f_n)
+\]</span></p></li>
+<li><p><strong>Arrays.</strong> A <span class="math inline">\(\tau\;{\mathsf{array}}\)</span> of size <span class="math inline">\(K\)</span> can be encoded by concatenating the result of applying the encoder for <span class="math inline">\(\tau\)</span> <span class="math inline">\(K\)</span> times. While this is conceptually simple, the resulting regular expressions for large or even medium size arrays will probably be too large for our tools.</p></li>
+<li><p><strong>Fixed- and variable-width encodings.</strong> So far we have dealt solely with data of fixed size. Techniques for encoding variable-width data, such as lists or trees, and for handling polymorphic types, have been explored in a variety of settings. For theorem proving, focusing on polytypism, see “Applications of polytypism in theorem proving” (Slind and Hurd, 2003) and similar work in other proof systems.</p></li>
+</ul>
+<h1 id="interval-properties-and-regexps">Interval Properties and Regexps</h1>
+<p>Now that we have covered an approach to data encoding, we discuss the encoding of data properties by regular expressions. The <span class="math inline">\({\mathsf{even}}(n)\)</span> predicate from our initial example was created in an <em>ad hoc</em> manner, but we seek some properties that can be algorithmically translated to regexps. One of the most useful for us so far has been <em>intervals</em>.</p>
+<p>An interval <span class="math inline">\([\mathit{lo} ,\mathit{hi}]\)</span> is defined to be <span class="math inline">\({\{ {n \in \mathbb{N} \mid \mathit{lo} \leq n \leq \mathit{hi}} \}}\)</span>; another way of expressing it is as a property <span class="math inline">\(\lambda n. \mathit{lo} \leq n \land n \leq \mathit{hi}\)</span>. An interval is mapped to a regular expression by an algorithm <span class="math inline">\({{\mathsf{regexp\_of}}\;{[\mathit{lo},\mathit{hi}]}}\)</span> that proceeds in parallel on the base-256 representations given by <span class="math inline">\({\mathsf{reverse}} \circ {\mathsf{n2l}}\)</span>, <em>i.e</em>, following the MSB (most significant byte leftmost) format. However, the algorithm on the representations is quite detailed, and better insight is obtained by describing the transformations at the level of numbers. Let <span class="math inline">\(\mathbf{B} = 256\)</span> so that <span class="math display">\[
+\begin{array}{ll}
+\mathit{lo} = p {\mathbf{B}^{a}} + r_1 &amp; ; \quad r_1 &lt; {\mathbf{B}^{a}} \\
+\mathit{hi} = q {\mathbf{B}^{b}} + r_2 &amp; ; \quad r_2 &lt; {\mathbf{B}^{b}}
+\end{array}
+\]</span> The algorithm breaks large intervals down to unions of sub-intervals in such a way that regular expressions can be easily generated from the subintervals. Proceeding lexicographically on exponents, then factors, then remainders, there are essentially four ways for <span class="math inline">\(\mathit{lo} \leq \mathit{hi}\)</span> to hold:</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(a &lt; b\)</span>. The span between the exponents is split into one interval per intermediate exponent <span class="math display">\[
+ [\mathit{lo}, {\mathbf{B}^{a + 1}} -1] \cup 
+\underbrace{[{\mathbf{B}^{a + 1}}, {\mathbf{B}^{a + 2}} -1] \cup \cdots \cup [{\mathbf{B}^{b - 1}}, {\mathbf{B}^{b}} -1]}_{\text{exponent slices}}
+ \cup [{\mathbf{B}^{b}} ,\mathit{hi}]
+\]</span> An <em>exponent slice</em> interval <span class="math inline">\([{\mathbf{B}^{k}},{\mathbf{B}^{k+1}}-1]\)</span> is represented by the regexp <span class="math inline">\([1-255]\bullet^k\)</span>. This leaves the endpoint intervals <span class="math inline">\([\mathit{lo}, {\mathbf{B}^{a + 1}} -1]\)</span> and <span class="math inline">\([{\mathbf{B}^{b}} ,\mathit{hi}]\)</span>, each with a uniform exponent, which are dealt with by the next case.</p></li>
+<li><p><span class="math inline">\(a = b, p &lt; q\)</span>. The span between factors can also lead to splits: <span class="math display">\[
+[p{\mathbf{B}^{a}} + r_1,(p + 1){\mathbf{B}^{a}} -1 ] \cup\
+ \underbrace{[(p + 1){\mathbf{B}^{a}},q{\mathbf{B}^{a}} -1]}_{\text{factor slice}} \cup\ 
+[q {\mathbf{B}^{a}} ,q {\mathbf{B}^{a}} + r_2]
+\]</span> The <em>factor slice</em> interval <span class="math inline">\([(p+1) {\mathbf{B}^{k}},q{\mathbf{B}^{k}}-1]\)</span> is only defined when <span class="math inline">\(p+1 &lt; q\)</span> and is represented by the charset <span class="math inline">\([(p+1)-(q-1)]\)</span> followed by <span class="math inline">\(k\)</span> dots: <span class="math display">\[
+[(p+1)-(q-1)]\bullet^k .
+\]</span> This leaves the endpoint intervals <span class="math inline">\([p{\mathbf{B}^{a}} + r_1,(p + 1){\mathbf{B}^{a}} -1 ]\)</span> and <span class="math inline">\([q {\mathbf{B}^{a}} ,q {\mathbf{B}^{a}} + r_2]\)</span>, each with a uniform factor, which takes us to the next case.</p></li>
+<li><p><span class="math inline">\(a = b, p = q, r_1 \leq r_2\)</span>. In this case, the algorithm recurses on <span class="math inline">\([r_1,r_2]\)</span>, yielding regexps <span class="math inline">\(s_1, \ldots , s_k\)</span>, and we return <span class="math inline">\([p]s_1 + \cdots + [p]s_k\)</span>.</p></li>
+<li><p>The recursion bottoms out when <span class="math inline">\(\mathit{lo}\)</span> and <span class="math inline">\(\mathit{hi}\)</span> are less than 256, in which case the charset regexp <span class="math inline">\([\mathit{lo}-\mathit{hi}]\)</span> is returned.</p></li>
+</ol>
+<p><strong>Integer Intervals.</strong> Translation of integer intervals is accomplished by reduction to natural number intervals, based on the following case split (number of bytes is <span class="math inline">\(w\)</span>):</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(0 \leq \mathit{lo} \leq \mathit{hi}\)</span>. No translation needed; the interval is <span class="math inline">\({{\mathsf{regexp\_of}}\;{[\mathit{lo},\mathit{hi}]}}\)</span>.</p></li>
+<li><p><span class="math inline">\(\mathit{lo} &lt; 0 \leq \mathit{hi}\)</span>. A disjunction is made around 0. <span class="math display">\[
+{{\mathsf{regexp\_of}}\;{[\mathit{lo},\mathit{hi}]}} =
+{{\mathsf{regexp\_of}}\;{[2^{8w} + \mathit{lo}, 2^{8w} - 1]}} + {{\mathsf{regexp\_of}}\;{[0, \mathit{hi}]}}
+\]</span> There is a special case here, where <span class="math inline">\(\mathit{lo} = -2^{8w-1}\)</span> and <span class="math inline">\(\mathit{hi} = 2^{8w-1} - 1\)</span>, in which case <span class="math inline">\({{\mathsf{regexp\_of}}\;{[\mathit{lo},\mathit{hi}]}} = \bullet^{w}\)</span>.</p></li>
+<li><p><span class="math inline">\(\mathit{lo} \leq \mathit{hi} &lt; 0\)</span>. Both numbers are negative; we generate the interval from their twos complements. <span class="math display">\[
+{{\mathsf{regexp\_of}}\;{[\mathit{lo},\mathit{hi}]}} =
+{{\mathsf{regexp\_of}}\;{[2^{8w} + \mathit{lo}, 2^{8w} + \mathit{hi}]}}
+\]</span></p></li>
+</ol>
+<h3 id="examples">Examples</h3>
+<p>In the following the implementation prints regexps out in a format similar to the one used in this document. A charset may be expressed as a sequence of ranges <span class="math inline">\([(m_1 - n_1), ... , (m_k - n_k)]\)</span>, where <span class="math inline">\(m\)</span> and <span class="math inline">\(n\)</span> are written as decimal ASCII codes or as printable characters. Also, disjunction is expressed with <span class="math inline">\((- \mid -)\)</span>. The following are in MSB format.</p>
+<p>The interval <span class="math inline">\([-90,90]\)</span> generates the regexp</p>
+<pre><code>   [\166-\255] | [\000-Z]</code></pre>
+<p>This disjunction is on single charsets, so can be replaced by (and is, in the translation to DFA):</p>
+<pre><code>   [\000-Z\166-\255]</code></pre>
+<p>The interval <span class="math inline">\([-180,180]\)</span> is recognized by the regexp</p>
+<pre><code>   [\255][L-\255] | [\000][\000-\180]</code></pre>
+<p>The interval <span class="math inline">\([0,14000]\)</span> maps to</p>
+<pre><code>   [\000]. | [\001-5]. | [6][\000-\176]</code></pre>
+<p>A 5-state DFA is generated. The interval <span class="math inline">\([-2^{63}, 2^{63}-1]\)</span> maps to</p>
+<pre><code>   ........</code></pre>
+<p>A 10-state machine is generated. The interval <span class="math inline">\([123456789,9876543210]\)</span> generates the regexp:</p>
+<pre><code>   [\000][\007][[][\205][\021-\255] |
+   [\000][\007][[][\206-\255]. |
+   [\000][\007][\-\255].. |
+   [\000][\008-\255]... |
+   [\001].... |
+   [\002][\000]... |
+   [\002][\001-K]... |
+   [\002][L][\000].. |
+   [\002][L][\001-\175].. |
+   [\002][L][\176][\000]. |
+   [\002][L][\176][\001-\021]. |
+   [\002][L][\176][\022][\000-\234]</code></pre>
+<p>which translates to a DFA with 15 states.</p>
+<h2 id="record-properties">Record properties</h2>
+<p>Given record type <span class="math display">\[
+   {\mathsf{recd}} = \{ f_1 : \tau_1; \ldots ; f_n : \tau_n\}
+\]</span> and property <span class="math inline">\(P : {\mathsf{recd}} \to {\mathsf{bool}}\)</span> defined with field properties <span class="math inline">\(P_1, \ldots, P_n\)</span> by <span class="math display">\[
+   P(r) \Leftrightarrow P_1(r.f_1) \land \ldots \land P_n(r.f_n),
+\]</span> we can build <span class="math inline">\({{\mathsf{regexp\_of}}\;{(P)}}\)</span> as the concatenation <span class="math display">\[
+   {{\mathsf{regexp\_of}}\;{(P_1)}} \cdots {{\mathsf{regexp\_of}}\;{(P_n)}}
+\]</span> In our examples so far, the field properties have been intervals and subsets of enumerations.</p>
+<h1 id="a-record-message-package">A record message package</h1>
+<p>The modelling of record properties via regexps, as just outlined, gives us a useful level of abstraction for a package that takes high level specifications of records and generates encoder/decoder/filter implementations plus associated correctness proofs.</p>
+<p>In particular, given a declaration of record type <span class="math inline">\({\mathsf{recd}}\)</span> plus a predicate <span class="math inline">\(P : {\mathsf{recd}} \to {\mathsf{bool}}\)</span> over the fields of the record, we generate the following artifacts:</p>
+<ul>
+<li>a regexp <span class="math inline">\(\mathcal{R} = {{\mathsf{regexp\_of}}\;{P}}\)</span></li>
+<li>an encoding function <span class="math inline">\({\mathsf{encode}} : {\mathsf{recd}} \to \mathbb{S}\)</span></li>
+<li>a decoding function <span class="math inline">\({\mathsf{decode}} : \mathbb{S} \to {\mathsf{recd}}\;{\mathsf{option}}\)</span></li>
+<li>an inversion theorem showing that decoding inverts encoding for wellformed records</li>
+</ul>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~\vdash \forall r:{\mathsf{recd}}.\; P(r) {\;\Rightarrow\;}{\mathsf{decode}}({\mathsf{encode}}\; r) = {\mathsf{SOME}}\;r\)</span></p>
+<ul>
+<li>a correctness theorem showing that encodings of well-formed records are exactly in the language of <span class="math inline">\(\mathcal{R}\)</span>.</li>
+</ul>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~\vdash \forall r:{\mathsf{recd}}.\; P(r) \Leftrightarrow {\mathsf{encode}}(r) \in {{\mathcal L}({\mathcal{R}})}\)</span></p>
+<ul>
+<li>a deterministic finite state automaton (DFA) <span class="math inline">\(M\)</span> with the property that</li>
+</ul>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~\vdash \forall s:\mathbb{S}.\; s \in {{\mathcal L}({\mathcal{R}})} \Leftrightarrow {\mathsf{exec}}(M,s) = {\mathsf{true}}\)</span></p>
+<ul>
+<li>a theorem stating that DFA <span class="math inline">\(M\)</span> enforces property <span class="math inline">\(P\)</span>:</li>
+</ul>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~\vdash \forall r:{\mathsf{recd}}.\; P(r) \Leftrightarrow {\mathsf{exec}}(M,{\mathsf{encode}}(r)) = {\mathsf{true}}\)</span></p>
+<ul>
+<li>CakeML programs and proofs (Johannes)</li>
+</ul>
+<p>In summary, given the record type and a wellformedness predicate, the package produces implementations for an encoder and decoder, a DFA that checks wellformedness of encoded records, along with correctness proofs.</p>
+<h2 id="property-discussion">Property discussion</h2>
+<p>A variety of theorems can be proved in this setting, and it is worth discussing how they can be applied. For example, invertibility of encoding</p>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~\vdash \forall r:{\mathsf{recd}}.\; P(r) {\;\Rightarrow\;}{\mathsf{decode}}({\mathsf{encode}}\; r) = {\mathsf{SOME}}\;r\)</span></p>
+<p>is dependent on the well-formedness of the record. What happens when the record is not well-formed? Proving the “iff” form of this might be better. Similarly, one might want the property that successfully decoding a string into a record implies that the record is well-formed. One version of this is</p>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~{\mathsf{decode}}(s) = {\mathsf{SOME}}\;r {\;\Rightarrow\;}P(r)\)</span></p>
+<p>Another version:</p>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~{\mathsf{decode}}(s) = {\mathsf{SOME}}\;r {\;\Rightarrow\;}s \in {{\mathcal L}({{{\mathsf{regexp\_of}}\;{P}}})}\)</span></p>
+<p>Both of these fail to exclude an incorrect encoder that (say) maps all records into one (well-formed) value. To forbid that, one could demand that the encoder is injective:</p>
+<p><span class="math inline">\(~~~~~~~~~~~~~~~~~\forall \mathit{recd}_1\; \mathit{recd}_2.\; {\mathsf{encode}}(\mathit{recd}_1) = {\mathsf{encode}}(\mathit{recd}_2) {\;\Rightarrow\;}\mathit{recd}_1 = \mathit{recd}_2\)</span></p>
+<p>Regarding applicability, another consideration is that, typically, encoders and decoders are written by different people at different times and places, trying to conform to a standard. Thus statements about a generated encoding/decoding pair are of limited utility, so separate properties about the encoder and decoder are valuable, whence the importance of the well-formedness specification.</p>
+<h1 id="proofs-and-automation">Proofs and Automation</h1>
+<h1 id="property-enhanced-lexing">Property-enhanced lexing</h1>
+<p>Lexing provides an interesting application of <strong>SPLAT</strong> notions. A typical lexer specification has the form <span class="math inline">\((r_1,f_1), \ldots , (r_n,f_n)\)</span> where an <span class="math inline">\((r,f)\)</span> pair binds a regular expression <span class="math inline">\(r\)</span> with an <em>action</em> function <span class="math inline">\(f : \mathbb{S}\to \tau\)</span>. From this specification a lexer of type <span class="math inline">\(\mathbb{S}\to\tau\;{\mathsf{list}}\)</span> can be automatically created. By attaching properties to regular expressions one can imagine a lexer specification augmented with postconditions. In particular, an element <span class="math inline">\(({{\mathsf{regexp\_of}}\;{P}},f,Q)\)</span> of such a lexer spec comprises regular expression <span class="math inline">\({{\mathsf{regexp\_of}}\;{P}}\)</span>, action function <span class="math inline">\(f\)</span>, and post-condition <span class="math inline">\(Q\)</span>. The following theorem can be automatically proved for <span class="math inline">\({{\mathsf{regexp\_of}}\;{P}}\)</span>: <span class="math display">\[
+ \vdash s \in {{\mathcal L}({{{\mathsf{regexp\_of}}\;{P}}})} {\;\Rightarrow\;}P ({\mathsf{the}}({\mathsf{decode}}\; s))
+\]</span> (where <span class="math inline">\({\mathsf{the}}\)</span> projects the wrapped element from an option datum.) The theorem can be used in the following way: when the lexer matches rule <span class="math inline">\(({{\mathsf{regexp\_of}}\;{P}},f,Q)\)</span> on substring <span class="math inline">\(s\)</span> of the input, a normal lexer would invoke <span class="math inline">\(f\)</span> on <span class="math inline">\(s\)</span> to produce a lexeme. Instead, we have the opportunity to invoke <span class="math inline">\(f\)</span> on the decoded substring, <span class="math inline">\(({\mathsf{the}}({\mathsf{decode}}\; s)\)</span>, knowing that the result is in <span class="math inline">\(P\)</span>. This gives the Hoare-style formula <span class="math display">\[
+   \forall s.\; P\, ({\mathsf{the}}({\mathsf{decode}}\; s)) {\;\Rightarrow\;}Q \; (f\; ({\mathsf{the}}({\mathsf{decode}}\; s)))
+\]</span> to be proved, which can be chained with the original theorem to yield <span class="math display">\[
+   \vdash \forall s.\; s \in {{\mathcal L}({{{\mathsf{regexp\_of}}\;{P}}})} {\;\Rightarrow\;}Q \; (f\; ({\mathsf{the}}({\mathsf{decode}}\; s)))
+\]</span> These theorems can be proved at lexer specification time, leaving only the last to be applied at runtime. Thus a successful run of an augmented lexer will yield a list of lexemes <span class="math inline">\([\ell_1, \ldots, \ell_n]\)</span> and a list of theorems <span class="math inline">\([\vdash Q_1(\ell_1), \ldots, \vdash Q_n(\ell_n)]\)</span>.</p>
+<p>In lexers for programming languages, this does not seem to offer much improvement in verification, but for lexing message formats, as sketched above, this may allow an improved verification and code synthesis experience.</p>
+<h1 id="further-issues">Further Issues</h1>
+<h2 id="packed-record-formats">Packed Record Formats</h2>
+<h2 id="dependent-records">Dependent Records</h2>
+<h1 id="related-work">Related Work</h1>
+<p>Buechi, Mona, Narcissus, D’Antoni, Slind and Hurd (encoding/decoding). Sail, PADS, message format specification languages. G. Rosu and generation of runtime monitors from regexps (any property proofs there?)</p>
+<p>Note: unlike, say, Narcissus, we do not focus solely on encoding and decoding. We add verified compilation, and proof of well-formednes with respect to arithmetic specifications.</p>
+<p>Much work in auto-synthesis of encoder/decoder pairs from high-level specs, e.g., ASN.1 and Google Protocol Buffers.</p>
+<p>The details about encoding higher data in regexps are probably not novel, given the huge amount of work expended on transition system encodings for model-checking and in applying BDD and SAT algorithms. However, I haven’t yet come across any literature focusing on intervals.</p>
+<p>Check BDD encodings of numbers, etc.</p>
+<hr color="gray">
+Last built:
+Tue Mar  5 23:31:27 CST 2019
+<hr color="gray">
+</body>
+</html>

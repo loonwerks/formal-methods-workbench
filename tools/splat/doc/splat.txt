@@ -169,8 +169,20 @@ $$
 
 **Question.** To what extent can formula constructions (conjunction,
 disjunction, implication, *etc*.) over the predicates be paralleled by
-regular expression constructions on the right? We haven't yet pursued
-this.
+regular expression constructions on the right? As a start, we can prove
+the following theorems:
+$$
+\begin{array}{rcl}
+\neg{P(x)} & \iff & \konst{encode}(x) \notin \Lang{\regexpof{P}} \\
+P(x) \land Q(x) & \iff & \konst{encode}(x) \in \Lang{\konst{And}\;(\regexpof{P})\;(\regexpof{Q})} \\
+P(x) \lor Q(x) & \iff & \konst{encode}(x) \in \Lang{\konst{Or}\;[\regexpof{P},\regexpof{Q}]} \\
+P(x) \imp Q(x) & \iff & \konst{encode}(x) \in \Lang{\konst{Or}\;[\konst{Neg}(\regexpof{P}),\regexpof{Q}]} \\
+P(x) \land Q(y) & \iff & \konst{encode}(x)\konst{encode}(y) \in \Lang{\konst{Cat}\;(\regexpof{P})\;(\regexpof{Q})}
+\end{array}
+$$
+Further work is needed to see whether, *e.g.*, Presburger
+formulas could be encoded. (It is entirely plausible that this has
+already been reported in the vast literature on formal languages.)
 
 ### Example
 
@@ -536,32 +548,52 @@ Proofs and Automation
 =====================
 
 Property-enhanced lexing 
-=======================================
-
-(Speculative!)
+========================
 
 Lexing provides an interesting application of **SPLAT** notions. A
-typical lexer specification has the form $(r_1,f_1), \ldots , (r_n,f_n)$
-where an $(r,f)$ pair binds a regular expression $r$ with an
-*action* function $f : \mathbb{S}\to \tau$. From this specification
+typical lexer specification has the form $(r_1,f_1), \ldots ,
+(r_n,f_n)$ where an $(r,f)$ pair binds a regular expression $r$ with
+an *action* function $f : \mathbb{S}\to \tau$. From this specification
 a lexer of type $\mathbb{S}\to\tau\;\konst{list}$ can be automatically
-created. By connecting properties to regular expressions one can imagine
-a lexer specification enhanced with property information. Thus
+created. By attaching properties to regular expressions one can
+imagine a lexer specification augmented with postconditions. In
+particular, an element $(\regexpof{P},f,Q)$ of such a lexer spec
+comprises regular expression $\regexpof{P}$, action function $f$, and
+post-condition $Q$. The following theorem can be automatically proved for 
+$\regexpof{P}$:
 $$
-  (\regexpof{(P_1)},f_1,Q_1) \ldots (\regexpof{(P_n)},f_n,Q_n)
+ \vdash s \in \Lang{\regexpof{P}} \imp P (\konst{the}(\konst{decode}\; s))
 $$
-can be leveraged to give a list of lexemes-with-properties where each
-$(\regexpof{P},f,Q)$ gives rise to a Hoare-triple
+(where $\konst{the}$ projects the wrapped element from an option
+datum.) The theorem can be used in the following way: when the lexer
+matches rule $(\regexpof{P},f,Q)$ on substring $s$ of the input, a
+normal lexer would invoke $f$ on $s$ to produce a lexeme. Instead, we
+have the opportunity to invoke $f$ on the decoded substring,
+$(\konst{the}(\konst{decode}\; s)$, knowing that the result is in
+$P$. This gives the Hoare-style formula
 $$
-(\konst{decode}\;s = \konst{SOME}\;d) \land P\; d \imp Q (f\; d)\ .
+   \forall s.\; P\, (\konst{the}(\konst{decode}\; s)) \imp Q \; (f\; (\konst{the}(\konst{decode}\; s)))
 $$
-... more to come ...
+to be proved, which can be chained with the original theorem to yield
+$$
+   \vdash \forall s.\; s \in \Lang{\regexpof{P}} \imp Q \; (f\; (\konst{the}(\konst{decode}\; s)))
+$$
+These theorems can be proved at lexer specification time, leaving only the
+last to be applied at runtime. Thus a successful run of an augmented
+lexer will yield a list of lexemes $[\ell_1, \ldots, \ell_n]$ and a
+list of theorems $[\vdash Q_1(\ell_1), \ldots, \vdash Q_n(\ell_n)]$.
+
+In lexers for programming languages, this does not seem to offer much
+improvement in verification, but for lexing message formats, as
+sketched above, this may allow an improved verification and code
+synthesis experience.
 
 Further Issues
 ==============
 
 Packed Record Formats
 ---------------------
+
 Dependent Records
 -----------------
 
@@ -570,10 +602,11 @@ Related Work
 
 Buechi, Mona, Narcissus, D'Antoni, Slind and Hurd
 (encoding/decoding). Sail, PADS, message format specification
-languages. G. Rosu and generation of runtime monitors from regexps (any property proofs there?)
+languages. G. Rosu and generation of runtime monitors from regexps
+(any property proofs there?)
 
 Note: unlike, say, Narcissus, we do not focus solely on encoding and
-decoding. We add verified compilation, and proof of well-formedness
+decoding. We add verified compilation, and proof of well-formednes
 with respect to arithmetic specifications.
 
 Much work in auto-synthesis of encoder/decoder pairs from high-level
