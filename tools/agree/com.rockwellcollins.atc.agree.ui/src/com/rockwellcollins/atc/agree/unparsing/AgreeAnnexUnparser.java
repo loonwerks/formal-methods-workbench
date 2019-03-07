@@ -26,7 +26,6 @@
 
 package com.rockwellcollins.atc.agree.unparsing;
 
-import org.eclipse.xtext.resource.SaveOptions;
 import org.eclipse.xtext.serializer.ISerializer;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
@@ -35,6 +34,8 @@ import org.osate.annexsupport.AnnexUnparser;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
+import com.rockwellcollins.atc.agree.agree.Expr;
+import com.rockwellcollins.atc.agree.agree.NamedSpecStatement;
 import com.rockwellcollins.atc.agree.serializer.AgreeSerializer;
 import com.rockwellcollins.atc.agree.ui.internal.AgreeActivator;
 
@@ -64,6 +65,14 @@ public class AgreeAnnexUnparser implements AnnexUnparser {
 
 	public String unparseContract(AgreeContract agreeContract, String indent) {
 		return indent + getSerializer().serialize(agreeContract);
+	}
+
+	public String unparseNamedSpecStatement(NamedSpecStatement namedSpecStatement, String indent) {
+		return indent + getSerializer().serialize(namedSpecStatement);
+	}
+
+	public String unparseExpr(Expr expr, String indent) {
+		return indent + getSerializer().serialize(expr);
 	}
 
 }

@@ -45,8 +45,17 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Resolute.ecore#//NestedDotID/base"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//NestedDotID/sub"/>
     </genClasses>
-    <genClasses ecoreClass="Resolute.ecore#//ProveStatement">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//ProveStatement/expr"/>
+    <genClasses ecoreClass="Resolute.ecore#//LintStatement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//LintStatement/expr"/>
+    </genClasses>
+    <genClasses ecoreClass="Resolute.ecore#//Ruleset">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//Ruleset/body"/>
+    </genClasses>
+    <genClasses ecoreClass="Resolute.ecore#//RulesetBody">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//RulesetBody/lintStatements"/>
+    </genClasses>
+    <genClasses ecoreClass="Resolute.ecore#//AnalysisStatement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//AnalysisStatement/expr"/>
     </genClasses>
     <genClasses ecoreClass="Resolute.ecore#//ListType">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//ListType/type"/>
@@ -57,7 +66,6 @@
     <genClasses ecoreClass="Resolute.ecore#//LibraryFnType">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Resolute.ecore#//LibraryFnType/libName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Resolute.ecore#//LibraryFnType/fnType"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Resolute.ecore#//LibraryFnType/name"/>
     </genClasses>
     <genClasses ecoreClass="Resolute.ecore#//QuantArg">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//QuantArg/expr"/>
@@ -137,6 +145,9 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Resolute.ecore#//FnCallExpr/fn"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//FnCallExpr/args"/>
     </genClasses>
+    <genClasses ecoreClass="Resolute.ecore#//LintExpr">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//LintExpr/lintStmt"/>
+    </genClasses>
     <genClasses ecoreClass="Resolute.ecore#//ListFilterMapExpr">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//ListFilterMapExpr/map"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//ListFilterMapExpr/args"/>
@@ -157,10 +168,10 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//LetExpr/binding"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//LetExpr/expr"/>
     </genClasses>
-    <genClasses ecoreClass="Resolute.ecore#//AnalysisExpr">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Resolute.ecore#//AnalysisExpr/libName"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Resolute.ecore#//AnalysisExpr/fnName"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Resolute.ecore#//AnalysisExpr/args"/>
-    </genClasses>
+    <genClasses ecoreClass="Resolute.ecore#//WarningStatement"/>
+    <genClasses ecoreClass="Resolute.ecore#//ErrorStatement"/>
+    <genClasses ecoreClass="Resolute.ecore#//InfoStatement"/>
+    <genClasses ecoreClass="Resolute.ecore#//ProveStatement"/>
+    <genClasses ecoreClass="Resolute.ecore#//CheckStatement"/>
   </genPackages>
 </genmodel:GenModel>

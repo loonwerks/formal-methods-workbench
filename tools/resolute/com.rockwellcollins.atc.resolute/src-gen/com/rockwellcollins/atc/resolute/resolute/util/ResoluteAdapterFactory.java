@@ -152,9 +152,24 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
         return createNestedDotIDAdapter();
       }
       @Override
-      public Adapter caseProveStatement(ProveStatement object)
+      public Adapter caseLintStatement(LintStatement object)
       {
-        return createProveStatementAdapter();
+        return createLintStatementAdapter();
+      }
+      @Override
+      public Adapter caseRuleset(Ruleset object)
+      {
+        return createRulesetAdapter();
+      }
+      @Override
+      public Adapter caseRulesetBody(RulesetBody object)
+      {
+        return createRulesetBodyAdapter();
+      }
+      @Override
+      public Adapter caseAnalysisStatement(AnalysisStatement object)
+      {
+        return createAnalysisStatementAdapter();
       }
       @Override
       public Adapter caseListType(ListType object)
@@ -277,6 +292,11 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
         return createFnCallExprAdapter();
       }
       @Override
+      public Adapter caseLintExpr(LintExpr object)
+      {
+        return createLintExprAdapter();
+      }
+      @Override
       public Adapter caseListFilterMapExpr(ListFilterMapExpr object)
       {
         return createListFilterMapExprAdapter();
@@ -300,6 +320,31 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
       public Adapter caseLetExpr(LetExpr object)
       {
         return createLetExprAdapter();
+      }
+      @Override
+      public Adapter caseWarningStatement(WarningStatement object)
+      {
+        return createWarningStatementAdapter();
+      }
+      @Override
+      public Adapter caseErrorStatement(ErrorStatement object)
+      {
+        return createErrorStatementAdapter();
+      }
+      @Override
+      public Adapter caseInfoStatement(InfoStatement object)
+      {
+        return createInfoStatementAdapter();
+      }
+      @Override
+      public Adapter caseProveStatement(ProveStatement object)
+      {
+        return createProveStatementAdapter();
+      }
+      @Override
+      public Adapter caseCheckStatement(CheckStatement object)
+      {
+        return createCheckStatementAdapter();
       }
       @Override
       public Adapter caseElement(Element object)
@@ -564,16 +609,61 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ProveStatement <em>Prove Statement</em>}'.
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.LintStatement <em>Lint Statement</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see com.rockwellcollins.atc.resolute.resolute.ProveStatement
+   * @see com.rockwellcollins.atc.resolute.resolute.LintStatement
    * @generated
    */
-  public Adapter createProveStatementAdapter()
+  public Adapter createLintStatementAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.Ruleset <em>Ruleset</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.Ruleset
+   * @generated
+   */
+  public Adapter createRulesetAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.RulesetBody <em>Ruleset Body</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.RulesetBody
+   * @generated
+   */
+  public Adapter createRulesetBodyAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.AnalysisStatement <em>Analysis Statement</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.AnalysisStatement
+   * @generated
+   */
+  public Adapter createAnalysisStatementAdapter()
   {
     return null;
   }
@@ -939,6 +1029,21 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.LintExpr <em>Lint Expr</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.LintExpr
+   * @generated
+   */
+  public Adapter createLintExprAdapter()
+  {
+    return null;
+  }
+
+  /**
    * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ListFilterMapExpr <em>List Filter Map Expr</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
@@ -1009,6 +1114,81 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
    * @generated
    */
   public Adapter createLetExprAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.WarningStatement <em>Warning Statement</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.WarningStatement
+   * @generated
+   */
+  public Adapter createWarningStatementAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ErrorStatement <em>Error Statement</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.ErrorStatement
+   * @generated
+   */
+  public Adapter createErrorStatementAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.InfoStatement <em>Info Statement</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.InfoStatement
+   * @generated
+   */
+  public Adapter createInfoStatementAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ProveStatement <em>Prove Statement</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.ProveStatement
+   * @generated
+   */
+  public Adapter createProveStatementAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.CheckStatement <em>Check Statement</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.CheckStatement
+   * @generated
+   */
+  public Adapter createCheckStatementAdapter()
   {
     return null;
   }

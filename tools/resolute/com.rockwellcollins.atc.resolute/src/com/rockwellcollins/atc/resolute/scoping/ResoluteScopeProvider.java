@@ -20,13 +20,13 @@ import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.xtext.aadl2.properties.scoping.PropertiesScopeProvider;
 
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.Arg;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.LetBinding;
 import com.rockwellcollins.atc.resolute.resolute.LetExpr;
 import com.rockwellcollins.atc.resolute.resolute.ListFilterMapExpr;
 import com.rockwellcollins.atc.resolute.resolute.NestedDotID;
-import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
 import com.rockwellcollins.atc.resolute.resolute.QuantifiedExpr;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 import com.rockwellcollins.atc.resolute.resolute.SetFilterMapExpr;
@@ -83,7 +83,29 @@ public class ResoluteScopeProvider extends PropertiesScopeProvider {
 				getScope(ctx.eContainer(), ref));
 	}
 
-	IScope scope_NamedElement(ProveStatement ctx, EReference ref) {
+//	IScope scope_NamedElement(ProveStatement ctx, EReference ref) {
+//		EObject container = ctx.eContainer();
+//		assert (container instanceof ResoluteSubclause);
+//		container = container.eContainer();
+//		if (container instanceof ComponentImplementation) {
+//			ComponentImplementation compImpl = (ComponentImplementation) container;
+//			return Scopes.scopeFor(compImpl.getAllModes(), getScope(ctx.eContainer(), ref));
+//		}
+//		return getScope(ctx.eContainer(), ref);
+//	}
+
+//	IScope scope_NamedElement(CheckStatement ctx, EReference ref) {
+//		EObject container = ctx.eContainer();
+//		assert (container instanceof ResoluteSubclause);
+//		container = container.eContainer();
+//		if (container instanceof ComponentImplementation) {
+//			ComponentImplementation compImpl = (ComponentImplementation) container;
+//			return Scopes.scopeFor(compImpl.getAllModes(), getScope(ctx.eContainer(), ref));
+//		}
+//		return getScope(ctx.eContainer(), ref);
+//	}
+
+	IScope scope_NamedElement(AnalysisStatement ctx, EReference ref) {
 		EObject container = ctx.eContainer();
 		assert (container instanceof ResoluteSubclause);
 		container = container.eContainer();

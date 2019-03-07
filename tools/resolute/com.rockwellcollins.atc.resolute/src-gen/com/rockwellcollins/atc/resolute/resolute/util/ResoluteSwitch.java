@@ -204,11 +204,35 @@ public class ResoluteSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case ResolutePackage.PROVE_STATEMENT:
+      case ResolutePackage.LINT_STATEMENT:
       {
-        ProveStatement proveStatement = (ProveStatement)theEObject;
-        T result = caseProveStatement(proveStatement);
-        if (result == null) result = caseElement(proveStatement);
+        LintStatement lintStatement = (LintStatement)theEObject;
+        T result = caseLintStatement(lintStatement);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.RULESET:
+      {
+        Ruleset ruleset = (Ruleset)theEObject;
+        T result = caseRuleset(ruleset);
+        if (result == null) result = caseDefinition(ruleset);
+        if (result == null) result = caseNamedElement(ruleset);
+        if (result == null) result = caseElement(ruleset);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.RULESET_BODY:
+      {
+        RulesetBody rulesetBody = (RulesetBody)theEObject;
+        T result = caseRulesetBody(rulesetBody);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.ANALYSIS_STATEMENT:
+      {
+        AnalysisStatement analysisStatement = (AnalysisStatement)theEObject;
+        T result = caseAnalysisStatement(analysisStatement);
+        if (result == null) result = caseElement(analysisStatement);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -427,6 +451,15 @@ public class ResoluteSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
+      case ResolutePackage.LINT_EXPR:
+      {
+        LintExpr lintExpr = (LintExpr)theEObject;
+        T result = caseLintExpr(lintExpr);
+        if (result == null) result = caseExpr(lintExpr);
+        if (result == null) result = caseElement(lintExpr);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
       case ResolutePackage.LIST_FILTER_MAP_EXPR:
       {
         ListFilterMapExpr listFilterMapExpr = (ListFilterMapExpr)theEObject;
@@ -469,6 +502,48 @@ public class ResoluteSwitch<T> extends Switch<T>
         T result = caseLetExpr(letExpr);
         if (result == null) result = caseExpr(letExpr);
         if (result == null) result = caseElement(letExpr);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.WARNING_STATEMENT:
+      {
+        WarningStatement warningStatement = (WarningStatement)theEObject;
+        T result = caseWarningStatement(warningStatement);
+        if (result == null) result = caseLintStatement(warningStatement);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.ERROR_STATEMENT:
+      {
+        ErrorStatement errorStatement = (ErrorStatement)theEObject;
+        T result = caseErrorStatement(errorStatement);
+        if (result == null) result = caseLintStatement(errorStatement);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.INFO_STATEMENT:
+      {
+        InfoStatement infoStatement = (InfoStatement)theEObject;
+        T result = caseInfoStatement(infoStatement);
+        if (result == null) result = caseLintStatement(infoStatement);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.PROVE_STATEMENT:
+      {
+        ProveStatement proveStatement = (ProveStatement)theEObject;
+        T result = caseProveStatement(proveStatement);
+        if (result == null) result = caseAnalysisStatement(proveStatement);
+        if (result == null) result = caseElement(proveStatement);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.CHECK_STATEMENT:
+      {
+        CheckStatement checkStatement = (CheckStatement)theEObject;
+        T result = caseCheckStatement(checkStatement);
+        if (result == null) result = caseAnalysisStatement(checkStatement);
+        if (result == null) result = caseElement(checkStatement);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -701,17 +776,65 @@ public class ResoluteSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>Prove Statement</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>Lint Statement</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Prove Statement</em>'.
+   * @return the result of interpreting the object as an instance of '<em>Lint Statement</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T caseProveStatement(ProveStatement object)
+  public T caseLintStatement(LintStatement object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Ruleset</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Ruleset</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseRuleset(Ruleset object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Ruleset Body</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Ruleset Body</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseRulesetBody(RulesetBody object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Analysis Statement</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Analysis Statement</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseAnalysisStatement(AnalysisStatement object)
   {
     return null;
   }
@@ -1101,6 +1224,22 @@ public class ResoluteSwitch<T> extends Switch<T>
   }
 
   /**
+   * Returns the result of interpreting the object as an instance of '<em>Lint Expr</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Lint Expr</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseLintExpr(LintExpr object)
+  {
+    return null;
+  }
+
+  /**
    * Returns the result of interpreting the object as an instance of '<em>List Filter Map Expr</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
@@ -1176,6 +1315,86 @@ public class ResoluteSwitch<T> extends Switch<T>
    * @generated
    */
   public T caseLetExpr(LetExpr object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Warning Statement</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Warning Statement</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseWarningStatement(WarningStatement object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Error Statement</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Error Statement</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseErrorStatement(ErrorStatement object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Info Statement</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Info Statement</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseInfoStatement(InfoStatement object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Prove Statement</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Prove Statement</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseProveStatement(ProveStatement object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Check Statement</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Check Statement</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseCheckStatement(CheckStatement object)
   {
     return null;
   }

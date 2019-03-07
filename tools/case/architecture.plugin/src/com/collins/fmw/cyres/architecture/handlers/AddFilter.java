@@ -41,7 +41,10 @@ import com.collins.fmw.cyres.architecture.CaseClaimsManager;
 import com.collins.fmw.cyres.architecture.dialogs.AddFilterDialog;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
+import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
+import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.unparsing.AgreeAnnexUnparser;
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
@@ -158,29 +161,6 @@ public class AddFilter extends AadlHandler {
 				if (!addCaseModelTransformationsImport(pkgSection, true)) {
 					return;
 				}
-//				// First check if CASE Property file has already been imported in the model
-//				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-//				PropertySet casePropSet = null;
-//				for (ModelUnit modelUnit : importedUnits) {
-//					if (modelUnit instanceof PropertySet) {
-//						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
-//							casePropSet = (PropertySet) modelUnit;
-//							break;
-//						}
-//					}
-//				}
-//
-//				if (casePropSet == null) {
-//					// Try importing the resource
-//					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-//					if (casePropSet == null) {
-//						Dialog.showError("Could not import " + CASE_PROPSET_NAME,
-//								"Property set " + CASE_PROPSET_NAME + " could not be found.");
-//						return;
-//					}
-//					// Add as "importedUnit" to package section
-//					pkgSection.getImportedUnits().add(casePropSet);
-//				}
 
 				// Create Filter thread type
 //				EClass componentClass;
@@ -276,11 +256,6 @@ public class AddFilter extends AadlHandler {
 				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterThreadType, casePropSet)) {
 //					return;
 				}
-
-//				if (!addPropertyAssociation("COMP_SPEC", filterAgreeSpecIDs, filterThreadType, casePropSet)) {
-//					return;
-//				}
-
 
 				// Move filter to proper location
 				// (just before component it connects to on communication pathway)
@@ -476,22 +451,19 @@ public class AddFilter extends AadlHandler {
 					.getContainingClassifier().getOwnedAnnexSubclauses();
 			for (AnnexSubclause annexSubclause : annexSubclauses) {
 				// See if there's an agree annex
-				if (annexSubclause.getName().equalsIgnoreCase("agree")) {
-					DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
+				DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
+				if (defaultSubclause.getParsedAnnexSubclause() instanceof AgreeContractSubclause) {
 					// See if the agree annex contains guarantee statements
-					AgreeContractSubclause agreeContract = (AgreeContractSubclause) annexSubclauseImpl
+					AgreeContractSubclause agreeSubclause = (AgreeContractSubclause) defaultSubclause
 							.getParsedAnnexSubclause();
 					AgreeAnnexUnparser unparser = new AgreeAnnexUnparser();
-					// TODO: unparse just guarantee statements
-					String specs = unparser.unparseContract((AgreeContract) agreeContract.getContract(), "");
-					for (String spec : specs.split(";")) {
-						if (spec.trim().toLowerCase().startsWith("guarantee")) {
-							String guarantee = "";
-							for (String line : spec.trim().concat(";").split(System.lineSeparator())) {
-								guarantee += line.trim() + " ";
-							}
-
-							guarantees.add(guarantee.trim());
+					AgreeContract agreeContract = (AgreeContract) agreeSubclause.getContract();
+					for (SpecStatement ss : agreeContract.getSpecs()) {
+						if (ss instanceof GuaranteeStatement) {
+							GuaranteeStatement gs = (GuaranteeStatement) ss;
+							String guarantee = "guarantee " + gs.getName().trim() + " \"" + gs.getStr().trim() + "\" : "
+									+ unparser.unparseExpr(gs.getExpr(), "").trim() + ";";
+							guarantees.add(guarantee);
 						}
 					}
 					break;
@@ -501,6 +473,16 @@ public class AddFilter extends AadlHandler {
 		});
 
 	}
+
+//	private List<String> getConnections(URI uri) {
+//		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+//
+//		return xtextEditor.getDocument().readOnly(resource -> {
+//			List<String> connections = new ArrayList<>();
+//
+//			return connections;
+//		});
+//	}
 
 	private List<String> getResoluteClauses(URI uri) {
 
@@ -512,20 +494,22 @@ public class AddFilter extends AadlHandler {
 			final EList<AnnexSubclause> annexSubclauses = selectedConnection.getDestination().getConnectionEnd()
 					.getContainingClassifier().getOwnedAnnexSubclauses();
 			for (AnnexSubclause annexSubclause : annexSubclauses) {
+				DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
 				// See if there's a resolute annex
-				if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
-					DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
+				if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
 					// See if there are any 'prove' clauses
-					ResoluteSubclause resoluteClause = (ResoluteSubclause) annexSubclauseImpl.getParsedAnnexSubclause();
-					EList<ProveStatement> proves = resoluteClause.getProves();
-					for (ProveStatement prove : proves) {
-						Expr expr = prove.getExpr();
-						if (expr instanceof FnCallExpr) {
-							FnCallExpr fnCall = (FnCallExpr) expr;
-							if (fnCall.getFn().getName() != null) {
-								resoluteClauses.add(fnCall.getFn().getName());
-							} else {
-								return null;
+					ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause.getParsedAnnexSubclause();
+					for (AnalysisStatement as : resoluteClause.getProves()) {
+						if (as instanceof ProveStatement) {
+							ProveStatement prove = (ProveStatement) as;
+							Expr expr = prove.getExpr();
+							if (expr instanceof FnCallExpr) {
+								FnCallExpr fnCall = (FnCallExpr) expr;
+								if (fnCall.getFn().getName() != null) {
+									resoluteClauses.add(fnCall.getFn().getName());
+								} else {
+									return null;
+								}
 							}
 						}
 					}

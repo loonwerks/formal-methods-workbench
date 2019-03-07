@@ -21,14 +21,15 @@ import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.AadlPackageImpl;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
-import org.osate.aadl2.impl.PackageSectionImpl;
 
 import com.collins.fmw.cyres.architecture.CaseClaimsManager;
 import com.collins.fmw.cyres.architecture.dialogs.ImportRequirementsDialog;
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
@@ -41,12 +42,9 @@ public class AddRequirement extends AbstractHandler {
 		public String id = "";
 		public String text = "";
 		public String component = "";
-//		public boolean agree = false;
 		public String agree = "";
 		public String rationale = "";
 
-//		public CASE_Requirement(String name, String id, String text, String component, boolean agree,
-//				String rationale) {
 		public CASE_Requirement(String name, String id, String text, String component, String agree,
 				String rationale) {
 			this.name = name;
@@ -61,11 +59,6 @@ public class AddRequirement extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-//		// TODO: These should all be in a single class
-//		List<String> reqNames = null;
-//		List<String> reqIDs = null;
-//		List<String> reqTexts = null;
-//		List<String> reqComps = null;
 		List<CASE_Requirement> importReqs = null;
 
 		// Open wizard to enter filter info
@@ -74,19 +67,10 @@ public class AddRequirement extends AbstractHandler {
 		wizard.setResoluteClauses(getResoluteClauses());
 		wizard.create();
 		if (wizard.open() == Window.OK) {
-//			reqNames = wizard.getReqNames();
-//			reqIDs = wizard.getReqIDs();
-//			reqTexts = wizard.getReqTexts();
-//			reqComps = wizard.getComponents();
 			importReqs = wizard.getImportRequirements();
 
-//			for (int i = 0; i < reqNames.size(); i++) {
 			// Insert selected requirements into model
 			for (CASE_Requirement req : importReqs) {
-//				// Insert requirements into model
-//				addRequirement(reqComps.get(i), reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
-//				// Add corresponding resolute clauses to *_CASE_Claims.aadl
-//				addClaims(reqNames.get(i), reqIDs.get(i), reqTexts.get(i));
 				// Insert requirements into model
 				addRequirement(req.component, req.name, req.id, req.text, req.agree);
 				// Add corresponding resolute clauses to *_CASE_Claims.aadl
@@ -99,7 +83,6 @@ public class AddRequirement extends AbstractHandler {
 		return null;
 	}
 
-//	private void addRequirement(String componentName, String reqName, String reqID, String reqText, boolean agreeProp) {
 	private void addRequirement(String componentName, String reqName, String reqID, String reqText, String agreeProp) {
 
 		// Get the active xtext editor so we can make modifications
@@ -110,8 +93,8 @@ public class AddRequirement extends AbstractHandler {
 			@Override
 			public void process(final XtextResource resource) throws Exception {
 				// Get the component in the model
-				final AadlPackageImpl aadlPkg = (AadlPackageImpl) resource.getContents().get(0);
-				PackageSectionImpl pkgSection = (PackageSectionImpl) aadlPkg.getOwnedPublicSection();
+				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
+				PackageSection pkgSection = aadlPkg.getOwnedPublicSection();
 				int idx = getIndex(componentName, pkgSection.getOwnedClassifiers());
 				Classifier classifier = pkgSection.getOwnedClassifiers().get(idx);
 
@@ -124,28 +107,26 @@ public class AddRequirement extends AbstractHandler {
 
 				Iterator<AnnexSubclause> annexSubclause = annexSubclauses.iterator();
 				while (annexSubclause.hasNext()) {
-					DefaultAnnexSubclauseImpl annexSubclauseImpl = (DefaultAnnexSubclauseImpl) annexSubclause.next();
-					String sourceText = annexSubclauseImpl.getSourceText();
+					DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclauseImpl) annexSubclause.next();
+					String sourceText = defaultSubclause.getSourceText();
 
-//					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree") && agreeProp) {
-					if (annexSubclauseImpl.getName().equalsIgnoreCase("agree") && !agreeProp.isEmpty()) {
+					if (defaultSubclause.getName().equalsIgnoreCase("agree") && !agreeProp.isEmpty()) {
 						// Add AGREE assume statement
 						assumeStatement = sourceText.replace("{**", assumeStatement);
 						// Delete annex subclause from owned subclauses. Will add it back later.
-						// There must be a better way to get the formatting to display correctly.
+						// TODO: There must be a better way to get the formatting to display correctly.
 						annexSubclause.remove();
-					} else if (annexSubclauseImpl.getName().equalsIgnoreCase("resolute")) {
+					} else if (defaultSubclause.getName().equalsIgnoreCase("resolute")) {
 						// Add Resolute prove statement
 						proveStatement = sourceText.replace("{**", proveStatement);
 						// Delete annex subclause from owned subclauses. Will add it back later.
-						// There must be a better way to get the formatting to display correctly.
+						// TODO: There must be a better way to get the formatting to display correctly.
 						annexSubclause.remove();
 					}
 				}
 
-//				if (agreeProp) {
 				if (!agreeProp.isEmpty()) {
-					DefaultAnnexSubclauseImpl agreeSubclause = (DefaultAnnexSubclauseImpl) threadType
+					DefaultAnnexSubclause agreeSubclause = threadType
 							.createOwnedAnnexSubclause();
 					agreeSubclause.setName("agree");
 					if (!assumeStatement.contains("**}")) {
@@ -154,7 +135,7 @@ public class AddRequirement extends AbstractHandler {
 					agreeSubclause.setSourceText(assumeStatement);
 				}
 
-				DefaultAnnexSubclauseImpl resoluteSubclause = (DefaultAnnexSubclauseImpl) threadType
+				DefaultAnnexSubclause resoluteSubclause = threadType
 						.createOwnedAnnexSubclause();
 				resoluteSubclause.setName("resolute");
 				if (!proveStatement.contains("**}")) {
@@ -171,7 +152,6 @@ public class AddRequirement extends AbstractHandler {
 		});
 	}
 
-//	private void addClaims(String reqName, String reqID, String reqText, boolean agreeProp) {
 	private void addClaims(String reqName, String reqID, String reqText, String agreeProp) {
 
 		// Add requirement
@@ -223,27 +203,25 @@ public class AddRequirement extends AbstractHandler {
 
 				if (classifier instanceof ComponentType) {
 
-					ComponentType compType = (ComponentType) classifier;
-					final EList<AnnexSubclause> annexSubclauses = compType.getOwnedAnnexSubclauses();
-
-					for (AnnexSubclause annexSubclause : annexSubclauses) {
+					final ComponentType compType = (ComponentType) classifier;
+					for (AnnexSubclause annexSubclause : compType.getOwnedAnnexSubclauses()) {
+						DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
 						// See if there's a resolute annex
-						if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
-							DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
-							// See if there are any 'prove' clauses
-							ResoluteSubclause resoluteClause = (ResoluteSubclause) annexSubclauseImpl
+						if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
+							ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
 									.getParsedAnnexSubclause();
-							EList<ProveStatement> proves = resoluteClause.getProves();
-							for (ProveStatement prove : proves) {
-								Expr expr = prove.getExpr();
-								if (expr instanceof FnCallExpr) {
-									FnCallExpr fnCall = (FnCallExpr) expr;
-									if (fnCall.getFn().getName() != null
-											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
-//										resoluteClauses.add(new CASE_Requirement(fnCall.getFn().getName(), "", "",
-//												compType.getName(), false, ""));
-										resoluteClauses.add(new CASE_Requirement(fnCall.getFn().getName(), "", "",
-												compType.getName(), "", ""));
+							// See if there are any 'prove' clauses
+							for (AnalysisStatement as : resoluteClause.getProves()) {
+								if (as instanceof ProveStatement) {
+									ProveStatement prove = (ProveStatement) as;
+									Expr expr = prove.getExpr();
+									if (expr instanceof FnCallExpr) {
+										FnCallExpr fnCall = (FnCallExpr) expr;
+										CASE_Requirement req = new CASE_Requirement(fnCall.getFn().getName(), "", "",
+												compType.getName(), "", "");
+										if (fnCall.getFn().getName() != null && !resoluteClauses.contains(req)) {
+											resoluteClauses.add(req);
+										}
 									}
 								}
 							}

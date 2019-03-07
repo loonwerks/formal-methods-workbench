@@ -2,12 +2,14 @@
  */
 package com.rockwellcollins.atc.resolute.resolute.impl;
 
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.Arg;
 import com.rockwellcollins.atc.resolute.resolute.BaseType;
 import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
 import com.rockwellcollins.atc.resolute.resolute.BuiltInFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.CastExpr;
+import com.rockwellcollins.atc.resolute.resolute.CheckStatement;
 import com.rockwellcollins.atc.resolute.resolute.ClaimArg;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ClaimString;
@@ -16,6 +18,7 @@ import com.rockwellcollins.atc.resolute.resolute.ClaimTextVar;
 import com.rockwellcollins.atc.resolute.resolute.ConstantDefinition;
 import com.rockwellcollins.atc.resolute.resolute.Definition;
 import com.rockwellcollins.atc.resolute.resolute.DefinitionBody;
+import com.rockwellcollins.atc.resolute.resolute.ErrorStatement;
 import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.FailExpr;
 import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
@@ -23,12 +26,15 @@ import com.rockwellcollins.atc.resolute.resolute.FunctionBody;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.IdExpr;
 import com.rockwellcollins.atc.resolute.resolute.IfThenElseExpr;
+import com.rockwellcollins.atc.resolute.resolute.InfoStatement;
 import com.rockwellcollins.atc.resolute.resolute.InstanceOfExpr;
 import com.rockwellcollins.atc.resolute.resolute.IntExpr;
 import com.rockwellcollins.atc.resolute.resolute.LetBinding;
 import com.rockwellcollins.atc.resolute.resolute.LetExpr;
 import com.rockwellcollins.atc.resolute.resolute.LibraryFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.LibraryFnType;
+import com.rockwellcollins.atc.resolute.resolute.LintExpr;
+import com.rockwellcollins.atc.resolute.resolute.LintStatement;
 import com.rockwellcollins.atc.resolute.resolute.ListExpr;
 import com.rockwellcollins.atc.resolute.resolute.ListFilterMapExpr;
 import com.rockwellcollins.atc.resolute.resolute.ListType;
@@ -41,6 +47,8 @@ import com.rockwellcollins.atc.resolute.resolute.ResoluteFactory;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteLibrary;
 import com.rockwellcollins.atc.resolute.resolute.ResolutePackage;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
+import com.rockwellcollins.atc.resolute.resolute.Ruleset;
+import com.rockwellcollins.atc.resolute.resolute.RulesetBody;
 import com.rockwellcollins.atc.resolute.resolute.SetExpr;
 import com.rockwellcollins.atc.resolute.resolute.SetFilterMapExpr;
 import com.rockwellcollins.atc.resolute.resolute.SetType;
@@ -48,6 +56,7 @@ import com.rockwellcollins.atc.resolute.resolute.StringExpr;
 import com.rockwellcollins.atc.resolute.resolute.ThisExpr;
 import com.rockwellcollins.atc.resolute.resolute.Type;
 import com.rockwellcollins.atc.resolute.resolute.UnaryExpr;
+import com.rockwellcollins.atc.resolute.resolute.WarningStatement;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -170,7 +179,28 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass proveStatementEClass = null;
+  private EClass lintStatementEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass rulesetEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass rulesetBodyEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass analysisStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -345,6 +375,13 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  private EClass lintExprEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   private EClass listFilterMapExprEClass = null;
 
   /**
@@ -374,6 +411,41 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * @generated
    */
   private EClass letExprEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass warningStatementEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass errorStatementEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass infoStatementEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass proveStatementEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass checkStatementEClass = null;
 
   /**
    * Creates an instance of the model <b>Package</b>, registered with
@@ -727,9 +799,9 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EClass getProveStatement()
+  public EClass getLintStatement()
   {
-    return proveStatementEClass;
+    return lintStatementEClass;
   }
 
   /**
@@ -737,9 +809,69 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getProveStatement_Expr()
+  public EReference getLintStatement_Expr()
   {
-    return (EReference)proveStatementEClass.getEStructuralFeatures().get(0);
+    return (EReference)lintStatementEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getRuleset()
+  {
+    return rulesetEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EReference getRuleset_Body()
+  {
+    return (EReference)rulesetEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getRulesetBody()
+  {
+    return rulesetBodyEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EReference getRulesetBody_LintStatements()
+  {
+    return (EReference)rulesetBodyEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getAnalysisStatement()
+  {
+    return analysisStatementEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EReference getAnalysisStatement_Expr()
+  {
+    return (EReference)analysisStatementEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -1387,6 +1519,26 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  public EClass getLintExpr()
+  {
+    return lintExprEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EReference getLintExpr_LintStmt()
+  {
+    return (EReference)lintExprEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   public EClass getListFilterMapExpr()
   {
     return listFilterMapExprEClass;
@@ -1537,6 +1689,56 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  public EClass getWarningStatement()
+  {
+    return warningStatementEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getErrorStatement()
+  {
+    return errorStatementEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getInfoStatement()
+  {
+    return infoStatementEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getProveStatement()
+  {
+    return proveStatementEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getCheckStatement()
+  {
+    return checkStatementEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   public ResoluteFactory getResoluteFactory()
   {
     return (ResoluteFactory)getEFactoryInstance();
@@ -1604,8 +1806,17 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     createEReference(nestedDotIDEClass, NESTED_DOT_ID__BASE);
     createEReference(nestedDotIDEClass, NESTED_DOT_ID__SUB);
 
-    proveStatementEClass = createEClass(PROVE_STATEMENT);
-    createEReference(proveStatementEClass, PROVE_STATEMENT__EXPR);
+    lintStatementEClass = createEClass(LINT_STATEMENT);
+    createEReference(lintStatementEClass, LINT_STATEMENT__EXPR);
+
+    rulesetEClass = createEClass(RULESET);
+    createEReference(rulesetEClass, RULESET__BODY);
+
+    rulesetBodyEClass = createEClass(RULESET_BODY);
+    createEReference(rulesetBodyEClass, RULESET_BODY__LINT_STATEMENTS);
+
+    analysisStatementEClass = createEClass(ANALYSIS_STATEMENT);
+    createEReference(analysisStatementEClass, ANALYSIS_STATEMENT__EXPR);
 
     listTypeEClass = createEClass(LIST_TYPE);
     createEReference(listTypeEClass, LIST_TYPE__TYPE);
@@ -1695,6 +1906,9 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     createEReference(fnCallExprEClass, FN_CALL_EXPR__FN);
     createEReference(fnCallExprEClass, FN_CALL_EXPR__ARGS);
 
+    lintExprEClass = createEClass(LINT_EXPR);
+    createEReference(lintExprEClass, LINT_EXPR__LINT_STMT);
+
     listFilterMapExprEClass = createEClass(LIST_FILTER_MAP_EXPR);
     createEReference(listFilterMapExprEClass, LIST_FILTER_MAP_EXPR__MAP);
     createEReference(listFilterMapExprEClass, LIST_FILTER_MAP_EXPR__ARGS);
@@ -1714,6 +1928,16 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     letExprEClass = createEClass(LET_EXPR);
     createEReference(letExprEClass, LET_EXPR__BINDING);
     createEReference(letExprEClass, LET_EXPR__EXPR);
+
+    warningStatementEClass = createEClass(WARNING_STATEMENT);
+
+    errorStatementEClass = createEClass(ERROR_STATEMENT);
+
+    infoStatementEClass = createEClass(INFO_STATEMENT);
+
+    proveStatementEClass = createEClass(PROVE_STATEMENT);
+
+    checkStatementEClass = createEClass(CHECK_STATEMENT);
   }
 
   /**
@@ -1764,7 +1988,8 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     letBindingEClass.getESuperTypes().add(theAadl2Package.getNamedElement());
     letBindingEClass.getESuperTypes().add(this.getClaimTextVar());
     resoluteSubclauseEClass.getESuperTypes().add(theAadl2Package.getAnnexSubclause());
-    proveStatementEClass.getESuperTypes().add(theAadl2Package.getElement());
+    rulesetEClass.getESuperTypes().add(this.getDefinition());
+    analysisStatementEClass.getESuperTypes().add(theAadl2Package.getElement());
     listTypeEClass.getESuperTypes().add(this.getType());
     setTypeEClass.getESuperTypes().add(this.getType());
     libraryFnTypeEClass.getESuperTypes().add(this.getType());
@@ -1789,11 +2014,17 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     libraryFnCallExprEClass.getESuperTypes().add(this.getExpr());
     builtInFnCallExprEClass.getESuperTypes().add(this.getExpr());
     fnCallExprEClass.getESuperTypes().add(this.getExpr());
+    lintExprEClass.getESuperTypes().add(this.getExpr());
     listFilterMapExprEClass.getESuperTypes().add(this.getExpr());
     listExprEClass.getESuperTypes().add(this.getExpr());
     setFilterMapExprEClass.getESuperTypes().add(this.getExpr());
     setExprEClass.getESuperTypes().add(this.getExpr());
     letExprEClass.getESuperTypes().add(this.getExpr());
+    warningStatementEClass.getESuperTypes().add(this.getLintStatement());
+    errorStatementEClass.getESuperTypes().add(this.getLintStatement());
+    infoStatementEClass.getESuperTypes().add(this.getLintStatement());
+    proveStatementEClass.getESuperTypes().add(this.getAnalysisStatement());
+    checkStatementEClass.getESuperTypes().add(this.getAnalysisStatement());
 
     // Initialize classes and features; add operations and parameters
     initEClass(resoluteLibraryEClass, ResoluteLibrary.class, "ResoluteLibrary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1832,14 +2063,23 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     initEReference(getLetBinding_Expr(), this.getExpr(), null, "expr", null, 0, 1, LetBinding.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(resoluteSubclauseEClass, ResoluteSubclause.class, "ResoluteSubclause", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getResoluteSubclause_Proves(), this.getProveStatement(), null, "proves", null, 0, -1, ResoluteSubclause.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getResoluteSubclause_Proves(), this.getAnalysisStatement(), null, "proves", null, 0, -1, ResoluteSubclause.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(nestedDotIDEClass, NestedDotID.class, "NestedDotID", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getNestedDotID_Base(), theAadl2Package.getNamedElement(), null, "base", null, 0, 1, NestedDotID.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getNestedDotID_Sub(), this.getNestedDotID(), null, "sub", null, 0, 1, NestedDotID.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(proveStatementEClass, ProveStatement.class, "ProveStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getProveStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, ProveStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEClass(lintStatementEClass, LintStatement.class, "LintStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getLintStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, LintStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(rulesetEClass, Ruleset.class, "Ruleset", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getRuleset_Body(), this.getRulesetBody(), null, "body", null, 0, 1, Ruleset.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(rulesetBodyEClass, RulesetBody.class, "RulesetBody", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getRulesetBody_LintStatements(), this.getLintStatement(), null, "lintStatements", null, 0, -1, RulesetBody.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(analysisStatementEClass, AnalysisStatement.class, "AnalysisStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getAnalysisStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, AnalysisStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(listTypeEClass, ListType.class, "ListType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getListType_Type(), this.getType(), null, "type", null, 0, 1, ListType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1929,6 +2169,9 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     initEReference(getFnCallExpr_Fn(), this.getFunctionDefinition(), null, "fn", null, 0, 1, FnCallExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getFnCallExpr_Args(), this.getExpr(), null, "args", null, 0, -1, FnCallExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+    initEClass(lintExprEClass, LintExpr.class, "LintExpr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getLintExpr_LintStmt(), this.getLintStatement(), null, "lintStmt", null, 0, 1, LintExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
     initEClass(listFilterMapExprEClass, ListFilterMapExpr.class, "ListFilterMapExpr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getListFilterMapExpr_Map(), this.getExpr(), null, "map", null, 0, 1, ListFilterMapExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getListFilterMapExpr_Args(), this.getArg(), null, "args", null, 0, -1, ListFilterMapExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1948,6 +2191,16 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     initEClass(letExprEClass, LetExpr.class, "LetExpr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getLetExpr_Binding(), this.getLetBinding(), null, "binding", null, 0, 1, LetExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getLetExpr_Expr(), this.getExpr(), null, "expr", null, 0, 1, LetExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(warningStatementEClass, WarningStatement.class, "WarningStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+    initEClass(errorStatementEClass, ErrorStatement.class, "ErrorStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+    initEClass(infoStatementEClass, InfoStatement.class, "InfoStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+    initEClass(proveStatementEClass, ProveStatement.class, "ProveStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+    initEClass(checkStatementEClass, CheckStatement.class, "CheckStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
     // Create resource
     createResource(eNS_URI);

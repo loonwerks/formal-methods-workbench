@@ -37,6 +37,11 @@
             id="com.rockwellcollins.atc.resolute.analysis.commands.resolute"
             name="Resolute">
      </command>
+     <command
+           categoryId="com.rockwellcollins.atc.resolute.analysis.commands"
+           id="com.rockwellcollins.atc.resolute.analysis.commands.linter"
+           name="Linter">
+     </command>
 	 <command categoryId="com.rockwellcollins.atc.resolute.analysis.commands"
 	           id="com.rockwellcollins.atc.resolute.analysis.commands.resolutePredefined" 
 	          name="RESOLUTE Predefined">
@@ -109,6 +114,12 @@
                mnemonic="r"
                style="push">
          </command>
+         <command
+               commandId="com.rockwellcollins.atc.resolute.analysis.commands.linter"
+               icon="icons/claims.png"
+               id="com.rockwellcollins.atc.resolute.analysis.menus.linter"
+               style="push">
+         </command>
          <menu
                icon="icons/claims.png"
                id="com.rockwellcollins.atc.resolute.analysis.menus.predefined"
@@ -149,6 +160,10 @@
                   definitionId="com.rockwellcollins.atc.resolute.analysis.expressions.isSingleOutlineSelection">
             </reference>
          </enabledWhen>
+      </handler>
+      <handler
+            class="com.rockwellcollins.atc.resolute.analysis.handlers.LinterHandler"
+            commandId="com.rockwellcollins.atc.resolute.analysis.commands.linter">
       </handler>
       <handler
             class="com.rockwellcollins.atc.resolute.analysis.handlers.ResoluteHandler"
@@ -193,5 +208,16 @@
             file="resources/Resolute_Stdlib.aadl"
             id="com.rockwellcollins.atc.resolute.analysis.aadlcontribution4">
       </aadlcontribution>
+   </extension>
+   <extension
+         id="com.rockwellcollins.atc.resolute.linter.marker"
+         name="Linter Marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.osate.aadl2.modelsupport.AadlObjectMarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
    </extension>
 </plugin>

@@ -43,6 +43,7 @@ import com.rockwellcollins.atc.resolute.resolute.UnaryExpr
 import com.rockwellcollins.atc.resolute.services.ResoluteGrammarAccess
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.osate.xtext.aadl2.properties.formatting2.PropertiesFormatter
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement
 
 class ResoluteFormatter extends PropertiesFormatter {
 	
@@ -250,7 +251,8 @@ class ResoluteFormatter extends PropertiesFormatter {
 
 	def dispatch void format(ResoluteSubclause resolutesubclause, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		for (ProveStatement proves : resolutesubclause.getProves()) {
+//		for (ProveStatement proves : resolutesubclause.getProves()) {
+		for (AnalysisStatement proves : resolutesubclause.getProves()) {
 			proves.surround[newLines=1]
 			format(proves, document);
 		}

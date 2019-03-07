@@ -2,11 +2,13 @@ package com.rockwellcollins.atc.agree.parsing;
 
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.modelsupport.errorreporting.NullParseErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.annexsupport.AnnexParseUtil;
 import org.osate.annexsupport.AnnexParser;
 
 import com.google.inject.Injector;
+import com.rockwellcollins.atc.agree.agree.NamedSpecStatement;
 import com.rockwellcollins.atc.agree.parser.antlr.AgreeParser;
 import com.rockwellcollins.atc.agree.services.AgreeGrammarAccess;
 import com.rockwellcollins.atc.agree.ui.internal.AgreeActivator;
@@ -40,6 +42,11 @@ public class AgreeAnnexParser implements AnnexParser {
 			ParseErrorReporter errReporter) {
 		return (AnnexSubclause) AnnexParseUtil.parse(getParser(), source, getGrammarAccess().getAgreeSubclauseRule(),
 				filename, line, column, errReporter);
+	}
+
+	public NamedSpecStatement parseNamedSpecStatement(String namedSpecStatement) {
+		return (NamedSpecStatement) AnnexParseUtil.parse(getParser(), namedSpecStatement,
+				getGrammarAccess().getNamedSpecStatementRule(), "", 0, 0, NullParseErrorReporter.prototype);
 	}
 
 }

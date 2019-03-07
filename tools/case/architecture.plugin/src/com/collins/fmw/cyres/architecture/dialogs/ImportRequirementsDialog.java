@@ -140,13 +140,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		lblCompName.setText(compName);
 		lblComponents.add(compName);
 
-//		Button btnAgree = new Button(container, SWT.CHECK);
-//		btnAgree.setText("");
-//		btnAgree.setSelection(false);
-//		GridData agreePropInfoField = new GridData(SWT.CENTER, SWT.FILL, true, false);
-//		btnAgree.setLayoutData(agreePropInfoField);
-//		btnAgreeProps.add(btnAgree);
-
 		Text txtAgree = new Text(container, SWT.BORDER);
 		GridData agreeInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
 		txtAgree.setLayoutData(agreeInfoField);
@@ -196,16 +189,10 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.");
 					return false;
 				}
-//				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-//						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
-//						txtRationales.get(i).getText()));
 				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
 						lblReqTexts.get(i), lblComponents.get(i), txtAgreeProps.get(i).getText(),
 						txtRationales.get(i).getText()));
 			} else {
-//				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-//						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
-//						txtRationales.get(i).getText()));
 				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
 						lblReqTexts.get(i), lblComponents.get(i), txtAgreeProps.get(i).getText(),
 						txtRationales.get(i).getText()));
