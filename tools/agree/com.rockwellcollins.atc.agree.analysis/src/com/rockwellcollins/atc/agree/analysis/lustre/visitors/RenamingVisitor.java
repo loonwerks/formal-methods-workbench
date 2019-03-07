@@ -165,11 +165,29 @@ public class RenamingVisitor extends AstIterVisitor {
 		}
 
 		if (reference instanceof GuaranteeStatement) {
-			return ((GuaranteeStatement) reference).getStr();
+			String id = ((GuaranteeStatement) reference).getName();
+			if (id == null || id.isEmpty()) {
+				id = "";
+			} else {
+				id = "[" + id + "] ";
+			}
+			return id + ((GuaranteeStatement) reference).getStr();
 		} else if (reference instanceof AssumeStatement) {
-			return prefix + " assume: " + ((AssumeStatement) reference).getStr();
+			String id = ((AssumeStatement) reference).getName();
+			if (id == null || id.isEmpty()) {
+				id = "";
+			} else {
+				id = "[" + id + "] ";
+			}
+			return prefix + " assume: " + id + ((AssumeStatement) reference).getStr();
 		} else if (reference instanceof LemmaStatement) {
-			return prefix + " lemma: " + ((LemmaStatement) reference).getStr();
+			String id = ((LemmaStatement) reference).getName();
+			if (id == null || id.isEmpty()) {
+				id = "";
+			} else {
+				id = "[" + id + "] ";
+			}
+			return prefix + " lemma: " + id + ((LemmaStatement) reference).getStr();
 		} else if (reference instanceof AssertStatement) {
 			throw new AgreeException("We really didn't expect to see an assert statement here");
 		} else if (reference instanceof Arg) {
