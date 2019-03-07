@@ -67,7 +67,7 @@ public class AgreeAnnexUnparser implements AnnexUnparser {
 		return indent + getSerializer().serialize(agreeContract);
 	}
 
-	public String unparseNamesSpecStatement(NamedSpecStatement namedSpecStatement, String indent) {
+	public String unparseNamedSpecStatement(NamedSpecStatement namedSpecStatement, String indent) {
 		return indent + getSerializer().serialize(namedSpecStatement);
 	}
 
