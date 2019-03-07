@@ -498,7 +498,6 @@ public abstract class AadlHandler extends AbstractHandler {
 		} else if (num == 0 && !startWithBase) {
 			num = 1;
 		}
-//		int num = (startWithBase ? 0 : 1);
 
 		do {
 			if (names.contains(newIdentifier)) {

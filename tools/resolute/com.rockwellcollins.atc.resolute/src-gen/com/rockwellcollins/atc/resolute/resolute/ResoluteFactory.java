@@ -149,13 +149,40 @@ public interface ResoluteFactory extends EFactory
   NestedDotID createNestedDotID();
 
   /**
-   * Returns a new object of class '<em>Prove Statement</em>'.
+   * Returns a new object of class '<em>Lint Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>Prove Statement</em>'.
+   * @return a new object of class '<em>Lint Statement</em>'.
    * @generated
    */
-  ProveStatement createProveStatement();
+  LintStatement createLintStatement();
+
+  /**
+   * Returns a new object of class '<em>Ruleset</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Ruleset</em>'.
+   * @generated
+   */
+  Ruleset createRuleset();
+
+  /**
+   * Returns a new object of class '<em>Ruleset Body</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Ruleset Body</em>'.
+   * @generated
+   */
+  RulesetBody createRulesetBody();
+
+  /**
+   * Returns a new object of class '<em>Analysis Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Analysis Statement</em>'.
+   * @generated
+   */
+  AnalysisStatement createAnalysisStatement();
 
   /**
    * Returns a new object of class '<em>List Type</em>'.
@@ -374,6 +401,15 @@ public interface ResoluteFactory extends EFactory
   FnCallExpr createFnCallExpr();
 
   /**
+   * Returns a new object of class '<em>Lint Expr</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Lint Expr</em>'.
+   * @generated
+   */
+  LintExpr createLintExpr();
+
+  /**
    * Returns a new object of class '<em>List Filter Map Expr</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -417,6 +453,51 @@ public interface ResoluteFactory extends EFactory
    * @generated
    */
   LetExpr createLetExpr();
+
+  /**
+   * Returns a new object of class '<em>Warning Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Warning Statement</em>'.
+   * @generated
+   */
+  WarningStatement createWarningStatement();
+
+  /**
+   * Returns a new object of class '<em>Error Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Error Statement</em>'.
+   * @generated
+   */
+  ErrorStatement createErrorStatement();
+
+  /**
+   * Returns a new object of class '<em>Info Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Info Statement</em>'.
+   * @generated
+   */
+  InfoStatement createInfoStatement();
+
+  /**
+   * Returns a new object of class '<em>Prove Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Prove Statement</em>'.
+   * @generated
+   */
+  ProveStatement createProveStatement();
+
+  /**
+   * Returns a new object of class '<em>Check Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Check Statement</em>'.
+   * @generated
+   */
+  CheckStatement createCheckStatement();
 
   /**
    * Returns the package supported by this factory.

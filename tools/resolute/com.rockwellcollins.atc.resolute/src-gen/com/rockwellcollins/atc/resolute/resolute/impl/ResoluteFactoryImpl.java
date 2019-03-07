@@ -78,7 +78,10 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
       case ResolutePackage.LET_BINDING: return createLetBinding();
       case ResolutePackage.RESOLUTE_SUBCLAUSE: return createResoluteSubclause();
       case ResolutePackage.NESTED_DOT_ID: return createNestedDotID();
-      case ResolutePackage.PROVE_STATEMENT: return createProveStatement();
+      case ResolutePackage.LINT_STATEMENT: return createLintStatement();
+      case ResolutePackage.RULESET: return createRuleset();
+      case ResolutePackage.RULESET_BODY: return createRulesetBody();
+      case ResolutePackage.ANALYSIS_STATEMENT: return createAnalysisStatement();
       case ResolutePackage.LIST_TYPE: return createListType();
       case ResolutePackage.SET_TYPE: return createSetType();
       case ResolutePackage.LIBRARY_FN_TYPE: return createLibraryFnType();
@@ -103,11 +106,17 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
       case ResolutePackage.LIBRARY_FN_CALL_EXPR: return createLibraryFnCallExpr();
       case ResolutePackage.BUILT_IN_FN_CALL_EXPR: return createBuiltInFnCallExpr();
       case ResolutePackage.FN_CALL_EXPR: return createFnCallExpr();
+      case ResolutePackage.LINT_EXPR: return createLintExpr();
       case ResolutePackage.LIST_FILTER_MAP_EXPR: return createListFilterMapExpr();
       case ResolutePackage.LIST_EXPR: return createListExpr();
       case ResolutePackage.SET_FILTER_MAP_EXPR: return createSetFilterMapExpr();
       case ResolutePackage.SET_EXPR: return createSetExpr();
       case ResolutePackage.LET_EXPR: return createLetExpr();
+      case ResolutePackage.WARNING_STATEMENT: return createWarningStatement();
+      case ResolutePackage.ERROR_STATEMENT: return createErrorStatement();
+      case ResolutePackage.INFO_STATEMENT: return createInfoStatement();
+      case ResolutePackage.PROVE_STATEMENT: return createProveStatement();
+      case ResolutePackage.CHECK_STATEMENT: return createCheckStatement();
       default:
         throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
     }
@@ -272,10 +281,43 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
-  public ProveStatement createProveStatement()
+  public LintStatement createLintStatement()
   {
-    ProveStatementImpl proveStatement = new ProveStatementImpl();
-    return proveStatement;
+    LintStatementImpl lintStatement = new LintStatementImpl();
+    return lintStatement;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Ruleset createRuleset()
+  {
+    RulesetImpl ruleset = new RulesetImpl();
+    return ruleset;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public RulesetBody createRulesetBody()
+  {
+    RulesetBodyImpl rulesetBody = new RulesetBodyImpl();
+    return rulesetBody;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public AnalysisStatement createAnalysisStatement()
+  {
+    AnalysisStatementImpl analysisStatement = new AnalysisStatementImpl();
+    return analysisStatement;
   }
 
   /**
@@ -547,6 +589,17 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  public LintExpr createLintExpr()
+  {
+    LintExprImpl lintExpr = new LintExprImpl();
+    return lintExpr;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   public ListFilterMapExpr createListFilterMapExpr()
   {
     ListFilterMapExprImpl listFilterMapExpr = new ListFilterMapExprImpl();
@@ -595,6 +648,61 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
   {
     LetExprImpl letExpr = new LetExprImpl();
     return letExpr;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public WarningStatement createWarningStatement()
+  {
+    WarningStatementImpl warningStatement = new WarningStatementImpl();
+    return warningStatement;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ErrorStatement createErrorStatement()
+  {
+    ErrorStatementImpl errorStatement = new ErrorStatementImpl();
+    return errorStatement;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public InfoStatement createInfoStatement()
+  {
+    InfoStatementImpl infoStatement = new InfoStatementImpl();
+    return infoStatement;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ProveStatement createProveStatement()
+  {
+    ProveStatementImpl proveStatement = new ProveStatementImpl();
+    return proveStatement;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public CheckStatement createCheckStatement()
+  {
+    CheckStatementImpl checkStatement = new CheckStatementImpl();
+    return checkStatement;
   }
 
   /**

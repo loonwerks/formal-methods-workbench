@@ -2,7 +2,7 @@
  */
 package com.rockwellcollins.atc.resolute.resolute.impl;
 
-import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.ResolutePackage;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 
@@ -43,7 +43,7 @@ public class ResoluteSubclauseImpl extends AnnexSubclauseImpl implements Resolut
    * @generated
    * @ordered
    */
-  protected EList<ProveStatement> proves;
+  protected EList<AnalysisStatement> proves;
 
   /**
    * <!-- begin-user-doc -->
@@ -71,11 +71,11 @@ public class ResoluteSubclauseImpl extends AnnexSubclauseImpl implements Resolut
    * <!-- end-user-doc -->
    * @generated
    */
-  public EList<ProveStatement> getProves()
+  public EList<AnalysisStatement> getProves()
   {
     if (proves == null)
     {
-      proves = new EObjectContainmentEList<ProveStatement>(ProveStatement.class, this, ResolutePackage.RESOLUTE_SUBCLAUSE__PROVES);
+      proves = new EObjectContainmentEList<AnalysisStatement>(AnalysisStatement.class, this, ResolutePackage.RESOLUTE_SUBCLAUSE__PROVES);
     }
     return proves;
   }
@@ -125,7 +125,7 @@ public class ResoluteSubclauseImpl extends AnnexSubclauseImpl implements Resolut
     {
       case ResolutePackage.RESOLUTE_SUBCLAUSE__PROVES:
         getProves().clear();
-        getProves().addAll((Collection<? extends ProveStatement>)newValue);
+        getProves().addAll((Collection<? extends AnalysisStatement>)newValue);
         return;
     }
     super.eSet(featureID, newValue);

@@ -28,7 +28,7 @@ public interface ResoluteSubclause extends EObject, AnnexSubclause
 {
   /**
    * Returns the value of the '<em><b>Proves</b></em>' containment reference list.
-   * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.ProveStatement}.
+   * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.AnalysisStatement}.
    * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Proves</em>' containment reference list isn't clear,
@@ -40,6 +40,6 @@ public interface ResoluteSubclause extends EObject, AnnexSubclause
    * @model containment="true"
    * @generated
    */
-  EList<ProveStatement> getProves();
+  EList<AnalysisStatement> getProves();
 
 } // ResoluteSubclause

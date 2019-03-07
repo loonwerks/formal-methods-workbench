@@ -54,6 +54,7 @@ import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
 import com.rockwellcollins.atc.resolute.resolute.BuiltInFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.CastExpr;
+import com.rockwellcollins.atc.resolute.resolute.CheckStatement;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ConstantDefinition;
 import com.rockwellcollins.atc.resolute.resolute.DefinitionBody;
@@ -70,6 +71,8 @@ import com.rockwellcollins.atc.resolute.resolute.LetBinding;
 import com.rockwellcollins.atc.resolute.resolute.LetExpr;
 import com.rockwellcollins.atc.resolute.resolute.LibraryFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.LibraryFnType;
+import com.rockwellcollins.atc.resolute.resolute.LintExpr;
+import com.rockwellcollins.atc.resolute.resolute.LintStatement;
 import com.rockwellcollins.atc.resolute.resolute.ListExpr;
 import com.rockwellcollins.atc.resolute.resolute.ListFilterMapExpr;
 import com.rockwellcollins.atc.resolute.resolute.NestedDotID;
@@ -78,6 +81,7 @@ import com.rockwellcollins.atc.resolute.resolute.QuantArg;
 import com.rockwellcollins.atc.resolute.resolute.QuantifiedExpr;
 import com.rockwellcollins.atc.resolute.resolute.RealExpr;
 import com.rockwellcollins.atc.resolute.resolute.ResolutePackage;
+import com.rockwellcollins.atc.resolute.resolute.Ruleset;
 import com.rockwellcollins.atc.resolute.resolute.SetExpr;
 import com.rockwellcollins.atc.resolute.resolute.SetFilterMapExpr;
 import com.rockwellcollins.atc.resolute.resolute.StringExpr;
@@ -119,6 +123,59 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		}
 
 		error(prove, "Prove statements must contain a claim");
+	}
+
+	@Check
+	public void checkCheckStatement(CheckStatement check) {
+		Expr checkExpr = check.getExpr();
+
+		if (checkExpr instanceof IdExpr) {
+			IdExpr idExpr = (IdExpr) checkExpr;
+			if (idExpr.getId() instanceof Ruleset) {
+				Ruleset ruleset = (Ruleset) idExpr.getId();
+				if (ruleset.getBody().getLintStatements().isEmpty()) {
+					warning(checkExpr, "Ruleset " + ruleset.getName() + " is empty");
+					return;
+				} else if (ruleset.eIsProxy()) {
+					error(checkExpr, "Could not find ruleset " + ruleset.getName());
+					return;
+				} else {
+					return;
+				}
+			} else {
+				error(checkExpr, "Not a valid ruleset");
+				return;
+			}
+		} else if (checkExpr instanceof LintExpr) {
+			LintStatement lint = ((LintExpr) checkExpr).getLintStmt();
+			if (lint.getExpr() instanceof FnCallExpr) {
+				FnCallExpr fnCallExpr = (FnCallExpr) lint.getExpr();
+				if (fnCallExpr.getFn().getBody() instanceof ClaimBody) {
+					return;
+				}
+				if (fnCallExpr.getFn().eIsProxy()) {
+					error(checkExpr, "Could not find rule function");
+					return;
+				}
+			}
+		}
+
+		error(check, "Check statements must contain either a ruleset or lint call");
+	}
+
+	@Check
+	public void checkLintStatement(LintStatement lintStmt) {
+
+		if (lintStmt.getExpr() instanceof FnCallExpr) {
+			FnCallExpr fnCallExpr = (FnCallExpr) lintStmt.getExpr();
+			if (fnCallExpr.getFn().getBody() instanceof ClaimBody) {
+				return;
+			}
+			if (fnCallExpr.getFn().eIsProxy()) {
+				error(lintStmt, "Could not find rule function");
+				return;
+			}
+		}
 	}
 
 	@Check
@@ -368,7 +425,8 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 	private boolean inClaimContext(EObject obj) {
 		EObject context = obj.eContainer();
 
-		if (context instanceof ClaimBody || context instanceof ProveStatement) {
+//		if (context instanceof ClaimBody || context instanceof ProveStatement) {
+		if (context instanceof ClaimBody || context instanceof ProveStatement || context instanceof LintStatement) {
 			return true;
 		}
 
@@ -766,6 +824,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		case "has_type":
 		case "features":
 		case "is_data_access":
+		case "is_bus_access":
 		case "is_data_port":
 		case "is_port":
 
@@ -829,6 +888,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 			// Primary type: connection
 		case "source":
 		case "destination":
+		case "is_bidirectional":
 			expectedTypes.add(BaseType.CONNECTION);
 			break;
 
@@ -1307,7 +1367,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		case "direction":
 			return BaseType.STRING;
 
-
+		case "is_bidirectional":
 		case "is_event_port":
 		case "is_processor":
 		case "is_virtual_processor":

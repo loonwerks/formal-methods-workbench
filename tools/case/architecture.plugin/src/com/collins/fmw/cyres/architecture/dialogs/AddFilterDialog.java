@@ -35,7 +35,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> strPropagateGuarantees = new ArrayList<>();
 	private List<String> strResoluteClauses = new ArrayList<>();
 
-
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
 		setHelpAvailable(false);
@@ -239,10 +238,16 @@ public class AddFilterDialog extends TitleAreaDialog {
 		for (int i = 0; i < btnPropagateGuarantees.size(); i++) {
 			if (btnPropagateGuarantees.get(i).getSelection()) {
 
+				// TODO: Maybe look into passing actual guarantees instead of strings, that way we can parse/unparse it
+//				AgreeAnnexParser parser = new AgreeAnnexParser();
+//				NamedSpecStatement nss = parser.parseNamedSpecStatement(strSourceGuarantees.get(i));
+//				AgreeAnnexUnparser unparser = new AgreeAnnexUnparser();
+//				String expr = unparser.unparseExpr(nss.getExpr(), "").trim();
+//				String desc = nss.getStr().trim();
+//				String id = nss.getName();
 				// Parse the guarantee (for now do it the old fashioned way)
 				String guarantee = strSourceGuarantees.get(i);
-				String expr = guarantee.substring(guarantee.lastIndexOf(":") + 1, guarantee.lastIndexOf(";"))
-						.trim();
+				String expr = guarantee.substring(guarantee.lastIndexOf(":") + 1, guarantee.lastIndexOf(";")).trim();
 				String desc = guarantee.substring(guarantee.indexOf("\""), guarantee.lastIndexOf("\"") + 1).trim();
 				String id = guarantee.substring(guarantee.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
 						guarantee.indexOf("\"")).trim();
