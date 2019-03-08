@@ -13,7 +13,7 @@
 	<properties>
 		<tycho.version>1.0.0</tycho.version>
 		<tycho-extras.version>1.0.0</tycho-extras.version>
-		<xtext.version>2.12.0</xtext.version>
+		<xtext.version>2.16.0</xtext.version>
 		<xsemantics.version>1.16.0-SNAPSHOT</xsemantics.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!--
@@ -79,7 +79,9 @@
 		<module>agree</module>
 		<module>resolute</module>
 		<module>case</module>
+    <!---
 		<module>ide</module>
+    -->
 	</modules>
 
 
@@ -415,7 +417,6 @@
 
 		<pluginManagement>
 			<plugins>
-
         
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>

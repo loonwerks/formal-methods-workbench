@@ -101,8 +101,7 @@ public class AddFilter extends AadlHandler {
 			filterResoluteClause = wizard.getResoluteClause();
 			filterAgreeProperty = wizard.getAgreeProperty();
 			propagatedGuarantees = wizard.getGuaranteeList();
-		}
-		else {
+		} else {
 			return;
 		}
 
@@ -215,8 +214,7 @@ public class AddFilter extends AadlHandler {
 				} else if (port instanceof EventPort) {
 //					portIn = filterThreadType.createOwnedEventPort();
 //					portOut = filterThreadType.createOwnedEventPort();
-					Dialog.showError("Incompatible port type",
-							"Cannot connect a filter to a non-data port.");
+					Dialog.showError("Incompatible port type", "Cannot connect a filter to a non-data port.");
 					return;
 				} else {
 					Dialog.showError("Undetermined port type",
@@ -247,8 +245,8 @@ public class AddFilter extends AadlHandler {
 				try {
 					filterPropId = filterAgreeProperty
 							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-								filterAgreeProperty.indexOf("\""))
-						.trim();
+									filterAgreeProperty.indexOf("\""))
+							.trim();
 
 				} catch (IndexOutOfBoundsException e) {
 					// agree property is malformed, so leave blank
@@ -312,8 +310,7 @@ public class AddFilter extends AadlHandler {
 				// Create connection from filter to connection destination
 				final PortConnection portConnOut = newImpl.createOwnedPortConnection();
 				// Give it a unique name
-				portConnOut
-						.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
+				portConnOut.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
 				portConnOut.setBidirectional(false);
 				final ConnectedElement filterOutSrc = portConnOut.createSource();
 				filterOutSrc.setContext(filterThreadSubComp);
@@ -329,8 +326,7 @@ public class AddFilter extends AadlHandler {
 
 				// Add new implementation to package and place immediately above original implementation
 				pkgSection.getOwnedClassifiers().add(newImpl);
-				pkgSection.getOwnedClassifiers().move(
-						getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
+				pkgSection.getOwnedClassifiers().move(getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Add add_filter claims to resolute prove statement, if applicable
@@ -349,8 +345,7 @@ public class AddFilter extends AadlHandler {
 								// Add arguments
 								int startIdx = sourceText.indexOf(filterResoluteClause + "(")
 										+ filterResoluteClause.length() + 1;
-								String args = sourceText.substring(startIdx,
-										sourceText.indexOf(")", startIdx));
+								String args = sourceText.substring(startIdx, sourceText.indexOf(")", startIdx));
 								sourceText = sourceText.replace(filterResoluteClause + "(" + args + ")",
 										filterResoluteClause + "(" + args + ", " + dataFeatureClassifier.getName()
 												+ ")");
@@ -399,12 +394,10 @@ public class AddFilter extends AadlHandler {
 
 					agreeClauses = agreeClauses + "\t\t**}";
 
-					final DefaultAnnexSubclause annexSubclauseImpl = filterThreadType
-							.createOwnedAnnexSubclause();
+					final DefaultAnnexSubclause annexSubclauseImpl = filterThreadType.createOwnedAnnexSubclause();
 					annexSubclauseImpl.setName("agree");
 					annexSubclauseImpl.setSourceText(agreeClauses);
 				}
-
 
 			}
 		});

@@ -45,8 +45,7 @@ public class AddRequirement extends AbstractHandler {
 		public String agree = "";
 		public String rationale = "";
 
-		public CASE_Requirement(String name, String id, String text, String component, String agree,
-				String rationale) {
+		public CASE_Requirement(String name, String id, String text, String component, String agree, String rationale) {
 			this.name = name;
 			this.id = id;
 			this.text = text;
@@ -126,8 +125,7 @@ public class AddRequirement extends AbstractHandler {
 				}
 
 				if (!agreeProp.isEmpty()) {
-					DefaultAnnexSubclause agreeSubclause = threadType
-							.createOwnedAnnexSubclause();
+					DefaultAnnexSubclause agreeSubclause = threadType.createOwnedAnnexSubclause();
 					agreeSubclause.setName("agree");
 					if (!assumeStatement.contains("**}")) {
 						assumeStatement = assumeStatement + System.lineSeparator() + "\t\t**}";
@@ -135,14 +133,12 @@ public class AddRequirement extends AbstractHandler {
 					agreeSubclause.setSourceText(assumeStatement);
 				}
 
-				DefaultAnnexSubclause resoluteSubclause = threadType
-						.createOwnedAnnexSubclause();
+				DefaultAnnexSubclause resoluteSubclause = threadType.createOwnedAnnexSubclause();
 				resoluteSubclause.setName("resolute");
 				if (!proveStatement.contains("**}")) {
 					proveStatement = proveStatement + System.lineSeparator() + "\t\t**}";
 				}
 				resoluteSubclause.setSourceText(proveStatement);
-
 
 				// Delete and re-insert this component from package section
 				// This seems to be the only way to get the formatting (mostly) correct
@@ -192,7 +188,6 @@ public class AddRequirement extends AbstractHandler {
 		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
 		return xtextEditor.getDocument().readOnly(resource -> {
-
 
 			List<CASE_Requirement> resoluteClauses = new ArrayList<>();
 
