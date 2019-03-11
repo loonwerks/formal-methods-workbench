@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/com.collins.fmw.cyres.feature_0.0.0.jar" id="com.collins.fmw.cyres.feature" version="0.0.0"/>
+   <feature id="com.collins.fmw.cyres.feature">
+      <category name="fm.workbench"/>
+   </feature>
+
+   <feature id="com.collins.fmw.cyres.feature.source">
+      <category name="fm.workbench.source"/>
+   </feature>
+   <category-def name="fm.workbench" label="CASE"/>
+   <category-def name="fm.workbench.source" label="CASE Source Code"/>
 </site>
