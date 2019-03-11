@@ -77,11 +77,8 @@ public class ResoluteFormatter extends PropertiesFormatter {
     for (final Definition definitions : _definitions) {
       {
         if ((i != 0)) {
-          final Procedure1<IHiddenRegionFormatter> _function = new Procedure1<IHiddenRegionFormatter>() {
-            @Override
-            public void apply(final IHiddenRegionFormatter it) {
-              it.setNewLines(2);
-            }
+          final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+            it.setNewLines(2);
           };
           document.<Definition>prepend(definitions, _function);
         }
@@ -117,31 +114,19 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final FunctionDefinition functiondefinition, @Extension final IFormattableDocument document) {
-    final Procedure1<IHiddenRegionFormatter> _function = new Procedure1<IHiddenRegionFormatter>() {
-      @Override
-      public void apply(final IHiddenRegionFormatter it) {
-        it.noSpace();
-      }
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
     };
-    final Procedure1<IHiddenRegionFormatter> _function_1 = new Procedure1<IHiddenRegionFormatter>() {
-      @Override
-      public void apply(final IHiddenRegionFormatter it) {
-        it.oneSpace();
-      }
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.oneSpace();
     };
     document.append(document.prepend(this.textRegionExtensions.regionFor(functiondefinition).keyword("("), _function), _function_1);
-    final Procedure1<IHiddenRegionFormatter> _function_2 = new Procedure1<IHiddenRegionFormatter>() {
-      @Override
-      public void apply(final IHiddenRegionFormatter it) {
-        it.oneSpace();
-      }
+    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
+      it.oneSpace();
     };
     document.surround(this.textRegionExtensions.regionFor(functiondefinition).keyword(")"), _function_2);
-    final Procedure1<IHiddenRegionFormatter> _function_3 = new Procedure1<IHiddenRegionFormatter>() {
-      @Override
-      public void apply(final IHiddenRegionFormatter it) {
-        it.noSpace();
-      }
+    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
     };
     document.prepend(this.textRegionExtensions.regionFor(functiondefinition).keyword(","), _function_3);
     EList<Arg> _args = functiondefinition.getArgs();
@@ -157,22 +142,16 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final ClaimBody claimbody, @Extension final IFormattableDocument document) {
-    final Procedure1<IHiddenRegionFormatter> _function = new Procedure1<IHiddenRegionFormatter>() {
-      @Override
-      public void apply(final IHiddenRegionFormatter it) {
-        it.setNewLines(1);
-      }
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
     };
     document.append(this.textRegionExtensions.regionFor(claimbody).keyword("<="), _function);
     EList<ClaimText> _claim = claimbody.getClaim();
     for (final ClaimText claim : _claim) {
       this.format(claim, document);
     }
-    final Procedure1<IHiddenRegionFormatter> _function_1 = new Procedure1<IHiddenRegionFormatter>() {
-      @Override
-      public void apply(final IHiddenRegionFormatter it) {
-        it.setNewLines(1);
-      }
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
     };
     document.<Expr>prepend(claimbody.getExpr(), _function_1);
     this.format(claimbody.getExpr(), document);
@@ -299,11 +278,8 @@ public class ResoluteFormatter extends PropertiesFormatter {
     EList<AnalysisStatement> _proves = resolutesubclause.getProves();
     for (final AnalysisStatement proves : _proves) {
       {
-        final Procedure1<IHiddenRegionFormatter> _function = new Procedure1<IHiddenRegionFormatter>() {
-          @Override
-          public void apply(final IHiddenRegionFormatter it) {
-            it.setNewLines(1);
-          }
+        final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+          it.setNewLines(1);
         };
         document.<AnalysisStatement>surround(proves, _function);
         this.format(proves, document);

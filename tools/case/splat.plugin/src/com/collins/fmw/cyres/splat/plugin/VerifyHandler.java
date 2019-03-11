@@ -31,7 +31,6 @@ import org.osgi.framework.Bundle;
 
 import com.collins.fmw.cyres.json.plugin.AgreeJson;
 
-
 public class VerifyHandler extends AbstractHandler {
 
 	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
@@ -75,7 +74,6 @@ public class VerifyHandler extends AbstractHandler {
 					"Running HOL proof of Filter Properties.\n" + "File: " + fullpath + "\n"
 							+ "See output in console.");
 
-
 			Bundle bundle = Platform.getBundle(bundleId);
 
 			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
@@ -107,7 +105,6 @@ public class VerifyHandler extends AbstractHandler {
 			System.err.println("Trouble in Filter Verification");
 			e.printStackTrace();
 		}
-
 
 		return null;
 	}

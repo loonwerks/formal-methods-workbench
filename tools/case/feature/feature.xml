@@ -46,7 +46,7 @@
          unpack="false"/>
 
    <plugin
-         id="com.collins.fmw.cyres.agree.json.plugin"
+         id="com.collins.fmw.cyres.json.plugin"
          download-size="0"
          install-size="0"
          version="0.0.0"

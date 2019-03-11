@@ -43,7 +43,7 @@ The exception is for submodules that are from external repos, such as smaccm and
 ```
 formal-methods-workbench
 |- com.collins.fmw.cyres
-|  |- agree.json.plugin
+|  |- json.plugin
 |  |  `- pom.xml
 |  |
 |  |- architecture.plugin
