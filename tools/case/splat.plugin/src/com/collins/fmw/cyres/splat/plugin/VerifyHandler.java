@@ -29,7 +29,7 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osgi.framework.Bundle;
 
-import com.collins.fmw.cyres.agree.json.plugin.AgreeJson;
+import com.collins.fmw.cyres.json.plugin.AgreeJson;
 
 
 public class VerifyHandler extends AbstractHandler {

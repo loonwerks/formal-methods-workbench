@@ -1,4 +1,4 @@
-package com.collins.fmw.cyres.agree.json.plugin;
+package com.collins.fmw.cyres.json.plugin;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import com.collins.fmw.json.ArrayValue;
 import com.collins.fmw.json.Value;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -68,7 +69,7 @@ public class AgreeJson {
 		List<ModelUnit> modelUnits = new ArrayList<>();
 		getModelDependencies(model, modelUnits);
 
-		ArrayList<Value> modelBuilder = new ArrayList<Value>();
+		JsonArray modelBuilder = new JsonArray();
 		Iterator<ModelUnit> i = modelUnits.iterator();
 
 		while (i.hasNext()) {
@@ -81,8 +82,7 @@ public class AgreeJson {
 		}
 
 		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-		JsonParser jp = new JsonParser();
-		JsonElement je = jp.parse(ArrayValue.build(modelBuilder).toString());
+		JsonElement je = modelBuilder;
 
 		URI jsonURI = null;
 		try {
