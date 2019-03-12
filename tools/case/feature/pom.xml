@@ -46,6 +46,4 @@
             </plugin>
         </plugins>
     </build>
-    <version>0.0.0</version>
-
 </project>

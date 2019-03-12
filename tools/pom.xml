@@ -165,10 +165,12 @@
 									<resources>
 										<resource>
 											<directory>${basedir}</directory>
+                      <!--
 											<includes>
 												<include>about.mappings</include>
 												<include>plugin.properties</include>
 											</includes>
+                      -->
 											<filtering>true</filtering>
 										</resource>
 									</resources>
@@ -179,6 +181,8 @@
 							</execution>
 						</executions>
 					</plugin>
+
+          <!--
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>tycho-packaging-plugin</artifactId>
@@ -195,6 +199,8 @@
 							</additionalFileSets>
 						</configuration>
 					</plugin>
+          -->
+
 				</plugins>
 			</build>
 		</profile>
@@ -359,31 +365,31 @@
 						<artifactId>org.eclipse.jdt.compiler.tool</artifactId>
 						<version>1.2.101</version>
 					</dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.common</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.ecore</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.codegen</artifactId>
-                        <version>2.11.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.codegen.ecore</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
+            <dependency>
+                <groupId>org.eclipse.emf</groupId>
+                <artifactId>org.eclipse.emf.common</artifactId>
+                <version>2.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.emf</groupId>
+                <artifactId>org.eclipse.emf.ecore</artifactId>
+                <version>2.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.emf</groupId>
+                <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
+                <version>2.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.emf</groupId>
+                <artifactId>org.eclipse.emf.codegen</artifactId>
+                <version>2.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.emf</groupId>
+                <artifactId>org.eclipse.emf.codegen.ecore</artifactId>
+                <version>2.12.0</version>
+            </dependency>
 				</dependencies>
 			</plugin>
 			<plugin>
@@ -422,13 +428,21 @@
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-p2-repository-plugin</artifactId>
 					<version>${tycho.version}</version>
+          <!--
+          <configuration>
+              <includeAllDependencies>true</includeAllDependencies>
+              <createArtifactRepository>true</createArtifactRepository>
+              <compress>true</compress>
+          </configuration>
+          -->
         </plugin>
         
+
+        <!--
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-packaging-plugin</artifactId>
 					<version>${tycho.version}</version>
-          <!--
 					<dependencies>
 						<dependency>
 							<groupId>org.eclipse.tycho.extras</groupId>
@@ -444,8 +458,8 @@
 							pom.xml
 						</jgit.ignore>
 					</configuration>
-          -->
 				</plugin>
+          -->
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-surefire-plugin</artifactId>

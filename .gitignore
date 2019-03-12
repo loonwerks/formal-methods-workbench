@@ -40,3 +40,5 @@ TAGS
 *.class
 *~HEAD
 target
+
+\#*\#
