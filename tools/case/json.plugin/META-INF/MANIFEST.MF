@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: com.collins.fmw.cyres.agree.json.plugin
-Bundle-SymbolicName: com.collins.fmw.cyres.agree.json.plugin;singleton:=true
+Bundle-Name: com.collins.fmw.cyres.json.plugin
+Bundle-SymbolicName: com.collins.fmw.cyres.json.plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Automatic-Module-Name: com.collins.fmw.cyres.agree.json.plugin
+Automatic-Module-Name: com.collins.fmw.cyres.json.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,
@@ -11,12 +11,11 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.emf.common,
  org.eclipse.ui.console
 Import-Package: com.collins.fmw.cyres.util.plugin,
+ com.google.gson;version="2.8.2",
  com.rockwellcollins.atc.agree.agree,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.osate.aadl2.instantiation,
  org.osate.annexsupport
-Bundle-ClassPath: jlib/gson-2.8.5.jar,
- jlib/com.collins.fmw.json-0.0.0.jar,
- .
-Export-Package: com.collins.fmw.cyres.agree.json.plugin
+Bundle-ClassPath: .
+Export-Package: com.collins.fmw.cyres.json.plugin

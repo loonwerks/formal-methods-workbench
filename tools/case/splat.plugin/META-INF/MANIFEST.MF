@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.xtext.ui,
  org.eclipse.emf.common,
  org.eclipse.ui.console
-Import-Package: com.collins.fmw.cyres.agree.json.plugin,
+Import-Package: com.collins.fmw.cyres.json.plugin,
  org.eclipse.debug.ui.console,
  org.eclipse.ui,
  org.eclipse.ui.console,

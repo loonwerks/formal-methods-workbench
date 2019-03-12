@@ -3,11 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.collins.fmw</groupId>
-	<artifactId>com.collins.fmw.cyres</artifactId>
-	<version>0.0.0</version>
-	<packaging>pom</packaging>
-	
 
 	<parent>
 		<groupId>com.collins.fmw</groupId>
@@ -16,8 +11,14 @@
 		<relativePath>..</relativePath>
 	</parent>
 
+	<groupId>com.collins.fmw</groupId>
+	<artifactId>com.collins.fmw.cyres</artifactId>
+	<version>0.0.0</version>
+	<packaging>pom</packaging>
+	
+
 	<modules>
-		<module>agree.json.plugin</module>
+		<module>json.plugin</module>
 		<module>util.plugin</module>
 		<module>splat.plugin</module>
 		<module>architecture.plugin</module>
