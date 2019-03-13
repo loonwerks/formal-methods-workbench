@@ -42,7 +42,7 @@
      <!--
       <feature id="org.sireum.aadl.osate.act.feature"/>
       -->
-      <feature id="com.collins.fmw.cyres.feature"/>
+      <feature id="com.collins.fmw.cyres.feature"  version="1.0.0.qualifier"/>
       <feature id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier"/>
       <feature id="com.rockwellcollins.atc.resolute.feature" version="1.0.0.qualifier"/>
       <feature id="org.osate.core.feature"/>

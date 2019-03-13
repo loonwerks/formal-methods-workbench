@@ -58,7 +58,7 @@
    <repository>
      <id>osate</id>
      <layout>p2</layout>
-     <url>https://osate-build.sei.cmu.edu/download/osate/stable/latest/updates</url>
+     <url>https://osate-build.sei.cmu.edu/download/osate/stable/2.4.0/updates</url>
    </repository>
 
    <!--
@@ -78,9 +78,9 @@
 		<module>agree</module>
 		<module>resolute</module>
 		<module>case</module>
-    <!---
+<!--
 		<module>ide</module>
-    -->
+-->
 	</modules>
 
 
