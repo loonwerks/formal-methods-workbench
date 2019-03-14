@@ -119,7 +119,6 @@ public class AgreeTranslate {
 		return result;
 	}
 
-
 	private JsonElement genCallExpr(CallExpr expr) {
 
 		JsonObject result = new JsonObject();
@@ -233,7 +232,6 @@ public class AgreeTranslate {
 		}
 	}
 
-
 	private JsonElement genEnumLitExpr(EnumLitExpr expr) {
 
 		JsonObject result = new JsonObject();
@@ -252,7 +250,6 @@ public class AgreeTranslate {
 		result.add("expr", genExpr(stmt.getExpr()));
 		return result;
 	}
-
 
 	private JsonElement genAssumeStatement(AssumeStatement stmt) {
 
@@ -302,7 +299,6 @@ public class AgreeTranslate {
 		return result;
 	}
 
-
 	private JsonElement genDoubleDotRef(DoubleDotRef ref) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("DoubleDotRef"));
@@ -310,8 +306,6 @@ public class AgreeTranslate {
 		result.add("name", new JsonPrimitive(id));
 		return result;
 	}
-
-
 
 	private JsonElement genPrimType(PrimType type) {
 
@@ -334,7 +328,6 @@ public class AgreeTranslate {
 		return result;
 	}
 
-
 	private JsonElement genArg(Arg arg) {
 
 		JsonObject result = new JsonObject();
@@ -342,7 +335,6 @@ public class AgreeTranslate {
 		result.add("type", genType(arg.getType()));
 		return result;
 	}
-
 
 	private JsonElement genFnDef(FnDef stmt) {
 
@@ -437,10 +429,8 @@ public class AgreeTranslate {
 
 	}
 
-
 	public JsonObject genContract(Contract contr) {
 		JsonObject result = new JsonObject();
-
 
 		if (contr instanceof AgreeContract) {
 			EList<SpecStatement> stmts = ((AgreeContract) contr).getSpecs();
@@ -473,7 +463,6 @@ public class AgreeTranslate {
 				components.add(genContract(contr));
 			}
 		}
-
 
 		return components;
 	}
