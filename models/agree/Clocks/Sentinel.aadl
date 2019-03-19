@@ -1,0 +1,45 @@
+package Sentinel
+public 
+   with Base_Types;
+   
+system Counter
+	features
+		Output: out data port Base_Types::Integer;
+			
+	annex agree {** 
+		guarantee "Counter" : Output = (0 -> (pre(Output) + 1));
+	**};
+	
+end Counter ; 
+   
+   
+system Sieve
+	features
+		Input: in data port Base_Types::Integer;
+		Output: out data port Base_Types::Integer;
+			
+	annex agree {** 
+		assume "Sieve" : (Input = 0) -> (pre(Input) < Input);
+		guarantee "Sieve" : Output = if Input mod 7 = 0 then -1 else Input ;
+	**};	
+end Sieve ; 
+
+   
+system top_level
+	annex agree {**
+	**};	
+end top_level;
+
+system implementation top_level.Impl
+	subcomponents
+		counter : system Counter ;
+		sieve : system Sieve ;
+	connections
+		counter_to_sieve : port counter.Output -> sieve.Input {Communication_Properties::Timing => immediate;};
+	annex agree{**
+		lemma "sieve output" : (sieve.Output = -1) or (pre(sieve.Output) < sieve.Output);
+	**};
+	
+end top_level.Impl;
+	
+end Sentinel;
