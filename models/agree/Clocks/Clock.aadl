@@ -30,8 +30,7 @@ system Target
 		Input: in data port Base_Types::Integer;
 			
 	annex agree {** 
-		assume "Target" : (Input = 0) -> (pre(Input) < Input);
-		guarantee "Target" : not (Input mod 7 = 0) ;
+		assume "Target" : ((Input = 0) -> (pre(Input) < Input)) and (not (Input mod 7 = 0)) ;
 	**};
 	
 end Target ; 
@@ -53,12 +52,10 @@ system implementation top_level.Impl
 	annex agree{**	
 		synchrony: asynchronous;
 		
-		assert (counter._CLK = true and sieve._CLK = true);
-		assert (target._CLK = not (sieve.Output = -1));
+		assert (counter._CLK);
+		assert (sieve._CLK);
+		assert (target._CLK = sieve._CLK and (not (sieve.Output = -1)));
 		
-		lemma "sieve output" : 
---		(sieve.Output = -1) or 
-		(pre(sieve.Output) < sieve.Output);
 	**};
 	
 end top_level.Impl;

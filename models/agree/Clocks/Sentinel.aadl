@@ -24,6 +24,16 @@ system Sieve
 	**};	
 end Sieve ; 
 
+system Target
+	features
+		Input: in data port Base_Types::Integer;
+			
+	annex agree {**
+		assume "Target" : (Input = -1) or (Input = 0 -> pre(Input) < Input) and (not (Input mod 7 = 0));
+	**};
+	
+end Target ; 
+
    
 system top_level
 	annex agree {**
@@ -34,10 +44,12 @@ system implementation top_level.Impl
 	subcomponents
 		counter : system Counter ;
 		sieve : system Sieve ;
+		target : system Target ;
 	connections
 		counter_to_sieve : port counter.Output -> sieve.Input {Communication_Properties::Timing => immediate;};
+		sieve_to_target : port sieve.Output -> target.Input {Communication_Properties::Timing => immediate;};
 	annex agree{**
-		lemma "sieve output" : (sieve.Output = -1) or (pre(sieve.Output) < sieve.Output);
+		
 	**};
 	
 end top_level.Impl;
