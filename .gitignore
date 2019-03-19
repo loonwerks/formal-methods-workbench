@@ -43,5 +43,5 @@ target
 
 \#*\#
 
-.xtendbin
-._trace
+*.xtendbin
+*._trace
