@@ -42,3 +42,6 @@ TAGS
 target
 
 \#*\#
+
+*.xtendbin
+*._trace
