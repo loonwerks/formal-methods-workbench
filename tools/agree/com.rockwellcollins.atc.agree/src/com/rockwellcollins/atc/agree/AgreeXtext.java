@@ -105,7 +105,7 @@ import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 
 public class AgreeXtext {
 
-	public static Spec toTypeDef(Type t) {
+	public static Spec toSpec(Type t) {
 
 		if (t instanceof PrimType) {
 
@@ -140,21 +140,21 @@ public class AgreeXtext {
 
 		} else if (t instanceof ArrayType) {
 			String size = ((ArrayType) t).getSize();
-			Spec baseTypeDef = toTypeDef(((ArrayType) t).getStem());
+			Spec baseTypeDef = toSpec(((ArrayType) t).getStem());
 
 			return new ArraySpec(baseTypeDef, Integer.parseInt(size), Optional.empty());
 
 		} else if (t instanceof DoubleDotRef) {
-			return toTypeDefFromNamedElm(((DoubleDotRef) t).getElm());
+			return toSpecFromNamedElm(((DoubleDotRef) t).getElm());
 		} else {
 			return Prim.ErrorSpec;
 		}
 
 	}
 
-	public static Spec toTypeDefFromNamedElm(NamedElement ne) {
+	public static Spec toSpecFromNamedElm(NamedElement ne) {
 		if (ne instanceof Classifier) {
-			return toTypeDefFromClassifier((Classifier) ne);
+			return toSpecFromClassifier((Classifier) ne);
 
 		} else if (ne instanceof RecordDef) {
 
@@ -162,7 +162,7 @@ public class AgreeXtext {
 			Map<String, Spec> fields = new HashMap<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
-				Spec typeDef = toTypeDef(arg.getType());
+				Spec typeDef = toSpec(arg.getType());
 				fields.put(key, typeDef);
 			}
 			return new RecordSpec(ne.getQualifiedName(), fields, ne);
@@ -178,14 +178,14 @@ public class AgreeXtext {
 			return new EnumSpec(name, enumValues, ne);
 
 		} else if (ne instanceof Arg) {
-			return toTypeDef(((Arg) ne).getType());
+			return toSpec(((Arg) ne).getType());
 
 		} else {
 			return Prim.ErrorSpec;
 		}
 	}
 
-	public static Spec toTypeDefFromClassifier(Classifier c) {
+	public static Spec toSpecFromClassifier(Classifier c) {
 
 		if (c instanceof AadlBoolean || c.getName().contains("Boolean")) {
 			return Prim.BoolSpec;
@@ -292,7 +292,7 @@ public class AgreeXtext {
 						ListValue l = (ListValue) v;
 						PropertyExpression pe = l.getOwnedListElements().get(0);
 						if (pe instanceof ClassifierValue) {
-							prop_arrayBaseType = toTypeDefFromClassifier(((ClassifierValue) pe).getClassifier());
+							prop_arrayBaseType = toSpecFromClassifier(((ClassifierValue) pe).getClassifier());
 						}
 
 					}
@@ -332,13 +332,13 @@ public class AgreeXtext {
 						if (sub.getClassifier() != null) {
 
 							if (sub.getArrayDimensions().size() == 0) {
-								Spec typeDef = toTypeDefFromClassifier(sub.getClassifier());
+								Spec typeDef = toSpecFromClassifier(sub.getClassifier());
 								fields.putIfAbsent(fieldName, typeDef);
 							} else if (sub.getArrayDimensions().size() == 1) {
 								ArrayDimension ad = sub.getArrayDimensions().get(0);
 								int size = Math.toIntExact(getArraySize(ad));
 
-								Spec stem = toTypeDefFromClassifier(sub.getClassifier());
+								Spec stem = toSpecFromClassifier(sub.getClassifier());
 								Spec typeDef = new ArraySpec(stem, size, Optional.empty());
 								fields.putIfAbsent(fieldName, typeDef);
 
@@ -359,12 +359,12 @@ public class AgreeXtext {
 
 						if (feature.getClassifier() != null) {
 							if (feature.getArrayDimensions().size() == 0) {
-								Spec typeDef = toTypeDefFromClassifier(feature.getClassifier());
+								Spec typeDef = toSpecFromClassifier(feature.getClassifier());
 								fields.putIfAbsent(fieldName, typeDef);
 							} else if (feature.getArrayDimensions().size() == 1) {
 								ArrayDimension ad = feature.getArrayDimensions().get(0);
 								int size = Math.toIntExact(getArraySize(ad));
-								Spec stem = toTypeDefFromClassifier(feature.getClassifier());
+								Spec stem = toSpecFromClassifier(feature.getClassifier());
 								Spec typeDef = new ArraySpec(stem, size, Optional.empty());
 
 								fields.putIfAbsent(fieldName, typeDef);
@@ -388,7 +388,7 @@ public class AgreeXtext {
 
 							for (Arg arg : args) {
 								String fieldName = arg.getName();
-								Spec typeDef = toTypeDefFromNamedElm(arg);
+								Spec typeDef = toSpecFromNamedElm(arg);
 								fields.putIfAbsent(fieldName, typeDef);
 							}
 						}
@@ -408,10 +408,10 @@ public class AgreeXtext {
 
 	}
 
-	public static Spec inferFromNamedElement(NamedElement ne) {
+	public static Spec inferSpecFromNamedElement(NamedElement ne) {
 
 		if (ne instanceof PropertyStatement) {
-			return infer(((PropertyStatement) ne).getExpr());
+			return inferSpec(((PropertyStatement) ne).getExpr());
 
 		} else if (ne instanceof NamedID && ne.eContainer() instanceof EnumStatement) {
 
@@ -449,7 +449,7 @@ public class AgreeXtext {
 			}
 
 			if (arrExpr != null) {
-				Spec arrType = infer(arrExpr);
+				Spec arrType = inferSpec(arrExpr);
 				if (arrType instanceof ArraySpec) {
 					return ((ArraySpec) arrType).stemType;
 				}
@@ -457,27 +457,27 @@ public class AgreeXtext {
 
 			if (container instanceof FoldLeftExpr) {
 				Expr initExpr = ((FoldLeftExpr) container).getInitial();
-				Spec initType = infer(initExpr);
+				Spec initType = inferSpec(initExpr);
 				return initType;
 
 			} else if (container instanceof FoldRightExpr) {
 				Expr initExpr = ((FoldRightExpr) container).getInitial();
-				Spec initType = infer(initExpr);
+				Spec initType = inferSpec(initExpr);
 				return initType;
 			}
 
 		} else if (ne instanceof ConstStatement) {
-			return toTypeDef(((ConstStatement) ne).getType());
+			return toSpec(((ConstStatement) ne).getType());
 
 		} else if (ne instanceof Arg) {
-			return toTypeDef(((Arg) ne).getType());
+			return toSpec(((Arg) ne).getType());
 
 		} else if (ne instanceof Subcomponent) {
 
 			Subcomponent sub = (Subcomponent) ne;
 			Classifier cl = sub.getClassifier();
 			List<ArrayDimension> dims = sub.getArrayDimensions();
-			Spec clsTypeDef = toTypeDefFromClassifier(cl);
+			Spec clsTypeDef = toSpecFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
@@ -489,7 +489,7 @@ public class AgreeXtext {
 
 			Classifier cl = ((Feature) ne).getClassifier();
 			List<ArrayDimension> dims = ((Feature) ne).getArrayDimensions();
-			Spec clsTypeDef = toTypeDefFromClassifier(cl);
+			Spec clsTypeDef = toSpecFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
@@ -500,7 +500,7 @@ public class AgreeXtext {
 
 		} else if (ne instanceof PropertyConstant) {
 			PropertyExpression pe = ((PropertyConstant) ne).getConstantValue();
-			return inferPropExp(pe);
+			return inferSpecFromPropExp(pe);
 
 		}
 
@@ -508,8 +508,8 @@ public class AgreeXtext {
 
 	}
 
-	public static boolean hasType(NamedElement ne) {
-		return inferFromNamedElement(ne) != (Prim.ErrorSpec);
+	public static boolean hasSpec(NamedElement ne) {
+		return inferSpecFromNamedElement(ne) != (Prim.ErrorSpec);
 	}
 
 	public static boolean isInLinearizationBody(Expr expr) {
@@ -562,7 +562,7 @@ public class AgreeXtext {
 		return Optional.empty();
 	}
 
-	private static Spec inferPropExp(PropertyExpression pe) {
+	private static Spec inferSpecFromPropExp(PropertyExpression pe) {
 		if (pe instanceof IntegerLiteral) {
 			return Prim.IntSpec;
 
@@ -573,7 +573,7 @@ public class AgreeXtext {
 			NamedValue nv = (NamedValue) pe;
 			AbstractNamedValue anv = nv.getNamedValue();
 			if (anv instanceof PropertyConstant) {
-				return inferPropExp(((PropertyConstant) anv).getConstantValue());
+				return inferSpecFromPropExp(((PropertyConstant) anv).getConstantValue());
 			}
 		}
 
@@ -581,12 +581,12 @@ public class AgreeXtext {
 
 	}
 
-	public static Spec infer(Expr expr) {
+	public static Spec inferSpec(Expr expr) {
 
 		if (expr instanceof SelectionExpr) {
 
 			Expr target = ((SelectionExpr) expr).getTarget();
-			Spec targetType = infer(target);
+			Spec targetType = inferSpec(target);
 			String field = ((SelectionExpr) expr).getField().getName();
 
 			if (targetType instanceof AgreeSpecSystem.RecordSpec) {
@@ -613,13 +613,13 @@ public class AgreeXtext {
 
 		} else if (expr instanceof ArraySubExpr) {
 			Expr arrExpr = ((ArraySubExpr) expr).getExpr();
-			Spec arrType = infer(arrExpr);
+			Spec arrType = inferSpec(arrExpr);
 			if (arrType instanceof ArraySpec) {
 				return ((ArraySpec) arrType).stemType;
 			}
 
 		} else if (expr instanceof IndicesExpr) {
-			Spec arrType = infer(((IndicesExpr) expr).getArray());
+			Spec arrType = inferSpec(((IndicesExpr) expr).getArray());
 			if (arrType instanceof ArraySpec) {
 				int size = ((ArraySpec) arrType).size;
 				return new ArraySpec(Prim.IntSpec, size, Optional.empty());
@@ -632,10 +632,10 @@ public class AgreeXtext {
 			return Prim.BoolSpec;
 
 		} else if (expr instanceof FlatmapExpr) {
-			Spec innerArrType = infer(((FlatmapExpr) expr).getExpr());
+			Spec innerArrType = inferSpec(((FlatmapExpr) expr).getExpr());
 			if (innerArrType instanceof ArraySpec) {
 				Spec stemType = ((ArraySpec) innerArrType).stemType;
-				Spec arrType = infer(((FlatmapExpr) expr).getArray());
+				Spec arrType = inferSpec(((FlatmapExpr) expr).getArray());
 
 				if (arrType instanceof ArraySpec) {
 					int size = ((ArraySpec) arrType).size;
@@ -644,13 +644,13 @@ public class AgreeXtext {
 			}
 
 		} else if (expr instanceof FoldLeftExpr) {
-			return infer(((FoldLeftExpr) expr).getExpr());
+			return inferSpec(((FoldLeftExpr) expr).getExpr());
 
 		} else if (expr instanceof FoldRightExpr) {
-			return infer(((FoldRightExpr) expr).getExpr());
+			return inferSpec(((FoldRightExpr) expr).getExpr());
 
 		} else if (expr instanceof BinaryExpr) {
-			Spec leftType = infer(((BinaryExpr) expr).getLeft());
+			Spec leftType = inferSpec(((BinaryExpr) expr).getLeft());
 			String op = ((BinaryExpr) expr).getOp();
 
 			switch (op) {
@@ -679,13 +679,13 @@ public class AgreeXtext {
 			}
 
 		} else if (expr instanceof UnaryExpr) {
-			return infer(((UnaryExpr) expr).getExpr());
+			return inferSpec(((UnaryExpr) expr).getExpr());
 
 		} else if (expr instanceof IfThenElseExpr) {
-			return infer(((IfThenElseExpr) expr).getB());
+			return inferSpec(((IfThenElseExpr) expr).getB());
 
 		} else if (expr instanceof PrevExpr) {
-			return infer(((PrevExpr) expr).getInit());
+			return inferSpec(((PrevExpr) expr).getInit());
 
 		} else if (expr instanceof GetPropertyExpr) {
 
@@ -696,7 +696,7 @@ public class AgreeXtext {
 				if (prop instanceof Property) {
 					PropertyType pt = ((Property) prop).getPropertyType();
 
-					return inferFromNamedElement(pt);
+					return inferSpecFromNamedElement(pt);
 
 				} else {
 
@@ -705,7 +705,7 @@ public class AgreeXtext {
 					for (PropertyAssociation choice : pas) {
 						if (choice.getProperty().getName().equals(prop.getName())) {
 							PropertyType pt = choice.getProperty().getPropertyType();
-							return inferFromNamedElement(pt);
+							return inferSpecFromNamedElement(pt);
 						}
 					}
 				}
@@ -722,7 +722,7 @@ public class AgreeXtext {
 
 							if (pchoice.getProperty().getName().equals(prop.getName())) {
 								PropertyType pt = pchoice.getProperty().getPropertyType();
-								return inferFromNamedElement(pt);
+								return inferSpecFromNamedElement(pt);
 							}
 						}
 
@@ -754,10 +754,10 @@ public class AgreeXtext {
 			return Prim.RealSpec;
 
 		} else if (expr instanceof EnumLitExpr) {
-			return toTypeDef(((EnumLitExpr) expr).getEnumType());
+			return toSpec(((EnumLitExpr) expr).getEnumType());
 
 		} else if (expr instanceof LatchedExpr) {
-			return infer(((LatchedExpr) expr).getExpr());
+			return inferSpec(((LatchedExpr) expr).getExpr());
 
 		} else if (expr instanceof TimeOfExpr) {
 			return Prim.RealSpec;
@@ -778,28 +778,28 @@ public class AgreeXtext {
 			return Prim.RealSpec;
 
 		} else if (expr instanceof PreExpr) {
-			return infer(((PreExpr) expr).getExpr());
+			return inferSpec(((PreExpr) expr).getExpr());
 
 		} else if (expr instanceof ArrayLiteralExpr) {
 			EList<Expr> elems = ((ArrayLiteralExpr) expr).getElems();
 			Expr first = elems.get(0);
 			int size = elems.size();
-			Spec firstType = infer(first);
+			Spec firstType = inferSpec(first);
 
 			return new ArraySpec(firstType, size, Optional.empty());
 
 		} else if (expr instanceof ArrayUpdateExpr) {
-			return infer(((ArrayUpdateExpr) expr).getArray());
+			return inferSpec(((ArrayUpdateExpr) expr).getArray());
 
 		} else if (expr instanceof RecordLitExpr) {
-			return toTypeDef(((RecordLitExpr) expr).getRecordType());
+			return toSpec(((RecordLitExpr) expr).getRecordType());
 
 		} else if (expr instanceof RecordUpdateExpr) {
-			return infer(((RecordUpdateExpr) expr).getRecord());
+			return inferSpec(((RecordUpdateExpr) expr).getRecord());
 
 		} else if (expr instanceof NamedElmExpr) {
 			NamedElement ne = ((NamedElmExpr) expr).getElm();
-			return inferFromNamedElement(ne);
+			return inferSpecFromNamedElement(ne);
 
 		} else if (expr instanceof CallExpr) {
 
@@ -813,25 +813,25 @@ public class AgreeXtext {
 					return Prim.RealSpec;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
-					return toTypeDef(fnDef.getType());
+					return toSpec(fnDef.getType());
 				}
 
 			} else {
 				// extract in/out arguments
 				if (namedEl instanceof FnDef) {
 					FnDef fnDef = (FnDef) namedEl;
-					return toTypeDef(fnDef.getType());
+					return toSpec(fnDef.getType());
 				} else if (namedEl instanceof NodeDef) {
 					NodeDef nodeDef = (NodeDef) namedEl;
 					List<Type> outDefTypes = typesFromArgs(nodeDef.getRets());
 					if (outDefTypes.size() == 1) {
-						return toTypeDef(outDefTypes.get(0));
+						return toSpec(outDefTypes.get(0));
 					}
 				} else if (namedEl instanceof LinearizationDef) {
 					return Prim.RealSpec;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
-					return toTypeDef(fnDef.getType());
+					return toSpec(fnDef.getType());
 				}
 
 			}

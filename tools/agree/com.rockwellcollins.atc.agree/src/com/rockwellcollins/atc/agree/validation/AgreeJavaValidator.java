@@ -336,8 +336,8 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 		}
 
-		Spec lhsType = (AgreeXtext.inferFromNamedElement(namedEl));
-		Spec rhsType = (AgreeXtext.infer(expr));
+		Spec lhsType = (AgreeXtext.inferSpecFromNamedElement(namedEl));
+		Spec rhsType = (AgreeXtext.inferSpec(expr));
 
 		if (!AgreeSpecSystem.staticEqual(lhsType, rhsType)) {
 			error(assign, "The left hand side of the assignment statement is of type '" + lhsType.getName()
@@ -413,18 +413,18 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataImplementation) {
-				if (AgreeSpecSystem.staticEqual(AgreeXtext.toTypeDef(recType),
+				if (AgreeSpecSystem.staticEqual(AgreeXtext.toSpec(recType),
 						AgreeSpecSystem.Prim.ErrorSpec)) {
 					error(recType, "Data Implementations with no subcomponents must extend"
 							+ " a Base_Type that AGREE can reason about.");
 					return;
 				}
 				if (((DataImplementation) finalId).getAllSubcomponents().size() != 0) {
-					if (AgreeSpecSystem.staticEqual(AgreeXtext.toTypeDef(recType),
+					if (AgreeSpecSystem.staticEqual(AgreeXtext.toSpec(recType),
 							AgreeSpecSystem.Prim.BoolSpec)
-							|| AgreeSpecSystem.staticEqual(AgreeXtext.toTypeDef(recType),
+							|| AgreeSpecSystem.staticEqual(AgreeXtext.toSpec(recType),
 									AgreeSpecSystem.Prim.IntSpec)
-							|| AgreeSpecSystem.staticEqual(AgreeXtext.toTypeDef(recType),
+							|| AgreeSpecSystem.staticEqual(AgreeXtext.toSpec(recType),
 									AgreeSpecSystem.Prim.RealSpec)) {
 						error(finalId, "Data implementations with subcomponents cannot be"
 								+ " interpreted by AGREE if they extend Base_Types");
@@ -436,7 +436,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataType) {
-				if (AgreeSpecSystem.staticEqual(AgreeXtext.toTypeDef(recType),
+				if (AgreeSpecSystem.staticEqual(AgreeXtext.toSpec(recType),
 						AgreeSpecSystem.Prim.ErrorSpec)) {
 					error(recType, "AADL Datatypes must extend" + " a Base_Type that AGREE can reason about.");
 					return;
@@ -470,7 +470,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			return;
 		}
 		checkTypeExists(floor.getExpr());
-		Spec exprType = AgreeXtext.infer(floor.getExpr());
+		Spec exprType = AgreeXtext.inferSpec(floor.getExpr());
 
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 			error(floor, "Argument of floor cast is of type '" + exprType.getName()
@@ -486,7 +486,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		checkTypeExists(real.getExpr());
-		Spec exprType = AgreeXtext.infer(real.getExpr());
+		Spec exprType = AgreeXtext.inferSpec(real.getExpr());
 
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.IntSpec, exprType)) {
 			error(real, "Argument of real cast is of type '" + exprType.getName()
@@ -760,7 +760,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		// the expression could be null if a pattern is used
 		Expr expr = assume.getExpr();
 		if (expr != null) {
-			Spec exprType = AgreeXtext.infer(expr);
+			Spec exprType = AgreeXtext.inferSpec(expr);
 			if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 				error(assume, "Expression for assume statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
@@ -775,7 +775,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			error(statement, "Initial statements are allowed only in component types");
 		}
 
-		Spec exprType = AgreeXtext.infer(statement.getExpr());
+		Spec exprType = AgreeXtext.inferSpec(statement.getExpr());
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 			error(statement,
 					"Expression for 'initially' statement is of type '" + exprType.getName()
@@ -812,7 +812,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		// the expression could be null if a pattern is used
 		Expr expr = asser.getExpr();
 		if (expr != null) {
-			Spec exprType = AgreeXtext.infer(expr);
+			Spec exprType = AgreeXtext.inferSpec(expr);
 			if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 				error(asser, "Expression for assert statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
@@ -862,7 +862,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		// the expression could be null if a pattern is used
 		Expr expr = guar.getExpr();
 		if (expr != null) {
-			Spec exprType = AgreeXtext.infer(expr);
+			Spec exprType = AgreeXtext.inferSpec(expr);
 			if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 				error(guar, "Expression for guarantee statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
@@ -884,7 +884,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		checkExprIsIdentifier(event);
 
-		Spec eventType = AgreeXtext.infer(event);
+		Spec eventType = AgreeXtext.inferSpec(event);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, eventType)) {
 			error(event, "Expression is of type '" + eventType + "' but must be of type 'bool'");
 		}
@@ -933,7 +933,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		checkExprIsIdentifier(event);
 
-		Spec eventType = AgreeXtext.infer(event);
+		Spec eventType = AgreeXtext.inferSpec(event);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, eventType)) {
 			error(event, "Expression is of type '" + eventType + "' but must be of type 'bool'");
 		}
@@ -980,12 +980,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			error(when, "Statement most of a cause interval");
 		}
 
-		Spec type = AgreeXtext.infer(condition);
+		Spec type = AgreeXtext.inferSpec(condition);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(condition,
 					"The condition of a when statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
-		type = AgreeXtext.infer(event);
+		type = AgreeXtext.inferSpec(event);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(event, "The effect of a when statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
@@ -1000,17 +1000,17 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(condition);
 		checkExprIsIdentifier(event);
 
-		Spec type = AgreeXtext.infer(condition);
+		Spec type = AgreeXtext.inferSpec(condition);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(condition,
 					"The condition of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
-		type = AgreeXtext.infer(event);
+		type = AgreeXtext.inferSpec(event);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(event,
 					"The effect of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
-		type = AgreeXtext.infer(times);
+		type = AgreeXtext.inferSpec(times);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.IntSpec, type)) {
 			error(event,
 					"The 'times' of the 'when' statement is of type '" + type + "'" + " but must be of type 'int'");
@@ -1026,12 +1026,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(cause);
 		checkExprIsIdentifier(effect);
 
-		Spec type = AgreeXtext.infer(cause);
+		Spec type = AgreeXtext.inferSpec(cause);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
-		type = AgreeXtext.infer(effect);
+		type = AgreeXtext.inferSpec(effect);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(effect,
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
@@ -1046,12 +1046,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(cause);
 		checkExprIsIdentifier(effect);
 
-		Spec type = AgreeXtext.infer(cause);
+		Spec type = AgreeXtext.inferSpec(cause);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
-		type = AgreeXtext.infer(effect);
+		type = AgreeXtext.inferSpec(effect);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(effect,
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
@@ -1066,12 +1066,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(cause);
 		checkExprIsIdentifier(effect);
 
-		Spec type = AgreeXtext.infer(cause);
+		Spec type = AgreeXtext.inferSpec(cause);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
-		type = AgreeXtext.infer(effect);
+		type = AgreeXtext.inferSpec(effect);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(effect,
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
@@ -1088,19 +1088,19 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(lhs);
 		checkExprIsIdentifier(rhs);
 
-		Spec type = AgreeXtext.infer(cause);
+		Spec type = AgreeXtext.inferSpec(cause);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
 
-		type = AgreeXtext.infer(lhs);
+		type = AgreeXtext.inferSpec(lhs);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(lhs, "The left hand side of the 'implies' of the 'whenever' statement is of type '" + type + "' "
 					+ "but must be of type 'bool'");
 		}
 
-		type = AgreeXtext.infer(rhs);
+		type = AgreeXtext.inferSpec(rhs);
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(lhs, "The rhs hand side of the 'implies' of the 'whenever' statement is of type '" + type + "' "
 					+ "but must be of type 'bool'");
@@ -1149,7 +1149,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	public void checkTimeExpr(EObject expr, NamedElement id) {
-		Spec type = AgreeXtext.inferFromNamedElement(id);
+		Spec type = AgreeXtext.inferSpecFromNamedElement(id);
 
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, type)) {
 			error(expr, "Time functions can be applied only to Boolean identifiers");
@@ -1166,7 +1166,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		Expr expr = lemma.getExpr();
 		if (expr != null) {
-			Spec exprType = AgreeXtext.infer(expr);
+			Spec exprType = AgreeXtext.inferSpec(expr);
 			if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 				error(lemma, "Expression for lemma statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
@@ -1182,7 +1182,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			ne = ((SelectionExpr) e).getField();
 		}
 
-		if (ne != null && !AgreeXtext.hasType(ne)) {
+		if (ne != null && !AgreeXtext.hasSpec(ne)) {
 			error(e, "named thing must be an expression with a type");
 		}
 	}
@@ -1192,7 +1192,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		checkTypeExists(unaryExpr.getExpr());
 
-		Spec typeRight = AgreeXtext.infer(unaryExpr.getExpr());
+		Spec typeRight = AgreeXtext.inferSpec(unaryExpr.getExpr());
 		String op = unaryExpr.getOp();
 
 		switch (op) {
@@ -1221,7 +1221,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			error(propStat, "Property statments are allowed only in component annexes");
 		}
 
-		Spec exprType = AgreeXtext.infer(propStat.getExpr());
+		Spec exprType = AgreeXtext.inferSpec(propStat.getExpr());
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 			error(propStat, "Property statement '" + propStat.getName() + "' is of type '" + exprType
 					+ "' but must be of type 'bool'");
@@ -1247,16 +1247,16 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		checkTypeExists(upExpr.getRecord());
-		Spec recordType = AgreeXtext.infer(upExpr.getRecord());
+		Spec recordType = AgreeXtext.inferSpec(upExpr.getRecord());
 
 
 		if (recordType instanceof RecordSpec) {
 
 			// scoping should ensure the key is a proper Arg
 			Arg arg = (Arg) upExpr.getKey();
-			Spec keyType = AgreeXtext.toTypeDef(arg.getType());
+			Spec keyType = AgreeXtext.toSpec(arg.getType());
 			checkTypeExists(upExpr.getExpr());
-			Spec expType = AgreeXtext.infer(upExpr.getExpr());
+			Spec expType = AgreeXtext.inferSpec(upExpr.getExpr());
 
 			if (!AgreeSpecSystem.staticEqual(keyType, expType)) {
 				error(upExpr, "the update field is of type '" + keyType.getName() + "', but the expression is of type '"
@@ -1289,10 +1289,10 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		Expr target = exprs.get(0);
 		checkTypeExists(target);
-		Spec t1 = AgreeXtext.infer(target);
+		Spec t1 = AgreeXtext.inferSpec(target);
 		for (Expr e : exprs) {
 			checkTypeExists(e);
-			Spec t2 = AgreeXtext.infer(e);
+			Spec t2 = AgreeXtext.inferSpec(e);
 			if (!AgreeSpecSystem.staticEqual(t1, t2)) {
 				error(e, "type of element must be " + t1.getName() + ", but has type " + t2.getName());
 			}
@@ -1309,11 +1309,11 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		Expr arrExpr = arrup.getArray();
 		checkTypeExists(arrExpr);
-		Spec arrType = AgreeXtext.infer(arrExpr);
+		Spec arrType = AgreeXtext.inferSpec(arrExpr);
 
 		if (arrType instanceof ArraySpec) {
 			Spec t = ((ArraySpec) arrType).stemType;
-			Spec elmType = AgreeXtext.infer(exprs.get(0));
+			Spec elmType = AgreeXtext.inferSpec(exprs.get(0));
 			if (!AgreeSpecSystem.staticEqual(elmType, t)) {
 				error(exprs.get(0),
 						"type of element must be " + elmType.getName() + ", but has type " + t.getName());
@@ -1332,7 +1332,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		Expr arrExp = asub.getExpr();
 		checkTypeExists(arrExp);
-		Spec arrType = AgreeXtext.infer(arrExp);
+		Spec arrType = AgreeXtext.inferSpec(arrExp);
 
 		if (arrType instanceof ArraySpec) {
 
@@ -1344,7 +1344,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		Expr index = asub.getIndex();
 		checkTypeExists(index);
-		Spec indexType = AgreeXtext.infer(index);
+		Spec indexType = AgreeXtext.inferSpec(index);
 		if (!AgreeSpecSystem.staticEqual(indexType, AgreeSpecSystem.Prim.IntSpec)) {
 			error(index, "index must be an int");
 		}
@@ -1407,7 +1407,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			Spec defType = argNameMap.get(actArgName);
 
 			checkTypeExists(argExprs.get(i));
-			Spec exprType = AgreeXtext.infer(argExprs.get(i));
+			Spec exprType = AgreeXtext.inferSpec(argExprs.get(i));
 
 			if (!AgreeSpecSystem.staticEqual(defType, exprType)) {
 				error(recExpr, "The expression assigned to '" + actArgName + "' does not match its definition type of '"
@@ -1458,12 +1458,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		if (rec instanceof RecordDef) {
 			RecordDef recDef = (RecordDef) rec;
 			for (Arg arg : recDef.getArgs()) {
-				typeMap.put(arg.getName(), AgreeXtext.toTypeDef(arg.getType()));
+				typeMap.put(arg.getName(), AgreeXtext.toSpec(arg.getType()));
 			}
 		} else if (rec instanceof DataImplementation) {
 			DataImplementation dataImpl = (DataImplementation) rec;
 			for (Subcomponent sub : dataImpl.getAllSubcomponents()) {
-				typeMap.put(sub.getName(), AgreeXtext.toTypeDefFromClassifier((sub.getClassifier())));
+				typeMap.put(sub.getName(), AgreeXtext.toSpecFromClassifier((sub.getClassifier())));
 			}
 		} else {
 			error(recType, "Record type '" + rec.getName() + "' must be a feature group or a record type definition");
@@ -1594,8 +1594,8 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 	@Check(CheckType.FAST)
 	public void checkConstStatement(ConstStatement constStat) {
-		Spec expected = AgreeXtext.toTypeDef(constStat.getType());
-		Spec actual = AgreeXtext.infer(constStat.getExpr());
+		Spec expected = AgreeXtext.toSpec(constStat.getType());
+		Spec actual = AgreeXtext.inferSpec(constStat.getExpr());
 
 		if (!AgreeSpecSystem.staticEqual(expected, actual)) {
 			error(constStat, "The assumed type of constant statement '" + constStat.getName() + "' is '" + expected
@@ -1857,7 +1857,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		List<Spec> agreeLhsTypes = new ArrayList<>();
 		for (Arg arg : lhsArgs) {
-			agreeLhsTypes.add(AgreeXtext.toTypeDef(arg.getType()));
+			agreeLhsTypes.add(AgreeXtext.toSpec(arg.getType()));
 		}
 		List<Spec> agreeRhsTypes = new ArrayList<>();
 
@@ -1867,17 +1867,17 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			if (namedEl instanceof NodeDef) {
 				NodeDef nodeDef = (NodeDef) namedEl;
 				for (Arg var : nodeDef.getRets()) {
-					agreeRhsTypes.add(AgreeXtext.toTypeDef(var.getType()));
+					agreeRhsTypes.add(AgreeXtext.toSpec(var.getType()));
 				}
 			} else if (namedEl instanceof FnDef) {
 				FnDef fnDef = (FnDef) namedEl;
-				agreeRhsTypes.add(AgreeXtext.toTypeDef(fnDef.getType()));
+				agreeRhsTypes.add(AgreeXtext.toSpec(fnDef.getType()));
 			} else {
 				return; // parse error
 			}
 		} else {
 			checkTypeExists(rhsExpr);
-			Spec rhsType = AgreeXtext.infer(rhsExpr);
+			Spec rhsType = AgreeXtext.inferSpec(rhsExpr);
 			agreeRhsTypes.add(rhsType);
 
 		}
@@ -2034,7 +2034,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 	@Check(CheckType.FAST)
 	public void checkNodeLemma(NodeLemma nodeLemma) {
-		Spec exprType = AgreeXtext.infer(nodeLemma.getExpr());
+		Spec exprType = AgreeXtext.inferSpec(nodeLemma.getExpr());
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, exprType)) {
 			error(nodeLemma, "Expression for lemma statement is of type '" + exprType + "' but must be of type 'bool'");
 		}
@@ -2127,7 +2127,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		// Check that the formal args are all of real type
 		for (Arg arg : linDefExpr.getArgs()) {
-			Spec argType = AgreeXtext.toTypeDef(arg.getType());
+			Spec argType = AgreeXtext.toSpec(arg.getType());
 			if (!AgreeSpecSystem.staticEqual(argType, AgreeSpecSystem.Prim.RealSpec)) {
 				error(arg, "Linearizations formal arguments must be of real type, but found type " + argType);
 			}
@@ -2143,7 +2143,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		// of real type
 		Expr precisionExpr = linDefExpr.getPrecision();
 		if (precisionExpr != null) {
-			Spec precisionExprType = AgreeXtext.infer(precisionExpr);
+			Spec precisionExprType = AgreeXtext.inferSpec(precisionExpr);
 			if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.RealSpec, precisionExprType)) {
 				error(precisionExpr,
 						"Linearization precision must be of real type, but found type " + precisionExprType);
@@ -2160,8 +2160,8 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		final String message = "Linearization interval endpoints must be constant expressions of real type";
 		Expr startExpr = linInterval.getStart();
 		Expr endExpr = linInterval.getEnd();
-		Spec startExprType = AgreeXtext.infer(startExpr);
-		Spec endExprType = AgreeXtext.infer(endExpr);
+		Spec startExprType = AgreeXtext.inferSpec(startExpr);
+		Spec endExprType = AgreeXtext.inferSpec(endExpr);
 
 		// The type of the interval start and end must be of real type
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.RealSpec, startExprType)) {
@@ -2216,9 +2216,9 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	public void checkPrevExpr(PrevExpr prevExpr) {
 
 		checkTypeExists(prevExpr.getDelay());
-		Spec delayType = AgreeXtext.infer(prevExpr.getDelay());
+		Spec delayType = AgreeXtext.inferSpec(prevExpr.getDelay());
 		checkTypeExists(prevExpr.getInit());
-		Spec initType = AgreeXtext.infer(prevExpr.getInit());
+		Spec initType = AgreeXtext.inferSpec(prevExpr.getInit());
 
 		if (!AgreeSpecSystem.staticEqual(initType, delayType)) {
 			error(prevExpr, "The first and second arguments of the 'prev' function are of non-matching types '"
@@ -2234,7 +2234,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	public List<Spec> typeDefsFromArgs(List<Arg> args) {
 		List<Spec> types = new ArrayList<Spec>();
 		for (Arg arg : args) {
-			types.add(AgreeXtext.toTypeDef(arg.getType()));
+			types.add(AgreeXtext.toSpec(arg.getType()));
 		}
 		return types;
 	}
@@ -2287,7 +2287,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		List<Spec> argCallTypes = new ArrayList<>();
 		for (Expr expr : call.getArgs()) {
 			checkTypeExists(expr);
-			argCallTypes.add(AgreeXtext.infer(expr));
+			argCallTypes.add(AgreeXtext.inferSpec(expr));
 		}
 
 		if (inDefTypes.size() != argCallTypes.size()) {
@@ -2337,9 +2337,9 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	@Check(CheckType.FAST)
 	public void checkFnDefExpr(FnDef fnDef) {
 
-		Spec fnType = AgreeXtext.toTypeDef(fnDef.getType());
+		Spec fnType = AgreeXtext.toSpec(fnDef.getType());
 
-		Spec exprType = AgreeXtext.infer(fnDef.getExpr());
+		Spec exprType = AgreeXtext.inferSpec(fnDef.getExpr());
 		if (!AgreeSpecSystem.staticEqual(exprType, fnType)) {
 			error(fnDef, "Function '" + fnDef.getName() + "' is of type '" + fnType.getName()
 					+ "' but its expression is of type '" + exprType.getName() + "'");
@@ -2384,13 +2384,13 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		checkTypeExists(expr.getA());
-		Spec condType = AgreeXtext.infer(expr.getA());
+		Spec condType = AgreeXtext.inferSpec(expr.getA());
 
 		checkTypeExists(expr.getB());
-		Spec thenType = AgreeXtext.infer(expr.getB());
+		Spec thenType = AgreeXtext.inferSpec(expr.getB());
 
 		checkTypeExists(expr.getC());
-		Spec elseType = AgreeXtext.infer(expr.getC());
+		Spec elseType = AgreeXtext.inferSpec(expr.getC());
 
 		if (!AgreeSpecSystem.staticEqual(AgreeSpecSystem.Prim.BoolSpec, condType)) {
 			error(expr, "The condition of the if statement is of type '" + condType + "' but must be of type 'bool'");
@@ -2416,8 +2416,8 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkTypeExists(binExpr.getLeft());
 		checkTypeExists(binExpr.getRight());
 
-		Spec typeLeft = AgreeXtext.infer(binExpr.getLeft());
-		Spec typeRight = AgreeXtext.infer(binExpr.getRight());
+		Spec typeLeft = AgreeXtext.inferSpec(binExpr.getLeft());
+		Spec typeRight = AgreeXtext.inferSpec(binExpr.getRight());
 		String op = binExpr.getOp();
 		Expr rightSide = binExpr.getRight();
 		Expr leftSide = binExpr.getLeft();

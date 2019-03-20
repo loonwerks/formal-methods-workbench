@@ -682,7 +682,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			return;
 		}
 
-		Type type = AgreeXtext.toTypeDefFromNamedElm(dataClass).toLustreType();
+		Type type = AgreeXtext.toSpecFromNamedElm(dataClass).toLustreType();
 		lustreTypes.add(type);
 
 		if (type == null) {
@@ -697,7 +697,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			inputs.add(agreeVar);
 			if (dataClass instanceof DataClassifier) {
 
-				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.toTypeDefFromNamedElm(dataClass));
+				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.toSpecFromNamedElm(dataClass));
 				if (!constraints.isEmpty()) {
 					assumptions.add(getDataClassifierTypePredicate(feature.getName(), constraints, dataFeature));
 				}
@@ -706,7 +706,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		case OUT:
 			outputs.add(agreeVar);
 			if (dataClass instanceof DataClassifier) {
-				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.toTypeDefFromNamedElm(dataClass));
+				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.toSpecFromNamedElm(dataClass));
 				if (!constraints.isEmpty()) {
 					guarantees.add(getDataClassifierTypePredicate(feature.getName(), constraints, dataFeature));
 				}
@@ -834,7 +834,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		}
 		// EGM: array-backend
 		// Type lustreType = AgreeTypeUtils.getType(dataClass, typeMap, globalTypes);
-		Type lustreType = AgreeXtext.toTypeDefFromNamedElm(dataClass).toLustreType();
+		Type lustreType = AgreeXtext.toSpecFromNamedElm(dataClass).toLustreType();
 		lustreTypes.add(lustreType);
 		return lustreType;
 	}
@@ -1072,7 +1072,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				// this will record them to the global types
 				// EGM: array-backend
 				// AgreeTypeUtils.getType((NamedElement) spec, typeMap, globalTypes);
-				Type t = AgreeXtext.toTypeDefFromNamedElm((NamedElement) spec).toLustreType();
+				Type t = AgreeXtext.toSpecFromNamedElm((NamedElement) spec).toLustreType();
 				lustreTypes.add(t);
 			}
 		}
@@ -1090,7 +1090,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	}
 
 	public VarDecl agreeVarFromArg(Arg arg, ComponentInstance compInst) {
-		Type type = AgreeXtext.toTypeDef(arg.getType()).toLustreType();
+		Type type = AgreeXtext.toSpec(arg.getType()).toLustreType();
 		lustreTypes.add(type);
 
 		if (type != null) {
@@ -1270,7 +1270,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<AgreeStatement> constraints = new ArrayList<>();
 		for (Arg arg : args) {
 			List<Expr> argConstraints = getConstraintsFromTypeDef(arg.getName(),
-					AgreeXtext.toTypeDef(arg.getType()));
+					AgreeXtext.toSpec(arg.getType()));
 			if (!argConstraints.isEmpty()) {
 				constraints.add(new AgreeStatement("Type predicate on '" + arg.getName() + "'", argConstraints.stream()
 						.reduce(new BoolExpr(true), (a, b) -> new BinaryExpr(a, BinaryOp.AND, b)), reference));
@@ -1597,7 +1597,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<VarDecl> inputs = agreeVarsFromArgs(fnDef.getArgs(), null);
 		Expr bodyExpr = doSwitch(fnDef.getExpr());
 
-		Type outType = AgreeXtext.toTypeDef(fnDef.getType()).toLustreType();
+		Type outType = AgreeXtext.toSpec(fnDef.getType()).toLustreType();
 		lustreTypes.add(outType);
 
 		if (outType != null) {
@@ -1956,7 +1956,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseIndicesExpr(IndicesExpr expr) {
-		AgreeSpecSystem.Spec arrayTypeDef = AgreeXtext.infer(expr.getArray());
+		AgreeSpecSystem.Spec arrayTypeDef = AgreeXtext.inferSpec(expr.getArray());
 
 		if (arrayTypeDef instanceof AgreeSpecSystem.ArraySpec) {
 			int size = ((AgreeSpecSystem.ArraySpec) arrayTypeDef).size;
@@ -2090,7 +2090,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		com.rockwellcollins.atc.agree.agree.Expr arrayExpr = expr.getArray();
 		Expr array = doSwitch(arrayExpr);
 
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.infer(arrayExpr);
+		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(arrayExpr);
 		int size = 0;
 		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
 			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
@@ -2114,7 +2114,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		com.rockwellcollins.atc.agree.agree.Expr arrayExpr = expr.getArray();
 		Expr array = doSwitch(arrayExpr);
 
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.infer(arrayExpr);
+		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(arrayExpr);
 		int size = 0;
 		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
 			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
@@ -2135,7 +2135,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFlatmapExpr(FlatmapExpr expr) {
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.infer(expr.getArray());
+		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
 		int size = 0;
 		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
 			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
@@ -2149,7 +2149,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			Expr arrayAccess = new ArrayAccessExpr(array, i);
 			Expr body = substitute(doSwitch(expr.getExpr()), binding.getName(), arrayAccess);
 
-			AgreeSpecSystem.Spec innerArrType = AgreeXtext.infer(expr.getExpr());
+			AgreeSpecSystem.Spec innerArrType = AgreeXtext.inferSpec(expr.getExpr());
 			if (innerArrType instanceof AgreeSpecSystem.ArraySpec) {
 				int innerSize = ((AgreeSpecSystem.ArraySpec) innerArrType).size;
 				for (int j = 0; j < innerSize; j++) {
@@ -2165,7 +2165,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFoldLeftExpr(FoldLeftExpr expr) {
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.infer(expr.getArray());
+		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
 
 		int size = 0;
 		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
@@ -2187,7 +2187,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFoldRightExpr(FoldRightExpr expr) {
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.infer(expr.getArray());
+		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
 
 		int size = 0;
 		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {

@@ -529,7 +529,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 	IScope scope_RecordUpdateExpr_key(RecordUpdateExpr ctx, EReference ref) {
 		IScope prevScope = prevScope(ctx, ref);
-		Spec typ = AgreeXtext.infer(ctx.getRecord());
+		Spec typ = AgreeXtext.inferSpec(ctx.getRecord());
 		if (typ instanceof RecordSpec) {
 			NamedElement ne = ((RecordSpec) typ).namedElement;
 			return Scopes.scopeFor(getFieldsOfNE(ne), prevScope);
@@ -554,7 +554,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 	protected IScope scope_SelectionExpr_field(SelectionExpr ctx, EReference ref) {
 
-		Spec typ = AgreeXtext.infer(ctx.getTarget());
+		Spec typ = AgreeXtext.inferSpec(ctx.getTarget());
 
 		if (typ instanceof RecordSpec) {
 			NamedElement ne = ((RecordSpec) typ).namedElement;
