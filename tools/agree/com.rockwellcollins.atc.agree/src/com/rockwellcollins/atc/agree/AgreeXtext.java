@@ -105,7 +105,7 @@ import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 
 public class AgreeXtext {
 
-	public static TypeDef typeDefFromType(Type t) {
+	public static TypeDef toTypeDef(Type t) {
 
 		if (t instanceof PrimType) {
 
@@ -140,21 +140,21 @@ public class AgreeXtext {
 
 		} else if (t instanceof ArrayType) {
 			String size = ((ArrayType) t).getSize();
-			TypeDef baseTypeDef = typeDefFromType(((ArrayType) t).getStem());
+			TypeDef baseTypeDef = toTypeDef(((ArrayType) t).getStem());
 
 			return new ArrayTypeDef(baseTypeDef, Integer.parseInt(size), Optional.empty());
 
 		} else if (t instanceof DoubleDotRef) {
-			return typeDefFromNE(((DoubleDotRef) t).getElm());
+			return toTypeDefFromNamedElm(((DoubleDotRef) t).getElm());
 		} else {
 			return Prim.ErrorTypeDef;
 		}
 
 	}
 
-	public static TypeDef typeDefFromNE(NamedElement ne) {
+	public static TypeDef toTypeDefFromNamedElm(NamedElement ne) {
 		if (ne instanceof Classifier) {
-			return typeDefFromClassifier((Classifier) ne);
+			return toTypeDefFromClassifier((Classifier) ne);
 
 		} else if (ne instanceof RecordDef) {
 
@@ -162,7 +162,7 @@ public class AgreeXtext {
 			Map<String, TypeDef> fields = new HashMap<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
-				TypeDef typeDef = typeDefFromType(arg.getType());
+				TypeDef typeDef = toTypeDef(arg.getType());
 				fields.put(key, typeDef);
 			}
 			return new RecordTypeDef(ne.getQualifiedName(), fields, ne);
@@ -178,14 +178,14 @@ public class AgreeXtext {
 			return new EnumTypeDef(name, enumValues, ne);
 
 		} else if (ne instanceof Arg) {
-			return typeDefFromType(((Arg) ne).getType());
+			return toTypeDef(((Arg) ne).getType());
 
 		} else {
 			return Prim.ErrorTypeDef;
 		}
 	}
 
-	public static TypeDef typeDefFromClassifier(Classifier c) {
+	public static TypeDef toTypeDefFromClassifier(Classifier c) {
 
 		if (c instanceof AadlBoolean || c.getName().contains("Boolean")) {
 			return Prim.BoolTypeDef;
@@ -292,7 +292,7 @@ public class AgreeXtext {
 						ListValue l = (ListValue) v;
 						PropertyExpression pe = l.getOwnedListElements().get(0);
 						if (pe instanceof ClassifierValue) {
-							prop_arrayBaseType = typeDefFromClassifier(((ClassifierValue) pe).getClassifier());
+							prop_arrayBaseType = toTypeDefFromClassifier(((ClassifierValue) pe).getClassifier());
 						}
 
 					}
@@ -332,13 +332,13 @@ public class AgreeXtext {
 						if (sub.getClassifier() != null) {
 
 							if (sub.getArrayDimensions().size() == 0) {
-								TypeDef typeDef = typeDefFromClassifier(sub.getClassifier());
+								TypeDef typeDef = toTypeDefFromClassifier(sub.getClassifier());
 								fields.putIfAbsent(fieldName, typeDef);
 							} else if (sub.getArrayDimensions().size() == 1) {
 								ArrayDimension ad = sub.getArrayDimensions().get(0);
 								int size = Math.toIntExact(getArraySize(ad));
 
-								TypeDef stem = typeDefFromClassifier(sub.getClassifier());
+								TypeDef stem = toTypeDefFromClassifier(sub.getClassifier());
 								TypeDef typeDef = new ArrayTypeDef(stem, size, Optional.empty());
 								fields.putIfAbsent(fieldName, typeDef);
 
@@ -359,12 +359,12 @@ public class AgreeXtext {
 
 						if (feature.getClassifier() != null) {
 							if (feature.getArrayDimensions().size() == 0) {
-								TypeDef typeDef = typeDefFromClassifier(feature.getClassifier());
+								TypeDef typeDef = toTypeDefFromClassifier(feature.getClassifier());
 								fields.putIfAbsent(fieldName, typeDef);
 							} else if (feature.getArrayDimensions().size() == 1) {
 								ArrayDimension ad = feature.getArrayDimensions().get(0);
 								int size = Math.toIntExact(getArraySize(ad));
-								TypeDef stem = typeDefFromClassifier(feature.getClassifier());
+								TypeDef stem = toTypeDefFromClassifier(feature.getClassifier());
 								TypeDef typeDef = new ArrayTypeDef(stem, size, Optional.empty());
 
 								fields.putIfAbsent(fieldName, typeDef);
@@ -388,7 +388,7 @@ public class AgreeXtext {
 
 							for (Arg arg : args) {
 								String fieldName = arg.getName();
-								TypeDef typeDef = typeDefFromNE(arg);
+								TypeDef typeDef = toTypeDefFromNamedElm(arg);
 								fields.putIfAbsent(fieldName, typeDef);
 							}
 						}
@@ -467,17 +467,17 @@ public class AgreeXtext {
 			}
 
 		} else if (ne instanceof ConstStatement) {
-			return typeDefFromType(((ConstStatement) ne).getType());
+			return toTypeDef(((ConstStatement) ne).getType());
 
 		} else if (ne instanceof Arg) {
-			return typeDefFromType(((Arg) ne).getType());
+			return toTypeDef(((Arg) ne).getType());
 
 		} else if (ne instanceof Subcomponent) {
 
 			Subcomponent sub = (Subcomponent) ne;
 			Classifier cl = sub.getClassifier();
 			List<ArrayDimension> dims = sub.getArrayDimensions();
-			TypeDef clsTypeDef = typeDefFromClassifier(cl);
+			TypeDef clsTypeDef = toTypeDefFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
@@ -489,7 +489,7 @@ public class AgreeXtext {
 
 			Classifier cl = ((Feature) ne).getClassifier();
 			List<ArrayDimension> dims = ((Feature) ne).getArrayDimensions();
-			TypeDef clsTypeDef = typeDefFromClassifier(cl);
+			TypeDef clsTypeDef = toTypeDefFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
@@ -754,7 +754,7 @@ public class AgreeXtext {
 			return Prim.RealTypeDef;
 
 		} else if (expr instanceof EnumLitExpr) {
-			return typeDefFromType(((EnumLitExpr) expr).getEnumType());
+			return toTypeDef(((EnumLitExpr) expr).getEnumType());
 
 		} else if (expr instanceof LatchedExpr) {
 			return infer(((LatchedExpr) expr).getExpr());
@@ -792,7 +792,7 @@ public class AgreeXtext {
 			return infer(((ArrayUpdateExpr) expr).getArray());
 
 		} else if (expr instanceof RecordLitExpr) {
-			return typeDefFromType(((RecordLitExpr) expr).getRecordType());
+			return toTypeDef(((RecordLitExpr) expr).getRecordType());
 
 		} else if (expr instanceof RecordUpdateExpr) {
 			return infer(((RecordUpdateExpr) expr).getRecord());
@@ -813,25 +813,25 @@ public class AgreeXtext {
 					return Prim.RealTypeDef;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
-					return typeDefFromType(fnDef.getType());
+					return toTypeDef(fnDef.getType());
 				}
 
 			} else {
 				// extract in/out arguments
 				if (namedEl instanceof FnDef) {
 					FnDef fnDef = (FnDef) namedEl;
-					return typeDefFromType(fnDef.getType());
+					return toTypeDef(fnDef.getType());
 				} else if (namedEl instanceof NodeDef) {
 					NodeDef nodeDef = (NodeDef) namedEl;
 					List<Type> outDefTypes = typesFromArgs(nodeDef.getRets());
 					if (outDefTypes.size() == 1) {
-						return typeDefFromType(outDefTypes.get(0));
+						return toTypeDef(outDefTypes.get(0));
 					}
 				} else if (namedEl instanceof LinearizationDef) {
 					return Prim.RealTypeDef;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
-					return typeDefFromType(fnDef.getType());
+					return toTypeDef(fnDef.getType());
 				}
 
 			}

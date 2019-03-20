@@ -682,7 +682,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			return;
 		}
 
-		Type type = AgreeXtext.typeDefFromNE(dataClass).toLustreType();
+		Type type = AgreeXtext.toTypeDefFromNamedElm(dataClass).toLustreType();
 		lustreTypes.add(type);
 
 		if (type == null) {
@@ -697,7 +697,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			inputs.add(agreeVar);
 			if (dataClass instanceof DataClassifier) {
 
-				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.typeDefFromNE(dataClass));
+				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.toTypeDefFromNamedElm(dataClass));
 				if (!constraints.isEmpty()) {
 					assumptions.add(getDataClassifierTypePredicate(feature.getName(), constraints, dataFeature));
 				}
@@ -706,7 +706,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		case OUT:
 			outputs.add(agreeVar);
 			if (dataClass instanceof DataClassifier) {
-				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.typeDefFromNE(dataClass));
+				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeXtext.toTypeDefFromNamedElm(dataClass));
 				if (!constraints.isEmpty()) {
 					guarantees.add(getDataClassifierTypePredicate(feature.getName(), constraints, dataFeature));
 				}
@@ -834,7 +834,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		}
 		// EGM: array-backend
 		// Type lustreType = AgreeTypeUtils.getType(dataClass, typeMap, globalTypes);
-		Type lustreType = AgreeXtext.typeDefFromNE(dataClass).toLustreType();
+		Type lustreType = AgreeXtext.toTypeDefFromNamedElm(dataClass).toLustreType();
 		lustreTypes.add(lustreType);
 		return lustreType;
 	}
@@ -1072,7 +1072,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				// this will record them to the global types
 				// EGM: array-backend
 				// AgreeTypeUtils.getType((NamedElement) spec, typeMap, globalTypes);
-				Type t = AgreeXtext.typeDefFromNE((NamedElement) spec).toLustreType();
+				Type t = AgreeXtext.toTypeDefFromNamedElm((NamedElement) spec).toLustreType();
 				lustreTypes.add(t);
 			}
 		}
@@ -1090,7 +1090,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	}
 
 	public VarDecl agreeVarFromArg(Arg arg, ComponentInstance compInst) {
-		Type type = AgreeXtext.typeDefFromType(arg.getType()).toLustreType();
+		Type type = AgreeXtext.toTypeDef(arg.getType()).toLustreType();
 		lustreTypes.add(type);
 
 		if (type != null) {
@@ -1270,7 +1270,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<AgreeStatement> constraints = new ArrayList<>();
 		for (Arg arg : args) {
 			List<Expr> argConstraints = getConstraintsFromTypeDef(arg.getName(),
-					AgreeXtext.typeDefFromType(arg.getType()));
+					AgreeXtext.toTypeDef(arg.getType()));
 			if (!argConstraints.isEmpty()) {
 				constraints.add(new AgreeStatement("Type predicate on '" + arg.getName() + "'", argConstraints.stream()
 						.reduce(new BoolExpr(true), (a, b) -> new BinaryExpr(a, BinaryOp.AND, b)), reference));
@@ -1597,7 +1597,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<VarDecl> inputs = agreeVarsFromArgs(fnDef.getArgs(), null);
 		Expr bodyExpr = doSwitch(fnDef.getExpr());
 
-		Type outType = AgreeXtext.typeDefFromType(fnDef.getType()).toLustreType();
+		Type outType = AgreeXtext.toTypeDef(fnDef.getType()).toLustreType();
 		lustreTypes.add(outType);
 
 		if (outType != null) {

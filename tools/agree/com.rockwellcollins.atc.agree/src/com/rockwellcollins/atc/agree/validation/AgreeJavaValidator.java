@@ -413,18 +413,18 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataImplementation) {
-				if (AgreeTypeSystem.typesEqual(AgreeXtext.typeDefFromType(recType),
+				if (AgreeTypeSystem.typesEqual(AgreeXtext.toTypeDef(recType),
 						AgreeTypeSystem.Prim.ErrorTypeDef)) {
 					error(recType, "Data Implementations with no subcomponents must extend"
 							+ " a Base_Type that AGREE can reason about.");
 					return;
 				}
 				if (((DataImplementation) finalId).getAllSubcomponents().size() != 0) {
-					if (AgreeTypeSystem.typesEqual(AgreeXtext.typeDefFromType(recType),
+					if (AgreeTypeSystem.typesEqual(AgreeXtext.toTypeDef(recType),
 							AgreeTypeSystem.Prim.BoolTypeDef)
-							|| AgreeTypeSystem.typesEqual(AgreeXtext.typeDefFromType(recType),
+							|| AgreeTypeSystem.typesEqual(AgreeXtext.toTypeDef(recType),
 									AgreeTypeSystem.Prim.IntTypeDef)
-							|| AgreeTypeSystem.typesEqual(AgreeXtext.typeDefFromType(recType),
+							|| AgreeTypeSystem.typesEqual(AgreeXtext.toTypeDef(recType),
 									AgreeTypeSystem.Prim.RealTypeDef)) {
 						error(finalId, "Data implementations with subcomponents cannot be"
 								+ " interpreted by AGREE if they extend Base_Types");
@@ -436,7 +436,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataType) {
-				if (AgreeTypeSystem.typesEqual(AgreeXtext.typeDefFromType(recType),
+				if (AgreeTypeSystem.typesEqual(AgreeXtext.toTypeDef(recType),
 						AgreeTypeSystem.Prim.ErrorTypeDef)) {
 					error(recType, "AADL Datatypes must extend" + " a Base_Type that AGREE can reason about.");
 					return;
@@ -1254,7 +1254,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 			// scoping should ensure the key is a proper Arg
 			Arg arg = (Arg) upExpr.getKey();
-			TypeDef keyType = AgreeXtext.typeDefFromType(arg.getType());
+			TypeDef keyType = AgreeXtext.toTypeDef(arg.getType());
 			checkTypeExists(upExpr.getExpr());
 			TypeDef expType = AgreeXtext.infer(upExpr.getExpr());
 
@@ -1458,12 +1458,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		if (rec instanceof RecordDef) {
 			RecordDef recDef = (RecordDef) rec;
 			for (Arg arg : recDef.getArgs()) {
-				typeMap.put(arg.getName(), AgreeXtext.typeDefFromType(arg.getType()));
+				typeMap.put(arg.getName(), AgreeXtext.toTypeDef(arg.getType()));
 			}
 		} else if (rec instanceof DataImplementation) {
 			DataImplementation dataImpl = (DataImplementation) rec;
 			for (Subcomponent sub : dataImpl.getAllSubcomponents()) {
-				typeMap.put(sub.getName(), AgreeXtext.typeDefFromClassifier((sub.getClassifier())));
+				typeMap.put(sub.getName(), AgreeXtext.toTypeDefFromClassifier((sub.getClassifier())));
 			}
 		} else {
 			error(recType, "Record type '" + rec.getName() + "' must be a feature group or a record type definition");
@@ -1594,7 +1594,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 	@Check(CheckType.FAST)
 	public void checkConstStatement(ConstStatement constStat) {
-		TypeDef expected = AgreeXtext.typeDefFromType(constStat.getType());
+		TypeDef expected = AgreeXtext.toTypeDef(constStat.getType());
 		TypeDef actual = AgreeXtext.infer(constStat.getExpr());
 
 		if (!AgreeTypeSystem.typesEqual(expected, actual)) {
@@ -1857,7 +1857,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		List<TypeDef> agreeLhsTypes = new ArrayList<>();
 		for (Arg arg : lhsArgs) {
-			agreeLhsTypes.add(AgreeXtext.typeDefFromType(arg.getType()));
+			agreeLhsTypes.add(AgreeXtext.toTypeDef(arg.getType()));
 		}
 		List<TypeDef> agreeRhsTypes = new ArrayList<>();
 
@@ -1867,11 +1867,11 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			if (namedEl instanceof NodeDef) {
 				NodeDef nodeDef = (NodeDef) namedEl;
 				for (Arg var : nodeDef.getRets()) {
-					agreeRhsTypes.add(AgreeXtext.typeDefFromType(var.getType()));
+					agreeRhsTypes.add(AgreeXtext.toTypeDef(var.getType()));
 				}
 			} else if (namedEl instanceof FnDef) {
 				FnDef fnDef = (FnDef) namedEl;
-				agreeRhsTypes.add(AgreeXtext.typeDefFromType(fnDef.getType()));
+				agreeRhsTypes.add(AgreeXtext.toTypeDef(fnDef.getType()));
 			} else {
 				return; // parse error
 			}
@@ -2127,7 +2127,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		// Check that the formal args are all of real type
 		for (Arg arg : linDefExpr.getArgs()) {
-			TypeDef argType = AgreeXtext.typeDefFromType(arg.getType());
+			TypeDef argType = AgreeXtext.toTypeDef(arg.getType());
 			if (!AgreeTypeSystem.typesEqual(argType, AgreeTypeSystem.Prim.RealTypeDef)) {
 				error(arg, "Linearizations formal arguments must be of real type, but found type " + argType);
 			}
@@ -2234,7 +2234,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	public List<TypeDef> typeDefsFromArgs(List<Arg> args) {
 		List<TypeDef> types = new ArrayList<TypeDef>();
 		for (Arg arg : args) {
-			types.add(AgreeXtext.typeDefFromType(arg.getType()));
+			types.add(AgreeXtext.toTypeDef(arg.getType()));
 		}
 		return types;
 	}
@@ -2337,7 +2337,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	@Check(CheckType.FAST)
 	public void checkFnDefExpr(FnDef fnDef) {
 
-		TypeDef fnType = AgreeXtext.typeDefFromType(fnDef.getType());
+		TypeDef fnType = AgreeXtext.toTypeDef(fnDef.getType());
 
 		TypeDef exprType = AgreeXtext.infer(fnDef.getExpr());
 		if (!AgreeTypeSystem.typesEqual(exprType, fnType)) {
