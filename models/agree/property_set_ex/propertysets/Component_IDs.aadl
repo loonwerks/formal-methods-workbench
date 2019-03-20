@@ -1,0 +1,6 @@
+property set Component_IDs is
+	Own_ComponentID : aadlinteger applies to (thread);
+	
+	ComponentA_ComponentID_Val : constant aadlinteger => 1;
+	
+end Component_IDs;
