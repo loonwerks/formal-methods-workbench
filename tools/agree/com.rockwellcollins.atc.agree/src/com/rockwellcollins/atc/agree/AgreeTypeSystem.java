@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.eclipse.emf.common.util.EList;
@@ -96,27 +97,43 @@ import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 
+import jkind.lustre.EnumType;
+import jkind.lustre.NamedType;
+
 public class AgreeTypeSystem {
 
 	public static interface TypeDef {
 
 		public String getName();
 
+		public jkind.lustre.Type toLustreType();
+
 	}
 
+
 	public static enum Prim implements TypeDef {
-		IntTypeDef("int"), RealTypeDef("real"), BoolTypeDef("bool"), ErrorTypeDef("<error>");
+		IntTypeDef("int", NamedType.INT), RealTypeDef("real", NamedType.REAL), BoolTypeDef("bool",
+				NamedType.BOOL), ErrorTypeDef("<error>", null);
 
 		public final String name;
+		public final jkind.lustre.Type lustreType;
 
-		Prim(String name) {
+		Prim(String name, jkind.lustre.Type lustreType) {
 			this.name = name;
+			this.lustreType = lustreType;
 		}
 
 		@Override
 		public String getName() {
 			return name;
 		}
+
+		@Override
+		public jkind.lustre.Type toLustreType() {
+			return lustreType;
+		}
+
+
 
 	}
 
@@ -136,6 +153,11 @@ public class AgreeTypeSystem {
 			return name;
 		}
 
+		@Override
+		public jkind.lustre.Type toLustreType() {
+			return NamedType.INT;
+		}
+
 	}
 
 	public static class RangeRealTypeDef implements TypeDef {
@@ -152,6 +174,11 @@ public class AgreeTypeSystem {
 		@Override
 		public String getName() {
 			return name;
+		}
+
+		@Override
+		public jkind.lustre.Type toLustreType() {
+			return NamedType.REAL;
 		}
 	}
 
@@ -171,6 +198,20 @@ public class AgreeTypeSystem {
 		public String getName() {
 			return name;
 		}
+
+		@Override
+		public jkind.lustre.Type toLustreType() {
+			String lustreName = name.replace("::", "__").replace(".", "__");
+			List<String> enumValues = new ArrayList<String>();
+			for (String raw : ((AgreeTypeSystem.EnumTypeDef) agreeType).values) {
+				String enumValue = raw.replace("::", "__").replace(".", "__");
+				enumValues.add(enumValue);
+			}
+			EnumType lustreEnumType = new EnumType(lustreName, enumValues);
+			return lustreEnumType;
+		}
+
+
 	}
 
 	public static class RecordTypeDef implements TypeDef {
@@ -189,6 +230,24 @@ public class AgreeTypeSystem {
 		public String getName() {
 			return name;
 		}
+
+		@Override
+		public jkind.lustre.Type toLustreType() {
+			String lustreName = name.replace("::", "__").replace(".", "__");
+			Map<String, AgreeTypeSystem.TypeDef> agreeFields = fields;
+
+			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
+			for (Entry<String, AgreeTypeSystem.TypeDef> entry : agreeFields.entrySet()) {
+				String key = entry.getKey();
+				jkind.lustre.Type lt = entry.getValue().toLustreType();
+				if (lt != null) {
+					lustreFields.put(key, lt);
+				}
+			}
+			jkind.lustre.RecordType lustreRecType = new jkind.lustre.RecordType(lustreName, lustreFields);
+			return lustreRecType;
+		}
+
 	}
 
 	public static class ArrayTypeDef implements TypeDef {
@@ -205,6 +264,19 @@ public class AgreeTypeSystem {
 		@Override
 		public String getName() {
 			return stemType.getName() + "[" + size + "]";
+		}
+
+		@Override
+		public jkind.lustre.Type toLustreType() {
+
+			jkind.lustre.Type lustreBaseType = stemType.toLustreType();
+			if (lustreBaseType != null) {
+				jkind.lustre.ArrayType lustreArrayType = new jkind.lustre.ArrayType(lustreBaseType, size);
+				return lustreArrayType;
+			} else {
+				return null;
+			}
+
 		}
 
 	}
