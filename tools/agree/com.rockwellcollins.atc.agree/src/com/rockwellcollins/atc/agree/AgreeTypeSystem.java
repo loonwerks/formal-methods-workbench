@@ -100,6 +100,8 @@ public class AgreeTypeSystem {
 
 	public static interface TypeDef {
 
+		public String getName();
+
 	}
 
 	public static enum Prim implements TypeDef {
@@ -109,6 +111,11 @@ public class AgreeTypeSystem {
 
 		Prim(String name) {
 			this.name = name;
+		}
+
+		@Override
+		public String getName() {
+			return name;
 		}
 
 	}
@@ -123,6 +130,12 @@ public class AgreeTypeSystem {
 			this.low = low;
 			this.high = high;
 		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
 	}
 
 	public static class RangeRealTypeDef implements TypeDef {
@@ -134,6 +147,11 @@ public class AgreeTypeSystem {
 			this.name = Prim.RealTypeDef.name;
 			this.low = f;
 			this.high = g;
+		}
+
+		@Override
+		public String getName() {
+			return name;
 		}
 	}
 
@@ -148,6 +166,11 @@ public class AgreeTypeSystem {
 			this.values.addAll(values);
 			this.elm = elm;
 		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
 	}
 
 	public static class RecordTypeDef implements TypeDef {
@@ -161,6 +184,11 @@ public class AgreeTypeSystem {
 			this.fields.putAll(fields);
 			this.namedElement = namedElement;
 		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
 	}
 
 	public static class ArrayTypeDef implements TypeDef {
@@ -173,27 +201,14 @@ public class AgreeTypeSystem {
 			this.stemType = stemType;
 			this.elmOp = elmOp;
 		}
+
+		@Override
+		public String getName() {
+			return stemType.getName() + "[" + size + "]";
+		}
+
 	}
 
-	public static String nameOfTypeDef(TypeDef td) {
-		if (td instanceof Prim) {
-			return ((Prim) td).name;
-		} else if (td instanceof RangeIntTypeDef) {
-			return ((RangeIntTypeDef) td).name;
-		} else if (td instanceof RangeRealTypeDef) {
-			return ((RangeRealTypeDef) td).name;
-		} else if (td instanceof EnumTypeDef) {
-			return ((EnumTypeDef) td).name;
-		} else if (td instanceof ArrayTypeDef) {
-			int size = ((ArrayTypeDef) td).size;
-			TypeDef stemType = ((ArrayTypeDef) td).stemType;
-			return nameOfTypeDef(stemType) + "[" + size + "]";
-		} else if (td instanceof RecordTypeDef) {
-			return ((RecordTypeDef) td).name;
-		} else {
-			return "<error>";
-		}
-	}
 
 	public static TypeDef typeDefFromNE(NamedElement ne) {
 		if (ne instanceof Classifier) {
@@ -509,8 +524,8 @@ public class AgreeTypeSystem {
 	}
 
 	public static boolean typesEqual(TypeDef t1, TypeDef t2) {
-		String str1 = nameOfTypeDef(t1);
-		String str2 = nameOfTypeDef(t2);
+		String str1 = t1.getName();
+		String str2 = t2.getName();
 		return str1.equals(str2);
 	}
 

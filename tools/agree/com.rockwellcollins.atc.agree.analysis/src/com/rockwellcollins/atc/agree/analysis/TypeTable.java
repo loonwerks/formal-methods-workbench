@@ -25,11 +25,11 @@ public class TypeTable {
 
 
 	public Type updateLustreTypeMap(AgreeTypeSystem.TypeDef agreeType) {
-		Type lustreType = typeNameToLustreType.get(AgreeTypeSystem.nameOfTypeDef(agreeType));
+		Type lustreType = typeNameToLustreType.get(agreeType.getName());
 		if (lustreType == null) {
 			lustreType = getLustreType(agreeType);
 			if (lustreType != null) {
-				typeNameToLustreType.put(AgreeTypeSystem.nameOfTypeDef(agreeType), lustreType);
+				typeNameToLustreType.put(agreeType.getName(), lustreType);
 			}
 		}
 		return lustreType;
