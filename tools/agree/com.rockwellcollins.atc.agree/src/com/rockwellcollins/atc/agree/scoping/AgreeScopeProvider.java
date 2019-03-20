@@ -38,9 +38,9 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.AgreeTypeSystem;
 import com.rockwellcollins.atc.agree.AgreeTypeSystem.RecordTypeDef;
 import com.rockwellcollins.atc.agree.AgreeTypeSystem.TypeDef;
+import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -529,7 +529,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 	IScope scope_RecordUpdateExpr_key(RecordUpdateExpr ctx, EReference ref) {
 		IScope prevScope = prevScope(ctx, ref);
-		TypeDef typ = AgreeTypeSystem.infer(ctx.getRecord());
+		TypeDef typ = AgreeXtext.infer(ctx.getRecord());
 		if (typ instanceof RecordTypeDef) {
 			NamedElement ne = ((RecordTypeDef) typ).namedElement;
 			return Scopes.scopeFor(getFieldsOfNE(ne), prevScope);
@@ -554,7 +554,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 	protected IScope scope_SelectionExpr_field(SelectionExpr ctx, EReference ref) {
 
-		TypeDef typ = AgreeTypeSystem.infer(ctx.getTarget());
+		TypeDef typ = AgreeXtext.infer(ctx.getTarget());
 
 		if (typ instanceof RecordTypeDef) {
 			NamedElement ne = ((RecordTypeDef) typ).namedElement;
