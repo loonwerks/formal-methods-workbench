@@ -12,9 +12,9 @@ import org.osate.aadl2.NamedElement;
 import jkind.lustre.EnumType;
 import jkind.lustre.NamedType;
 
-public class AgreeTypeSystem {
+public class AgreeSpecSystem {
 
-	public static interface TypeDef {
+	public static interface Spec {
 
 		public String getName();
 
@@ -23,9 +23,9 @@ public class AgreeTypeSystem {
 	}
 
 
-	public static enum Prim implements TypeDef {
-		IntTypeDef("int", NamedType.INT), RealTypeDef("real", NamedType.REAL), BoolTypeDef("bool",
-				NamedType.BOOL), ErrorTypeDef("<error>", null);
+	public static enum Prim implements Spec {
+		IntSpec("int", NamedType.INT), RealSpec("real", NamedType.REAL), BoolSpec("bool",
+				NamedType.BOOL), ErrorSpec("<error>", null);
 
 		public final String name;
 		public final jkind.lustre.Type lustreType;
@@ -49,13 +49,13 @@ public class AgreeTypeSystem {
 
 	}
 
-	public static class RangeIntTypeDef implements TypeDef {
+	public static class RangeIntSpec implements Spec {
 		public final String name;
 		public final long low;
 		public final long high;
 
-		public RangeIntTypeDef(long low, long high) {
-			this.name = Prim.IntTypeDef.name;
+		public RangeIntSpec(long low, long high) {
+			this.name = Prim.IntSpec.name;
 			this.low = low;
 			this.high = high;
 		}
@@ -72,13 +72,13 @@ public class AgreeTypeSystem {
 
 	}
 
-	public static class RangeRealTypeDef implements TypeDef {
+	public static class RangeRealSpec implements Spec {
 		public final String name;
 		public final double low;
 		public final double high;
 
-		public RangeRealTypeDef(double f, double g) {
-			this.name = Prim.RealTypeDef.name;
+		public RangeRealSpec(double f, double g) {
+			this.name = Prim.RealSpec.name;
 			this.low = f;
 			this.high = g;
 		}
@@ -94,12 +94,12 @@ public class AgreeTypeSystem {
 		}
 	}
 
-	public static class EnumTypeDef implements TypeDef {
+	public static class EnumSpec implements Spec {
 		public final String name;
 		public final List<String> values;
 		public final NamedElement elm;
 
-		public EnumTypeDef(String name, List<String> values, NamedElement elm) {
+		public EnumSpec(String name, List<String> values, NamedElement elm) {
 			this.name = name;
 			this.values = new ArrayList<>();
 			this.values.addAll(values);
@@ -126,12 +126,12 @@ public class AgreeTypeSystem {
 
 	}
 
-	public static class RecordTypeDef implements TypeDef {
+	public static class RecordSpec implements Spec {
 		public final String name;
-		public final Map<String, TypeDef> fields;
+		public final Map<String, Spec> fields;
 		public final NamedElement namedElement;
 
-		public RecordTypeDef(String name, Map<String, TypeDef> fields, NamedElement namedElement) {
+		public RecordSpec(String name, Map<String, Spec> fields, NamedElement namedElement) {
 			this.name = name;
 			this.fields = new HashMap<>();
 			this.fields.putAll(fields);
@@ -146,10 +146,10 @@ public class AgreeTypeSystem {
 		@Override
 		public jkind.lustre.Type toLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
-			Map<String, AgreeTypeSystem.TypeDef> agreeFields = fields;
+			Map<String, AgreeSpecSystem.Spec> agreeFields = fields;
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
-			for (Entry<String, AgreeTypeSystem.TypeDef> entry : agreeFields.entrySet()) {
+			for (Entry<String, AgreeSpecSystem.Spec> entry : agreeFields.entrySet()) {
 				String key = entry.getKey();
 				jkind.lustre.Type lt = entry.getValue().toLustreType();
 				if (lt != null) {
@@ -162,12 +162,12 @@ public class AgreeTypeSystem {
 
 	}
 
-	public static class ArrayTypeDef implements TypeDef {
-		public final TypeDef stemType;
+	public static class ArraySpec implements Spec {
+		public final Spec stemType;
 		public final int size;
 		public final Optional<NamedElement> elmOp;
 
-		public ArrayTypeDef(TypeDef stemType, int size, Optional<NamedElement> elmOp) {
+		public ArraySpec(Spec stemType, int size, Optional<NamedElement> elmOp) {
 			this.size = size;
 			this.stemType = stemType;
 			this.elmOp = elmOp;
@@ -193,11 +193,7 @@ public class AgreeTypeSystem {
 
 	}
 
-
-
-
-
-	public static boolean typesEqual(TypeDef t1, TypeDef t2) {
+	public static boolean staticEqual(Spec t1, Spec t2) {
 		String str1 = t1.getName();
 		String str2 = t2.getName();
 		return str1.equals(str2);
