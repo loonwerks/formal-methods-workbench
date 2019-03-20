@@ -164,13 +164,11 @@ public class AgreeTypeSystem {
 	}
 
 	public static class ArrayTypeDef implements TypeDef {
-		public final String name;
 		public final TypeDef stemType;
 		public final int size;
 		public final Optional<NamedElement> elmOp;
 
 		public ArrayTypeDef(TypeDef stemType, int size, Optional<NamedElement> elmOp) {
-			this.name = nameOfTypeDef(stemType) + "[" + size + "]";
 			this.size = size;
 			this.stemType = stemType;
 			this.elmOp = elmOp;
@@ -187,7 +185,9 @@ public class AgreeTypeSystem {
 		} else if (td instanceof EnumTypeDef) {
 			return ((EnumTypeDef) td).name;
 		} else if (td instanceof ArrayTypeDef) {
-			return ((ArrayTypeDef) td).name;
+			int size = ((ArrayTypeDef) td).size;
+			TypeDef stemType = ((ArrayTypeDef) td).stemType;
+			return nameOfTypeDef(stemType) + "[" + size + "]";
 		} else if (td instanceof RecordTypeDef) {
 			return ((RecordTypeDef) td).name;
 		} else {
