@@ -203,7 +203,7 @@ public class AgreeTypeSystem {
 		public jkind.lustre.Type toLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 			List<String> enumValues = new ArrayList<String>();
-			for (String raw : ((AgreeTypeSystem.EnumTypeDef) agreeType).values) {
+			for (String raw : values) {
 				String enumValue = raw.replace("::", "__").replace(".", "__");
 				enumValues.add(enumValue);
 			}
