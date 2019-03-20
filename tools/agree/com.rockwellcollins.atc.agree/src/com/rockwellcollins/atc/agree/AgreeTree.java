@@ -2,12 +2,13 @@ package com.rockwellcollins.atc.agree;
 
 public class AgreeTree {
 
-	public interface Model {
+	public static class Spec {
 
 	}
 
-	public interface Package {
+	public static class Module {
 
 	}
+
 
 }

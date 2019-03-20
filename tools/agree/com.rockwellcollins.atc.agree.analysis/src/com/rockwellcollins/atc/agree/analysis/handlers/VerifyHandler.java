@@ -138,9 +138,9 @@ public abstract class VerifyHandler extends AadlHandler {
 				ComponentImplementation ci = cis.get(0);
 				Shell shell = getWindow().getShell();
 				String message = "User selected " + ct.getFullName() + ".\nRunning analysis on " + ci.getFullName()
-				+ " instead.";
+						+ " instead.";
 				shell.getDisplay()
-				.asyncExec(() -> MessageDialog.openInformation(shell, "Analysis information", message));
+						.asyncExec(() -> MessageDialog.openInformation(shell, "Analysis information", message));
 				return ci;
 			} else {
 				throw new AgreeException(
