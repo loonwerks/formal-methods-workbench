@@ -24,10 +24,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.osate.aadl2.ComponentType;
 
-import com.collins.fmw.cyres.architecture.handlers.ModelAnnotations.BOUNDARY;
-import com.collins.fmw.cyres.architecture.handlers.ModelAnnotations.CIA;
-import com.collins.fmw.cyres.architecture.handlers.ModelAnnotations.COMM_MODALITY;
-import com.collins.fmw.cyres.architecture.handlers.ModelAnnotations.COMP_TYPE;
+import com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler.BOUNDARY;
+import com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler.CIA;
+import com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler.COMM_MODALITY;
+import com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler.COMP_TYPE;
 
 public class ModelAnnotationsDialog extends TitleAreaDialog {
 

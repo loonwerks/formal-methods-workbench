@@ -40,7 +40,6 @@ import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.CaseClaimsManager;
 import com.collins.fmw.cyres.architecture.dialogs.AddAttestationManagerDialog;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -51,7 +50,7 @@ import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 
-public class AddAttestationManager extends AadlHandler {
+public class AddAttestationManagerHandler extends AadlHandler {
 
 	static final String AM_REQUEST_MSG_NAME = "CASE_AttestationRequestMsg";
 	static final String AM_RESPONSE_MSG_NAME = "CASE_AttestationResponseMsg";
@@ -522,7 +521,7 @@ public class AddAttestationManager extends AadlHandler {
 					// Add add_attestation claims to *_CASE_Claims file
 					// If the prove statement exists, the *_CASE_Claims file should also already
 					// exist, but double check just to be sure, and create it if it doesn't
-					CaseClaimsManager.getInstance().addAttestationManager(attestationResoluteClause);
+//					ClaimsManager.getInstance().addAttestationManager(attestationResoluteClause);
 //					CaseClaimsManager.getInstance(aadlPkg).addAttestationManager(attestationResoluteClause);
 
 				}

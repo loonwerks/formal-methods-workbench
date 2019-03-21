@@ -37,7 +37,6 @@ import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.CaseClaimsManager;
 import com.collins.fmw.cyres.architecture.dialogs.AddFilterDialog;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -50,7 +49,7 @@ import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 
-public class AddFilter extends AadlHandler {
+public class AddFilterHandler extends AadlHandler {
 
 	static final String FILTER_COMP_TYPE_NAME = "CASE_Filter";
 	static final String FILTER_PORT_IN_NAME = "filter_in";
@@ -283,6 +282,7 @@ public class AddFilter extends AadlHandler {
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Make a copy of the process component implementation
+				// TODO: original needs to be renamed, transformed implementation should keep original name
 				final ProcessImplementation procImpl = (ProcessImplementation) selectedConnection
 						.getContainingComponentImpl();
 				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
@@ -370,7 +370,7 @@ public class AddFilter extends AadlHandler {
 					// Add add_filter claims to *_CASE_Claims file
 					// If the prove statement exists, the *_CASE_Claims file should also already
 					// exist, but double check just to be sure, and create it if it doesn't
-					CaseClaimsManager.getInstance().addFilter(filterResoluteClause);
+//					ClaimsManager.getInstance().addFilter(filterResoluteClause);
 
 				}
 

@@ -11,10 +11,34 @@
             <menu
                   id="com.collins.fmw.cyres.menus.outline.requirements"
                   label="Cyber Requirements">
+               <menu
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
+                     label="Generate Requirements">
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
+                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
+                        label="GearCase"
+                        style="push">
+                     <parameter
+                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+                           value="GearCase">
+                     </parameter>
+                  </command>
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
+                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
+                        label="DCRYPPS"
+                        style="push">
+                     <parameter
+                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+                           value="DCRYPPS">
+                     </parameter>
+                  </command>
+               </menu>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement"
-                     id="com.collins.fmw.cyres.requirements.menus.gearcase"
-                     label="Run TA1 tool"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.import"
+                     label="Import Requirements..."
                      style="push">
                </command>
             </menu>
@@ -40,6 +64,11 @@
                         commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
                         id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
                         label="Add Attestation Manger..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex"
+                        label="Add Simplex Architecture"
                         style="push">
                   </command>
                   <command
@@ -95,10 +124,34 @@
             <menu
                   id="com.collins.fmw.cyres.menus.menubar.requirements"
                   label="Cyber Requirements">
+               <menu
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
+                     label="Generate Requirements">
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
+                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
+                        label="GearCase"
+                        style="push">
+                     <parameter
+                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+                           value="GearCase">
+                     </parameter>
+                  </command>
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
+                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
+                        label="DCRYPPS"
+                        style="push">
+                     <parameter
+                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+                           value="DCRYPPS">
+                     </parameter>
+                  </command>
+               </menu>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.gearcase"
-                     label="Run TA1 tool"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.import"
+                     label="Import Requirements..."
                      style="push">
                </command>
             </menu>
@@ -124,6 +177,11 @@
                         commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
                         id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
                         label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex"
+                        label="Add Simplex Architecture"
                         style="push">
                   </command>
                   <command
@@ -200,10 +258,34 @@
             <menu
                   id="com.collins.fmw.cyres.menus.editor.requirements"
                   label="Cyber Requirements">
+               <menu
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
+                     label="Generate Requirements">
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
+                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
+                        label="GearCase"
+                        style="push">
+                     <parameter
+                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+                           value="GearCase">
+                     </parameter>
+                  </command>
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
+                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
+                        label="DCRYPPS"
+                        style="push">
+                     <parameter
+                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+                           value="DCRYPPS">
+                     </parameter>
+                  </command>
+               </menu>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement"
-                     id="com.collins.fmw.cyres.requirements.menus.gearcase"
-                     label="Run TA1 tool"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.import"
+                     label="Import Requirements..."
                      style="push">
                </command>
             </menu>
@@ -229,6 +311,11 @@
                         commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
                         id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
                         label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex"
+                        label="Add Simplex Architecture"
                         style="push">
                   </command>
                   <command
@@ -275,12 +362,33 @@
             </menu>
          </menu>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="touch.toolbar"
+               label="Touch">
+            <command
+                  commandId="com.collins.fmw.cyres.architecture.commands.Touch"
+                  label="Touch">
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
             id="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
             name="Generate Requirements">
+         <commandParameter
+               id="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
+               name="Tool"
+               optional="true">
+         </commandParameter>
+      </command>
+      <command
+            id="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
+            name="Import Requirements">
       </command>
       <command
             id="com.collins.fmw.cyres.architecture.commands.AddFilter"
@@ -314,44 +422,60 @@
             id="com.collins.fmw.cyres.architecture.commands.FilterChecker"
             name="Filter Checker">
       </command>
+      <command
+            id="com.collins.fmw.cyres.architecture.commands.Touch"
+            name="Touch">
+      </command>
+      <command
+            id="om.collins.fmw.cyres.architecture.commands.AddSimplex"
+            name="Add Simplex Architecture">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddFilter"
+            class="com.collins.fmw.cyres.architecture.handlers.AddFilterHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.AddFilter">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddRouter"
+            class="com.collins.fmw.cyres.architecture.handlers.AddRouterHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.AddRouter">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddMonitor"
+            class="com.collins.fmw.cyres.architecture.handlers.AddMonitorHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.ModelAnnotations"
+            class="com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.SelectImplementation"
+            class="com.collins.fmw.cyres.architecture.handlers.SelectImplementationHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.VerifyLegacyImplementation"
+            class="com.collins.fmw.cyres.architecture.handlers.VerifyLegacyImplementationHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddRequirement"
-            commandId="com.collins.fmw.cyres.architecture.commands.AddRequirement">
+            class="com.collins.fmw.cyres.architecture.handlers.ImportRequirementsHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.JsonHandler"
-            commandId="com.collins.fmw.cyres.architecture.commands.test">
-      </handler>
-      <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddAttestationManager"
+            class="com.collins.fmw.cyres.architecture.handlers.AddAttestationManagerHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.GenerateRequirementsHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.TouchHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.Touch">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.AddSimplexHandler"
+            commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex">
       </handler>
    </extension>
    <extension

@@ -14,6 +14,9 @@ Import-Package: org.eclipse.debug.ui.console,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.osate.aadl2.instantiation,
- org.osate.annexsupport
-Bundle-ClassPath: .
+ org.osate.aadl2.modelsupport.util,
+ org.osate.annexsupport,
+ org.osate.workspace
+Bundle-ClassPath: .,
+ dependencies/gson-2.8.5.jar
 Export-Package: com.collins.fmw.cyres.util.plugin

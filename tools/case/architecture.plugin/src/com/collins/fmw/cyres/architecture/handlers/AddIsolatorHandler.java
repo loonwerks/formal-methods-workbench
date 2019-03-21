@@ -32,7 +32,7 @@ import org.osate.ui.dialogs.Dialog;
  * for all component instances that have the "Trusted_Component" property.
  */
 
-public class AddIsolator extends AbstractHandler {
+public class AddIsolatorHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) {
