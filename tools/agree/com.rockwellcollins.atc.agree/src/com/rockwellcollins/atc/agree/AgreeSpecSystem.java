@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
@@ -25,7 +24,7 @@ public class AgreeSpecSystem {
 
 	public static enum Prim implements Spec {
 		IntSpec("int", NamedType.INT), RealSpec("real", NamedType.REAL), BoolSpec("bool",
-				NamedType.BOOL), ErrorSpec("<error>", null);
+				NamedType.BOOL), UnitSpec("unit", null), ErrorSpec("<error>", null);
 
 		public final String name;
 		public final jkind.lustre.Type lustreType;
@@ -134,80 +133,45 @@ public class AgreeSpecSystem {
 		In, Out
 	}
 
-	public static interface Mode {
-		public boolean isEvent();
-
-		public Optional<Spec> getPayloadOption();
-	}
-
-	public static class DataMode implements Mode {
-		private Spec payload;
-
-		@Override
-		public boolean isEvent() {
-			return false;
-		}
-
-		@Override
-		public Optional<Spec> getPayloadOption() {
-			return Optional.of(payload);
-		}
-	}
-
-	public static class EventDataMode implements Mode {
-		private Spec payload;
-
-		@Override
-		public boolean isEvent() {
-			return true;
-		}
-
-		@Override
-		public Optional<Spec> getPayloadOption() {
-			return Optional.of(payload);
-		}
-	}
-
-	public static class EventMode implements Mode {
-
-		@Override
-		public boolean isEvent() {
-			return true;
-		}
-
-		@Override
-		public Optional<Spec> getPayloadOption() {
-			return Optional.empty();
-		}
-	}
 
 	public static class Port {
+		public final Direc direction;
+		public final boolean isEvent;
+
+		public Port(Direc direction, boolean isEvent) {
+			this.direction = direction;
+			this.isEvent = isEvent;
+		}
+	}
+
+	public static class Field {
+		public final String name;
+		public final Spec spec;
+		public final Optional<Port> portOption;
+
+		public Field(String name, Spec spec, Optional<Port> portOption) {
+			this.name = name;
+			this.spec = spec;
+			this.portOption = portOption;
+		}
 
 	}
 
 	public static class RecordSpec implements Spec {
 
 		public final String name;
-
-
 		public final Topo topo;
-
-		public final Map<String, Spec> fields;
-
-
-		public final Map<String, Port> ports;
+		public final List<Field> fields;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-
-		public RecordSpec(String name, Map<String, Spec> fields, NamedElement namedElement) {
+		public RecordSpec(String name, Topo topo, List<Field> fields, NamedElement namedElement) {
 			this.name = name;
-			this.fields = new HashMap<>();
-			this.fields.putAll(fields);
+			this.topo = topo;
+			this.fields = new ArrayList<>();
+			this.fields.addAll(fields);
 			this.namedElement = namedElement;
-			this.topo = null;
-			this.ports = new HashMap<>();
 
 		}
 
@@ -219,12 +183,11 @@ public class AgreeSpecSystem {
 		@Override
 		public jkind.lustre.Type toLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
-			Map<String, AgreeSpecSystem.Spec> agreeFields = fields;
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
-			for (Entry<String, AgreeSpecSystem.Spec> entry : agreeFields.entrySet()) {
-				String key = entry.getKey();
-				jkind.lustre.Type lt = entry.getValue().toLustreType();
+			for (Field field : fields) {
+				String key = field.name;
+				jkind.lustre.Type lt = field.spec.toLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}

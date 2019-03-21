@@ -18,6 +18,7 @@ import org.osate.aadl2.ArraySize;
 import org.osate.aadl2.ArraySizeProperty;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
+import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
@@ -159,13 +160,14 @@ public class AgreeXtext {
 		} else if (ne instanceof RecordDef) {
 
 			EList<Arg> args = ((RecordDef) ne).getArgs();
-			Map<String, Spec> fields = new HashMap<>();
+			List<AgreeSpecSystem.Field> fields = new ArrayList<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
 				Spec typeDef = toSpec(arg.getType());
-				fields.put(key, typeDef);
+				fields.add(new AgreeSpecSystem.Field(arg.getName(), typeDef, Optional.empty()));
 			}
-			return new RecordSpec(ne.getQualifiedName(), fields, ne);
+
+			return new RecordSpec(ne.getQualifiedName(), AgreeSpecSystem.Topo.Data, fields, ne);
 
 		} else if (ne instanceof EnumStatement) {
 			String name = ne.getQualifiedName();
@@ -320,6 +322,18 @@ public class AgreeXtext {
 
 		} else if (c instanceof ComponentClassifier) {
 
+
+			AgreeSpecSystem.Topo topo;
+			ComponentCategory cat = ((ComponentClassifier) c).getCategory();
+
+			if (cat.getValue() == ComponentCategory.ABSTRACT_VALUE) {
+
+			} else if (cat.getValue() == ComponentCategory.DATA_VALUE) {
+				topo = AgreeSpecSystem.Topo.Data;
+			} else if (cat.getValue() == ComponentCategory.SYSTEM_VALUE) {
+				topo = AgreeSpecSystem.Topo.System;
+			}
+
 			Map<String, Spec> fields = new HashMap<>();
 
 			Classifier currClsfr = c;
@@ -400,7 +414,8 @@ public class AgreeXtext {
 			}
 
 			String name = c.getQualifiedName();
-			return new RecordSpec(name, fields, c);
+
+			return new RecordSpec(name, topo, fields, c);
 
 		}
 
