@@ -126,16 +126,89 @@ public class AgreeSpecSystem {
 
 	}
 
+	public static enum Topo {
+		System, Data
+	}
+
+	public static enum Direc {
+		In, Out
+	}
+
+	public static interface Mode {
+		public boolean isEvent();
+
+		public Optional<Spec> getPayloadOption();
+	}
+
+	public static class DataMode implements Mode {
+		private Spec payload;
+
+		@Override
+		public boolean isEvent() {
+			return false;
+		}
+
+		@Override
+		public Optional<Spec> getPayloadOption() {
+			return Optional.of(payload);
+		}
+	}
+
+	public static class EventDataMode implements Mode {
+		private Spec payload;
+
+		@Override
+		public boolean isEvent() {
+			return true;
+		}
+
+		@Override
+		public Optional<Spec> getPayloadOption() {
+			return Optional.of(payload);
+		}
+	}
+
+	public static class EventMode implements Mode {
+
+		@Override
+		public boolean isEvent() {
+			return true;
+		}
+
+		@Override
+		public Optional<Spec> getPayloadOption() {
+			return Optional.empty();
+		}
+	}
+
+	public static class Port {
+
+	}
+
 	public static class RecordSpec implements Spec {
+
 		public final String name;
+
+
+		public final Topo topo;
+
 		public final Map<String, Spec> fields;
+
+
+		public final Map<String, Port> ports;
+
+		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
+
 
 		public RecordSpec(String name, Map<String, Spec> fields, NamedElement namedElement) {
 			this.name = name;
 			this.fields = new HashMap<>();
 			this.fields.putAll(fields);
 			this.namedElement = namedElement;
+			this.topo = null;
+			this.ports = new HashMap<>();
+
 		}
 
 		@Override
