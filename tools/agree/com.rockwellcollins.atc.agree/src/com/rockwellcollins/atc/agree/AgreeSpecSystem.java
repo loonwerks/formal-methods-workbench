@@ -24,7 +24,7 @@ public class AgreeSpecSystem {
 
 	public static enum Prim implements Spec {
 		IntSpec("int", NamedType.INT), RealSpec("real", NamedType.REAL), BoolSpec("bool",
-				NamedType.BOOL), UnitSpec("unit", null), ErrorSpec("<error>", null);
+				NamedType.BOOL), ErrorSpec("<error>", null);
 
 		public final String name;
 		public final jkind.lustre.Type lustreType;

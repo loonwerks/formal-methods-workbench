@@ -4,6 +4,7 @@ Bundle-Name: AGREE back-end
 Bundle-Vendor: Rockwell Collins, Inc.
 Bundle-Version: 2.4.0.qualifier
 Bundle-SymbolicName: com.rockwellcollins.atc.agree; singleton:=true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.eclipse.xtext.xbase;resolution:=optional;visibility:=reexport,
@@ -24,22 +25,41 @@ Bundle-ClassPath: .,
  dependencies/jkind-api.jar,
  dependencies/jxl.jar,
  dependencies/antlr-runtime-4.4.jar,
- dependencies/gson-2.8.5.jar 
+ dependencies/gson-2.8.5.jar
 Import-Package: org.apache.log4j,
  org.eclipse.xtext.xbase.lib,
  org.osate.annexsupport
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: com.rockwellcollins.atc.agree,
- com.rockwellcollins.atc.agree.services,
+Export-Package: com.google.gson,
+ com.google.gson.reflect,
+ com.google.gson.stream,
+ com.rockwellcollins.atc.agree,
  com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.agree.impl,
  com.rockwellcollins.atc.agree.agree.util,
+ com.rockwellcollins.atc.agree.formatting,
+ com.rockwellcollins.atc.agree.generator,
+ com.rockwellcollins.atc.agree.linking,
  com.rockwellcollins.atc.agree.parser.antlr,
  com.rockwellcollins.atc.agree.parser.antlr.internal,
- com.rockwellcollins.atc.agree.validation,
+ com.rockwellcollins.atc.agree.parser.antlr.lexer,
  com.rockwellcollins.atc.agree.scoping,
- com.rockwellcollins.atc.agree.formatting,
- com.rockwellcollins.atc.agree.linking,
  com.rockwellcollins.atc.agree.serializer,
- com.rockwellcollins.atc.agree.parser.antlr.lexer
-Automatic-Module-Name: com.rockwellcollins.atc.agree
+ com.rockwellcollins.atc.agree.services,
+ com.rockwellcollins.atc.agree.validation,
+ com.rockwellcollins.atc.agree.visitors,
+ jkind,
+ jkind.api,
+ jkind.api.results,
+ jkind.api.ui.counterexample,
+ jkind.api.ui.results,
+ jkind.lustre,
+ jkind.lustre.builders,
+ jkind.lustre.parsing,
+ jkind.lustre.values,
+ jkind.lustre.visitors,
+ jkind.results,
+ jkind.results.layout,
+ jkind.translation,
+ jkind.util
+Automatic-Module-Name: com.rockwellcollins.atc.agree,
+
