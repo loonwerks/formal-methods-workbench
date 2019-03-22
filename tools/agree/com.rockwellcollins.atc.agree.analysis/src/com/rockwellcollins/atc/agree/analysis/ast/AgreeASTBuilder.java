@@ -184,6 +184,13 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	private List<Type> lustreTypes = new ArrayList<>();
 
+	private void addIfCustomType(Type type) {
+		if (!(type instanceof NamedType && ((NamedType) type).isBuiltin())
+				&& !(type instanceof jkind.lustre.ArrayType)) {
+			lustreTypes.add(type);
+		}
+	}
+
 	private static Map<String, AgreeVar> timeOfVarMap;
 	private static Map<String, AgreeVar> timeRiseVarMap;
 	private static Map<String, AgreeVar> timeFallVarMap;
@@ -683,7 +690,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		}
 
 		Type type = AgreeXtext.toSpecFromNamedElm(dataClass).toLustreType();
-		lustreTypes.add(type);
+		addIfCustomType(type);
 
 		if (type == null) {
 			// we do not reason about this type
@@ -835,7 +842,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		// EGM: array-backend
 		// Type lustreType = AgreeTypeUtils.getType(dataClass, typeMap, globalTypes);
 		Type lustreType = AgreeXtext.toSpecFromNamedElm(dataClass).toLustreType();
-		lustreTypes.add(lustreType);
+		addIfCustomType(lustreType);
 		return lustreType;
 	}
 
@@ -1073,7 +1080,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				// EGM: array-backend
 				// AgreeTypeUtils.getType((NamedElement) spec, typeMap, globalTypes);
 				Type t = AgreeXtext.toSpecFromNamedElm((NamedElement) spec).toLustreType();
-				lustreTypes.add(t);
+				addIfCustomType(t);
 			}
 		}
 		return types;
@@ -1091,7 +1098,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	public VarDecl agreeVarFromArg(Arg arg, ComponentInstance compInst) {
 		Type type = AgreeXtext.toSpec(arg.getType()).toLustreType();
-		lustreTypes.add(type);
+		addIfCustomType(type);
 
 		if (type != null) {
 			return new AgreeVar(arg.getName(), type, arg, compInst, null);
@@ -1598,7 +1605,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		Expr bodyExpr = doSwitch(fnDef.getExpr());
 
 		Type outType = AgreeXtext.toSpec(fnDef.getType()).toLustreType();
-		lustreTypes.add(outType);
+		addIfCustomType(outType);
 
 		if (outType != null) {
 

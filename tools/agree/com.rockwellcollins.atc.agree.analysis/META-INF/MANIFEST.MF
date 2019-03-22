@@ -22,10 +22,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- dependencies/jkind-api.jar,
- dependencies/jxl.jar,
- dependencies/antlr-runtime-4.4.jar,
- dependencies/gson-2.8.5.jar
+ dependencies/antlr-runtime-4.4.jar
 Import-Package: 
  org.apache.commons.lang;version="2.6.0",
  org.osate.aadl2.instantiation,
@@ -35,8 +32,10 @@ Export-Package: com.rockwellcollins.atc.agree.analysis,
  com.rockwellcollins.atc.agree.analysis.ast.visitors,
  com.rockwellcollins.atc.agree.analysis.extentions,
  com.rockwellcollins.atc.agree.analysis.handlers,
+ com.rockwellcollins.atc.agree.analysis.linearization,
  com.rockwellcollins.atc.agree.analysis.lustre.visitors,
  com.rockwellcollins.atc.agree.analysis.preferences,
+ com.rockwellcollins.atc.agree.analysis.realtime,
  com.rockwellcollins.atc.agree.analysis.saving,
  com.rockwellcollins.atc.agree.analysis.translation,
  com.rockwellcollins.atc.agree.analysis.views
