@@ -1,0 +1,17 @@
+package Top
+public
+	with ComponentA;
+	with Component_IDs;
+	
+	process Top
+
+	end Top;
+
+
+process implementation Top.Impl
+	subcomponents
+		ComponentA: thread ComponentA::ComponentA {Component_IDs::Own_ComponentID => Component_IDs::ComponentA_ComponentID_Val;};
+
+end Top.Impl;
+
+end Top;
