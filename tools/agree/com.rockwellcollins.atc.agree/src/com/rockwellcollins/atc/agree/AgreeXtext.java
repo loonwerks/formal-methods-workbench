@@ -1,9 +1,7 @@
 package com.rockwellcollins.atc.agree;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.emf.common.util.EList;
@@ -23,12 +21,16 @@ import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataType;
+import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyConstant;
@@ -323,18 +325,14 @@ public class AgreeXtext {
 		} else if (c instanceof ComponentClassifier) {
 
 
-			AgreeSpecSystem.Topo topo;
+			AgreeSpecSystem.Topo topo = AgreeSpecSystem.Topo.Data;
 			ComponentCategory cat = ((ComponentClassifier) c).getCategory();
 
-			if (cat.getValue() == ComponentCategory.ABSTRACT_VALUE) {
-
-			} else if (cat.getValue() == ComponentCategory.DATA_VALUE) {
-				topo = AgreeSpecSystem.Topo.Data;
-			} else if (cat.getValue() == ComponentCategory.SYSTEM_VALUE) {
+			if (cat.getValue() == ComponentCategory.SYSTEM_VALUE) {
 				topo = AgreeSpecSystem.Topo.System;
 			}
 
-			Map<String, Spec> fields = new HashMap<>();
+			List<AgreeSpecSystem.Field> fields = new ArrayList<>();
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
@@ -347,14 +345,18 @@ public class AgreeXtext {
 
 							if (sub.getArrayDimensions().size() == 0) {
 								Spec typeDef = toSpecFromClassifier(sub.getClassifier());
-								fields.putIfAbsent(fieldName, typeDef);
+								AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+										Optional.empty());
+								fields.add(field);
 							} else if (sub.getArrayDimensions().size() == 1) {
 								ArrayDimension ad = sub.getArrayDimensions().get(0);
 								int size = Math.toIntExact(getArraySize(ad));
 
 								Spec stem = toSpecFromClassifier(sub.getClassifier());
 								Spec typeDef = new ArraySpec(stem, size, Optional.empty());
-								fields.putIfAbsent(fieldName, typeDef);
+								AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+										Optional.empty());
+								fields.add(field);
 
 							}
 						}
@@ -371,18 +373,41 @@ public class AgreeXtext {
 					for (Feature feature : features) {
 						String fieldName = feature.getName();
 
-						if (feature.getClassifier() != null) {
-							if (feature.getArrayDimensions().size() == 0) {
-								Spec typeDef = toSpecFromClassifier(feature.getClassifier());
-								fields.putIfAbsent(fieldName, typeDef);
-							} else if (feature.getArrayDimensions().size() == 1) {
-								ArrayDimension ad = feature.getArrayDimensions().get(0);
-								int size = Math.toIntExact(getArraySize(ad));
-								Spec stem = toSpecFromClassifier(feature.getClassifier());
-								Spec typeDef = new ArraySpec(stem, size, Optional.empty());
+						boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
+						AgreeSpecSystem.Direc direction = null;
+						if (feature instanceof Port) {
+							int v = ((Port) feature).getDirection().getValue();
+							if (v == DirectionType.IN_VALUE) {
+								direction = AgreeSpecSystem.Direc.In;
+							} else if (v == DirectionType.OUT_VALUE) {
+								direction = AgreeSpecSystem.Direc.Out;
+							}
+						}
 
-								fields.putIfAbsent(fieldName, typeDef);
+						if (direction != null) {
 
+							AgreeSpecSystem.Port port = new AgreeSpecSystem.Port(direction, isEvent);
+
+							if (feature.getClassifier() != null) {
+								if (feature.getArrayDimensions().size() == 0) {
+									Spec typeDef = toSpecFromClassifier(feature.getClassifier());
+
+									AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+											Optional.of(port));
+
+									fields.add(field);
+								} else if (feature.getArrayDimensions().size() == 1) {
+									ArrayDimension ad = feature.getArrayDimensions().get(0);
+									int size = Math.toIntExact(getArraySize(ad));
+									Spec stem = toSpecFromClassifier(feature.getClassifier());
+									Spec typeDef = new ArraySpec(stem, size, Optional.empty());
+
+									AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+											Optional.of(port));
+
+									fields.add(field);
+
+								}
 							}
 						}
 					}
@@ -403,7 +428,10 @@ public class AgreeXtext {
 							for (Arg arg : args) {
 								String fieldName = arg.getName();
 								Spec typeDef = toSpecFromNamedElm(arg);
-								fields.putIfAbsent(fieldName, typeDef);
+								AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+										Optional.empty());
+
+								fields.add(field);
 							}
 						}
 
@@ -602,12 +630,14 @@ public class AgreeXtext {
 
 			Expr target = ((SelectionExpr) expr).getTarget();
 			Spec targetType = inferSpec(target);
-			String field = ((SelectionExpr) expr).getField().getName();
+			String name = ((SelectionExpr) expr).getField().getName();
 
 			if (targetType instanceof AgreeSpecSystem.RecordSpec) {
-				Map<String, Spec> fields = ((AgreeSpecSystem.RecordSpec) targetType).fields;
-				if (fields.containsKey(field)) {
-					return fields.get(field);
+				List<AgreeSpecSystem.Field> fields = ((AgreeSpecSystem.RecordSpec) targetType).fields;
+				for (AgreeSpecSystem.Field field : fields) {
+					if (field.name.equals(name)) {
+						return field.spec;
+					}
 				}
 
 			}
