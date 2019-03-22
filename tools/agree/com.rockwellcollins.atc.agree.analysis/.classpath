@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/antlr-runtime-4.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jkind.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jxl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
