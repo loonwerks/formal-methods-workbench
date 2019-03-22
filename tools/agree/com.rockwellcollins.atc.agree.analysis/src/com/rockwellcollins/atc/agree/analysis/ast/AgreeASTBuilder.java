@@ -1252,10 +1252,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			}
 
 		} else if (typeDef instanceof AgreeSpecSystem.RecordSpec) {
-			Map<String, AgreeSpecSystem.Spec> fields = ((AgreeSpecSystem.RecordSpec) typeDef).fields;
-			for (Entry<String, AgreeSpecSystem.Spec> entry : fields.entrySet()) {
-				String childName = name + "." + entry.getKey();
-				AgreeSpecSystem.Spec childType = entry.getValue();
+			List<AgreeSpecSystem.Field> fields = ((AgreeSpecSystem.RecordSpec) typeDef).fields;
+			for (AgreeSpecSystem.Field field : fields) {
+				String childName = name + "." + field.name;
+				AgreeSpecSystem.Spec childType = field.spec;
 				constraints.addAll(getConstraintsFromTypeDef(childName, childType));
 			}
 
