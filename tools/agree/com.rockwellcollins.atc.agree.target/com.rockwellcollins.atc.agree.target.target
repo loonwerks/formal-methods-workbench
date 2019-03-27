@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="com.rockwellcollins.atc.agree.target" sequenceNumber="1">
+<locations>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.jdt.feature.group" version="3.16.0.v20181206-1038"/>
+<unit id="org.eclipse.pde.feature.group" version="3.13.300.v20181206-0815"/>
+<unit id="org.eclipse.emf.sdk.feature.group" version="2.16.0.v20181206-1055"/>
+<repository location="http://download.eclipse.org/releases/2018-12"/>
+	<unit id="org.eclipse.emf.compare.ide.ui.feature.group" version="3.3.5.201812111422"/>
+	<unit id="org.eclipse.rcp.feature.group" version="0.0.0"/>
+	<unit id="org.eclipse.equinox.launcher" version="0.0.0"/>
+	<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
+	<unit id="org.eclipse.urischeme" version="0.0.0"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.emf.mwe2.launcher.feature.group" version="0.0.0"/>
+<repository location="http://download.eclipse.org/modeling/emft/mwe/updates/releases/2.9.1/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+	<unit id="com.google.gson" version="2.7.0.v20170129-0911"/>
+	<unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
+	<unit id="org.junit" version="4.12.0.v201504281640"/>
+	<unit id="org.junit.jupiter.api" version="5.3.1.v20181005-1442"/>
+	<unit id="org.junit.jupiter.engine" version="5.3.1.v20181005-1442"/>
+	<unit id="org.junit.platform.commons" version="1.3.1.v20181005-1442"/>
+	<unit id="org.junit.platform.engine" version="1.3.1.v20181005-1442"/>
+	<unit id="org.junit.platform.launcher" version="1.3.1.v20181005-1442"/>
+	<unit id="org.junit.platform.runner" version="1.3.1.v20181005-1442"/>
+	<unit id="org.opentest4j" version="1.1.1.v20181005-1442"/>
+	<unit id="org.objectweb.asm" version="7.0.0.v20181030-2244"/>
+	<unit id="org.objectweb.asm.tree" version="7.0.0.v20181030-2244"/>
+	<repository location="http://download.eclipse.org/modeling/tmf/xtext/updates/orbit/2018-12"/>
+</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+		<unit id="org.eclipse.xtend.sdk.feature.group" version="2.16.0.v20181203-1555"/>
+		<unit id="org.eclipse.xtext.sdk.feature.group" version="2.16.0.v20181203-1555"/>
+		<repository location="http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.16.0"/>
+	</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+		<unit id="com.collins.trustedsystems.z3.feature.feature.group" version="4.7.1"/>
+		<repository location="https://raw.githubusercontent.com/smaccm/z3-plugin-updates-test/master/"/>
+	</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+		<unit id="org.osate.ba.feature.feature.group" version="1.0.0.v20181106-1533"/>
+		<unit id="org.osate.core.feature.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.core.feature.source.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.ge.feature.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.ge.feature.source.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.ocarina.feature.feature.group" version="0.0.1.v20190214-1652"/>
+		<unit id="org.osate.ocarina.feature.source.feature.group" version="0.0.1.v20190214-1652"/>
+		<unit id="org.osate.plugins.feature.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.plugins.feature.source.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.utils.feature.feature.group" version="1.0.0.v20181114-1614"/>
+		<unit id="org.osate.xtext.aadl2.errormodel.feature.feature.group" version="2.4.0.vfinal"/>
+		<unit id="org.osate.xtext.aadl2.errormodel.feature.source.feature.group" version="2.4.0.vfinal"/>
+		<repository location="https://osate-build.sei.cmu.edu/download/osate/stable/latest/updates/"/>
+	</location>
+</locations>
+</target>
