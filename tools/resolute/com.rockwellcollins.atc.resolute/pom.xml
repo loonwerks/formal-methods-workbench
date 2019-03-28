@@ -1,14 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.rockwellcollins.atc.resolute</groupId>
-    <artifactId>com.rockwellcollins.atc.resolute.parent</artifactId>
-    <version>2.4.0-SNAPSHOT</version>
-    <relativePath>../com.rockwellcollins.atc.resolute.parent/pom.xml</relativePath>
-  </parent>
-  <artifactId>com.rockwellcollins.atc.resolute</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.rockwellcollins.atc.resolute</groupId>
+		<artifactId>com.rockwellcollins.atc.resolute.parent</artifactId>
+		<version>2.4.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>com.rockwellcollins.atc.resolute</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>eclipse-plugin</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.xtend</groupId>
+				<artifactId>xtend-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.eclipse.xtext
+										</groupId>
+										<artifactId>
+											xtext-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0.0,)
+										</versionRange>
+										<goals>
+											<goal>generate</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
 </project>
