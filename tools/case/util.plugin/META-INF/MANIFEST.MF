@@ -5,15 +5,7 @@ Bundle-SymbolicName: com.collins.fmw.cyres.util.plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: com.collins.fmw.cyres.plugin.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.jface,
- org.osate.aadl2,
- org.eclipse.xtext.ui,
- org.eclipse.emf.common,
- org.eclipse.ui.console
-Import-Package: org.eclipse.debug.ui.console,
- org.eclipse.ui,
- org.eclipse.ui.console,
- org.osate.aadl2.instantiation,
- org.osate.annexsupport
+Require-Bundle: org.osate.aadl2,
+ org.eclipse.xtext.ui
 Bundle-ClassPath: .
 Export-Package: com.collins.fmw.cyres.util.plugin
