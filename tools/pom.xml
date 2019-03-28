@@ -36,6 +36,8 @@
 		<module>agree</module>
 		<module>resolute</module>
 		<module>case</module>
+		<module>tcg</module>
+		<module>simulator</module>
 		<module>repository</module>
 	</modules>
 
