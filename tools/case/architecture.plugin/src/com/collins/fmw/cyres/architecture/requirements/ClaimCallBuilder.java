@@ -21,6 +21,19 @@ public class ClaimCallBuilder {
 		args = new ArrayList<>();
 	}
 
+	public ClaimCallBuilder(ProveStatement prove) {
+		if (prove == null) {
+			throw new RuntimeException("Claim call cannot be null.");
+		}
+		if (prove.getExpr() instanceof FnCallExpr) {
+			FnCallExpr fnCallExpr = (FnCallExpr) prove.getExpr();
+			this.def = fnCallExpr.getFn();
+			this.args = fnCallExpr.getArgs();
+		} else {
+			throw new RuntimeException("Prove statement can only contain a claim call.");
+		}
+	}
+
 	public Expr addArg(Expr e) {
 		args.add(e);
 		return e;

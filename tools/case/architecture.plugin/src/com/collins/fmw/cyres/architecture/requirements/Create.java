@@ -7,7 +7,9 @@ import org.osate.aadl2.StringLiteral;
 
 import com.rockwellcollins.atc.resolute.resolute.Arg;
 import com.rockwellcollins.atc.resolute.resolute.BaseType;
+import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
+import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.IdExpr;
@@ -27,7 +29,7 @@ public class Create {
 		return idExpr;
 	}
 
-	public static FnCallExpr fnCall(FunctionDefinition fnDef) {
+	public static FnCallExpr fnCallExpr(FunctionDefinition fnDef) {
 		FnCallExpr fnCallExpr = factory.createFnCallExpr();
 		fnCallExpr.setFn(fnDef);
 		return fnCallExpr;
@@ -46,6 +48,30 @@ public class Create {
 		x.setValue("\"" + val + "\"");
 		se.setVal(x);
 		return se;
+	}
+
+	public static BinaryExpr andExpr(Expr left, Expr right) {
+		BinaryExpr expr = factory.createBinaryExpr();
+		expr.setLeft(left);
+		expr.setRight(right);
+		expr.setOp("and");
+		return expr;
+	}
+
+	public static BinaryExpr orExpr(Expr left, Expr right) {
+		BinaryExpr expr = factory.createBinaryExpr();
+		expr.setLeft(left);
+		expr.setRight(right);
+		expr.setOp("or");
+		return expr;
+	}
+
+	public static BinaryExpr impliesExpr(Expr left, Expr right) {
+		BinaryExpr expr = factory.createBinaryExpr();
+		expr.setLeft(left);
+		expr.setRight(right);
+		expr.setOp("=>");
+		return expr;
 	}
 
 	public static BaseType baseType(String typeString) {

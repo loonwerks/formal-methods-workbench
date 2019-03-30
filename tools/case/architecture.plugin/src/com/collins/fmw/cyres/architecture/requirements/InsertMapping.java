@@ -47,7 +47,7 @@ public class InsertMapping {
 		if (editor != null) {
 			editor.getDocument().modify(resource -> {
 				for (CyberRequirement r : toInsert) {
-					r.insert(resource);
+//					r.insert(resource);
 				}
 				return null;
 			});

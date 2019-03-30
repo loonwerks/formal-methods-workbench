@@ -38,16 +38,13 @@ import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddFilterDialog;
+import com.collins.fmw.cyres.architecture.requirements.AddFilterClaim;
+import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.unparsing.AgreeAnnexUnparser;
-import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
-import com.rockwellcollins.atc.resolute.resolute.Expr;
-import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
-import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
-import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 
 public class AddFilterHandler extends AadlHandler {
 
@@ -81,14 +78,16 @@ public class AddFilterHandler extends AadlHandler {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 //		wizard.setFilterComponentTypeInfo(getDestinationType(uri), getParentType(uri));
 		wizard.setGuaranteeList(getSourceName(uri), getSourceGuarantees(uri));
-		List<String> resoluteClauses = getResoluteClauses(uri);
-		if (resoluteClauses == null) {
-			Dialog.showError("Undefined Resolute proves",
-					"Undefined Resolute prove() statements exist in the model.  Make sure all prove() statements have corresponding definitions before continuing.");
-			return;
-		} else {
+//		List<String> resoluteClauses = getResoluteClauses(uri);
+		List<String> resoluteClauses = new ArrayList<>();
+		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
+//		if (resoluteClauses == null) {
+//			Dialog.showError("Undefined Resolute proves",
+//					"Undefined Resolute prove() statements exist in the model.  Make sure all prove() statements have corresponding definitions before continuing.");
+//			return;
+//		} else {
 			wizard.setResoluteClauses(resoluteClauses);
-		}
+//		}
 		wizard.create();
 		if (wizard.open() == Window.OK) {
 //			filterComponentType = wizard.getFilterComponentType();
@@ -335,37 +334,40 @@ public class AddFilterHandler extends AadlHandler {
 
 				// Add add_filter claims to resolute prove statement, if applicable
 				if (!filterResoluteClause.isEmpty()) {
-					// Add arguments to prove statement in destination component
-					final ThreadType clauseThread = (ThreadType) selectedConnection.getDestination().getConnectionEnd()
-							.getContainingClassifier();
-					EList<AnnexSubclause> annexSubclauses = clauseThread.getOwnedAnnexSubclauses();
-					String sourceText = "";
-					for (AnnexSubclause annexSubclause : annexSubclauses) {
-						// Get the Resolute clause
-						if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
-							DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
-							sourceText = annexSubclauseImpl.getSourceText();
-							if (sourceText.contains(filterResoluteClause + "(")) {
-								// Add arguments
-								int startIdx = sourceText.indexOf(filterResoluteClause + "(")
-										+ filterResoluteClause.length() + 1;
-								String args = sourceText.substring(startIdx,
-										sourceText.indexOf(")", startIdx));
-								sourceText = sourceText.replace(filterResoluteClause + "(" + args + ")",
-										filterResoluteClause + "(" + args + ", " + dataFeatureClassifier.getName()
-												+ ")");
-								annexSubclauseImpl.setSourceText(sourceText);
-							}
-							break;
-						}
-					}
-					if (!sourceText.isEmpty()) {
-						clauseThread.getOwnedAnnexSubclauses()
-								.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
-						DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
-						newSubclause.setName("resolute");
-						newSubclause.setSourceText(sourceText);
-					}
+
+					RequirementsManager.getInstance().modifyRequirement(filterResoluteClause, new AddFilterClaim());
+
+//					// Add arguments to prove statement in destination component
+//					final ThreadType clauseThread = (ThreadType) selectedConnection.getDestination().getConnectionEnd()
+//							.getContainingClassifier();
+//					EList<AnnexSubclause> annexSubclauses = clauseThread.getOwnedAnnexSubclauses();
+//					String sourceText = "";
+//					for (AnnexSubclause annexSubclause : annexSubclauses) {
+//						// Get the Resolute clause
+//						if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
+//							DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
+//							sourceText = annexSubclauseImpl.getSourceText();
+//							if (sourceText.contains(filterResoluteClause + "(")) {
+//								// Add arguments
+//								int startIdx = sourceText.indexOf(filterResoluteClause + "(")
+//										+ filterResoluteClause.length() + 1;
+//								String args = sourceText.substring(startIdx,
+//										sourceText.indexOf(")", startIdx));
+//								sourceText = sourceText.replace(filterResoluteClause + "(" + args + ")",
+//										filterResoluteClause + "(" + args + ", " + dataFeatureClassifier.getName()
+//												+ ")");
+//								annexSubclauseImpl.setSourceText(sourceText);
+//							}
+//							break;
+//						}
+//					}
+//					if (!sourceText.isEmpty()) {
+//						clauseThread.getOwnedAnnexSubclauses()
+//								.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
+//						DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
+//						newSubclause.setName("resolute");
+//						newSubclause.setSourceText(sourceText);
+//					}
 
 					// Add add_filter claims to *_CASE_Claims file
 					// If the prove statement exists, the *_CASE_Claims file should also already
@@ -484,41 +486,41 @@ public class AddFilterHandler extends AadlHandler {
 //		});
 //	}
 
-	private List<String> getResoluteClauses(URI uri) {
-
-		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-
-		return xtextEditor.getDocument().readOnly(resource -> {
-			List<String> resoluteClauses = new ArrayList<>();
-			final PortConnection selectedConnection = (PortConnection) resource.getEObject(uri.fragment());
-			final EList<AnnexSubclause> annexSubclauses = selectedConnection.getDestination().getConnectionEnd()
-					.getContainingClassifier().getOwnedAnnexSubclauses();
-			for (AnnexSubclause annexSubclause : annexSubclauses) {
-				DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-				// See if there's a resolute annex
-				if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-					// See if there are any 'prove' clauses
-					ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause.getParsedAnnexSubclause();
-					for (AnalysisStatement as : resoluteClause.getProves()) {
-						if (as instanceof ProveStatement) {
-							ProveStatement prove = (ProveStatement) as;
-							Expr expr = prove.getExpr();
-							if (expr instanceof FnCallExpr) {
-								FnCallExpr fnCall = (FnCallExpr) expr;
-								if (fnCall.getFn().getName() != null) {
-									resoluteClauses.add(fnCall.getFn().getName());
-								} else {
-									return null;
-								}
-							}
-						}
-					}
-					break;
-				}
-			}
-
-			return resoluteClauses;
-		});
-	}
+//	private List<String> getResoluteClauses(URI uri) {
+//
+//		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+//
+//		return xtextEditor.getDocument().readOnly(resource -> {
+//			List<String> resoluteClauses = new ArrayList<>();
+//			final PortConnection selectedConnection = (PortConnection) resource.getEObject(uri.fragment());
+//			final EList<AnnexSubclause> annexSubclauses = selectedConnection.getDestination().getConnectionEnd()
+//					.getContainingClassifier().getOwnedAnnexSubclauses();
+//			for (AnnexSubclause annexSubclause : annexSubclauses) {
+//				DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
+//				// See if there's a resolute annex
+//				if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
+//					// See if there are any 'prove' clauses
+//					ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause.getParsedAnnexSubclause();
+//					for (AnalysisStatement as : resoluteClause.getProves()) {
+//						if (as instanceof ProveStatement) {
+//							ProveStatement prove = (ProveStatement) as;
+//							Expr expr = prove.getExpr();
+//							if (expr instanceof FnCallExpr) {
+//								FnCallExpr fnCall = (FnCallExpr) expr;
+//								if (fnCall.getFn().getName() != null) {
+//									resoluteClauses.add(fnCall.getFn().getName());
+//								} else {
+//									return null;
+//								}
+//							}
+//						}
+//					}
+//					break;
+//				}
+//			}
+//
+//			return resoluteClauses;
+//		});
+//	}
 
 }

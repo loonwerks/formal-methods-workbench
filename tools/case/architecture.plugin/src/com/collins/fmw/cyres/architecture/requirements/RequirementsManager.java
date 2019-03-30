@@ -3,14 +3,7 @@ package com.collins.fmw.cyres.architecture.requirements;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.AadlPackage;
@@ -46,7 +39,7 @@ public class RequirementsManager {
 	private static List<CyberRequirement> importedRequirements = new ArrayList<>();
 	private static List<CyberRequirement> omittedRequirements = new ArrayList<>();
 //	private static Map<IFile, List<CyberRequirement>> fileMap = new HashMap<>();
-	private static XtextEditor mainEditor = null;
+//	private static XtextEditor mainEditor = null;
 
 	// Singleton instance
 	private static RequirementsManager instance = null;
@@ -65,15 +58,21 @@ public class RequirementsManager {
 		return instance;
 	}
 
+	public void reset() {
+		currentProject = null;
+		importedRequirements = new ArrayList<>();
+		omittedRequirements = new ArrayList<>();
+	}
+
 	private static void initRequirements() {
 		// Initialize requirements list
 		importedRequirements = new ArrayList<>();
 		omittedRequirements = new ArrayList<>();
 		// Set main editor
-		if (mainEditor == null) {
-			// TODO: What if nothing is open?
-			mainEditor = EditorUtils.getActiveXtextEditor();
-		}
+//		if (mainEditor == null) {
+//			// TODO: What if nothing is open?
+//			mainEditor = EditorUtils.getActiveXtextEditor();
+//		}
 		if (currentProject == null) {
 			currentProject = TraverseProject.getCurrentProject();
 		}
@@ -139,13 +138,13 @@ public class RequirementsManager {
 									Expr expr = prove.getExpr();
 									if (expr instanceof FnCallExpr) {
 										FnCallExpr fnCall = (FnCallExpr) expr;
-										// Check if the function definition is in priv8 section
+										// Check if the corresponding function definition is in private section
 										FunctionDefinition fd = fnCall.getFn();
 										if (AadlUtil.getContainingPackageSection(fd) instanceof PrivatePackageSection
 												&& AadlUtil.getContainingPackage(fd) == aadlPkg) {
-											DefinitionBody db = fd.getBody();
 											String reqType = "";
 											String reqText = "";
+											DefinitionBody db = fd.getBody();
 											if (db instanceof ClaimBody) {
 												ClaimBody cb = (ClaimBody) db;
 												for (ClaimText ct : cb.getClaim()) {
@@ -157,11 +156,12 @@ public class RequirementsManager {
 												}
 											}
 											if (reqText.matches("^\\[.+\\]\\s.+")) {
-												// Extract the Requirement type from the text.
+												// Extract the Requirement type from the text
 												reqType = reqText.substring(1, reqText.indexOf("]") - 2);
 											}
 											// See if there is an agree statement with this requirement id
 											boolean agree = false;
+											NamedSpecStatement agreeSpec = null;
 											for (AnnexSubclause agreeAnnexSubclause : classifier
 													.getOwnedAnnexSubclauses()) {
 												DefaultAnnexSubclause defaultAgreeSubclause = (DefaultAnnexSubclause) agreeAnnexSubclause;
@@ -176,6 +176,7 @@ public class RequirementsManager {
 														if (ss instanceof NamedSpecStatement) {
 															NamedSpecStatement nss = (NamedSpecStatement) ss;
 															if (nss.getName().equalsIgnoreCase(fd.getName())) {
+																agreeSpec = nss;
 																agree = true;
 																break;
 															}
@@ -187,8 +188,10 @@ public class RequirementsManager {
 											CyberRequirement req = new CyberRequirement(reqType, fd.getName(), reqText,
 													classifier, agree, "");
 											// Set claimDefinition and claimCall for requirement
-											req.setClaimCall(prove);
-											req.setClaimDefinition(fd);
+//											req.setClaimCall(prove);
+//											req.setClaimDefinition(fd);
+//											// Set agree spec
+//											req.setAgreeSpec(agreeSpec);
 											if (fd.getName() != null && !resoluteClauses.contains(req)) {
 												resoluteClauses.add(req);
 											}
@@ -223,7 +226,7 @@ public class RequirementsManager {
 //		RequirementsManager.mainEditor = xtextEditor;
 //	}
 
-	public void addImportedRequirements(List<CyberRequirement> reqs) {
+	public void importRequirements(List<CyberRequirement> reqs) {
 		for (CyberRequirement req : reqs) {
 //			IFile file = req.getContainingFile();
 //			List<CyberRequirement> mappedReqs = new ArrayList<>();
@@ -234,12 +237,42 @@ public class RequirementsManager {
 //			fileMap.put(key, mappedReqs);
 
 			// Insert the requirement into the model
-			insertIntoModel(req);
+//			insertIntoModel(req);
 
 			// Add the requirement to the imported requirements list
-			importedRequirements.add(req);
+//			importedRequirements.add(req);
+
+			importRequirement(req);
 		}
 
+	}
+
+	public void importRequirement(CyberRequirement req) {
+
+//		// Get the file to insert into
+//		IFile file = req.getContainingFile();
+//		XtextEditor editor = getEditor(file);
+
+//		if (editor != null) {
+//			editor.getDocument().modify(resource -> {
+				// Create claim definition and claim call
+		BaseClaim baseClaim = new BaseClaim();
+		baseClaim.insert(req);
+
+				// Add AGREE check, if necessary
+		if (req.hasAgree()) {
+			AgreePropCheckedClaim agreePropCheckedClaim = new AgreePropCheckedClaim();
+			agreePropCheckedClaim.insert(req);
+		}
+
+//				return null;
+//			});
+//		}
+
+//		closeEditor(editor, true);
+
+		// Add the requirement to the imported requirements list
+		importedRequirements.add(req);
 	}
 
 //	public void addImportedRequirement(CyberRequirement req) {
@@ -259,23 +292,21 @@ public class RequirementsManager {
 //		}
 //	}
 
-	private void insertIntoModel(CyberRequirement req) {
-		// Get the file to insert into
-		IFile file = req.getContainingFile();
-
-		XtextEditor editor = getEditor(file);
-
-		if (editor != null) {
-			editor.getDocument().modify(resource -> {
-				req.insert(resource);
-				return null;
-			});
-
-		}
-
-		closeEditor(editor, true);
-
-	}
+//	private void insertIntoModel(CyberRequirement req) {
+//		// Get the file to insert into
+//		IFile file = req.getContainingFile();
+//		XtextEditor editor = getEditor(file);
+//
+//		if (editor != null) {
+//			editor.getDocument().modify(resource -> {
+//				req.insert(resource);
+//				return null;
+//			});
+//		}
+//
+//		closeEditor(editor, true);
+//
+//	}
 
 //	private void insertIntoFile(IFile f) {
 //		List<CyberRequirement> toInsert = fileMap.get(f);
@@ -295,47 +326,68 @@ public class RequirementsManager {
 //		closeEditor(editor, true);
 //	}
 
+	public void modifyRequirement(String reqId, BuiltInClaim claim) {
+
+		for (CyberRequirement req : importedRequirements) {
+			if (req.getId().equalsIgnoreCase(reqId)) {
+
+//				// Get the file to insert into
+//				IFile file = req.getContainingFile();
+//				XtextEditor editor = getEditor(file);
+//				if (editor != null) {
+//					editor.getDocument().modify(resource -> {
+//						req.modify(resource, claim);
+////						return claim.insert(req.getClaimCall());
+//						return null;
+//					});
+//				}
+				claim.insert(req);
+				break;
+			}
+		}
+	}
+
 	public void addOmittedRequirements(List<CyberRequirement> omittedReqs) {
 		omittedRequirements.addAll(omittedReqs);
 		// TODO: Write to file
 
 	}
 
-	private XtextEditor getEditor(IFile file) {
-		IWorkbenchPage page = null;
-		IEditorPart part = null;
-
-		if (file.exists()) {
-			page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
-			try {
-				part = page.openEditor(new FileEditorInput(file), desc.getId());
-			} catch (PartInitException e) {
-				e.printStackTrace();
-			}
-		}
-
-		if (part == null) {
-			return null;
-		}
-
-		XtextEditor xedit = null;
-		xedit = (XtextEditor) part;
-
-		return xedit;
-	}
-
-	private void closeEditor(XtextEditor editor, boolean save) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		if (save) {
-			page.saveEditor(editor, false);
-		}
-
-		if (editor.equals(RequirementsManager.mainEditor)) {
-			return;
-		} else {
-			page.closeEditor(editor, false);
-		}
-	}
+//	private XtextEditor getEditor(IFile file) {
+//		IWorkbenchPage page = null;
+//		IEditorPart part = null;
+//
+//		if (file.exists()) {
+//			page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//			IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+//			try {
+//				part = page.openEditor(new FileEditorInput(file), desc.getId());
+//			} catch (PartInitException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		if (part == null) {
+//			return null;
+//		}
+//
+//		XtextEditor xedit = null;
+//		xedit = (XtextEditor) part;
+//
+//		return xedit;
+//	}
+//
+//	private void closeEditor(XtextEditor editor, boolean save) {
+//		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//		if (save) {
+//			page.saveEditor(editor, false);
+//		}
+//
+//		if (editor.equals(RequirementsManager.mainEditor)) {
+//			return;
+//		} else {
+//			page.closeEditor(editor, false);
+//		}
+//	}
 
 }

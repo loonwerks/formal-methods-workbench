@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.rockwellcollins.atc.resolute.resolute.Arg;
+import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
 import com.rockwellcollins.atc.resolute.resolute.ClaimArg;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ClaimString;
 import com.rockwellcollins.atc.resolute.resolute.ClaimText;
+import com.rockwellcollins.atc.resolute.resolute.DefinitionBody;
 import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteFactory;
@@ -22,7 +24,26 @@ public class ClaimBuilder {
 	private Expr claimExpr;
 
 	public ClaimBuilder(String name) {
+		if (name == null || name.isEmpty()) {
+			throw new RuntimeException("Claim name cannot be null or empty.");
+		}
 		this.name = name;
+	}
+
+	public ClaimBuilder(FunctionDefinition claim) {
+		if (claim == null) {
+			throw new RuntimeException("Claim cannot be null.");
+		}
+		this.name = claim.getName();
+		claim.getArgs().forEach(a -> this.args.add(a));
+		DefinitionBody db = claim.getBody();
+		if (db instanceof ClaimBody) {
+			ClaimBody cb = (ClaimBody) db;
+			cb.getClaim().forEach(c -> this.claimText.add(c));
+			this.claimExpr = cb.getExpr();
+		} else {
+			throw new RuntimeException(claim.getName() + " must be a Resoltue claim");
+		}
 	}
 
 	public Arg addArg(Arg a) {
@@ -45,8 +66,19 @@ public class ClaimBuilder {
 		return claimArg;
 	}
 
-	public Expr setClaimExpr(Expr e) {
-		this.claimExpr = e;
+//	public Expr setClaimExpr(Expr e) {
+//		this.claimExpr = e;
+//		return e;
+//	}
+
+	public Expr addClaimExpr(Expr e) {
+		// Remove "true" or "false" claim, if they exist
+		if (this.claimExpr instanceof BoolExpr || this.claimExpr == null) {
+			this.claimExpr = e;
+		} else {
+			this.claimExpr = Create.andExpr(this.claimExpr, e);
+		}
+
 		return e;
 	}
 

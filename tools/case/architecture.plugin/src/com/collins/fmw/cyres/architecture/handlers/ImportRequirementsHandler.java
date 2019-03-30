@@ -60,7 +60,7 @@ public class ImportRequirementsHandler extends AbstractHandler {
 					"Could not load cyber requirements file " + reqFile.getName() + ".");
 			return null;
 		}
-
+		RequirementsManager.getInstance().reset();
 		// Compare new requirements with existing requirements and ignore the existing ones
 		removeExistingRequirements(jsonFile, RequirementsManager.getInstance().getImportedRequirements());
 		removeExistingRequirements(jsonFile, RequirementsManager.getInstance().getOmittedRequirements());
@@ -92,7 +92,7 @@ public class ImportRequirementsHandler extends AbstractHandler {
 //			}
 //			reqMap.insertIntoFiles();
 
-			RequirementsManager.getInstance().addImportedRequirements(importedReqs);
+			RequirementsManager.getInstance().importRequirements(importedReqs);
 
 			// Write omitted requirements to log
 			if (!omittedReqs.isEmpty()) {
