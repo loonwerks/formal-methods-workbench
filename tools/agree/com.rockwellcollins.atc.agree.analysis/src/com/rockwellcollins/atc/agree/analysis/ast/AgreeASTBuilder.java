@@ -689,7 +689,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			return;
 		}
 
-		Type type = AgreeXtext.toSpecFromNamedElm(dataClass).toLustreType();
+		Type type = AgreeXtext.toSpecFromNamedElm(dataClass).getLustreType();
 		addIfCustomType(type);
 
 		if (type == null) {
@@ -841,7 +841,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		}
 		// EGM: array-backend
 		// Type lustreType = AgreeTypeUtils.getType(dataClass, typeMap, globalTypes);
-		Type lustreType = AgreeXtext.toSpecFromNamedElm(dataClass).toLustreType();
+		Type lustreType = AgreeXtext.toSpecFromNamedElm(dataClass).getLustreType();
 		addIfCustomType(lustreType);
 		return lustreType;
 	}
@@ -1079,7 +1079,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				// this will record them to the global types
 				// EGM: array-backend
 				// AgreeTypeUtils.getType((NamedElement) spec, typeMap, globalTypes);
-				Type t = AgreeXtext.toSpecFromNamedElm((NamedElement) spec).toLustreType();
+				Type t = AgreeXtext.toSpecFromNamedElm((NamedElement) spec).getLustreType();
 				addIfCustomType(t);
 			}
 		}
@@ -1097,7 +1097,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	}
 
 	public VarDecl agreeVarFromArg(Arg arg, ComponentInstance compInst) {
-		Type type = AgreeXtext.toSpec(arg.getType()).toLustreType();
+		Type type = AgreeXtext.toSpec(arg.getType()).getLustreType();
 		addIfCustomType(type);
 
 		if (type != null) {
@@ -1604,7 +1604,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<VarDecl> inputs = agreeVarsFromArgs(fnDef.getArgs(), null);
 		Expr bodyExpr = doSwitch(fnDef.getExpr());
 
-		Type outType = AgreeXtext.toSpec(fnDef.getType()).toLustreType();
+		Type outType = AgreeXtext.toSpec(fnDef.getType()).getLustreType();
 		addIfCustomType(outType);
 
 		if (outType != null) {

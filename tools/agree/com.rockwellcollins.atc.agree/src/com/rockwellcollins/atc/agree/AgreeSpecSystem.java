@@ -17,7 +17,7 @@ public class AgreeSpecSystem {
 
 		public String getName();
 
-		public jkind.lustre.Type toLustreType();
+		public jkind.lustre.Type getLustreType();
 
 	}
 
@@ -40,7 +40,7 @@ public class AgreeSpecSystem {
 		}
 
 		@Override
-		public jkind.lustre.Type toLustreType() {
+		public jkind.lustre.Type getLustreType() {
 			return lustreType;
 		}
 
@@ -65,7 +65,7 @@ public class AgreeSpecSystem {
 		}
 
 		@Override
-		public jkind.lustre.Type toLustreType() {
+		public jkind.lustre.Type getLustreType() {
 			return NamedType.INT;
 		}
 
@@ -88,7 +88,7 @@ public class AgreeSpecSystem {
 		}
 
 		@Override
-		public jkind.lustre.Type toLustreType() {
+		public jkind.lustre.Type getLustreType() {
 			return NamedType.REAL;
 		}
 	}
@@ -111,7 +111,7 @@ public class AgreeSpecSystem {
 		}
 
 		@Override
-		public jkind.lustre.Type toLustreType() {
+		public jkind.lustre.Type getLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 			List<String> enumValues = new ArrayList<String>();
 			for (String raw : values) {
@@ -181,13 +181,13 @@ public class AgreeSpecSystem {
 		}
 
 		@Override
-		public jkind.lustre.Type toLustreType() {
+		public jkind.lustre.Type getLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
 			for (Field field : fields) {
 				String key = field.name;
-				jkind.lustre.Type lt = field.spec.toLustreType();
+				jkind.lustre.Type lt = field.spec.getLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}
@@ -215,9 +215,9 @@ public class AgreeSpecSystem {
 		}
 
 		@Override
-		public jkind.lustre.Type toLustreType() {
+		public jkind.lustre.Type getLustreType() {
 
-			jkind.lustre.Type lustreBaseType = stemType.toLustreType();
+			jkind.lustre.Type lustreBaseType = stemType.getLustreType();
 			if (lustreBaseType != null) {
 				jkind.lustre.ArrayType lustreArrayType = new jkind.lustre.ArrayType(lustreBaseType, size);
 				return lustreArrayType;

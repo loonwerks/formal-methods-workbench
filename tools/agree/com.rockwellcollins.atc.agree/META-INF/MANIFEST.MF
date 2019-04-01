@@ -25,7 +25,8 @@ Bundle-ClassPath: .,
  dependencies/gson-2.8.5.jar,
  dependencies/antlr-runtime-4.4.jar,
  dependencies/jxl.jar
-Import-Package: org.apache.log4j,
+Import-Package: org.apache.commons.lang;version="2.6.0",
+ org.apache.log4j,
  org.eclipse.xtext.xbase.lib,
  org.osate.annexsupport
 Export-Package: com.google.gson,
