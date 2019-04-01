@@ -42,13 +42,13 @@ import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.ArraySpec;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.EnumSpec;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.Prim;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.RangeIntSpec;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.RangeRealSpec;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.RecordSpec;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.Spec;
+import com.rockwellcollins.atc.agree.Agree.ArraySpec;
+import com.rockwellcollins.atc.agree.Agree.EnumSpec;
+import com.rockwellcollins.atc.agree.Agree.Prim;
+import com.rockwellcollins.atc.agree.Agree.RangeIntSpec;
+import com.rockwellcollins.atc.agree.Agree.RangeRealSpec;
+import com.rockwellcollins.atc.agree.Agree.RecordSpec;
+import com.rockwellcollins.atc.agree.Agree.Spec;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
@@ -162,14 +162,14 @@ public class AgreeXtext {
 		} else if (ne instanceof RecordDef) {
 
 			EList<Arg> args = ((RecordDef) ne).getArgs();
-			List<AgreeSpecSystem.Field> fields = new ArrayList<>();
+			List<Agree.Field> fields = new ArrayList<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
 				Spec typeDef = toSpec(arg.getType());
-				fields.add(new AgreeSpecSystem.Field(arg.getName(), typeDef, Optional.empty()));
+				fields.add(new Agree.Field(arg.getName(), typeDef, Optional.empty()));
 			}
 
-			return new RecordSpec(ne.getQualifiedName(), AgreeSpecSystem.Topo.Data, fields, ne);
+			return new RecordSpec(ne.getQualifiedName(), Agree.Topo.Data, fields, ne);
 
 		} else if (ne instanceof EnumStatement) {
 			String name = ne.getQualifiedName();
@@ -325,14 +325,14 @@ public class AgreeXtext {
 		} else if (c instanceof ComponentClassifier) {
 
 
-			AgreeSpecSystem.Topo topo = AgreeSpecSystem.Topo.Data;
+			Agree.Topo topo = Agree.Topo.Data;
 			ComponentCategory cat = ((ComponentClassifier) c).getCategory();
 
 			if (cat.getValue() == ComponentCategory.SYSTEM_VALUE) {
-				topo = AgreeSpecSystem.Topo.System;
+				topo = Agree.Topo.System;
 			}
 
-			List<AgreeSpecSystem.Field> fields = new ArrayList<>();
+			List<Agree.Field> fields = new ArrayList<>();
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
@@ -345,7 +345,7 @@ public class AgreeXtext {
 
 							if (sub.getArrayDimensions().size() == 0) {
 								Spec typeDef = toSpecFromClassifier(sub.getClassifier());
-								AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
 								fields.add(field);
 							} else if (sub.getArrayDimensions().size() == 1) {
@@ -354,7 +354,7 @@ public class AgreeXtext {
 
 								Spec stem = toSpecFromClassifier(sub.getClassifier());
 								Spec typeDef = new ArraySpec(stem, size, Optional.empty());
-								AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
 								fields.add(field);
 
@@ -374,25 +374,25 @@ public class AgreeXtext {
 						String fieldName = feature.getName();
 
 						boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
-						AgreeSpecSystem.Direc direction = null;
+						Agree.Direc direction = null;
 						if (feature instanceof Port) {
 							int v = ((Port) feature).getDirection().getValue();
 							if (v == DirectionType.IN_VALUE) {
-								direction = AgreeSpecSystem.Direc.In;
+								direction = Agree.Direc.In;
 							} else if (v == DirectionType.OUT_VALUE) {
-								direction = AgreeSpecSystem.Direc.Out;
+								direction = Agree.Direc.Out;
 							}
 						}
 
 						if (direction != null) {
 
-							AgreeSpecSystem.Port port = new AgreeSpecSystem.Port(direction, isEvent);
+							Agree.Port port = new Agree.Port(direction, isEvent);
 
 							if (feature.getClassifier() != null) {
 								if (feature.getArrayDimensions().size() == 0) {
 									Spec typeDef = toSpecFromClassifier(feature.getClassifier());
 
-									AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+									Agree.Field field = new Agree.Field(fieldName, typeDef,
 											Optional.of(port));
 
 									fields.add(field);
@@ -402,7 +402,7 @@ public class AgreeXtext {
 									Spec stem = toSpecFromClassifier(feature.getClassifier());
 									Spec typeDef = new ArraySpec(stem, size, Optional.empty());
 
-									AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+									Agree.Field field = new Agree.Field(fieldName, typeDef,
 											Optional.of(port));
 
 									fields.add(field);
@@ -428,7 +428,7 @@ public class AgreeXtext {
 							for (Arg arg : args) {
 								String fieldName = arg.getName();
 								Spec typeDef = toSpecFromNamedElm(arg);
-								AgreeSpecSystem.Field field = new AgreeSpecSystem.Field(fieldName, typeDef,
+								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
 
 								fields.add(field);
@@ -632,9 +632,9 @@ public class AgreeXtext {
 			Spec targetType = inferSpec(target);
 			String name = ((SelectionExpr) expr).getField().getName();
 
-			if (targetType instanceof AgreeSpecSystem.RecordSpec) {
-				List<AgreeSpecSystem.Field> fields = ((AgreeSpecSystem.RecordSpec) targetType).fields;
-				for (AgreeSpecSystem.Field field : fields) {
+			if (targetType instanceof Agree.RecordSpec) {
+				List<Agree.Field> fields = ((Agree.RecordSpec) targetType).fields;
+				for (Agree.Field field : fields) {
 					if (field.name.equals(name)) {
 						return field.spec;
 					}

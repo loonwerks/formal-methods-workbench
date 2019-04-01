@@ -11,7 +11,67 @@ import org.osate.aadl2.NamedElement;
 import jkind.lustre.EnumType;
 import jkind.lustre.NamedType;
 
-public class AgreeSpecSystem {
+public class Agree {
+
+
+//	NamedSpecStatement
+//|	{InitialStatement} 'initially' ':' expr=Expr  ';'
+//|	{ParamStatement} 'parameter' expr=Expr ':' type=Type ';'
+//|	{LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';'
+//|	{ConnectionStatement} 'connection' conn=[aadl2::NamedElement] ':' expr=Expr ';'
+//|	SynchStatement
+//|	OrderStatement
+//|	PropertyStatement
+//|	ConstStatement
+//|	EnumStatement
+//|	EqStatement
+//|	AssignStatement
+//|	LinearizationDef
+//|	FnDef
+//|	LibraryFnDef
+//|	NodeDef
+//|	RecordDef
+//|	InputStatement;
+//
+//NamedSpecStatement:
+//	{AssumeStatement} 'assume' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
+//	| {GuaranteeStatement} 'guarantee' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
+//	| {AssertStatement} 'assert' ((name=ID)? str=STRING ':')? (expr=Expr | pattern=PatternStatement) ';'
+//	| {LemmaStatement} 'lemma' (name=ID)?  str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
+//	;
+
+
+	public static interface Expr {
+
+	}
+
+	public static interface Prop {
+
+	}
+
+	public static class ExprProp implements Prop {
+		public final Expr expr;
+
+		public ExprProp(Expr expr) {
+			this.expr = expr;
+		}
+	}
+
+	public static interface TimingProp extends Prop {
+
+	}
+
+	public class Assume {
+		public final Optional<String> name;
+		public final String description;
+		public final Prop prop;
+
+		public Assume(Optional<String> name, String description, Prop prop) {
+			this.name = name;
+			this.description = description;
+			this.prop = prop;
+		}
+	}
 
 	public static interface Spec {
 
@@ -134,29 +194,6 @@ public class AgreeSpecSystem {
 	}
 
 
-	public static class Port {
-		public final Direc direction;
-		public final boolean isEvent;
-
-		public Port(Direc direction, boolean isEvent) {
-			this.direction = direction;
-			this.isEvent = isEvent;
-		}
-	}
-
-	public static class Field {
-		public final String name;
-		public final Spec spec;
-		public final Optional<Port> portOption;
-
-		public Field(String name, Spec spec, Optional<Port> portOption) {
-			this.name = name;
-			this.spec = spec;
-			this.portOption = portOption;
-		}
-
-	}
-
 	public static class RecordSpec implements Spec {
 
 		public final String name;
@@ -225,6 +262,29 @@ public class AgreeSpecSystem {
 				return null;
 			}
 
+		}
+
+	}
+
+	public static class Port {
+		public final Direc direction;
+		public final boolean isEvent;
+
+		public Port(Direc direction, boolean isEvent) {
+			this.direction = direction;
+			this.isEvent = isEvent;
+		}
+	}
+
+	public static class Field {
+		public final String name;
+		public final Spec spec;
+		public final Optional<Port> portOption;
+
+		public Field(String name, Spec spec, Optional<Port> portOption) {
+			this.name = name;
+			this.spec = spec;
+			this.portOption = portOption;
 		}
 
 	}

@@ -56,7 +56,7 @@ import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-import com.rockwellcollins.atc.agree.AgreeSpecSystem;
+import com.rockwellcollins.atc.agree.Agree;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -1222,14 +1222,14 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		return null;
 	}
 
-	private List<Expr> getConstraintsFromTypeDef(String name, AgreeSpecSystem.Spec typeDef) {
+	private List<Expr> getConstraintsFromTypeDef(String name, Agree.Spec typeDef) {
 		List<Expr> constraints = new ArrayList<>();
 
-		if (typeDef instanceof AgreeSpecSystem.RangeIntSpec) {
+		if (typeDef instanceof Agree.RangeIntSpec) {
 
 			Expr childName = new IdExpr(name);
-			long lowl = ((AgreeSpecSystem.RangeIntSpec) typeDef).low;
-			long highl = ((AgreeSpecSystem.RangeIntSpec) typeDef).high;
+			long lowl = ((Agree.RangeIntSpec) typeDef).low;
+			long highl = ((Agree.RangeIntSpec) typeDef).high;
 			Expr lowVal = new IntExpr(BigInteger.valueOf(lowl));
 			Expr highVal = new IntExpr(BigInteger.valueOf(highl));
 			Expr lowBound = new BinaryExpr(lowVal, BinaryOp.LESSEQUAL, childName);
@@ -1237,12 +1237,12 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			constraints.add(lowBound);
 			constraints.add(highBound);
 
-		} else if (typeDef instanceof AgreeSpecSystem.RangeRealSpec) {
+		} else if (typeDef instanceof Agree.RangeRealSpec) {
 
 			Expr childName = new IdExpr(name);
 
-			double lowd = ((AgreeSpecSystem.RangeRealSpec) typeDef).low;
-			double highd = ((AgreeSpecSystem.RangeRealSpec) typeDef).high;
+			double lowd = ((Agree.RangeRealSpec) typeDef).low;
+			double highd = ((Agree.RangeRealSpec) typeDef).high;
 			Expr lowVal = new RealExpr(BigDecimal.valueOf(lowd));
 			Expr highVal = new RealExpr(BigDecimal.valueOf(highd));
 			Expr lowBound = new BinaryExpr(lowVal, BinaryOp.LESSEQUAL, childName);
@@ -1250,19 +1250,19 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			constraints.add(lowBound);
 			constraints.add(highBound);
 
-		} else if (typeDef instanceof AgreeSpecSystem.ArraySpec) {
-			AgreeSpecSystem.Spec stemType = ((AgreeSpecSystem.ArraySpec) typeDef).stemType;
-			int size = ((AgreeSpecSystem.ArraySpec) typeDef).size;
+		} else if (typeDef instanceof Agree.ArraySpec) {
+			Agree.Spec stemType = ((Agree.ArraySpec) typeDef).stemType;
+			int size = ((Agree.ArraySpec) typeDef).size;
 			for (int i = 0; i < size; ++i) {
 				String childName = name + "[" + i + "]";
 				constraints.addAll(getConstraintsFromTypeDef(childName, stemType));
 			}
 
-		} else if (typeDef instanceof AgreeSpecSystem.RecordSpec) {
-			List<AgreeSpecSystem.Field> fields = ((AgreeSpecSystem.RecordSpec) typeDef).fields;
-			for (AgreeSpecSystem.Field field : fields) {
+		} else if (typeDef instanceof Agree.RecordSpec) {
+			List<Agree.Field> fields = ((Agree.RecordSpec) typeDef).fields;
+			for (Agree.Field field : fields) {
 				String childName = name + "." + field.name;
-				AgreeSpecSystem.Spec childType = field.spec;
+				Agree.Spec childType = field.spec;
 				constraints.addAll(getConstraintsFromTypeDef(childName, childType));
 			}
 
@@ -1722,9 +1722,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 					return new IdExpr(propInputName);
 				} else {
 					throw new AgreeException("Could not locate property value '" + prop.getQualifiedName()
-					+ "' in component '" + compName.getName() + "'.  Is it possible "
-					+ "that a 'this' statement is used in a context in which it wasn't supposed to?"
-					+ "  Analysis of unspecified AADL properties as inputs may be enabled in the AGREE preferences.");
+							+ "' in component '" + compName.getName() + "'.  Is it possible "
+							+ "that a 'this' statement is used in a context in which it wasn't supposed to?"
+							+ "  Analysis of unspecified AADL properties as inputs may be enabled in the AGREE preferences.");
 				}
 			}
 
@@ -1941,7 +1941,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		return new ArrayExpr(elems);
 	}
 
-
 	@Override
 	public Expr caseArrayUpdateExpr(ArrayUpdateExpr expr) {
 		Expr arrayExpr = doSwitch(expr.getArray());
@@ -1963,10 +1962,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseIndicesExpr(IndicesExpr expr) {
-		AgreeSpecSystem.Spec arrayTypeDef = AgreeXtext.inferSpec(expr.getArray());
+		Agree.Spec arrayTypeDef = AgreeXtext.inferSpec(expr.getArray());
 
-		if (arrayTypeDef instanceof AgreeSpecSystem.ArraySpec) {
-			int size = ((AgreeSpecSystem.ArraySpec) arrayTypeDef).size;
+		if (arrayTypeDef instanceof Agree.ArraySpec) {
+			int size = ((Agree.ArraySpec) arrayTypeDef).size;
 			List<Expr> elems = new ArrayList<>();
 			for (int i = 0; i < size; i++) {
 				elems.add(new IntExpr(i));
@@ -2024,7 +2023,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				args.add(arg);
 			}
 			return new CondactExpr(clock, (NodeCallExpr) call, args);
-
 
 		} else if (context instanceof FunctionCallExpr) {
 			List<Expr> args = new ArrayList<>();
@@ -2097,10 +2095,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		com.rockwellcollins.atc.agree.agree.Expr arrayExpr = expr.getArray();
 		Expr array = doSwitch(arrayExpr);
 
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(arrayExpr);
+		Agree.Spec agreeType = AgreeXtext.inferSpec(arrayExpr);
 		int size = 0;
-		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
-			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
+		if (agreeType instanceof Agree.ArraySpec) {
+			size = ((Agree.ArraySpec) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseForallExpr - '" + agreeType.getClass() + "' not handled");
 		}
@@ -2121,10 +2119,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		com.rockwellcollins.atc.agree.agree.Expr arrayExpr = expr.getArray();
 		Expr array = doSwitch(arrayExpr);
 
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(arrayExpr);
+		Agree.Spec agreeType = AgreeXtext.inferSpec(arrayExpr);
 		int size = 0;
-		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
-			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
+		if (agreeType instanceof Agree.ArraySpec) {
+			size = ((Agree.ArraySpec) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseExistsExpr - '" + agreeType.getClass() + "' not handled");
 		}
@@ -2142,10 +2140,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFlatmapExpr(FlatmapExpr expr) {
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
+		Agree.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
 		int size = 0;
-		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
-			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
+		if (agreeType instanceof Agree.ArraySpec) {
+			size = ((Agree.ArraySpec) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseFlatmapExpr");
 		}
@@ -2156,9 +2154,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			Expr arrayAccess = new ArrayAccessExpr(array, i);
 			Expr body = substitute(doSwitch(expr.getExpr()), binding.getName(), arrayAccess);
 
-			AgreeSpecSystem.Spec innerArrType = AgreeXtext.inferSpec(expr.getExpr());
-			if (innerArrType instanceof AgreeSpecSystem.ArraySpec) {
-				int innerSize = ((AgreeSpecSystem.ArraySpec) innerArrType).size;
+			Agree.Spec innerArrType = AgreeXtext.inferSpec(expr.getExpr());
+			if (innerArrType instanceof Agree.ArraySpec) {
+				int innerSize = ((Agree.ArraySpec) innerArrType).size;
 				for (int j = 0; j < innerSize; j++) {
 					Expr innerAccess = new ArrayAccessExpr(body, j);
 					elems.add(innerAccess);
@@ -2172,11 +2170,11 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFoldLeftExpr(FoldLeftExpr expr) {
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
+		Agree.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
 
 		int size = 0;
-		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
-			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
+		if (agreeType instanceof Agree.ArraySpec) {
+			size = ((Agree.ArraySpec) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseFoldLeftExpr");
 		}
@@ -2194,11 +2192,11 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFoldRightExpr(FoldRightExpr expr) {
-		AgreeSpecSystem.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
+		Agree.Spec agreeType = AgreeXtext.inferSpec(expr.getArray());
 
 		int size = 0;
-		if (agreeType instanceof AgreeSpecSystem.ArraySpec) {
-			size = ((AgreeSpecSystem.ArraySpec) agreeType).size;
+		if (agreeType instanceof Agree.ArraySpec) {
+			size = ((Agree.ArraySpec) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseFoldRightExpr");
 		}
@@ -2213,7 +2211,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		}
 		return accExpr;
 	}
-
 
 	@Override
 	public Expr caseEnumLitExpr(EnumLitExpr aadlEnum) {

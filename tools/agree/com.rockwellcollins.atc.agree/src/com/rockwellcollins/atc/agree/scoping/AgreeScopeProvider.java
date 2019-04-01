@@ -38,8 +38,8 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.RecordSpec;
-import com.rockwellcollins.atc.agree.AgreeSpecSystem.Spec;
+import com.rockwellcollins.atc.agree.Agree.RecordSpec;
+import com.rockwellcollins.atc.agree.Agree.Spec;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
