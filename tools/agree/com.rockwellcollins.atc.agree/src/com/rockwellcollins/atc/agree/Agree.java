@@ -14,32 +14,13 @@ import jkind.lustre.NamedType;
 public class Agree {
 
 
-//	NamedSpecStatement
-//|	{InitialStatement} 'initially' ':' expr=Expr  ';'
-//|	{ParamStatement} 'parameter' expr=Expr ':' type=Type ';'
-//|	{LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';'
-//|	{ConnectionStatement} 'connection' conn=[aadl2::NamedElement] ':' expr=Expr ';'
-//|	SynchStatement
-//|	OrderStatement
-//|	PropertyStatement
-//|	ConstStatement
-//|	EnumStatement
-//|	EqStatement
-//|	AssignStatement
-//|	LinearizationDef
-//|	FnDef
-//|	LibraryFnDef
-//|	NodeDef
-//|	RecordDef
-//|	InputStatement;
-//
-//NamedSpecStatement:
-//	{AssumeStatement} 'assume' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
-//	| {GuaranteeStatement} 'guarantee' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
-//	| {AssertStatement} 'assert' ((name=ID)? str=STRING ':')? (expr=Expr | pattern=PatternStatement) ';'
-//	| {LemmaStatement} 'lemma' (name=ID)?  str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
-//	;
+	public static class Name {
+		String name;
 
+		public Name(String name) {
+			this.name = name;
+		}
+	}
 
 	public static interface Expr {
 
@@ -57,21 +38,97 @@ public class Agree {
 		}
 	}
 
-	public static interface TimingProp extends Prop {
+	public static interface WheneverProp extends Prop {
 
 	}
 
-	public class Assume {
-		public final Optional<String> name;
+	public static interface WhenProp extends Prop {
+
+	}
+
+	public static interface RealTimeProp extends Prop {
+
+	}
+
+	public static class AlwaysProp implements Prop {
+
+	}
+
+	public enum ContractType {
+		Assume, Guarantee, Lemma, Assert
+	}
+
+	public class Contract {
+
+		public final ContractType ct;
+		public final String name;
 		public final String description;
 		public final Prop prop;
 
-		public Assume(Optional<String> name, String description, Prop prop) {
+		public Contract(ContractType ct, String name, String description, Prop prop) {
+			this.ct = ct;
 			this.name = name;
 			this.description = description;
 			this.prop = prop;
 		}
 	}
+
+	public class Initial {
+		public final Expr expr;
+
+		public Initial(Expr expr) {
+			this.expr = expr;
+		}
+	}
+
+	public class Parameter {
+		public final Expr expr;
+
+		public Parameter(Expr expr) {
+			this.expr = expr;
+		}
+	}
+
+
+	public static class Lift {
+		public final Name fieldName;
+
+		public Lift(Name fieldName) {
+			this.fieldName = fieldName;
+		}
+	}
+
+	public static class Connection {
+		public final Name connName;
+		public final Expr expr;
+
+		public Connection(Name connName, Expr expr) {
+			this.connName = connName;
+			this.expr = expr;
+		}
+	}
+
+	public static interface TimingMode {
+
+	}
+
+	public static class SynchMode implements TimingMode {
+
+	}
+
+	public static interface ExprDef {
+		public String getName();
+
+	}
+
+	// | PropertyStatement
+	// | ConstStatement
+	// | EqStatement
+	// | AssignStatement
+	// | LinearizationDef
+	// | FnDef
+	// | LibraryFnDef
+	// | NodeDef
 
 	public static interface Spec {
 
