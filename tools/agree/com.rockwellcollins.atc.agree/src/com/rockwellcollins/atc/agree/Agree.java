@@ -136,6 +136,8 @@ public class Agree {
 
 		public jkind.lustre.Type getLustreType();
 
+		public boolean staticEquals(Spec other);
+
 	}
 
 
@@ -161,6 +163,10 @@ public class Agree {
 			return lustreType;
 		}
 
+		@Override
+		public boolean staticEquals(Spec other) {
+			return this.getName().equals(other.getName());
+		}
 
 
 	}
@@ -186,6 +192,11 @@ public class Agree {
 			return NamedType.INT;
 		}
 
+		@Override
+		public boolean staticEquals(Spec other) {
+			return this.getName().equals(other.getName());
+		}
+
 	}
 
 	public static class RangeRealSpec implements Spec {
@@ -208,18 +219,29 @@ public class Agree {
 		public jkind.lustre.Type getLustreType() {
 			return NamedType.REAL;
 		}
+
+		@Override
+		public boolean staticEquals(Spec other) {
+			return this.getName().equals(other.getName());
+		}
 	}
 
 	public static class EnumSpec implements Spec {
-		public final String name;
+		private final String name;
 		public final List<String> values;
-		public final NamedElement elm;
 
-		public EnumSpec(String name, List<String> values, NamedElement elm) {
+
+		public final Map<String, ExprDef> exprDefMap;
+		public final List<Contract> contractList;
+
+		public EnumSpec(String name, List<String> values, Map<String, ExprDef> exprDefMap,
+				List<Contract> contractList) {
 			this.name = name;
 			this.values = new ArrayList<>();
 			this.values.addAll(values);
-			this.elm = elm;
+
+			this.exprDefMap = exprDefMap;
+			this.contractList = contractList;
 		}
 
 		@Override
@@ -239,6 +261,11 @@ public class Agree {
 			return lustreEnumType;
 		}
 
+		@Override
+		public boolean staticEquals(Spec other) {
+			return this.getName().equals(other.getName());
+		}
+
 
 	}
 
@@ -253,18 +280,25 @@ public class Agree {
 
 	public static class RecordSpec implements Spec {
 
-		public final String name;
+		private final String name;
 		public final Topo topo;
 		public final List<Field> fields;
+
+		public final Map<String, ExprDef> exprDefMap;
+		public final List<Contract> contractList;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-		public RecordSpec(String name, Topo topo, List<Field> fields, NamedElement namedElement) {
+		public RecordSpec(String name, Topo topo, List<Field> fields, Map<String, ExprDef> exprDefMap,
+				List<Contract> contractList, NamedElement namedElement) {
 			this.name = name;
 			this.topo = topo;
 			this.fields = new ArrayList<>();
 			this.fields.addAll(fields);
+			this.exprDefMap = exprDefMap;
+			this.contractList = contractList;
+
 			this.namedElement = namedElement;
 
 		}
@@ -290,28 +324,40 @@ public class Agree {
 			return lustreRecType;
 		}
 
+		@Override
+		public boolean staticEquals(Spec other) {
+			return this.getName().equals(other.getName());
+		}
+
 	}
 
 	public static class ArraySpec implements Spec {
-		public final Spec stemType;
-		public final int size;
-		public final Optional<NamedElement> elmOp;
 
-		public ArraySpec(Spec stemType, int size, Optional<NamedElement> elmOp) {
+		private final String name;
+		public final Spec stemSpec;
+		public final int size;
+
+		public final Map<String, ExprDef> exprDefMap;
+		public final List<Contract> contractList;
+
+		public ArraySpec(String name, Spec stemSpec, int size, Map<String, ExprDef> exprDefMap,
+				List<Contract> contractList) {
+			this.name = name;
 			this.size = size;
-			this.stemType = stemType;
-			this.elmOp = elmOp;
+			this.stemSpec = stemSpec;
+			this.exprDefMap = exprDefMap;
+			this.contractList = contractList;
 		}
 
 		@Override
 		public String getName() {
-			return stemType.getName() + "[" + size + "]";
+			return name.isEmpty() ? stemSpec.getName() + "[" + size + "]" : name;
 		}
 
 		@Override
 		public jkind.lustre.Type getLustreType() {
 
-			jkind.lustre.Type lustreBaseType = stemType.getLustreType();
+			jkind.lustre.Type lustreBaseType = stemSpec.getLustreType();
 			if (lustreBaseType != null) {
 				jkind.lustre.ArrayType lustreArrayType = new jkind.lustre.ArrayType(lustreBaseType, size);
 				return lustreArrayType;
@@ -319,6 +365,15 @@ public class Agree {
 				return null;
 			}
 
+		}
+
+		@Override
+		public boolean staticEquals(Spec other) {
+			if (other instanceof ArraySpec) {
+				return size == ((ArraySpec) other).size && stemSpec.staticEquals(((ArraySpec) other).stemSpec);
+			} else {
+				return false;
+			}
 		}
 
 	}
@@ -347,9 +402,17 @@ public class Agree {
 	}
 
 	public static boolean staticEqual(Spec t1, Spec t2) {
-		String str1 = t1.getName();
-		String str2 = t2.getName();
-		return str1.equals(str2);
+		return t1.staticEquals(t2);
+	}
+
+	public static class Program {
+		public final Spec main;
+		public final Map<String, Spec> specMap;
+
+		public Program(Spec main, Map<String, Spec> specMap) {
+			this.main = main;
+			this.specMap = specMap;
+		}
 	}
 
 

@@ -1,7 +1,10 @@
 package com.rockwellcollins.atc.agree;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.eclipse.emf.common.util.EList;
@@ -108,7 +111,7 @@ import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 
 public class AgreeXtext {
 
-	public static Spec toSpec(Type t) {
+	public static Spec toSpecFromType(Type t) {
 
 		if (t instanceof PrimType) {
 
@@ -143,9 +146,10 @@ public class AgreeXtext {
 
 		} else if (t instanceof ArrayType) {
 			String size = ((ArrayType) t).getSize();
-			Spec baseTypeDef = toSpec(((ArrayType) t).getStem());
+			Spec baseTypeDef = toSpecFromType(((ArrayType) t).getStem());
 
-			return new ArraySpec(baseTypeDef, Integer.parseInt(size), Optional.empty());
+			return new ArraySpec("", baseTypeDef, Integer.parseInt(size), new HashMap<String, Agree.ExprDef>(),
+					new ArrayList<Agree.Contract>());
 
 		} else if (t instanceof DoubleDotRef) {
 			return toSpecFromNamedElm(((DoubleDotRef) t).getElm());
@@ -165,11 +169,12 @@ public class AgreeXtext {
 			List<Agree.Field> fields = new ArrayList<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
-				Spec typeDef = toSpec(arg.getType());
+				Spec typeDef = toSpecFromType(arg.getType());
 				fields.add(new Agree.Field(arg.getName(), typeDef, Optional.empty()));
 			}
 
-			return new RecordSpec(ne.getQualifiedName(), Agree.Topo.Data, fields, ne);
+			return new RecordSpec(ne.getQualifiedName(), Agree.Topo.Data, fields, new HashMap<String, Agree.ExprDef>(),
+					new ArrayList<Agree.Contract>(), ne);
 
 		} else if (ne instanceof EnumStatement) {
 			String name = ne.getQualifiedName();
@@ -179,14 +184,26 @@ public class AgreeXtext {
 				String enumValue = name + "_" + nid.getName();
 				enumValues.add(enumValue);
 			}
-			return new EnumSpec(name, enumValues, ne);
+			return new EnumSpec(name, enumValues, new HashMap<String, Agree.ExprDef>(),
+					new ArrayList<Agree.Contract>());
 
 		} else if (ne instanceof Arg) {
-			return toSpec(((Arg) ne).getType());
+			return toSpecFromType(((Arg) ne).getType());
 
 		} else {
 			return Prim.ErrorSpec;
 		}
+	}
+
+
+	private static Map<String, Agree.ExprDef> extractExprDefMap(Classifier c) {
+		Map<String, Agree.ExprDef> result = new HashMap<String, Agree.ExprDef>();
+		return result;
+	}
+
+	private static List<Agree.Contract> extractContractList(Classifier c) {
+		List<Agree.Contract> result = new ArrayList<Agree.Contract>();
+		return result;
 	}
 
 	public static Spec toSpecFromClassifier(Classifier c) {
@@ -314,11 +331,12 @@ public class AgreeXtext {
 
 			if (prop_isArray && prop_arraySize > 0 && prop_arrayBaseType != null) {
 
-				return new ArraySpec(prop_arrayBaseType, prop_arraySize, Optional.of(c));
+				return new ArraySpec(c.getQualifiedName(), prop_arrayBaseType, prop_arraySize, extractExprDefMap(c),
+						extractContractList(c));
 
 			} else if (prop_isEnum && prop_enumValues != null) {
 				String name = c.getQualifiedName();
-				return new EnumSpec(name, prop_enumValues, c);
+				return new EnumSpec(name, prop_enumValues, extractExprDefMap(c), extractContractList(c));
 
 			}
 
@@ -333,11 +351,23 @@ public class AgreeXtext {
 			}
 
 			List<Agree.Field> fields = new ArrayList<>();
+			Map<String, Agree.ExprDef> exprDefMap = new HashMap<String, Agree.ExprDef>();
+			List<Agree.Contract> contractList = new ArrayList<Agree.Contract>();
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
+
+				Map<String, Agree.ExprDef> localExprDefMap = extractExprDefMap(currClsfr);
+				for (Entry<String, Agree.ExprDef> entry : localExprDefMap.entrySet()) {
+					exprDefMap.putIfAbsent(entry.getKey(), entry.getValue());
+				}
+
+				List<Agree.Contract> localContractList = extractContractList(currClsfr);
+				contractList.addAll(localContractList);
+
 				ComponentType ct = null;
 				if (currClsfr instanceof ComponentImplementation) {
+
 					EList<Subcomponent> subcomps = ((ComponentImplementation) currClsfr).getAllSubcomponents();
 					for (Subcomponent sub : subcomps) {
 						String fieldName = sub.getName();
@@ -353,7 +383,8 @@ public class AgreeXtext {
 								int size = Math.toIntExact(getArraySize(ad));
 
 								Spec stem = toSpecFromClassifier(sub.getClassifier());
-								Spec typeDef = new ArraySpec(stem, size, Optional.empty());
+								Spec typeDef = new ArraySpec("", stem, size, new HashMap<String, Agree.ExprDef>(),
+										new ArrayList<Agree.Contract>());
 								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
 								fields.add(field);
@@ -400,7 +431,8 @@ public class AgreeXtext {
 									ArrayDimension ad = feature.getArrayDimensions().get(0);
 									int size = Math.toIntExact(getArraySize(ad));
 									Spec stem = toSpecFromClassifier(feature.getClassifier());
-									Spec typeDef = new ArraySpec(stem, size, Optional.empty());
+									Spec typeDef = new ArraySpec("", stem, size, new HashMap<String, Agree.ExprDef>(),
+											new ArrayList<Agree.Contract>());
 
 									Agree.Field field = new Agree.Field(fieldName, typeDef,
 											Optional.of(port));
@@ -443,7 +475,7 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new RecordSpec(name, topo, fields, c);
+			return new RecordSpec(name, topo, fields, exprDefMap, contractList, c);
 
 		}
 
@@ -466,7 +498,8 @@ public class AgreeXtext {
 				String enumValue = name + "_" + nid.getName();
 				enumValues.add(enumValue);
 			}
-			return new EnumSpec(name, enumValues, enumDef);
+			return new EnumSpec(name, enumValues, new HashMap<String, Agree.ExprDef>(),
+					new ArrayList<Agree.Contract>());
 
 		} else if (ne instanceof NamedID) {
 
@@ -494,7 +527,7 @@ public class AgreeXtext {
 			if (arrExpr != null) {
 				Spec arrType = inferSpec(arrExpr);
 				if (arrType instanceof ArraySpec) {
-					return ((ArraySpec) arrType).stemType;
+					return ((ArraySpec) arrType).stemSpec;
 				}
 			}
 
@@ -510,10 +543,10 @@ public class AgreeXtext {
 			}
 
 		} else if (ne instanceof ConstStatement) {
-			return toSpec(((ConstStatement) ne).getType());
+			return toSpecFromType(((ConstStatement) ne).getType());
 
 		} else if (ne instanceof Arg) {
-			return toSpec(((Arg) ne).getType());
+			return toSpecFromType(((Arg) ne).getType());
 
 		} else if (ne instanceof Subcomponent) {
 
@@ -525,7 +558,8 @@ public class AgreeXtext {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
 				long size = getArraySize(dims.get(0));
-				return new ArraySpec(clsTypeDef, Math.toIntExact(size), Optional.empty());
+				return new ArraySpec("", clsTypeDef, Math.toIntExact(size), new HashMap<String, Agree.ExprDef>(),
+						new ArrayList<Agree.Contract>());
 			}
 
 		} else if (ne instanceof Feature) {
@@ -537,7 +571,8 @@ public class AgreeXtext {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
 				long size = getArraySize(dims.get(0));
-				return new ArraySpec(clsTypeDef, Math.toIntExact(size), Optional.empty());
+				return new ArraySpec("", clsTypeDef, Math.toIntExact(size), new HashMap<String, Agree.ExprDef>(),
+						new ArrayList<Agree.Contract>());
 
 			}
 
@@ -660,14 +695,15 @@ public class AgreeXtext {
 			Expr arrExpr = ((ArraySubExpr) expr).getExpr();
 			Spec arrType = inferSpec(arrExpr);
 			if (arrType instanceof ArraySpec) {
-				return ((ArraySpec) arrType).stemType;
+				return ((ArraySpec) arrType).stemSpec;
 			}
 
 		} else if (expr instanceof IndicesExpr) {
 			Spec arrType = inferSpec(((IndicesExpr) expr).getArray());
 			if (arrType instanceof ArraySpec) {
 				int size = ((ArraySpec) arrType).size;
-				return new ArraySpec(Prim.IntSpec, size, Optional.empty());
+				return new ArraySpec("", Prim.IntSpec, size, new HashMap<String, Agree.ExprDef>(),
+						new ArrayList<Agree.Contract>());
 			}
 
 		} else if (expr instanceof ForallExpr) {
@@ -679,12 +715,13 @@ public class AgreeXtext {
 		} else if (expr instanceof FlatmapExpr) {
 			Spec innerArrType = inferSpec(((FlatmapExpr) expr).getExpr());
 			if (innerArrType instanceof ArraySpec) {
-				Spec stemType = ((ArraySpec) innerArrType).stemType;
+				Spec stemType = ((ArraySpec) innerArrType).stemSpec;
 				Spec arrType = inferSpec(((FlatmapExpr) expr).getArray());
 
 				if (arrType instanceof ArraySpec) {
 					int size = ((ArraySpec) arrType).size;
-					return new ArraySpec(stemType, size, Optional.empty());
+					return new ArraySpec("", stemType, size, new HashMap<String, Agree.ExprDef>(),
+							new ArrayList<Agree.Contract>());
 				}
 			}
 
@@ -799,7 +836,7 @@ public class AgreeXtext {
 			return Prim.RealSpec;
 
 		} else if (expr instanceof EnumLitExpr) {
-			return toSpec(((EnumLitExpr) expr).getEnumType());
+			return toSpecFromType(((EnumLitExpr) expr).getEnumType());
 
 		} else if (expr instanceof LatchedExpr) {
 			return inferSpec(((LatchedExpr) expr).getExpr());
@@ -831,13 +868,14 @@ public class AgreeXtext {
 			int size = elems.size();
 			Spec firstType = inferSpec(first);
 
-			return new ArraySpec(firstType, size, Optional.empty());
+			return new ArraySpec("", firstType, size, new HashMap<String, Agree.ExprDef>(),
+					new ArrayList<Agree.Contract>());
 
 		} else if (expr instanceof ArrayUpdateExpr) {
 			return inferSpec(((ArrayUpdateExpr) expr).getArray());
 
 		} else if (expr instanceof RecordLitExpr) {
-			return toSpec(((RecordLitExpr) expr).getRecordType());
+			return toSpecFromType(((RecordLitExpr) expr).getRecordType());
 
 		} else if (expr instanceof RecordUpdateExpr) {
 			return inferSpec(((RecordUpdateExpr) expr).getRecord());
@@ -858,25 +896,25 @@ public class AgreeXtext {
 					return Prim.RealSpec;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
-					return toSpec(fnDef.getType());
+					return toSpecFromType(fnDef.getType());
 				}
 
 			} else {
 				// extract in/out arguments
 				if (namedEl instanceof FnDef) {
 					FnDef fnDef = (FnDef) namedEl;
-					return toSpec(fnDef.getType());
+					return toSpecFromType(fnDef.getType());
 				} else if (namedEl instanceof NodeDef) {
 					NodeDef nodeDef = (NodeDef) namedEl;
 					List<Type> outDefTypes = typesFromArgs(nodeDef.getRets());
 					if (outDefTypes.size() == 1) {
-						return toSpec(outDefTypes.get(0));
+						return toSpecFromType(outDefTypes.get(0));
 					}
 				} else if (namedEl instanceof LinearizationDef) {
 					return Prim.RealSpec;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
-					return toSpec(fnDef.getType());
+					return toSpecFromType(fnDef.getType());
 				}
 
 			}

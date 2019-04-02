@@ -1097,7 +1097,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	}
 
 	public VarDecl agreeVarFromArg(Arg arg, ComponentInstance compInst) {
-		Type type = AgreeXtext.toSpec(arg.getType()).getLustreType();
+		Type type = AgreeXtext.toSpecFromType(arg.getType()).getLustreType();
 		addIfCustomType(type);
 
 		if (type != null) {
@@ -1251,7 +1251,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			constraints.add(highBound);
 
 		} else if (typeDef instanceof Agree.ArraySpec) {
-			Agree.Spec stemType = ((Agree.ArraySpec) typeDef).stemType;
+			Agree.Spec stemType = ((Agree.ArraySpec) typeDef).stemSpec;
 			int size = ((Agree.ArraySpec) typeDef).size;
 			for (int i = 0; i < size; ++i) {
 				String childName = name + "[" + i + "]";
@@ -1277,7 +1277,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<AgreeStatement> constraints = new ArrayList<>();
 		for (Arg arg : args) {
 			List<Expr> argConstraints = getConstraintsFromTypeDef(arg.getName(),
-					AgreeXtext.toSpec(arg.getType()));
+					AgreeXtext.toSpecFromType(arg.getType()));
 			if (!argConstraints.isEmpty()) {
 				constraints.add(new AgreeStatement("Type predicate on '" + arg.getName() + "'", argConstraints.stream()
 						.reduce(new BoolExpr(true), (a, b) -> new BinaryExpr(a, BinaryOp.AND, b)), reference));
@@ -1604,7 +1604,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<VarDecl> inputs = agreeVarsFromArgs(fnDef.getArgs(), null);
 		Expr bodyExpr = doSwitch(fnDef.getExpr());
 
-		Type outType = AgreeXtext.toSpec(fnDef.getType()).getLustreType();
+		Type outType = AgreeXtext.toSpecFromType(fnDef.getType()).getLustreType();
 		addIfCustomType(outType);
 
 		if (outType != null) {

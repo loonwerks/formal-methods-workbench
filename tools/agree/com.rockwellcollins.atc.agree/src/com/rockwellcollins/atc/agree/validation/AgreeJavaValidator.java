@@ -413,18 +413,18 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataImplementation) {
-				if (Agree.staticEqual(AgreeXtext.toSpec(recType),
+				if (Agree.staticEqual(AgreeXtext.toSpecFromType(recType),
 						Agree.Prim.ErrorSpec)) {
 					error(recType, "Data Implementations with no subcomponents must extend"
 							+ " a Base_Type that AGREE can reason about.");
 					return;
 				}
 				if (((DataImplementation) finalId).getAllSubcomponents().size() != 0) {
-					if (Agree.staticEqual(AgreeXtext.toSpec(recType),
+					if (Agree.staticEqual(AgreeXtext.toSpecFromType(recType),
 							Agree.Prim.BoolSpec)
-							|| Agree.staticEqual(AgreeXtext.toSpec(recType),
+							|| Agree.staticEqual(AgreeXtext.toSpecFromType(recType),
 									Agree.Prim.IntSpec)
-							|| Agree.staticEqual(AgreeXtext.toSpec(recType),
+							|| Agree.staticEqual(AgreeXtext.toSpecFromType(recType),
 									Agree.Prim.RealSpec)) {
 						error(finalId, "Data implementations with subcomponents cannot be"
 								+ " interpreted by AGREE if they extend Base_Types");
@@ -436,7 +436,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataType) {
-				if (Agree.staticEqual(AgreeXtext.toSpec(recType),
+				if (Agree.staticEqual(AgreeXtext.toSpecFromType(recType),
 						Agree.Prim.ErrorSpec)) {
 					error(recType, "AADL Datatypes must extend" + " a Base_Type that AGREE can reason about.");
 					return;
@@ -1254,7 +1254,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 			// scoping should ensure the key is a proper Arg
 			Arg arg = (Arg) upExpr.getKey();
-			Spec keyType = AgreeXtext.toSpec(arg.getType());
+			Spec keyType = AgreeXtext.toSpecFromType(arg.getType());
 			checkTypeExists(upExpr.getExpr());
 			Spec expType = AgreeXtext.inferSpec(upExpr.getExpr());
 
@@ -1312,7 +1312,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Spec arrType = AgreeXtext.inferSpec(arrExpr);
 
 		if (arrType instanceof ArraySpec) {
-			Spec t = ((ArraySpec) arrType).stemType;
+			Spec t = ((ArraySpec) arrType).stemSpec;
 			Spec elmType = AgreeXtext.inferSpec(exprs.get(0));
 			if (!Agree.staticEqual(elmType, t)) {
 				error(exprs.get(0),
@@ -1458,7 +1458,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		if (rec instanceof RecordDef) {
 			RecordDef recDef = (RecordDef) rec;
 			for (Arg arg : recDef.getArgs()) {
-				typeMap.put(arg.getName(), AgreeXtext.toSpec(arg.getType()));
+				typeMap.put(arg.getName(), AgreeXtext.toSpecFromType(arg.getType()));
 			}
 		} else if (rec instanceof DataImplementation) {
 			DataImplementation dataImpl = (DataImplementation) rec;
@@ -1594,7 +1594,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 	@Check(CheckType.FAST)
 	public void checkConstStatement(ConstStatement constStat) {
-		Spec expected = AgreeXtext.toSpec(constStat.getType());
+		Spec expected = AgreeXtext.toSpecFromType(constStat.getType());
 		Spec actual = AgreeXtext.inferSpec(constStat.getExpr());
 
 		if (!Agree.staticEqual(expected, actual)) {
@@ -1857,7 +1857,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		List<Spec> agreeLhsTypes = new ArrayList<>();
 		for (Arg arg : lhsArgs) {
-			agreeLhsTypes.add(AgreeXtext.toSpec(arg.getType()));
+			agreeLhsTypes.add(AgreeXtext.toSpecFromType(arg.getType()));
 		}
 		List<Spec> agreeRhsTypes = new ArrayList<>();
 
@@ -1867,11 +1867,11 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			if (namedEl instanceof NodeDef) {
 				NodeDef nodeDef = (NodeDef) namedEl;
 				for (Arg var : nodeDef.getRets()) {
-					agreeRhsTypes.add(AgreeXtext.toSpec(var.getType()));
+					agreeRhsTypes.add(AgreeXtext.toSpecFromType(var.getType()));
 				}
 			} else if (namedEl instanceof FnDef) {
 				FnDef fnDef = (FnDef) namedEl;
-				agreeRhsTypes.add(AgreeXtext.toSpec(fnDef.getType()));
+				agreeRhsTypes.add(AgreeXtext.toSpecFromType(fnDef.getType()));
 			} else {
 				return; // parse error
 			}
@@ -2127,7 +2127,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		// Check that the formal args are all of real type
 		for (Arg arg : linDefExpr.getArgs()) {
-			Spec argType = AgreeXtext.toSpec(arg.getType());
+			Spec argType = AgreeXtext.toSpecFromType(arg.getType());
 			if (!Agree.staticEqual(argType, Agree.Prim.RealSpec)) {
 				error(arg, "Linearizations formal arguments must be of real type, but found type " + argType);
 			}
@@ -2234,7 +2234,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	public List<Spec> typeDefsFromArgs(List<Arg> args) {
 		List<Spec> types = new ArrayList<Spec>();
 		for (Arg arg : args) {
-			types.add(AgreeXtext.toSpec(arg.getType()));
+			types.add(AgreeXtext.toSpecFromType(arg.getType()));
 		}
 		return types;
 	}
@@ -2337,7 +2337,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	@Check(CheckType.FAST)
 	public void checkFnDefExpr(FnDef fnDef) {
 
-		Spec fnType = AgreeXtext.toSpec(fnDef.getType());
+		Spec fnType = AgreeXtext.toSpecFromType(fnDef.getType());
 
 		Spec exprType = AgreeXtext.inferSpec(fnDef.getExpr());
 		if (!Agree.staticEqual(exprType, fnType)) {
