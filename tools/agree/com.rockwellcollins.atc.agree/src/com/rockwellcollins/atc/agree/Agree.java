@@ -122,14 +122,19 @@ public class Agree {
 
 	}
 
-	// | PropertyStatement
-	// | ConstStatement
-	// | EqStatement
-	// | AssignStatement
-	// | LinearizationDef
-	// | FnDef
-	// | LibraryFnDef
-	// | NodeDef
+	// inline: ConstStatement
+
+	// global defs: NodeDef, FnDef, LinearizationDef
+
+	// local assertions: AssertionStatement, AssignStatement, PropertyStatement, EqStatement
+	// local assumptions: AssumeStatement, InputStatement
+	// local guarantees: GuaranteeStatement, EqStatement
+	// local lemmas: LemmaStatement
+	// local input vars: InputStatement
+	// local output vars: PropertyStatement, EqStatement
+
+
+	// not implemented: LibraryFnDef
 
 	public static interface Spec {
 

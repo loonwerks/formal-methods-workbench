@@ -207,7 +207,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private LinearizationRewriter linearizationRewriter = new LinearizationRewriter();
 
 	static class GatheredVariablesAndConstraints {
-		public List<AgreeVar> variables = new ArrayList<>();
+		private List<AgreeVar> variables = new ArrayList<>();
 		public List<AgreeStatement> assertions = new ArrayList<>();
 		public List<AgreeStatement> obligations = new ArrayList<>();
 
@@ -257,12 +257,12 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 		program.containsRealTimePatterns(containsRTPatterns);
 
-		// EGM: DEBUG
-		System.out.println("getAgreeProgram");
-		com.rockwellcollins.atc.agree.analysis.ast.visitors.AgreeASTPrettyprinter pp = new com.rockwellcollins.atc.agree.analysis.ast.visitors.AgreeASTPrettyprinter();
-		program.accept(pp);
-		System.out.println(pp.toString());
-		System.out.println(AgreeLogger.getLog());
+//		// EGM: DEBUG
+//		System.out.println("getAgreeProgram");
+//		com.rockwellcollins.atc.agree.analysis.ast.visitors.AgreeASTPrettyprinter pp = new com.rockwellcollins.atc.agree.analysis.ast.visitors.AgreeASTPrettyprinter();
+//		program.accept(pp);
+//		System.out.println(pp.toString());
+//		System.out.println(AgreeLogger.getLog());
 
 		return program;
 	}
