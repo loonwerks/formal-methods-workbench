@@ -124,7 +124,12 @@ public class Agree {
 
 	// inline: ConstStatement
 
-	// global defs: NodeDef, FnDef, LinearizationDef
+
+	// global types: Classifier, ArrayType, PrimType, EnumStatement, RecordDef
+
+	// global contract nodes: ComponentClassifier
+
+	// global simple nodes: NodeDef, FnDef, LinearizationDef
 
 	// local assertions: AssertionStatement, AssignStatement, PropertyStatement, EqStatement
 	// local assumptions: AssumeStatement, InputStatement
