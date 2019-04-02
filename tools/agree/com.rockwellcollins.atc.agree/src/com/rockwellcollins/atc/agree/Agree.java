@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
@@ -282,7 +283,7 @@ public class Agree {
 
 		private final String name;
 		public final Topo topo;
-		public final List<Field> fields;
+		public final Map<String, Field> fields;
 
 		public final Map<String, ExprDef> exprDefMap;
 		public final List<Contract> contractList;
@@ -290,12 +291,12 @@ public class Agree {
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-		public RecordSpec(String name, Topo topo, List<Field> fields, Map<String, ExprDef> exprDefMap,
+		public RecordSpec(String name, Topo topo, Map<String, Field> fields, Map<String, ExprDef> exprDefMap,
 				List<Contract> contractList, NamedElement namedElement) {
 			this.name = name;
 			this.topo = topo;
-			this.fields = new ArrayList<>();
-			this.fields.addAll(fields);
+			this.fields = new HashMap<>();
+			this.fields.putAll(fields);
 			this.exprDefMap = exprDefMap;
 			this.contractList = contractList;
 
@@ -313,9 +314,9 @@ public class Agree {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
-			for (Field field : fields) {
-				String key = field.name;
-				jkind.lustre.Type lt = field.spec.getLustreType();
+			for (Entry<String, Field> entry : fields.entrySet()) {
+				String key = entry.getKey();
+				jkind.lustre.Type lt = entry.getValue().spec.getLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}

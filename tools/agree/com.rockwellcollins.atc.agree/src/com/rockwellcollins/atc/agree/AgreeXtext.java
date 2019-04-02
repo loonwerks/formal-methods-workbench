@@ -47,6 +47,7 @@ import org.osate.annexsupport.AnnexUtil;
 
 import com.rockwellcollins.atc.agree.Agree.ArraySpec;
 import com.rockwellcollins.atc.agree.Agree.EnumSpec;
+import com.rockwellcollins.atc.agree.Agree.Field;
 import com.rockwellcollins.atc.agree.Agree.Prim;
 import com.rockwellcollins.atc.agree.Agree.RangeIntSpec;
 import com.rockwellcollins.atc.agree.Agree.RangeRealSpec;
@@ -166,11 +167,11 @@ public class AgreeXtext {
 		} else if (ne instanceof RecordDef) {
 
 			EList<Arg> args = ((RecordDef) ne).getArgs();
-			List<Agree.Field> fields = new ArrayList<>();
+			Map<String, Agree.Field> fields = new HashMap<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
 				Spec typeDef = toSpecFromType(arg.getType());
-				fields.add(new Agree.Field(arg.getName(), typeDef, Optional.empty()));
+				fields.putIfAbsent(key, new Agree.Field(arg.getName(), typeDef, Optional.empty()));
 			}
 
 			return new RecordSpec(ne.getQualifiedName(), Agree.Topo.Data, fields, new HashMap<String, Agree.ExprDef>(),
@@ -350,7 +351,7 @@ public class AgreeXtext {
 				topo = Agree.Topo.System;
 			}
 
-			List<Agree.Field> fields = new ArrayList<>();
+			Map<String, Agree.Field> fields = new HashMap<>();
 			Map<String, Agree.ExprDef> exprDefMap = new HashMap<String, Agree.ExprDef>();
 			List<Agree.Contract> contractList = new ArrayList<Agree.Contract>();
 
@@ -377,7 +378,7 @@ public class AgreeXtext {
 								Spec typeDef = toSpecFromClassifier(sub.getClassifier());
 								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
-								fields.add(field);
+								fields.putIfAbsent(fieldName, field);
 							} else if (sub.getArrayDimensions().size() == 1) {
 								ArrayDimension ad = sub.getArrayDimensions().get(0);
 								int size = Math.toIntExact(getArraySize(ad));
@@ -387,7 +388,7 @@ public class AgreeXtext {
 										new ArrayList<Agree.Contract>());
 								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
-								fields.add(field);
+								fields.putIfAbsent(fieldName, field);
 
 							}
 						}
@@ -426,7 +427,7 @@ public class AgreeXtext {
 									Agree.Field field = new Agree.Field(fieldName, typeDef,
 											Optional.of(port));
 
-									fields.add(field);
+									fields.putIfAbsent(fieldName, field);
 								} else if (feature.getArrayDimensions().size() == 1) {
 									ArrayDimension ad = feature.getArrayDimensions().get(0);
 									int size = Math.toIntExact(getArraySize(ad));
@@ -437,7 +438,7 @@ public class AgreeXtext {
 									Agree.Field field = new Agree.Field(fieldName, typeDef,
 											Optional.of(port));
 
-									fields.add(field);
+									fields.putIfAbsent(fieldName, field);
 
 								}
 							}
@@ -463,7 +464,7 @@ public class AgreeXtext {
 								Agree.Field field = new Agree.Field(fieldName, typeDef,
 										Optional.empty());
 
-								fields.add(field);
+								fields.putIfAbsent(fieldName, field);
 							}
 						}
 
@@ -668,10 +669,10 @@ public class AgreeXtext {
 			String name = ((SelectionExpr) expr).getField().getName();
 
 			if (targetType instanceof Agree.RecordSpec) {
-				List<Agree.Field> fields = ((Agree.RecordSpec) targetType).fields;
-				for (Agree.Field field : fields) {
-					if (field.name.equals(name)) {
-						return field.spec;
+				Map<String, Agree.Field> fields = ((Agree.RecordSpec) targetType).fields;
+				for (Entry<String, Field> entry : fields.entrySet()) {
+					if (entry.getKey().equals(name)) {
+						return entry.getValue().spec;
 					}
 				}
 
@@ -937,6 +938,17 @@ public class AgreeXtext {
 		}
 
 		return Optional.empty();
+	}
+
+	public static Map<String, Agree.Spec> extractSpecMap(Classifier c) {
+		Map<String, Agree.Spec> result = new HashMap<String, Agree.Spec>();
+		return result;
+	}
+
+	public static Agree.Program toProgram(ComponentImplementation ci) {
+		Spec main = toSpecFromClassifier(ci);
+		Map<String, Agree.Spec> specMap = extractSpecMap(ci);
+		return new Agree.Program(main, specMap);
 	}
 
 }
