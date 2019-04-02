@@ -38,8 +38,8 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.Agree.RecordSpec;
-import com.rockwellcollins.atc.agree.Agree.Spec;
+import com.rockwellcollins.atc.agree.Agree.RecordContract;
+import com.rockwellcollins.atc.agree.Agree.Contract;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
@@ -529,9 +529,9 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 	IScope scope_RecordUpdateExpr_key(RecordUpdateExpr ctx, EReference ref) {
 		IScope prevScope = prevScope(ctx, ref);
-		Spec typ = AgreeXtext.inferSpec(ctx.getRecord());
-		if (typ instanceof RecordSpec) {
-			NamedElement ne = ((RecordSpec) typ).namedElement;
+		Contract typ = AgreeXtext.inferContract(ctx.getRecord());
+		if (typ instanceof RecordContract) {
+			NamedElement ne = ((RecordContract) typ).namedElement;
 			return Scopes.scopeFor(getFieldsOfNE(ne), prevScope);
 		} else {
 			return IScope.NULLSCOPE;
@@ -554,10 +554,10 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 	protected IScope scope_SelectionExpr_field(SelectionExpr ctx, EReference ref) {
 
-		Spec typ = AgreeXtext.inferSpec(ctx.getTarget());
+		Contract typ = AgreeXtext.inferContract(ctx.getTarget());
 
-		if (typ instanceof RecordSpec) {
-			NamedElement ne = ((RecordSpec) typ).namedElement;
+		if (typ instanceof RecordContract) {
+			NamedElement ne = ((RecordContract) typ).namedElement;
 			return Scopes.scopeFor(getFieldsOfNE(ne));
 		}
 

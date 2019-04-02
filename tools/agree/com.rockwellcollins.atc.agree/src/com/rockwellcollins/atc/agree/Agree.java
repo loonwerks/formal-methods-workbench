@@ -55,19 +55,19 @@ public class Agree {
 
 	}
 
-	public enum ContractType {
+	public enum SpecTag {
 		Assume, Guarantee, Lemma, Assert
 	}
 
-	public class Contract {
+	public class XYZ {
 
-		public final ContractType ct;
+		public final SpecTag specTag;
 		public final String name;
 		public final String description;
 		public final Prop prop;
 
-		public Contract(ContractType ct, String name, String description, Prop prop) {
-			this.ct = ct;
+		public XYZ(SpecTag specTag, String name, String description, Prop prop) {
+			this.specTag = specTag;
 			this.name = name;
 			this.description = description;
 			this.prop = prop;
@@ -136,20 +136,20 @@ public class Agree {
 
 	// not implemented: LibraryFnDef
 
-	public static interface Spec {
+	public static interface Contract {
 
 		public String getName();
 
 		public jkind.lustre.Type getLustreType();
 
-		public boolean staticEquals(Spec other);
+		public boolean staticEquals(Contract other);
 
 	}
 
 
-	public static enum Prim implements Spec {
-		IntSpec("int", NamedType.INT), RealSpec("real", NamedType.REAL), BoolSpec("bool",
-				NamedType.BOOL), ErrorSpec("<error>", null);
+	public static enum Prim implements Contract {
+		IntContract("int", NamedType.INT), RealContract("real", NamedType.REAL), BoolContract("bool",
+				NamedType.BOOL), ErrorContract("<error>", null);
 
 		public final String name;
 		public final jkind.lustre.Type lustreType;
@@ -170,20 +170,20 @@ public class Agree {
 		}
 
 		@Override
-		public boolean staticEquals(Spec other) {
+		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
 
 
 	}
 
-	public static class RangeIntSpec implements Spec {
+	public static class RangeIntContract implements Contract {
 		public final String name;
 		public final long low;
 		public final long high;
 
-		public RangeIntSpec(long low, long high) {
-			this.name = Prim.IntSpec.name;
+		public RangeIntContract(long low, long high) {
+			this.name = Prim.IntContract.name;
 			this.low = low;
 			this.high = high;
 		}
@@ -199,19 +199,19 @@ public class Agree {
 		}
 
 		@Override
-		public boolean staticEquals(Spec other) {
+		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
 
 	}
 
-	public static class RangeRealSpec implements Spec {
+	public static class RangeRealContract implements Contract {
 		public final String name;
 		public final double low;
 		public final double high;
 
-		public RangeRealSpec(double f, double g) {
-			this.name = Prim.RealSpec.name;
+		public RangeRealContract(double f, double g) {
+			this.name = Prim.RealContract.name;
 			this.low = f;
 			this.high = g;
 		}
@@ -227,21 +227,21 @@ public class Agree {
 		}
 
 		@Override
-		public boolean staticEquals(Spec other) {
+		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
 	}
 
-	public static class EnumSpec implements Spec {
+	public static class EnumContract implements Contract {
 		private final String name;
 		public final List<String> values;
 
 
 		public final Map<String, ExprDef> exprDefMap;
-		public final List<Contract> contractList;
+		public final List<XYZ> contractList;
 
-		public EnumSpec(String name, List<String> values, Map<String, ExprDef> exprDefMap,
-				List<Contract> contractList) {
+		public EnumContract(String name, List<String> values, Map<String, ExprDef> exprDefMap,
+				List<XYZ> contractList) {
 			this.name = name;
 			this.values = new ArrayList<>();
 			this.values.addAll(values);
@@ -268,7 +268,7 @@ public class Agree {
 		}
 
 		@Override
-		public boolean staticEquals(Spec other) {
+		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
 
@@ -284,20 +284,20 @@ public class Agree {
 	}
 
 
-	public static class RecordSpec implements Spec {
+	public static class RecordContract implements Contract {
 
 		private final String name;
 		public final Topo topo;
 		public final Map<String, Field> fields;
 
 		public final Map<String, ExprDef> exprDefMap;
-		public final List<Contract> contractList;
+		public final List<XYZ> contractList;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-		public RecordSpec(String name, Topo topo, Map<String, Field> fields, Map<String, ExprDef> exprDefMap,
-				List<Contract> contractList, NamedElement namedElement) {
+		public RecordContract(String name, Topo topo, Map<String, Field> fields, Map<String, ExprDef> exprDefMap,
+				List<XYZ> contractList, NamedElement namedElement) {
 			this.name = name;
 			this.topo = topo;
 			this.fields = new HashMap<>();
@@ -321,7 +321,7 @@ public class Agree {
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
 			for (Entry<String, Field> entry : fields.entrySet()) {
 				String key = entry.getKey();
-				jkind.lustre.Type lt = entry.getValue().spec.getLustreType();
+				jkind.lustre.Type lt = entry.getValue().contract.getLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}
@@ -331,39 +331,39 @@ public class Agree {
 		}
 
 		@Override
-		public boolean staticEquals(Spec other) {
+		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
 
 	}
 
-	public static class ArraySpec implements Spec {
+	public static class ArrayContract implements Contract {
 
 		private final String name;
-		public final Spec stemSpec;
+		public final Contract stemContract;
 		public final int size;
 
 		public final Map<String, ExprDef> exprDefMap;
-		public final List<Contract> contractList;
+		public final List<XYZ> contractList;
 
-		public ArraySpec(String name, Spec stemSpec, int size, Map<String, ExprDef> exprDefMap,
-				List<Contract> contractList) {
+		public ArrayContract(String name, Contract stemContract, int size, Map<String, ExprDef> exprDefMap,
+				List<XYZ> contractList) {
 			this.name = name;
 			this.size = size;
-			this.stemSpec = stemSpec;
+			this.stemContract = stemContract;
 			this.exprDefMap = exprDefMap;
 			this.contractList = contractList;
 		}
 
 		@Override
 		public String getName() {
-			return name.isEmpty() ? stemSpec.getName() + "[" + size + "]" : name;
+			return name.isEmpty() ? stemContract.getName() + "[" + size + "]" : name;
 		}
 
 		@Override
 		public jkind.lustre.Type getLustreType() {
 
-			jkind.lustre.Type lustreBaseType = stemSpec.getLustreType();
+			jkind.lustre.Type lustreBaseType = stemContract.getLustreType();
 			if (lustreBaseType != null) {
 				jkind.lustre.ArrayType lustreArrayType = new jkind.lustre.ArrayType(lustreBaseType, size);
 				return lustreArrayType;
@@ -374,9 +374,9 @@ public class Agree {
 		}
 
 		@Override
-		public boolean staticEquals(Spec other) {
-			if (other instanceof ArraySpec) {
-				return size == ((ArraySpec) other).size && stemSpec.staticEquals(((ArraySpec) other).stemSpec);
+		public boolean staticEquals(Contract other) {
+			if (other instanceof ArrayContract) {
+				return size == ((ArrayContract) other).size && stemContract.staticEquals(((ArrayContract) other).stemContract);
 			} else {
 				return false;
 			}
@@ -396,28 +396,28 @@ public class Agree {
 
 	public static class Field {
 		public final String name;
-		public final Spec spec;
+		public final Contract contract;
 		public final Optional<Port> portOption;
 
-		public Field(String name, Spec spec, Optional<Port> portOption) {
+		public Field(String name, Contract contract, Optional<Port> portOption) {
 			this.name = name;
-			this.spec = spec;
+			this.contract = contract;
 			this.portOption = portOption;
 		}
 
 	}
 
-	public static boolean staticEqual(Spec t1, Spec t2) {
+	public static boolean staticEqual(Contract t1, Contract t2) {
 		return t1.staticEquals(t2);
 	}
 
 	public static class Program {
-		public final Spec main;
-		public final Map<String, Spec> specMap;
+		public final Contract main;
+		public final Map<String, Contract> contractMap;
 
-		public Program(Spec main, Map<String, Spec> specMap) {
+		public Program(Contract main, Map<String, Contract> contractMap) {
 			this.main = main;
-			this.specMap = specMap;
+			this.contractMap = contractMap;
 		}
 	}
 
