@@ -149,15 +149,17 @@ public class AgreeXtext {
 			String size = ((ArrayType) t).getSize();
 			Contract baseTypeDef = toContractFromType(((ArrayType) t).getStem());
 
-			return new ArrayContract("", baseTypeDef, Integer.parseInt(size));
-
+			if (baseTypeDef instanceof Agree.DataContract) {
+				return new ArrayContract("", (Agree.DataContract) baseTypeDef, Integer.parseInt(size));
+			}
 		} else if (t instanceof DoubleDotRef) {
 			return toContractFromNamedElm(((DoubleDotRef) t).getElm());
 
-		} else {
-			return Prim.ErrorContract;
-
 		}
+
+		return Prim.ErrorContract;
+
+
 
 	}
 
@@ -168,11 +170,14 @@ public class AgreeXtext {
 		} else if (ne instanceof RecordDef) {
 
 			EList<Arg> args = ((RecordDef) ne).getArgs();
-			Map<String, Agree.Contract> fields = new HashMap<>();
+			Map<String, Agree.DataContract> fields = new HashMap<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
 				Contract typeDef = toContractFromType(arg.getType());
-				fields.putIfAbsent(key, typeDef);
+
+				if (typeDef instanceof DataContract) {
+					fields.putIfAbsent(key, (DataContract) typeDef);
+				}
 			}
 
 			return new RecordContract(ne.getQualifiedName(), fields, ne);
@@ -326,9 +331,10 @@ public class AgreeXtext {
 
 			}
 
-			if (prop_isArray && prop_arraySize > 0 && prop_arrayBaseType != null) {
+			if (prop_isArray && prop_arraySize > 0 && prop_arrayBaseType != null
+					&& prop_arrayBaseType instanceof Agree.DataContract) {
 
-				return new ArrayContract(c.getQualifiedName(), prop_arrayBaseType, prop_arraySize);
+				return new ArrayContract(c.getQualifiedName(), (Agree.DataContract) prop_arrayBaseType, prop_arraySize);
 
 			} else if (prop_isEnum && prop_enumValues != null) {
 				String name = c.getQualifiedName();
@@ -336,6 +342,45 @@ public class AgreeXtext {
 
 			}
 		} else if (c instanceof DataImplementation) {
+
+			Map<String, Agree.DataContract> fields = new HashMap<>();
+
+			DataImplementation currClsfr = (DataImplementation) c;
+			while (currClsfr != null) {
+
+				EList<Subcomponent> subcomps = currClsfr.getAllSubcomponents();
+				for (Subcomponent sub : subcomps) {
+					String fieldName = sub.getName();
+					if (sub.getClassifier() != null) {
+
+						if (sub.getArrayDimensions().size() == 0) {
+							Contract typeDef = toContractFromClassifier(sub.getClassifier());
+							if (typeDef instanceof Agree.DataContract) {
+								fields.putIfAbsent(fieldName, (Agree.DataContract) typeDef);
+							}
+
+						} else if (sub.getArrayDimensions().size() == 1) {
+
+
+							Contract stemContract = toContractFromClassifier(sub.getClassifier());
+							if (stemContract instanceof Agree.DataContract) {
+								long size = getArraySize(sub.getArrayDimensions().get(0));
+								DataContract arrayContract = new Agree.ArrayContract("",
+										(Agree.DataContract) stemContract, Math.toIntExact(size));
+								fields.putIfAbsent(fieldName, arrayContract);
+
+							}
+							throw new RuntimeException("Arrays may not be used in node subcomponent");
+						}
+					}
+				}
+
+
+			}
+
+			String name = c.getQualifiedName();
+
+			return new Agree.RecordContract(name, fields, c);
 
 		} else if (c instanceof ComponentClassifier) {
 
@@ -408,9 +453,11 @@ public class AgreeXtext {
 									ArrayDimension ad = feature.getArrayDimensions().get(0);
 									int size = Math.toIntExact(getArraySize(ad));
 									Contract stem = toContractFromClassifier(feature.getClassifier());
-									DataContract typeDef = new ArrayContract("", stem, size);
-									Agree.Port port = new Agree.Port(typeDef, direction, isEvent);
-									ports.putIfAbsent(fieldName, port);
+									if (stem instanceof Agree.DataContract) {
+										DataContract typeDef = new ArrayContract("", (Agree.DataContract) stem, size);
+										Agree.Port port = new Agree.Port(typeDef, direction, isEvent);
+										ports.putIfAbsent(fieldName, port);
+									}
 
 								}
 							}
@@ -530,9 +577,9 @@ public class AgreeXtext {
 			Contract clsTypeDef = toContractFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
-			} else if (dims.size() == 1) {
+			} else if (dims.size() == 1 && clsTypeDef instanceof Agree.DataContract) {
 				long size = getArraySize(dims.get(0));
-				return new ArrayContract("", clsTypeDef, Math.toIntExact(size));
+				return new ArrayContract("", (Agree.DataContract) clsTypeDef, Math.toIntExact(size));
 			}
 
 		} else if (ne instanceof Feature) {
@@ -542,9 +589,9 @@ public class AgreeXtext {
 			Contract clsTypeDef = toContractFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
-			} else if (dims.size() == 1) {
+			} else if (dims.size() == 1 && clsTypeDef instanceof Agree.DataContract) {
 				long size = getArraySize(dims.get(0));
-				return new ArrayContract("", clsTypeDef, Math.toIntExact(size));
+				return new ArrayContract("", (Agree.DataContract) clsTypeDef, Math.toIntExact(size));
 
 			}
 
@@ -640,8 +687,8 @@ public class AgreeXtext {
 			String name = ((SelectionExpr) expr).getField().getName();
 
 			if (targetType instanceof Agree.RecordContract) {
-				Map<String, Agree.Contract> fields = ((Agree.RecordContract) targetType).fields;
-				for (Entry<String, Agree.Contract> entry : fields.entrySet()) {
+				Map<String, Agree.DataContract> fields = ((Agree.RecordContract) targetType).fields;
+				for (Entry<String, Agree.DataContract> entry : fields.entrySet()) {
 					if (entry.getKey().equals(name)) {
 						return entry.getValue();
 					}
@@ -689,9 +736,9 @@ public class AgreeXtext {
 				Contract stemType = ((ArrayContract) innerArrType).stemContract;
 				Contract arrType = inferContract(((FlatmapExpr) expr).getArray());
 
-				if (arrType instanceof ArrayContract) {
+				if (arrType instanceof ArrayContract && arrType instanceof Agree.DataContract) {
 					int size = ((ArrayContract) arrType).size;
-					return new ArrayContract("", stemType, size);
+					return new ArrayContract("", (Agree.DataContract) stemType, size);
 				}
 			}
 
@@ -838,7 +885,9 @@ public class AgreeXtext {
 			int size = elems.size();
 			Contract firstType = inferContract(first);
 
-			return new ArrayContract("", firstType, size);
+			if (firstType instanceof Agree.DataContract) {
+				return new ArrayContract("", (Agree.DataContract) firstType, size);
+			}
 
 		} else if (expr instanceof ArrayUpdateExpr) {
 			return inferContract(((ArrayUpdateExpr) expr).getArray());

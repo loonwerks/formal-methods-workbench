@@ -1259,8 +1259,8 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			}
 
 		} else if (typeDef instanceof Agree.RecordContract) {
-			Map<String, Agree.Contract> fields = ((Agree.RecordContract) typeDef).fields;
-			for (Entry<String, Agree.Contract> entry : fields.entrySet()) {
+			Map<String, Agree.DataContract> fields = ((Agree.RecordContract) typeDef).fields;
+			for (Entry<String, Agree.DataContract> entry : fields.entrySet()) {
 				String childName = name + "." + entry.getKey();
 				Agree.Contract childType = entry.getValue();
 				constraints.addAll(getConstraintsFromTypeDef(childName, childType));

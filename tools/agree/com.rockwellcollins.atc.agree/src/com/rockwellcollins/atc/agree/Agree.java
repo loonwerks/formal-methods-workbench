@@ -279,12 +279,12 @@ public class Agree {
 	public static class RecordContract implements DataContract {
 
 		private final String name;
-		public final Map<String, Contract> fields;
+		public final Map<String, DataContract> fields;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-		public RecordContract(String name, Map<String, Contract> fields, NamedElement namedElement) {
+		public RecordContract(String name, Map<String, DataContract> fields, NamedElement namedElement) {
 			this.name = name;
 			this.fields = new HashMap<>();
 			this.fields.putAll(fields);
@@ -303,7 +303,7 @@ public class Agree {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
-			for (Entry<String, Contract> entry : fields.entrySet()) {
+			for (Entry<String, DataContract> entry : fields.entrySet()) {
 				String key = entry.getKey();
 				jkind.lustre.Type lt = entry.getValue().getLustreType();
 				if (lt != null) {
@@ -325,10 +325,10 @@ public class Agree {
 	public static class ArrayContract implements DataContract {
 
 		private final String name;
-		public final Contract stemContract;
+		public final DataContract stemContract;
 		public final int size;
 
-		public ArrayContract(String name, Contract stemContract, int size) {
+		public ArrayContract(String name, DataContract stemContract, int size) {
 			this.name = name;
 			this.size = size;
 			this.stemContract = stemContract;
