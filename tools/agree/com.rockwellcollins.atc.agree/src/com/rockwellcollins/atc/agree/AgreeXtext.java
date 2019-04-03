@@ -694,6 +694,14 @@ public class AgreeXtext {
 					}
 				}
 
+			} else if (targetType instanceof Agree.NodeContract) {
+				Map<String, Agree.Port> ports = ((Agree.NodeContract) targetType).ports;
+				for (Entry<String, Agree.Port> entry : ports.entrySet()) {
+					if (entry.getKey().equals(name)) {
+						return entry.getValue().dataContract;
+					}
+				}
+
 			}
 
 		} else if (expr instanceof TagExpr) {

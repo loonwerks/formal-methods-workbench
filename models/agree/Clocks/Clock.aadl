@@ -51,10 +51,10 @@ system implementation top_level.Impl
 		sieve_to_target : port sieve.Output -> target.Input {Communication_Properties::Timing => immediate;};
 	annex agree{**	
 		synchrony: asynchronous;
-		
+		assert sieve.Output = -1;
 		assert (counter._CLK);
 		assert (sieve._CLK);
-		assert (target._CLK = sieve._CLK and (not (sieve.Output = -1)));
+--		assert (target._CLK = sieve._CLK and (not (sieve.Output = -1)));
 		
 	**};
 	
