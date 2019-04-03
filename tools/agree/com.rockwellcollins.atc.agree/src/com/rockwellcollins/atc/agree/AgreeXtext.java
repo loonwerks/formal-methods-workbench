@@ -19,10 +19,10 @@ import org.osate.aadl2.ArraySize;
 import org.osate.aadl2.ArraySizeProperty;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
-import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EnumerationLiteral;
@@ -46,13 +46,13 @@ import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.rockwellcollins.atc.agree.Agree.ArrayContract;
+import com.rockwellcollins.atc.agree.Agree.Contract;
+import com.rockwellcollins.atc.agree.Agree.DataContract;
 import com.rockwellcollins.atc.agree.Agree.EnumContract;
-import com.rockwellcollins.atc.agree.Agree.Field;
 import com.rockwellcollins.atc.agree.Agree.Prim;
 import com.rockwellcollins.atc.agree.Agree.RangeIntContract;
 import com.rockwellcollins.atc.agree.Agree.RangeRealContract;
 import com.rockwellcollins.atc.agree.Agree.RecordContract;
-import com.rockwellcollins.atc.agree.Agree.Contract;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
@@ -149,13 +149,14 @@ public class AgreeXtext {
 			String size = ((ArrayType) t).getSize();
 			Contract baseTypeDef = toContractFromType(((ArrayType) t).getStem());
 
-			return new ArrayContract("", baseTypeDef, Integer.parseInt(size), new HashMap<String, Agree.ExprDef>(),
-					new ArrayList<Agree.XYZ>());
+			return new ArrayContract("", baseTypeDef, Integer.parseInt(size));
 
 		} else if (t instanceof DoubleDotRef) {
 			return toContractFromNamedElm(((DoubleDotRef) t).getElm());
+
 		} else {
 			return Prim.ErrorContract;
+
 		}
 
 	}
@@ -167,15 +168,14 @@ public class AgreeXtext {
 		} else if (ne instanceof RecordDef) {
 
 			EList<Arg> args = ((RecordDef) ne).getArgs();
-			Map<String, Agree.Field> fields = new HashMap<>();
+			Map<String, Agree.Contract> fields = new HashMap<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
 				Contract typeDef = toContractFromType(arg.getType());
-				fields.putIfAbsent(key, new Agree.Field(arg.getName(), typeDef, Optional.empty()));
+				fields.putIfAbsent(key, typeDef);
 			}
 
-			return new RecordContract(ne.getQualifiedName(), Agree.Topo.Data, fields, new HashMap<String, Agree.ExprDef>(),
-					new ArrayList<Agree.XYZ>(), ne);
+			return new RecordContract(ne.getQualifiedName(), fields, ne);
 
 		} else if (ne instanceof EnumStatement) {
 			String name = ne.getQualifiedName();
@@ -185,25 +185,21 @@ public class AgreeXtext {
 				String enumValue = name + "_" + nid.getName();
 				enumValues.add(enumValue);
 			}
-			return new EnumContract(name, enumValues, new HashMap<String, Agree.ExprDef>(),
-					new ArrayList<Agree.XYZ>());
+
+			return new EnumContract(name, enumValues);
 
 		} else if (ne instanceof Arg) {
 			return toContractFromType(((Arg) ne).getType());
 
 		} else {
 			return Prim.ErrorContract;
+
 		}
 	}
 
 
-	private static Map<String, Agree.ExprDef> extractExprDefMap(Classifier c) {
-		Map<String, Agree.ExprDef> result = new HashMap<String, Agree.ExprDef>();
-		return result;
-	}
-
-	private static List<Agree.XYZ> extractContractList(Classifier c) {
-		List<Agree.XYZ> result = new ArrayList<Agree.XYZ>();
+	private static List<Agree.Spec> extractContractList(Classifier c) {
+		List<Agree.Spec> result = new ArrayList<Agree.Spec>();
 		return result;
 	}
 
@@ -332,38 +328,28 @@ public class AgreeXtext {
 
 			if (prop_isArray && prop_arraySize > 0 && prop_arrayBaseType != null) {
 
-				return new ArrayContract(c.getQualifiedName(), prop_arrayBaseType, prop_arraySize, extractExprDefMap(c),
-						extractContractList(c));
+				return new ArrayContract(c.getQualifiedName(), prop_arrayBaseType, prop_arraySize);
 
 			} else if (prop_isEnum && prop_enumValues != null) {
 				String name = c.getQualifiedName();
-				return new EnumContract(name, prop_enumValues, extractExprDefMap(c), extractContractList(c));
+				return new EnumContract(name, prop_enumValues);
 
 			}
+		} else if (c instanceof DataImplementation) {
 
 		} else if (c instanceof ComponentClassifier) {
 
 
-			Agree.Topo topo = Agree.Topo.Data;
-			ComponentCategory cat = ((ComponentClassifier) c).getCategory();
-
-			if (cat.getValue() == ComponentCategory.SYSTEM_VALUE) {
-				topo = Agree.Topo.System;
-			}
-
-			Map<String, Agree.Field> fields = new HashMap<>();
-			Map<String, Agree.ExprDef> exprDefMap = new HashMap<String, Agree.ExprDef>();
-			List<Agree.XYZ> contractList = new ArrayList<Agree.XYZ>();
+			Map<String, Agree.Port> ports = new HashMap<>();
+			Map<String, Agree.NodeContract> subNodes = new HashMap<>();
+			List<Agree.Spec> contractList = new ArrayList<Agree.Spec>();
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
 
-				Map<String, Agree.ExprDef> localExprDefMap = extractExprDefMap(currClsfr);
-				for (Entry<String, Agree.ExprDef> entry : localExprDefMap.entrySet()) {
-					exprDefMap.putIfAbsent(entry.getKey(), entry.getValue());
-				}
 
-				List<Agree.XYZ> localContractList = extractContractList(currClsfr);
+
+				List<Agree.Spec> localContractList = extractContractList(currClsfr);
 				contractList.addAll(localContractList);
 
 				ComponentType ct = null;
@@ -376,20 +362,12 @@ public class AgreeXtext {
 
 							if (sub.getArrayDimensions().size() == 0) {
 								Contract typeDef = toContractFromClassifier(sub.getClassifier());
-								Agree.Field field = new Agree.Field(fieldName, typeDef,
-										Optional.empty());
-								fields.putIfAbsent(fieldName, field);
+								if (typeDef instanceof Agree.NodeContract) {
+									subNodes.putIfAbsent(fieldName, (Agree.NodeContract) typeDef);
+								}
+
 							} else if (sub.getArrayDimensions().size() == 1) {
-								ArrayDimension ad = sub.getArrayDimensions().get(0);
-								int size = Math.toIntExact(getArraySize(ad));
-
-								Contract stem = toContractFromClassifier(sub.getClassifier());
-								Contract typeDef = new ArrayContract("", stem, size, new HashMap<String, Agree.ExprDef>(),
-										new ArrayList<Agree.XYZ>());
-								Agree.Field field = new Agree.Field(fieldName, typeDef,
-										Optional.empty());
-								fields.putIfAbsent(fieldName, field);
-
+								throw new RuntimeException("Arrays may not be used in node subcomponent");
 							}
 						}
 					}
@@ -418,27 +396,21 @@ public class AgreeXtext {
 
 						if (direction != null) {
 
-							Agree.Port port = new Agree.Port(direction, isEvent);
 
 							if (feature.getClassifier() != null) {
 								if (feature.getArrayDimensions().size() == 0) {
 									Contract typeDef = toContractFromClassifier(feature.getClassifier());
-
-									Agree.Field field = new Agree.Field(fieldName, typeDef,
-											Optional.of(port));
-
-									fields.putIfAbsent(fieldName, field);
+									if (typeDef instanceof DataContract) {
+										Agree.Port port = new Agree.Port((DataContract) typeDef, direction, isEvent);
+										ports.putIfAbsent(fieldName, port);
+									}
 								} else if (feature.getArrayDimensions().size() == 1) {
 									ArrayDimension ad = feature.getArrayDimensions().get(0);
 									int size = Math.toIntExact(getArraySize(ad));
 									Contract stem = toContractFromClassifier(feature.getClassifier());
-									Contract typeDef = new ArrayContract("", stem, size, new HashMap<String, Agree.ExprDef>(),
-											new ArrayList<Agree.XYZ>());
-
-									Agree.Field field = new Agree.Field(fieldName, typeDef,
-											Optional.of(port));
-
-									fields.putIfAbsent(fieldName, field);
+									DataContract typeDef = new ArrayContract("", stem, size);
+									Agree.Port port = new Agree.Port(typeDef, direction, isEvent);
+									ports.putIfAbsent(fieldName, port);
 
 								}
 							}
@@ -461,10 +433,12 @@ public class AgreeXtext {
 							for (Arg arg : args) {
 								String fieldName = arg.getName();
 								Contract typeDef = toContractFromNamedElm(arg);
-								Agree.Field field = new Agree.Field(fieldName, typeDef,
-										Optional.empty());
 
-								fields.putIfAbsent(fieldName, field);
+								if (typeDef instanceof DataContract) {
+									Agree.Port port = new Agree.Port((DataContract) typeDef, Agree.Direc.Out, false);
+									ports.putIfAbsent(fieldName, port);
+								}
+
 							}
 						}
 
@@ -476,7 +450,7 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new RecordContract(name, topo, fields, exprDefMap, contractList, c);
+			return new Agree.NodeContract(name, ports, subNodes, contractList, c);
 
 		}
 
@@ -499,8 +473,7 @@ public class AgreeXtext {
 				String enumValue = name + "_" + nid.getName();
 				enumValues.add(enumValue);
 			}
-			return new EnumContract(name, enumValues, new HashMap<String, Agree.ExprDef>(),
-					new ArrayList<Agree.XYZ>());
+			return new EnumContract(name, enumValues);
 
 		} else if (ne instanceof NamedID) {
 
@@ -559,8 +532,7 @@ public class AgreeXtext {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
 				long size = getArraySize(dims.get(0));
-				return new ArrayContract("", clsTypeDef, Math.toIntExact(size), new HashMap<String, Agree.ExprDef>(),
-						new ArrayList<Agree.XYZ>());
+				return new ArrayContract("", clsTypeDef, Math.toIntExact(size));
 			}
 
 		} else if (ne instanceof Feature) {
@@ -572,8 +544,7 @@ public class AgreeXtext {
 				return clsTypeDef;
 			} else if (dims.size() == 1) {
 				long size = getArraySize(dims.get(0));
-				return new ArrayContract("", clsTypeDef, Math.toIntExact(size), new HashMap<String, Agree.ExprDef>(),
-						new ArrayList<Agree.XYZ>());
+				return new ArrayContract("", clsTypeDef, Math.toIntExact(size));
 
 			}
 
@@ -669,10 +640,10 @@ public class AgreeXtext {
 			String name = ((SelectionExpr) expr).getField().getName();
 
 			if (targetType instanceof Agree.RecordContract) {
-				Map<String, Agree.Field> fields = ((Agree.RecordContract) targetType).fields;
-				for (Entry<String, Field> entry : fields.entrySet()) {
+				Map<String, Agree.Contract> fields = ((Agree.RecordContract) targetType).fields;
+				for (Entry<String, Agree.Contract> entry : fields.entrySet()) {
 					if (entry.getKey().equals(name)) {
-						return entry.getValue().contract;
+						return entry.getValue();
 					}
 				}
 
@@ -703,8 +674,7 @@ public class AgreeXtext {
 			Contract arrType = inferContract(((IndicesExpr) expr).getArray());
 			if (arrType instanceof ArrayContract) {
 				int size = ((ArrayContract) arrType).size;
-				return new ArrayContract("", Prim.IntContract, size, new HashMap<String, Agree.ExprDef>(),
-						new ArrayList<Agree.XYZ>());
+				return new ArrayContract("", Prim.IntContract, size);
 			}
 
 		} else if (expr instanceof ForallExpr) {
@@ -721,8 +691,7 @@ public class AgreeXtext {
 
 				if (arrType instanceof ArrayContract) {
 					int size = ((ArrayContract) arrType).size;
-					return new ArrayContract("", stemType, size, new HashMap<String, Agree.ExprDef>(),
-							new ArrayList<Agree.XYZ>());
+					return new ArrayContract("", stemType, size);
 				}
 			}
 
@@ -869,8 +838,7 @@ public class AgreeXtext {
 			int size = elems.size();
 			Contract firstType = inferContract(first);
 
-			return new ArrayContract("", firstType, size, new HashMap<String, Agree.ExprDef>(),
-					new ArrayList<Agree.XYZ>());
+			return new ArrayContract("", firstType, size);
 
 		} else if (expr instanceof ArrayUpdateExpr) {
 			return inferContract(((ArrayUpdateExpr) expr).getArray());

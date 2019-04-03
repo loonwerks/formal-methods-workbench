@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
 
@@ -59,14 +58,14 @@ public class Agree {
 		Assume, Guarantee, Lemma, Assert
 	}
 
-	public class XYZ {
+	public class Spec {
 
 		public final SpecTag specTag;
 		public final String name;
 		public final String description;
 		public final Prop prop;
 
-		public XYZ(SpecTag specTag, String name, String description, Prop prop) {
+		public Spec(SpecTag specTag, String name, String description, Prop prop) {
 			this.specTag = specTag;
 			this.name = name;
 			this.description = description;
@@ -117,11 +116,6 @@ public class Agree {
 
 	}
 
-	public static interface ExprDef {
-		public String getName();
-
-	}
-
 	// inline: ConstStatement
 
 
@@ -151,8 +145,12 @@ public class Agree {
 
 	}
 
+	public static interface DataContract extends Contract {
 
-	public static enum Prim implements Contract {
+	}
+
+
+	public static enum Prim implements DataContract {
 		IntContract("int", NamedType.INT), RealContract("real", NamedType.REAL), BoolContract("bool",
 				NamedType.BOOL), ErrorContract("<error>", null);
 
@@ -182,7 +180,7 @@ public class Agree {
 
 	}
 
-	public static class RangeIntContract implements Contract {
+	public static class RangeIntContract implements DataContract {
 		public final String name;
 		public final long low;
 		public final long high;
@@ -210,7 +208,7 @@ public class Agree {
 
 	}
 
-	public static class RangeRealContract implements Contract {
+	public static class RangeRealContract implements DataContract {
 		public final String name;
 		public final double low;
 		public final double high;
@@ -242,17 +240,10 @@ public class Agree {
 		public final List<String> values;
 
 
-		public final Map<String, ExprDef> exprDefMap;
-		public final List<XYZ> contractList;
-
-		public EnumContract(String name, List<String> values, Map<String, ExprDef> exprDefMap,
-				List<XYZ> contractList) {
+		public EnumContract(String name, List<String> values) {
 			this.name = name;
 			this.values = new ArrayList<>();
 			this.values.addAll(values);
-
-			this.exprDefMap = exprDefMap;
-			this.contractList = contractList;
 		}
 
 		@Override
@@ -280,35 +271,23 @@ public class Agree {
 
 	}
 
-	public static enum Topo {
-		System, Data
-	}
-
 	public static enum Direc {
 		In, Out
 	}
 
 
-	public static class RecordContract implements Contract {
+	public static class RecordContract implements DataContract {
 
 		private final String name;
-		public final Topo topo;
-		public final Map<String, Field> fields;
-
-		public final Map<String, ExprDef> exprDefMap;
-		public final List<XYZ> contractList;
+		public final Map<String, Contract> fields;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-		public RecordContract(String name, Topo topo, Map<String, Field> fields, Map<String, ExprDef> exprDefMap,
-				List<XYZ> contractList, NamedElement namedElement) {
+		public RecordContract(String name, Map<String, Contract> fields, NamedElement namedElement) {
 			this.name = name;
-			this.topo = topo;
 			this.fields = new HashMap<>();
 			this.fields.putAll(fields);
-			this.exprDefMap = exprDefMap;
-			this.contractList = contractList;
 
 			this.namedElement = namedElement;
 
@@ -324,9 +303,9 @@ public class Agree {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
-			for (Entry<String, Field> entry : fields.entrySet()) {
+			for (Entry<String, Contract> entry : fields.entrySet()) {
 				String key = entry.getKey();
-				jkind.lustre.Type lt = entry.getValue().contract.getLustreType();
+				jkind.lustre.Type lt = entry.getValue().getLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}
@@ -342,22 +321,17 @@ public class Agree {
 
 	}
 
-	public static class ArrayContract implements Contract {
+
+	public static class ArrayContract implements DataContract {
 
 		private final String name;
 		public final Contract stemContract;
 		public final int size;
 
-		public final Map<String, ExprDef> exprDefMap;
-		public final List<XYZ> contractList;
-
-		public ArrayContract(String name, Contract stemContract, int size, Map<String, ExprDef> exprDefMap,
-				List<XYZ> contractList) {
+		public ArrayContract(String name, Contract stemContract, int size) {
 			this.name = name;
 			this.size = size;
 			this.stemContract = stemContract;
-			this.exprDefMap = exprDefMap;
-			this.contractList = contractList;
 		}
 
 		@Override
@@ -390,27 +364,68 @@ public class Agree {
 	}
 
 	public static class Port {
+		public final DataContract dataContract;
 		public final Direc direction;
 		public final boolean isEvent;
 
-		public Port(Direc direction, boolean isEvent) {
+		public Port(DataContract dataContract, Direc direction, boolean isEvent) {
+			this.dataContract = dataContract;
 			this.direction = direction;
 			this.isEvent = isEvent;
 		}
+
 	}
 
-	public static class Field {
-		public final String name;
-		public final Contract contract;
-		public final Optional<Port> portOption;
+	public static class NodeContract implements Contract {
 
-		public Field(String name, Contract contract, Optional<Port> portOption) {
+		private final String name;
+		public final Map<String, Port> ports;
+		public final Map<String, NodeContract> subNodes;
+		public final List<Spec> specList;
+
+		/* reference to Xtext elm for gui update */
+		public final NamedElement namedElement;
+
+		public NodeContract(String name, Map<String, Port> ports, Map<String, NodeContract> subNodes,
+				List<Spec> specList, NamedElement namedElement) {
 			this.name = name;
-			this.contract = contract;
-			this.portOption = portOption;
+			this.ports = new HashMap<>();
+			this.ports.putAll(ports);
+			this.subNodes = new HashMap<>();
+			this.subNodes.putAll(subNodes);
+			this.specList = specList;
+			this.namedElement = namedElement;
+
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public jkind.lustre.Type getLustreType() {
+			String lustreName = name.replace("::", "__").replace(".", "__");
+
+			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
+			for (Entry<String, Port> entry : ports.entrySet()) {
+				String key = entry.getKey();
+				jkind.lustre.Type lt = entry.getValue().dataContract.getLustreType();
+				if (lt != null) {
+					lustreFields.put(key, lt);
+				}
+			}
+			jkind.lustre.RecordType lustreRecType = new jkind.lustre.RecordType(lustreName, lustreFields);
+			return lustreRecType;
+		}
+
+		@Override
+		public boolean staticEquals(Contract other) {
+			return this.getName().equals(other.getName());
 		}
 
 	}
+
 
 	public static boolean staticEqual(Contract t1, Contract t2) {
 		return t1.staticEquals(t2);

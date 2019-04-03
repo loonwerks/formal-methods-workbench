@@ -57,7 +57,6 @@ import org.osate.annexsupport.AnnexUtil;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
 import com.rockwellcollins.atc.agree.Agree;
-import com.rockwellcollins.atc.agree.Agree.Field;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -1260,10 +1259,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			}
 
 		} else if (typeDef instanceof Agree.RecordContract) {
-			Map<String, Agree.Field> fields = ((Agree.RecordContract) typeDef).fields;
-			for (Entry<String, Field> entry : fields.entrySet()) {
+			Map<String, Agree.Contract> fields = ((Agree.RecordContract) typeDef).fields;
+			for (Entry<String, Agree.Contract> entry : fields.entrySet()) {
 				String childName = name + "." + entry.getKey();
-				Agree.Contract childType = entry.getValue().contract;
+				Agree.Contract childType = entry.getValue();
 				constraints.addAll(getConstraintsFromTypeDef(childName, childType));
 			}
 
