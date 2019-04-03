@@ -1,0 +1,83 @@
+---------------------
+-- The top_level system looks like this:
+--
+--  A --request--> B
+--  |              | 
+--   <---response--
+--
+-- There is co-dependence, but it is "reasonable." 
+-- See the comments before the assumption in system B
+---------------------
+
+package CoDependentBlocks
+public
+	with Base_Types;
+	
+	annex agree{**
+		const GOLDEN_ID : int = 2; 
+	**};
+		
+	data Message		
+	end Message;
+	
+	data implementation Message.impl
+		subcomponents
+			ID : data Base_Types::Integer;
+			msg_details : data Base_Types::Integer;
+	end Message.impl;
+	
+	system A
+		features
+			Response_in : in data port Message.impl;
+			Request_out : out data port Message.impl;	
+		annex agree {**
+--			assume "After the initial timestep, Response Message ID equals GOLDEN_ID":
+--				true -> (Response_in.ID = GOLDEN_ID);
+
+			guarantee "Request Message ID equals GOLDEN_ID":
+				Request_out.ID = GOLDEN_ID;
+
+		**};
+	end A;
+	
+	system B
+		features
+			Request_in : in data port Message.impl;
+			Response_out : out data port Message.impl;	
+		annex agree {**
+-- If the following assumption is uncommented, all guarantees (except the placeholder at the top-level) become false.
+-- However, as the system is designed and by the lemmas proven at the top-level, we know this assumption is true.
+-- There is similar behavior with the assumption on A. We can have one but not both. 			
+			assume "Request Message ID equals GOLDEN_ID":
+				Request_in.ID = GOLDEN_ID;
+				
+			guarantee "Response Message ID equals the previous Request Message ID":
+				Response_out.ID = prev(Request_in.ID, 0);
+		**};
+	end B;
+	
+	system top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to get AGREE to run": true;
+		**};
+	end top_level;
+	
+	system implementation top_level.impl
+		subcomponents
+			A : system A;
+			B : system B;
+		connections
+			A_to_B : port A.Request_out -> B.Request_in;
+			B_to_A : port B.Response_out -> A.Response_in;
+		annex agree{**
+			lemma "The ID in A's request is always GOLDEN_ID":
+				(A.Request_out.ID = GOLDEN_ID)
+				and (B.Request_in.ID = GOLDEN_ID);
+				
+			lemma "After the first timestep, the ID in B's response is always GOLDEN_ID":
+				true -> ((B.Response_out.ID = GOLDEN_ID)
+						and (A.Response_in.ID = GOLDEN_ID));
+		**};
+	end top_level.impl;
+	
+end CoDependentBlocks;
