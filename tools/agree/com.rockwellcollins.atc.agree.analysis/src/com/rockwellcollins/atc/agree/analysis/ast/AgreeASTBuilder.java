@@ -400,7 +400,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		builder.addInput(inputs);
 		builder.addOutput(outputs);
 		builder.addLocal(locals);
-		builder.addLocalEquation(localEquations);
+//		builder.addLocalEquation(localEquations);
 		builder.addConnection(connections);
 		builder.addSubNode(subNodes);
 

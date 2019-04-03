@@ -116,25 +116,6 @@ public class Agree {
 
 	}
 
-	// inline: ConstStatement
-
-
-	// global types: Classifier, ArrayType, PrimType, EnumStatement, RecordDef
-
-	// global node contracts: ComponentClassifier
-
-	// global simple nodes: NodeDef, FnDef, LinearizationDef
-
-	// local assertions: AssertionStatement, AssignStatement, PropertyStatement, EqStatement
-	// local assumptions: AssumeStatement, InputStatement
-	// local guarantees: GuaranteeStatement, EqStatement
-	// local lemmas: LemmaStatement
-	// local input vars: InputStatement
-	// local output vars: PropertyStatement, EqStatement
-
-
-	// not implemented: LibraryFnDef
-
 	public static interface Contract {
 
 		public String getName();
@@ -440,6 +421,23 @@ public class Agree {
 			this.contractMap = contractMap;
 		}
 	}
+
+	// inline: ConstStatement
+
+	// global contracts: Classifier, ArrayType, PrimType, EnumStatement, RecordDef, ComponentClassifier
+
+	// global simple nodes: NodeDef, FnDef, LinearizationDef / or should these be contracts?
+
+	// local assertions: AssertionStatement, AssignStatement, PropertyStatement, EqStatement
+	// local assumptions: AssumeStatement, InputStatement
+	// local guarantees: GuaranteeStatement, EqStatement
+	// local lemmas: LemmaStatement
+	// local input ports: Feature, InputStatement
+	// local output ports: Feature, PropertyStatement, EqStatement
+	// local subNodes: Subcomponent
+	// local connections: ConnectedElement, ConnectionStatement
+
+	// not implemented: LibraryFnDef
 
 
 
