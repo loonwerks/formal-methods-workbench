@@ -140,13 +140,13 @@ public interface AgreeFactory extends EFactory
   Abstraction createAbstraction();
 
   /**
-   * Returns a new object of class '<em>Property Statement</em>'.
+   * Returns a new object of class '<em>Bool Output Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>Property Statement</em>'.
+   * @return a new object of class '<em>Bool Output Statement</em>'.
    * @generated
    */
-  PropertyStatement createPropertyStatement();
+  BoolOutputStatement createBoolOutputStatement();
 
   /**
    * Returns a new object of class '<em>Const Statement</em>'.
@@ -158,13 +158,13 @@ public interface AgreeFactory extends EFactory
   ConstStatement createConstStatement();
 
   /**
-   * Returns a new object of class '<em>Eq Statement</em>'.
+   * Returns a new object of class '<em>Output Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>Eq Statement</em>'.
+   * @return a new object of class '<em>Output Statement</em>'.
    * @generated
    */
-  EqStatement createEqStatement();
+  OutputStatement createOutputStatement();
 
   /**
    * Returns a new object of class '<em>Input Statement</em>'.
@@ -176,13 +176,13 @@ public interface AgreeFactory extends EFactory
   InputStatement createInputStatement();
 
   /**
-   * Returns a new object of class '<em>Assign Statement</em>'.
+   * Returns a new object of class '<em>Assert Equal Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>Assign Statement</em>'.
+   * @return a new object of class '<em>Assert Equal Statement</em>'.
    * @generated
    */
-  AssignStatement createAssignStatement();
+  AssertEqualStatement createAssertEqualStatement();
 
   /**
    * Returns a new object of class '<em>Fn Def</em>'.

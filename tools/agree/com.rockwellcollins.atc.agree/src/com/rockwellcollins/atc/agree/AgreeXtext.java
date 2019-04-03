@@ -69,7 +69,7 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -93,7 +93,7 @@ import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
@@ -433,9 +433,9 @@ public class AgreeXtext {
 						if (feature instanceof Port) {
 							int v = ((Port) feature).getDirection().getValue();
 							if (v == DirectionType.IN_VALUE) {
-								direction = Agree.Direc.In;
+								direction = new Agree.In();
 							} else if (v == DirectionType.OUT_VALUE) {
-								direction = Agree.Direc.Out;
+								direction = new Agree.Out(Optional.empty());
 							}
 						}
 
@@ -471,8 +471,8 @@ public class AgreeXtext {
 						for (SpecStatement spec : contract.getSpecs()) {
 
 							List<Arg> args = new ArrayList<>();
-							if (spec instanceof EqStatement) {
-								args = ((EqStatement) spec).getLhs();
+							if (spec instanceof OutputStatement) {
+								args = ((OutputStatement) spec).getLhs();
 							} else if (spec instanceof InputStatement) {
 								args = ((InputStatement) spec).getLhs();
 							}
@@ -482,7 +482,8 @@ public class AgreeXtext {
 								Contract typeDef = toContractFromNamedElm(arg);
 
 								if (typeDef instanceof DataContract) {
-									Agree.Port port = new Agree.Port((DataContract) typeDef, Agree.Direc.Out, false);
+									Agree.Port port = new Agree.Port((DataContract) typeDef,
+											new Agree.Out(Optional.empty()), false);
 									ports.putIfAbsent(fieldName, port);
 								}
 
@@ -507,8 +508,8 @@ public class AgreeXtext {
 
 	public static Contract inferContractFromNamedElement(NamedElement ne) {
 
-		if (ne instanceof PropertyStatement) {
-			return inferContract(((PropertyStatement) ne).getExpr());
+		if (ne instanceof BoolOutputStatement) {
+			return inferContract(((BoolOutputStatement) ne).getExpr());
 
 		} else if (ne instanceof NamedID && ne.eContainer() instanceof EnumStatement) {
 
@@ -965,14 +966,14 @@ public class AgreeXtext {
 		return Optional.empty();
 	}
 
-	public static Map<String, Agree.Contract> extractSpecMap(Classifier c) {
+	public static Map<String, Agree.Contract> extractContractMap(Classifier c) {
 		Map<String, Agree.Contract> result = new HashMap<String, Agree.Contract>();
 		return result;
 	}
 
 	public static Agree.Program toProgram(ComponentImplementation ci) {
 		Contract main = toContractFromClassifier(ci);
-		Map<String, Agree.Contract> specMap = extractSpecMap(ci);
+		Map<String, Agree.Contract> specMap = extractContractMap(ci);
 		return new Agree.Program(main, specMap);
 	}
 

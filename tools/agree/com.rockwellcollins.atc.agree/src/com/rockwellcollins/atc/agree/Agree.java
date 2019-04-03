@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
 
@@ -252,9 +253,25 @@ public class Agree {
 
 	}
 
-	public static enum Direc {
-		In, Out
+	public static interface Direc {
 	}
+
+	public static class In implements Direc {
+
+		public In() {
+
+		}
+
+	}
+
+	public static class Out implements Direc {
+		public final Optional<Expr> exprOp;
+
+		public Out(Optional<Expr> exprOp) {
+			this.exprOp = exprOp;
+		}
+	}
+
 
 
 	public static class RecordContract implements DataContract {
@@ -428,12 +445,12 @@ public class Agree {
 
 	// global simple nodes: NodeDef, FnDef, LinearizationDef / or should these be contracts?
 
-	// local assertions: AssertionStatement, AssignStatement, PropertyStatement, EqStatement
-	// local assumptions: AssumeStatement, InputStatement
-	// local guarantees: GuaranteeStatement, EqStatement
+	// local assertions: AssertionStatement, AssertEqualStatement,
+	// local assumptions: AssumeStatement
+	// local guarantees: GuaranteeStatement
 	// local lemmas: LemmaStatement
 	// local input ports: Feature, InputStatement
-	// local output ports: Feature, PropertyStatement, EqStatement
+	// local output ports: Feature, BoolOutputStatement, OutputStatement
 	// local subNodes: Subcomponent
 	// local connections: ConnectedElement, ConnectionStatement
 

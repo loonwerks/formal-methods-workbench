@@ -3,12 +3,12 @@ package edu.uah.rsesc.agree.ge.ui.properties;
 import org.eclipse.jface.viewers.IFilter;
 import org.osate.ge.ui.properties.PropertySectionUtil;
 
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 
-import edu.uah.rsesc.agree.ge.businessObjectHandlers.PropertyStatementHandler;
+import edu.uah.rsesc.agree.ge.businessObjectHandlers.BoolOutputStatementHandler;
 
 public class PropertiesPropertySection extends GenericPropertySection {
-	final PropertyStatementHandler handler = new PropertyStatementHandler();
+	final BoolOutputStatementHandler handler = new BoolOutputStatementHandler();
 
 	public static class Filter implements IFilter {
 		@Override
@@ -25,12 +25,12 @@ public class PropertiesPropertySection extends GenericPropertySection {
 
 	@Override
 	protected String getName(final Object element) {
-		return handler.getName((PropertyStatement) element);
+		return handler.getName((BoolOutputStatement) element);
 	}
 
 	@Override
 	protected Object[] getSpecStatements() {
-		return getSpecStatements(AgreePropertySectionUtil::asComponentClassifier, PropertyStatement.class);
+		return getSpecStatements(AgreePropertySectionUtil::asComponentClassifier, BoolOutputStatement.class);
 	}
 
 }

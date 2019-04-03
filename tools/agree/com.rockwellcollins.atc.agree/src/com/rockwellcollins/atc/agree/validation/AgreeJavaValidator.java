@@ -50,11 +50,11 @@ import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.google.common.collect.HashMultimap;
-import com.rockwellcollins.atc.agree.AgreeAADLEnumerationUtils;
 import com.rockwellcollins.atc.agree.Agree;
 import com.rockwellcollins.atc.agree.Agree.ArrayContract;
-import com.rockwellcollins.atc.agree.Agree.RecordContract;
 import com.rockwellcollins.atc.agree.Agree.Contract;
+import com.rockwellcollins.atc.agree.Agree.RecordContract;
+import com.rockwellcollins.atc.agree.AgreeAADLEnumerationUtils;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.Abstraction;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
@@ -66,21 +66,20 @@ import com.rockwellcollins.atc.agree.agree.Arg;
 import com.rockwellcollins.atc.agree.agree.ArrayLiteralExpr;
 import com.rockwellcollins.atc.agree.agree.ArraySubExpr;
 import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.AssertStatement;
-import com.rockwellcollins.atc.agree.agree.AssignStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
-import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.FloorCast;
@@ -99,6 +98,7 @@ import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
+import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NamedID;
 import com.rockwellcollins.atc.agree.agree.NamedSpecStatement;
@@ -108,11 +108,11 @@ import com.rockwellcollins.atc.agree.agree.NodeEq;
 import com.rockwellcollins.atc.agree.agree.NodeLemma;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.OrderStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.PeriodicStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
 import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
@@ -281,7 +281,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	@Check(CheckType.FAST)
-	public void checkAssign(AssignStatement assign) {
+	public void checkAssign(AssertEqualStatement assign) {
 
 		if (!(assign.getId() instanceof NamedElement)) {
 			error(assign.getId(),
@@ -313,7 +313,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			List<EObject> assignableElements = new ArrayList<>();
 			List<AgreeContract> implContracts = EcoreUtil2.getAllContentsOfType(compImpl, AgreeContract.class);
 			for (AgreeContract ac : implContracts) {
-				assignableElements.addAll(EcoreUtil2.getAllContentsOfType(ac, EqStatement.class).stream()
+				assignableElements.addAll(EcoreUtil2.getAllContentsOfType(ac, OutputStatement.class).stream()
 						.map(eq -> eq.getLhs()).flatMap(List::stream).collect(Collectors.toList()));
 			}
 
@@ -321,7 +321,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			if (compType != null) {
 				List<AgreeContract> typeContracts = EcoreUtil2.getAllContentsOfType(compType, AgreeContract.class);
 				for (AgreeContract ac : typeContracts) {
-					assignableElements.addAll(EcoreUtil2.getAllContentsOfType(ac, EqStatement.class).stream()
+					assignableElements.addAll(EcoreUtil2.getAllContentsOfType(ac, OutputStatement.class).stream()
 							.map(eq -> eq.getLhs()).flatMap(List::stream).collect(Collectors.toList()));
 				}
 			}
@@ -332,7 +332,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 					.collect(Collectors.toList()));
 			if (!assignableElements.contains(namedEl)) {
 				error("LHS of assignment must be an AGREE 'eq' variable or an output port of this component", assign,
-						AgreePackage.Literals.ASSIGN_STATEMENT__ID);
+						AgreePackage.Literals.ASSERT_EQUAL_STATEMENT__ID);
 			}
 		}
 
@@ -347,8 +347,8 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		AgreeContract contract = EcoreUtil2.getContainerOfType(assign, AgreeContract.class);
 		if (contract != null) {
 			for (SpecStatement spec : contract.getSpecs()) {
-				if (spec instanceof AssignStatement && spec != assign) {
-					NamedElement otherEl = ((AssignStatement) spec).getId();
+				if (spec instanceof AssertEqualStatement && spec != assign) {
+					NamedElement otherEl = ((AssertEqualStatement) spec).getId();
 					if (otherEl.equals(namedEl)) {
 						error(spec, "Mulitiple assignments to variable '" + namedEl.getName() + "'");
 						error(assign, "Mulitiple assignments to variable '" + namedEl.getName() + "'");
@@ -372,7 +372,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 				// this is a ranged argument. It can show up only in an equation statement
 				EObject container = arg.eContainer();
-				if (!(container instanceof EqStatement || container instanceof InputStatement)) {
+				if (!(container instanceof OutputStatement || container instanceof InputStatement)) {
 					error(arg, "Ranged arguments can appear only in equation statements or agree_input statements");
 				}
 
@@ -1215,7 +1215,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	@Check(CheckType.FAST)
-	public void checkPropertyStatement(PropertyStatement propStat) {
+	public void checkPropertyStatement(BoolOutputStatement propStat) {
 		AnnexLibrary library = EcoreUtil2.getContainerOfType(propStat, AnnexLibrary.class);
 		if (library != null) {
 			error(propStat, "Property statments are allowed only in component annexes");
@@ -1901,7 +1901,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	@Check(CheckType.FAST)
-	public void checkEqStatement(EqStatement eqStat) {
+	public void checkEqStatement(OutputStatement eqStat) {
 		AnnexLibrary library = EcoreUtil2.getContainerOfType(eqStat, AnnexLibrary.class);
 		if (library != null) {
 			error(eqStat, "Equation statments are allowed only in component annexes");

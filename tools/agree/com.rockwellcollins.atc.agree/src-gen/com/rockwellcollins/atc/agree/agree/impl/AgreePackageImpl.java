@@ -16,12 +16,13 @@ import com.rockwellcollins.atc.agree.agree.ArrayLiteralExpr;
 import com.rockwellcollins.atc.agree.agree.ArraySubExpr;
 import com.rockwellcollins.atc.agree.agree.ArrayType;
 import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.AssertStatement;
-import com.rockwellcollins.atc.agree.agree.AssignStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ClosedTimeInterval;
@@ -32,7 +33,6 @@ import com.rockwellcollins.atc.agree.agree.Contract;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -69,13 +69,13 @@ import com.rockwellcollins.atc.agree.agree.OpenLeftTimeInterval;
 import com.rockwellcollins.atc.agree.agree.OpenRightTimeInterval;
 import com.rockwellcollins.atc.agree.agree.OpenTimeInterval;
 import com.rockwellcollins.atc.agree.agree.OrderStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.ParamStatement;
 import com.rockwellcollins.atc.agree.agree.PatternStatement;
 import com.rockwellcollins.atc.agree.agree.PeriodicStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
 import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RealTimeStatement;
@@ -218,7 +218,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass propertyStatementEClass = null;
+  private EClass boolOutputStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -232,7 +232,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass eqStatementEClass = null;
+  private EClass outputStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -246,7 +246,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass assignStatementEClass = null;
+  private EClass assertEqualStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -1218,9 +1218,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EClass getPropertyStatement()
+  public EClass getBoolOutputStatement()
   {
-    return propertyStatementEClass;
+    return boolOutputStatementEClass;
   }
 
   /**
@@ -1229,9 +1229,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getPropertyStatement_Expr()
+  public EReference getBoolOutputStatement_Expr()
   {
-    return (EReference)propertyStatementEClass.getEStructuralFeatures().get(0);
+    return (EReference)boolOutputStatementEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -1273,9 +1273,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EClass getEqStatement()
+  public EClass getOutputStatement()
   {
-    return eqStatementEClass;
+    return outputStatementEClass;
   }
 
   /**
@@ -1284,9 +1284,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getEqStatement_Lhs()
+  public EReference getOutputStatement_Lhs()
   {
-    return (EReference)eqStatementEClass.getEStructuralFeatures().get(0);
+    return (EReference)outputStatementEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -1295,9 +1295,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getEqStatement_Expr()
+  public EReference getOutputStatement_Expr()
   {
-    return (EReference)eqStatementEClass.getEStructuralFeatures().get(1);
+    return (EReference)outputStatementEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -1328,9 +1328,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EClass getAssignStatement()
+  public EClass getAssertEqualStatement()
   {
-    return assignStatementEClass;
+    return assertEqualStatementEClass;
   }
 
   /**
@@ -1339,9 +1339,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getAssignStatement_Id()
+  public EReference getAssertEqualStatement_Id()
   {
-    return (EReference)assignStatementEClass.getEStructuralFeatures().get(0);
+    return (EReference)assertEqualStatementEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -1350,9 +1350,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getAssignStatement_Expr()
+  public EReference getAssertEqualStatement_Expr()
   {
-    return (EReference)assignStatementEClass.getEStructuralFeatures().get(1);
+    return (EReference)assertEqualStatementEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -3640,23 +3640,23 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
 
     abstractionEClass = createEClass(ABSTRACTION);
 
-    propertyStatementEClass = createEClass(PROPERTY_STATEMENT);
-    createEReference(propertyStatementEClass, PROPERTY_STATEMENT__EXPR);
+    boolOutputStatementEClass = createEClass(BOOL_OUTPUT_STATEMENT);
+    createEReference(boolOutputStatementEClass, BOOL_OUTPUT_STATEMENT__EXPR);
 
     constStatementEClass = createEClass(CONST_STATEMENT);
     createEReference(constStatementEClass, CONST_STATEMENT__TYPE);
     createEReference(constStatementEClass, CONST_STATEMENT__EXPR);
 
-    eqStatementEClass = createEClass(EQ_STATEMENT);
-    createEReference(eqStatementEClass, EQ_STATEMENT__LHS);
-    createEReference(eqStatementEClass, EQ_STATEMENT__EXPR);
+    outputStatementEClass = createEClass(OUTPUT_STATEMENT);
+    createEReference(outputStatementEClass, OUTPUT_STATEMENT__LHS);
+    createEReference(outputStatementEClass, OUTPUT_STATEMENT__EXPR);
 
     inputStatementEClass = createEClass(INPUT_STATEMENT);
     createEReference(inputStatementEClass, INPUT_STATEMENT__LHS);
 
-    assignStatementEClass = createEClass(ASSIGN_STATEMENT);
-    createEReference(assignStatementEClass, ASSIGN_STATEMENT__ID);
-    createEReference(assignStatementEClass, ASSIGN_STATEMENT__EXPR);
+    assertEqualStatementEClass = createEClass(ASSERT_EQUAL_STATEMENT);
+    createEReference(assertEqualStatementEClass, ASSERT_EQUAL_STATEMENT__ID);
+    createEReference(assertEqualStatementEClass, ASSERT_EQUAL_STATEMENT__EXPR);
 
     fnDefEClass = createEClass(FN_DEF);
     createEReference(fnDefEClass, FN_DEF__ARGS);
@@ -3986,15 +3986,15 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     synchStatementEClass.getESuperTypes().add(this.getSpecStatement());
     orderStatementEClass.getESuperTypes().add(this.getSpecStatement());
     abstractionEClass.getESuperTypes().add(theAadl2Package.getNamedElement());
-    propertyStatementEClass.getESuperTypes().add(theAadl2Package.getNamedElement());
-    propertyStatementEClass.getESuperTypes().add(this.getSpecStatement());
+    boolOutputStatementEClass.getESuperTypes().add(theAadl2Package.getNamedElement());
+    boolOutputStatementEClass.getESuperTypes().add(this.getSpecStatement());
     constStatementEClass.getESuperTypes().add(theAadl2Package.getNamedElement());
     constStatementEClass.getESuperTypes().add(this.getSpecStatement());
-    eqStatementEClass.getESuperTypes().add(theAadl2Package.getElement());
-    eqStatementEClass.getESuperTypes().add(this.getSpecStatement());
+    outputStatementEClass.getESuperTypes().add(theAadl2Package.getElement());
+    outputStatementEClass.getESuperTypes().add(this.getSpecStatement());
     inputStatementEClass.getESuperTypes().add(theAadl2Package.getElement());
     inputStatementEClass.getESuperTypes().add(this.getSpecStatement());
-    assignStatementEClass.getESuperTypes().add(this.getSpecStatement());
+    assertEqualStatementEClass.getESuperTypes().add(this.getSpecStatement());
     fnDefEClass.getESuperTypes().add(theAadl2Package.getNamedElement());
     fnDefEClass.getESuperTypes().add(this.getSpecStatement());
     fnDefEClass.getESuperTypes().add(this.getAbstraction());
@@ -4131,23 +4131,23 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
 
     initEClass(abstractionEClass, Abstraction.class, "Abstraction", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-    initEClass(propertyStatementEClass, PropertyStatement.class, "PropertyStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getPropertyStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, PropertyStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEClass(boolOutputStatementEClass, BoolOutputStatement.class, "BoolOutputStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getBoolOutputStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, BoolOutputStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(constStatementEClass, ConstStatement.class, "ConstStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getConstStatement_Type(), this.getType(), null, "type", null, 0, 1, ConstStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getConstStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, ConstStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(eqStatementEClass, EqStatement.class, "EqStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getEqStatement_Lhs(), this.getArg(), null, "lhs", null, 0, -1, EqStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getEqStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, EqStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEClass(outputStatementEClass, OutputStatement.class, "OutputStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getOutputStatement_Lhs(), this.getArg(), null, "lhs", null, 0, -1, OutputStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getOutputStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, OutputStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(inputStatementEClass, InputStatement.class, "InputStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getInputStatement_Lhs(), this.getArg(), null, "lhs", null, 0, -1, InputStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(assignStatementEClass, AssignStatement.class, "AssignStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getAssignStatement_Id(), theAadl2Package.getNamedElement(), null, "id", null, 0, 1, AssignStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getAssignStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, AssignStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEClass(assertEqualStatementEClass, AssertEqualStatement.class, "AssertEqualStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getAssertEqualStatement_Id(), theAadl2Package.getNamedElement(), null, "id", null, 0, 1, AssertEqualStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getAssertEqualStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, AssertEqualStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(fnDefEClass, FnDef.class, "FnDef", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getFnDef_Args(), this.getArg(), null, "args", null, 0, -1, FnDef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

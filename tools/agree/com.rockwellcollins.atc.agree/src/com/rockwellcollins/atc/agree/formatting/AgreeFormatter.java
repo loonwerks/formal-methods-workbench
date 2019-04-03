@@ -56,11 +56,11 @@ public class AgreeFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap(2).after(grammarAccess.getSpecStatementRule());
 		c.setLinewrap(2).before(grammarAccess.getSynchStatementRule());
 		c.setLinewrap(2).before(grammarAccess.getOrderStatementRule());
-		c.setLinewrap(2).before(grammarAccess.getPropertyStatementRule());
+		c.setLinewrap(2).before(grammarAccess.getBoolOutputStatementRule());
 		c.setLinewrap(2).before(grammarAccess.getConstStatementRule());
 		c.setLinewrap(2).before(grammarAccess.getEnumStatementRule());
-		c.setLinewrap(2).before(grammarAccess.getEqStatementRule());
-		c.setLinewrap(2).before(grammarAccess.getAssignStatementRule());
+		c.setLinewrap(2).before(grammarAccess.getOutputStatementRule());
+		c.setLinewrap(2).before(grammarAccess.getAssertEqualStatementRule());
 		c.setLinewrap(2).before(grammarAccess.getLinearizationDefRule());
 		c.setLinewrap(2).before(grammarAccess.getFnDefRule());
 		c.setLinewrap(2).before(grammarAccess.getLibraryFnDefRule());

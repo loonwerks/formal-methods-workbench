@@ -13,7 +13,7 @@ import org.osate.aadl2.NamedElement;
 
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.Arg;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 
 import edu.uah.rsesc.agree.ge.AgreeBusinessObjectProvider;
 import edu.uah.rsesc.agree.ge.AgreeGeUtil;
@@ -112,8 +112,8 @@ class AgreeBusinessObjectHandlerUtil {
 				if(name != null) {
 					results.add(name);
 				}
-			} else if (ss instanceof EqStatement) {
-				final EqStatement eq = (EqStatement) ss;
+			} else if (ss instanceof OutputStatement) {
+				final OutputStatement eq = (OutputStatement) ss;
 				for (final Arg lhArg : eq.getLhs()) {
 					if (lhArg != null && lhArg.getName() != null) {
 						results.add(lhArg.getName());

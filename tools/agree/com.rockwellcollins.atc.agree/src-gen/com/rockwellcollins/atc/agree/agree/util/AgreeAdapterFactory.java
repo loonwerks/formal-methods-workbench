@@ -146,9 +146,9 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
         return createAbstractionAdapter();
       }
       @Override
-      public Adapter casePropertyStatement(PropertyStatement object)
+      public Adapter caseBoolOutputStatement(BoolOutputStatement object)
       {
-        return createPropertyStatementAdapter();
+        return createBoolOutputStatementAdapter();
       }
       @Override
       public Adapter caseConstStatement(ConstStatement object)
@@ -156,9 +156,9 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
         return createConstStatementAdapter();
       }
       @Override
-      public Adapter caseEqStatement(EqStatement object)
+      public Adapter caseOutputStatement(OutputStatement object)
       {
-        return createEqStatementAdapter();
+        return createOutputStatementAdapter();
       }
       @Override
       public Adapter caseInputStatement(InputStatement object)
@@ -166,9 +166,9 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
         return createInputStatementAdapter();
       }
       @Override
-      public Adapter caseAssignStatement(AssignStatement object)
+      public Adapter caseAssertEqualStatement(AssertEqualStatement object)
       {
-        return createAssignStatementAdapter();
+        return createAssertEqualStatementAdapter();
       }
       @Override
       public Adapter caseFnDef(FnDef object)
@@ -818,16 +818,16 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.PropertyStatement <em>Property Statement</em>}'.
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.BoolOutputStatement <em>Bool Output Statement</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see com.rockwellcollins.atc.agree.agree.PropertyStatement
+   * @see com.rockwellcollins.atc.agree.agree.BoolOutputStatement
    * @generated
    */
-  public Adapter createPropertyStatementAdapter()
+  public Adapter createBoolOutputStatementAdapter()
   {
     return null;
   }
@@ -848,16 +848,16 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.EqStatement <em>Eq Statement</em>}'.
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.OutputStatement <em>Output Statement</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see com.rockwellcollins.atc.agree.agree.EqStatement
+   * @see com.rockwellcollins.atc.agree.agree.OutputStatement
    * @generated
    */
-  public Adapter createEqStatementAdapter()
+  public Adapter createOutputStatementAdapter()
   {
     return null;
   }
@@ -878,16 +878,16 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.AssignStatement <em>Assign Statement</em>}'.
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.AssertEqualStatement <em>Assert Equal Statement</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see com.rockwellcollins.atc.agree.agree.AssignStatement
+   * @see com.rockwellcollins.atc.agree.agree.AssertEqualStatement
    * @generated
    */
-  public Adapter createAssignStatementAdapter()
+  public Adapter createAssertEqualStatementAdapter()
   {
     return null;
   }

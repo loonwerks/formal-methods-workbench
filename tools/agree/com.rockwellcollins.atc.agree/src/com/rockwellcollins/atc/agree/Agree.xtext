@@ -9,7 +9,7 @@ NamedElement returns aadl2::NamedElement:
 	Arg
 	| NamedSpecStatement
 	| FnDef
-	| PropertyStatement
+	| BoolOutputStatement
 	| ConstStatement
 	| EnumStatement
 	| NodeDef
@@ -27,7 +27,7 @@ Element returns aadl2::Element:
 	| SpecStatement
 	| NodeStmt
 	| NodeBodyExpr
-	| EqStatement
+	| OutputStatement
 	| InputStatement;
 
 AnnexLibrary returns aadl2::AnnexLibrary:
@@ -53,11 +53,11 @@ SpecStatement:
 |	{ConnectionStatement} 'connection' conn=[aadl2::NamedElement] ':' expr=Expr ';'
 |	SynchStatement
 |	OrderStatement
-|	PropertyStatement
+|	BoolOutputStatement
 |	ConstStatement
 |	EnumStatement
-|	EqStatement
-|	AssignStatement
+|	OutputStatement
+|	AssertEqualStatement
 |	LinearizationDef
 |	FnDef
 |	LibraryFnDef
@@ -68,6 +68,8 @@ SpecStatement:
 NamedSpecStatement:
 	{AssumeStatement} 'assume' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
 	| {GuaranteeStatement} 'guarantee' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
+	
+	//remove AssertStatement; use 'assert equal' instead??.
 	| {AssertStatement} 'assert' ((name=ID)? str=STRING ':')? (expr=Expr | pattern=PatternStatement) ';'
 	| {LemmaStatement} 'lemma' (name=ID)?  str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
 	;
@@ -132,19 +134,25 @@ Abstraction returns Abstraction:
 	| FnDef
 	| NodeDef;
 
-PropertyStatement:
+//'property' is removed; use 'output' instead
+BoolOutputStatement:
 	'property' name=ID '=' expr=Expr ';';
 
 ConstStatement:
 	'const' name=ID ':' type=Type '=' expr=Expr ';'; //this should really be an "Arg"
 
-EqStatement:
+
+//'eq' migrates to 'output'
+OutputStatement:
 	'eq' (lhs+=Arg (',' lhs+=Arg)*) ('=' expr=Expr)? ';';
 	
+//'agree_input' migrates to 'input'	
 InputStatement:
 	'agree_input' (lhs+=Arg (',' lhs+=Arg)*) ';';
 
-AssignStatement:
+
+//'assign' migrates to 'assert'
+AssertEqualStatement:
 	'assign' id=[aadl2::NamedElement|QCPREF] '=' expr=Expr ';';
 
 FnDef:
@@ -198,9 +206,11 @@ RecordDef:
 	'type' name=ID '=' 'struct' '{' (args+=Arg (',' args+=Arg)*) '}' ';'
 ;
 
-	
+
+//'enum _ = { _, ..., _ };' migrates to 'type _ = 'enum _ | ... | _ ;'
 EnumStatement:
-	'enum' name=ID '=' '{' enums+=NamedID (',' enums+=NamedID)* '}' ';';
+	  'type' name=ID '=' 'enum' enums+=NamedID ('|' enums+=NamedID)* ';'
+	| 'enum' name=ID '=' '{' enums+=NamedID (',' enums+=NamedID)* '}' ';';
 
 
 Expr returns Expr:

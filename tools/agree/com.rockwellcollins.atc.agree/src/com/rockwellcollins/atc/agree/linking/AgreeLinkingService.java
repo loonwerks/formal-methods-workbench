@@ -32,7 +32,7 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
-import com.rockwellcollins.atc.agree.agree.AssignStatement;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
@@ -100,7 +100,7 @@ public class AgreeLinkingService extends PropertiesLinkingService {
 				|| context instanceof TagExpr
 				|| context instanceof SelectionExpr
 				|| context instanceof NamedElmExpr
-				|| context instanceof AssignStatement
+				|| context instanceof AssertEqualStatement
 				|| context instanceof NodeEq || context instanceof SynchStatement
 				|| context instanceof RecordLitExpr || context instanceof GetPropertyExpr
 				|| context instanceof RecordUpdateExpr || context instanceof EventExpr

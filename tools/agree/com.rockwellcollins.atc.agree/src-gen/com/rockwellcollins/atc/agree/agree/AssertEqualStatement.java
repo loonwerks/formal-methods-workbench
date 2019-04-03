@@ -6,22 +6,22 @@ import org.osate.aadl2.NamedElement;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Assign Statement</b></em>'.
+ * A representation of the model object '<em><b>Assert Equal Statement</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.AssignStatement#getId <em>Id</em>}</li>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.AssignStatement#getExpr <em>Expr</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.AssertEqualStatement#getId <em>Id</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.AssertEqualStatement#getExpr <em>Expr</em>}</li>
  * </ul>
  *
- * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getAssignStatement()
+ * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getAssertEqualStatement()
  * @model
  * @generated
  */
-public interface AssignStatement extends SpecStatement
+public interface AssertEqualStatement extends SpecStatement
 {
   /**
    * Returns the value of the '<em><b>Id</b></em>' reference.
@@ -33,14 +33,14 @@ public interface AssignStatement extends SpecStatement
    * <!-- end-user-doc -->
    * @return the value of the '<em>Id</em>' reference.
    * @see #setId(NamedElement)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getAssignStatement_Id()
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getAssertEqualStatement_Id()
    * @model
    * @generated
    */
   NamedElement getId();
 
   /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.AssignStatement#getId <em>Id</em>}' reference.
+   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.AssertEqualStatement#getId <em>Id</em>}' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @param value the new value of the '<em>Id</em>' reference.
@@ -59,14 +59,14 @@ public interface AssignStatement extends SpecStatement
    * <!-- end-user-doc -->
    * @return the value of the '<em>Expr</em>' containment reference.
    * @see #setExpr(Expr)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getAssignStatement_Expr()
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getAssertEqualStatement_Expr()
    * @model containment="true"
    * @generated
    */
   Expr getExpr();
 
   /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.AssignStatement#getExpr <em>Expr</em>}' containment reference.
+   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.AssertEqualStatement#getExpr <em>Expr</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @param value the new value of the '<em>Expr</em>' containment reference.
@@ -75,4 +75,4 @@ public interface AssignStatement extends SpecStatement
    */
   void setExpr(Expr value);
 
-} // AssignStatement
+} // AssertEqualStatement

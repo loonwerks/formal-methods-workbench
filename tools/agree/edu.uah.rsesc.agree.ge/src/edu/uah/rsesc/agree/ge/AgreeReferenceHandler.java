@@ -22,12 +22,12 @@ import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 
@@ -49,12 +49,12 @@ public class AgreeReferenceHandler {
 		ASSUME_STATEMENT("assumption", AssumeStatement.class, s -> s.getStr()),
 		CONST_STATEMENT("constant", ConstStatement.class, s -> s.getName()),
 		ENUM_STATEMENT("enum", EnumStatement.class, s -> s.getName()),
-		EQ_STATEMENT("eq", EqStatement.class, s -> s.getLhs().stream().map(a -> Strings.emptyIfNull(a.getName())).collect(Collectors.joining(" "))),
+		EQ_STATEMENT("eq", OutputStatement.class, s -> s.getLhs().stream().map(a -> Strings.emptyIfNull(a.getName())).collect(Collectors.joining(" "))),
 		GUARANTEE_STATEMENT("guarantee", GuaranteeStatement.class, s -> s.getStr()),
 		LEMMA_STATEMENT("lemma", LemmaStatement.class, s -> s.getStr()),
 		LINEARIZATION_DEFINITION("linearization", LinearizationDef.class, s -> s.getName()),
 		NODE_DEF_EXPRESSION("node_def", NodeDef.class, s -> s.getName()),
-		PROPERTY_STATEMENT("property", PropertyStatement.class, s -> s.getName()),
+		PROPERTY_STATEMENT("property", BoolOutputStatement.class, s -> s.getName()),
 		RECORD_DEF_EXPRESSION("record_def", RecordDef.class, s -> s.getName());
 
 		public final String id;

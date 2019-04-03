@@ -17,13 +17,13 @@ import com.rockwellcollins.atc.agree.agree.Arg;
 import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.GetPropertyExpr;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.InputStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.analysis.AgreeException;
 import com.rockwellcollins.atc.agree.analysis.AgreeLayout;
 import com.rockwellcollins.atc.agree.analysis.AgreeLayout.SigType;
@@ -192,9 +192,9 @@ public class RenamingVisitor extends AstIterVisitor {
 			throw new AgreeException("We really didn't expect to see an assert statement here");
 		} else if (reference instanceof Arg) {
 			return prefix + seperator + ((Arg) reference).getName() + suffix;
-		} else if (reference instanceof EqStatement) {
+		} else if (reference instanceof OutputStatement) {
 			return prefix + "eq " + String.join(", ",
-					((EqStatement) reference).getLhs().stream().map(lhs -> argToString(lhs))
+					((OutputStatement) reference).getLhs().stream().map(lhs -> argToString(lhs))
 					.collect(Collectors.toList()));
 		} else if (reference instanceof InputStatement) {
 			return prefix + "agree_input " + String.join(", ", ((InputStatement) reference).getLhs().stream()
@@ -210,8 +210,8 @@ public class RenamingVisitor extends AstIterVisitor {
 			String varName = var.toString();
 			featName = varName.substring(varName.indexOf(featName)).replace("__", ".");
 			return prefix + seperator + featName;
-		} else if (reference instanceof PropertyStatement) {
-			return prefix + seperator + ((PropertyStatement) reference).getName();
+		} else if (reference instanceof BoolOutputStatement) {
+			return prefix + seperator + ((BoolOutputStatement) reference).getName();
 		} else if (reference instanceof Property) {
 			return "AADL property " + ((Property) reference).getName();
 		} else if (reference instanceof GetPropertyExpr) {

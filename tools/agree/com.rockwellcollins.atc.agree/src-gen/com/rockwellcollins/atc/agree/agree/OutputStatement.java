@@ -8,22 +8,22 @@ import org.osate.aadl2.Element;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Eq Statement</b></em>'.
+ * A representation of the model object '<em><b>Output Statement</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.EqStatement#getLhs <em>Lhs</em>}</li>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.EqStatement#getExpr <em>Expr</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.OutputStatement#getLhs <em>Lhs</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.OutputStatement#getExpr <em>Expr</em>}</li>
  * </ul>
  *
- * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getEqStatement()
+ * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getOutputStatement()
  * @model
  * @generated
  */
-public interface EqStatement extends Element, SpecStatement
+public interface OutputStatement extends Element, SpecStatement
 {
   /**
    * Returns the value of the '<em><b>Lhs</b></em>' containment reference list.
@@ -35,7 +35,7 @@ public interface EqStatement extends Element, SpecStatement
    * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Lhs</em>' containment reference list.
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getEqStatement_Lhs()
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getOutputStatement_Lhs()
    * @model containment="true"
    * @generated
    */
@@ -51,14 +51,14 @@ public interface EqStatement extends Element, SpecStatement
    * <!-- end-user-doc -->
    * @return the value of the '<em>Expr</em>' containment reference.
    * @see #setExpr(Expr)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getEqStatement_Expr()
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getOutputStatement_Expr()
    * @model containment="true"
    * @generated
    */
   Expr getExpr();
 
   /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.EqStatement#getExpr <em>Expr</em>}' containment reference.
+   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.OutputStatement#getExpr <em>Expr</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @param value the new value of the '<em>Expr</em>' containment reference.
@@ -67,4 +67,4 @@ public interface EqStatement extends Element, SpecStatement
    */
   void setExpr(Expr value);
 
-} // EqStatement
+} // OutputStatement

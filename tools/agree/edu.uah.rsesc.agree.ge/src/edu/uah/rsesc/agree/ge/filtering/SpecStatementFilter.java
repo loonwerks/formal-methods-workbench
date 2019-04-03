@@ -12,12 +12,12 @@ import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
 
 enum SpecStatementFilter implements ContentFilter {
@@ -26,12 +26,12 @@ enum SpecStatementFilter implements ContentFilter {
 	ASSUMPTION(AssumeStatement.class, "assumptions", "Assumptions"),
 	CONST(ConstStatement.class, "constants", "Constants"),
 	ENUMERATION(EnumStatement.class, "enumerations", "Enumerations"),
-	EQUATION(EqStatement.class, "equations", "Equations"),
+	EQUATION(OutputStatement.class, "equations", "Equations"),
 	GUARANTEE(GuaranteeStatement.class, "guarantees", "Guarantees"),
 	LEMMA(LemmaStatement.class, "lemmas", "Lemmas"),
 	LINEARIZATION_DEFINITION(LinearizationDef.class, "linearizations", "Linearizations"),
 	NODE_DEFINITION(NodeDef.class, "nodeDefinitions", "Node Definitions"),
-	PROPERTY(PropertyStatement.class, "properties", "Properties"),
+	PROPERTY(BoolOutputStatement.class, "properties", "Properties"),
 	RECORD_DEFINITION(RecordDef.class, "recordDefinitions", "Record Definitions");
 	// @formatter:on
 

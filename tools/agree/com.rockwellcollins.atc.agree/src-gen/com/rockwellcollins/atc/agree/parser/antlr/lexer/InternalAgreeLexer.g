@@ -266,6 +266,8 @@ CircumflexAccent : '^';
 
 LeftCurlyBracket : '{';
 
+VerticalLine : '|';
+
 RightCurlyBracket : '}';
 
 

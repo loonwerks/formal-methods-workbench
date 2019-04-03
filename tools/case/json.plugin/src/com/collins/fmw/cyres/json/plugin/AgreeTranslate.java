@@ -23,7 +23,7 @@ import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.Arg;
 import com.rockwellcollins.atc.agree.agree.AssertStatement;
-import com.rockwellcollins.atc.agree.agree.AssignStatement;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
@@ -32,7 +32,7 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.Contract;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -48,7 +48,7 @@ import com.rockwellcollins.atc.agree.agree.NodeLemma;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordLitExpr;
 import com.rockwellcollins.atc.agree.agree.SelectionExpr;
@@ -261,7 +261,7 @@ public class AgreeTranslate {
 		return result;
 	}
 
-	private JsonElement genEqStatement(EqStatement stmt) {
+	private JsonElement genEqStatement(OutputStatement stmt) {
 
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("EqStatement"));
@@ -284,14 +284,14 @@ public class AgreeTranslate {
 		return result;
 	}
 
-	private JsonElement genAssignStatement(AssignStatement stmt) {
+	private JsonElement genAssignStatement(AssertEqualStatement stmt) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("AssignStatement"));
 		result.add("expr", genExpr(stmt.getExpr()));
 		return result;
 	}
 
-	private JsonElement genPropertyStatement(PropertyStatement stmt) {
+	private JsonElement genPropertyStatement(BoolOutputStatement stmt) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("PropertyStatement"));
 		result.add("name", new JsonPrimitive(stmt.getName()));
@@ -409,14 +409,14 @@ public class AgreeTranslate {
 			return genAssertStatement((AssertStatement) stmt);
 		} else if (stmt instanceof AssumeStatement) {
 			return genAssumeStatement((AssumeStatement) stmt);
-		} else if (stmt instanceof EqStatement) {
-			return genEqStatement((EqStatement) stmt);
+		} else if (stmt instanceof OutputStatement) {
+			return genEqStatement((OutputStatement) stmt);
 		} else if (stmt instanceof GuaranteeStatement) {
 			return genGuaranteeStatement((GuaranteeStatement) stmt);
-		} else if (stmt instanceof AssignStatement) {
-			return genAssignStatement((AssignStatement) stmt);
-		} else if (stmt instanceof PropertyStatement) {
-			return genPropertyStatement((PropertyStatement) stmt);
+		} else if (stmt instanceof AssertEqualStatement) {
+			return genAssignStatement((AssertEqualStatement) stmt);
+		} else if (stmt instanceof BoolOutputStatement) {
+			return genPropertyStatement((BoolOutputStatement) stmt);
 		} else if (stmt instanceof FnDef) {
 			return genFnDef((FnDef) stmt);
 		} else if (stmt instanceof ConstStatement) {

@@ -46,12 +46,11 @@ import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
-import com.rockwellcollins.atc.agree.agree.AssignStatement;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.FlatmapExpr;
@@ -67,6 +66,7 @@ import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.OrderStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
 import com.rockwellcollins.atc.agree.agree.RecordLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordUpdateExpr;
@@ -94,8 +94,8 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 				nelms.add((NamedElement) spec);
 			}
 
-			if (spec instanceof EqStatement) {
-				EqStatement eq = (EqStatement) spec;
+			if (spec instanceof OutputStatement) {
+				OutputStatement eq = (OutputStatement) spec;
 				nelms.addAll(eq.getLhs());
 			} else if (spec instanceof InputStatement) {
 				nelms.addAll(((InputStatement) spec).getLhs());
@@ -268,7 +268,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 		return getScope(ctx.eContainer(), ref);
 	}
 
-	IScope scope_NamedElement(AssignStatement ctx, EReference ref) {
+	IScope scope_NamedElement(AssertEqualStatement ctx, EReference ref) {
 		return getScope(ctx.eContainer(), ref);
 	}
 

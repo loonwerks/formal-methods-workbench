@@ -47,14 +47,14 @@
         eType="ecore:EClass platform:/resource/org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Abstraction" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
-  <eClassifiers xsi:type="ecore:EClass" name="PropertyStatement" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//NamedElement #//SpecStatement">
+  <eClassifiers xsi:type="ecore:EClass" name="BoolOutputStatement" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//NamedElement #//SpecStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expr" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ConstStatement" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//NamedElement #//SpecStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expr" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="EqStatement" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//Element #//SpecStatement">
+  <eClassifiers xsi:type="ecore:EClass" name="OutputStatement" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//Element #//SpecStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="lhs" upperBound="-1" eType="#//Arg"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expr" containment="true"/>
@@ -63,7 +63,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="lhs" upperBound="-1" eType="#//Arg"
         containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="AssignStatement" eSuperTypes="#//SpecStatement">
+  <eClassifiers xsi:type="ecore:EClass" name="AssertEqualStatement" eSuperTypes="#//SpecStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="id" eType="ecore:EClass platform:/resource/org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expr" containment="true"/>
   </eClassifiers>

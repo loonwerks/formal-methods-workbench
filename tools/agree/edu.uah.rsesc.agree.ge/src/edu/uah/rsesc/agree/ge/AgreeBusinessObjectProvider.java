@@ -24,12 +24,12 @@ import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 
@@ -54,9 +54,9 @@ public class AgreeBusinessObjectProvider {
 
 	private static boolean isSupported(final SpecStatement bo) {
 		return bo instanceof AssertStatement || bo instanceof AssumeStatement || bo instanceof ConstStatement
-				|| bo instanceof EnumStatement || bo instanceof EqStatement || bo instanceof GuaranteeStatement
+				|| bo instanceof EnumStatement || bo instanceof OutputStatement || bo instanceof GuaranteeStatement
 				|| bo instanceof LemmaStatement || bo instanceof LinearizationDef || bo instanceof NodeDef
-				|| bo instanceof PropertyStatement || bo instanceof RecordDef;
+				|| bo instanceof BoolOutputStatement || bo instanceof RecordDef;
 	}
 
 	public static Stream<SpecStatement> getAllSpecStatements(final Element e) {

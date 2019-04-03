@@ -190,13 +190,13 @@ public class AgreeSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case AgreePackage.PROPERTY_STATEMENT:
+      case AgreePackage.BOOL_OUTPUT_STATEMENT:
       {
-        PropertyStatement propertyStatement = (PropertyStatement)theEObject;
-        T result = casePropertyStatement(propertyStatement);
-        if (result == null) result = caseNamedElement(propertyStatement);
-        if (result == null) result = caseSpecStatement(propertyStatement);
-        if (result == null) result = caseElement(propertyStatement);
+        BoolOutputStatement boolOutputStatement = (BoolOutputStatement)theEObject;
+        T result = caseBoolOutputStatement(boolOutputStatement);
+        if (result == null) result = caseNamedElement(boolOutputStatement);
+        if (result == null) result = caseSpecStatement(boolOutputStatement);
+        if (result == null) result = caseElement(boolOutputStatement);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -210,12 +210,12 @@ public class AgreeSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case AgreePackage.EQ_STATEMENT:
+      case AgreePackage.OUTPUT_STATEMENT:
       {
-        EqStatement eqStatement = (EqStatement)theEObject;
-        T result = caseEqStatement(eqStatement);
-        if (result == null) result = caseSpecStatement(eqStatement);
-        if (result == null) result = caseElement(eqStatement);
+        OutputStatement outputStatement = (OutputStatement)theEObject;
+        T result = caseOutputStatement(outputStatement);
+        if (result == null) result = caseSpecStatement(outputStatement);
+        if (result == null) result = caseElement(outputStatement);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -228,12 +228,12 @@ public class AgreeSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case AgreePackage.ASSIGN_STATEMENT:
+      case AgreePackage.ASSERT_EQUAL_STATEMENT:
       {
-        AssignStatement assignStatement = (AssignStatement)theEObject;
-        T result = caseAssignStatement(assignStatement);
-        if (result == null) result = caseSpecStatement(assignStatement);
-        if (result == null) result = caseElement(assignStatement);
+        AssertEqualStatement assertEqualStatement = (AssertEqualStatement)theEObject;
+        T result = caseAssertEqualStatement(assertEqualStatement);
+        if (result == null) result = caseSpecStatement(assertEqualStatement);
+        if (result == null) result = caseElement(assertEqualStatement);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -1194,17 +1194,17 @@ public class AgreeSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>Property Statement</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>Bool Output Statement</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Property Statement</em>'.
+   * @return the result of interpreting the object as an instance of '<em>Bool Output Statement</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T casePropertyStatement(PropertyStatement object)
+  public T caseBoolOutputStatement(BoolOutputStatement object)
   {
     return null;
   }
@@ -1226,17 +1226,17 @@ public class AgreeSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>Eq Statement</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>Output Statement</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Eq Statement</em>'.
+   * @return the result of interpreting the object as an instance of '<em>Output Statement</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T caseEqStatement(EqStatement object)
+  public T caseOutputStatement(OutputStatement object)
   {
     return null;
   }
@@ -1258,17 +1258,17 @@ public class AgreeSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>Assign Statement</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>Assert Equal Statement</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Assign Statement</em>'.
+   * @return the result of interpreting the object as an instance of '<em>Assert Equal Statement</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T caseAssignStatement(AssignStatement object)
+  public T caseAssertEqualStatement(AssertEqualStatement object)
   {
     return null;
   }

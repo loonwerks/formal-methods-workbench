@@ -1,7 +1,10 @@
 package edu.uah.rsesc.agree.ge.businessObjectHandlers;
 
+import java.util.stream.Collectors;
+
 import javax.inject.Named;
 
+import org.eclipse.xtext.util.Strings;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentClassifier;
@@ -14,6 +17,7 @@ import org.osate.ge.PaletteEntryBuilder;
 import org.osate.ge.di.BuildCreateOperation;
 import org.osate.ge.di.CanCreate;
 import org.osate.ge.di.CanDelete;
+import org.osate.ge.di.CanRename;
 import org.osate.ge.di.GetGraphicalConfiguration;
 import org.osate.ge.di.GetName;
 import org.osate.ge.di.GetPaletteEntries;
@@ -31,24 +35,26 @@ import org.osate.ge.operations.StepResultBuilder;
 
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeFactory;
+import com.rockwellcollins.atc.agree.agree.Arg;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
+import com.rockwellcollins.atc.agree.agree.PrimType;
 
 import edu.uah.rsesc.agree.ge.AgreeCategories;
 
-public class PropertyStatementHandler {
+public class OutputStatementHandler {
 	private static final Graphic graphic = RectangleBuilder.create().build();
 
 	@IsApplicable
 	@CanDelete
-	public boolean isApplicable(final @Named(Names.BUSINESS_OBJECT) PropertyStatement bo) {
+	public boolean isApplicable(final @Named(Names.BUSINESS_OBJECT) OutputStatement bo) {
 		return true;
 	}
 
 	@GetGraphicalConfiguration
 	public GraphicalConfiguration getGraphicalConfiguration(
 			final @Named(Names.BUSINESS_OBJECT_CONTEXT) BusinessObjectContext boc) {
-		return GraphicalConfigurationBuilder.create().graphic(graphic).annotation("<property>")
+		return GraphicalConfigurationBuilder.create().graphic(graphic).annotation("<equation>")
 				.style(StyleBuilder
 						.create(GraphicalExtensionUtil.isInherited(boc) ? GraphicalExtensionUtil.STYLE_INHERITED_ELEMENT
 								: Style.EMPTY)
@@ -63,7 +69,7 @@ public class PropertyStatementHandler {
 		}
 
 		return new PaletteEntry[] {
-				PaletteEntryBuilder.create().label("Property").category(AgreeCategories.AGREE).build() };
+				PaletteEntryBuilder.create().label("Equation").category(AgreeCategories.AGREE).build() };
 	}
 
 	private static OperationBuilderHelper<ComponentClassifier> getClassifierOpBuilder() {
@@ -83,9 +89,13 @@ public class PropertyStatementHandler {
 					.map(AgreeHandlerUtil.toBusinessObjectToModify())
 					.modifyPreviousResult(modifyBo -> {
 				final AgreeContract agreeContract = AgreeHandlerUtil.getOrCreateAgreeContract(modifyBo);
-						final PropertyStatement newBo = AgreeFactory.eINSTANCE.createPropertyStatement();
-						newBo.setName(
-								AgreeBusinessObjectHandlerUtil.buildUniqueIdentifier(agreeContract, "property"));
+						final OutputStatement newBo = AgreeFactory.eINSTANCE.createOutputStatement();
+				final Arg newArg = AgreeFactory.eINSTANCE.createArg();
+						newArg.setName(AgreeBusinessObjectHandlerUtil.buildUniqueIdentifier(agreeContract, "var"));
+				final PrimType type = AgreeFactory.eINSTANCE.createPrimType();
+				type.setName("bool");
+				newArg.setType(type);
+				newBo.getLhs().add(newArg);
 				final BoolLitExpr trueExpr = AgreeFactory.eINSTANCE.createBoolLitExpr();
 				final BooleanLiteral trueLit = Aadl2Factory.eINSTANCE.createBooleanLiteral();
 				trueLit.setValue(true);
@@ -99,19 +109,24 @@ public class PropertyStatementHandler {
 	}
 
 	@GetName
-	public String getName(final @Named(Names.BUSINESS_OBJECT) PropertyStatement bo) {
-		return bo.getName();
+	public String getName(final @Named(Names.BUSINESS_OBJECT) OutputStatement bo) {
+		return bo.getLhs().stream().map(a -> Strings.emptyIfNull(a.getName())).collect(Collectors.joining(","));
+	}
+
+	@CanRename
+	public boolean canRename(final @Named(Names.BUSINESS_OBJECT) OutputStatement bo) {
+		// Renaming is only supported if there is only one identifier on the left hand side.
+		return bo.getLhs().size() == 1;
 	}
 
 	@ValidateName
-	public String validateName(final @Named(Names.BUSINESS_OBJECT) PropertyStatement bo,
+	public String validateName(final @Named(Names.BUSINESS_OBJECT) OutputStatement bo,
 			final @Named(Names.NAME) String value) {
-		return AgreeBusinessObjectHandlerUtil.validateName(bo, value);
+		return AgreeBusinessObjectHandlerUtil.validateName(bo.getLhs().get(0), value);
 	}
 
 	@Rename
-	public void setName(final @Named(Names.BUSINESS_OBJECT) PropertyStatement bo,
-			final @Named(Names.NAME) String value) {
-		bo.setName(value);
+	public void setName(final @Named(Names.BUSINESS_OBJECT) OutputStatement bo, final @Named(Names.NAME) String value) {
+		bo.getLhs().get(0).setName(value);
 	}
 }

@@ -3,52 +3,45 @@
 package com.rockwellcollins.atc.agree.agree.impl;
 
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
-import com.rockwellcollins.atc.agree.agree.Arg;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.Expr;
-
-import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
-import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
-
-import org.osate.aadl2.impl.ElementImpl;
+import org.osate.aadl2.NamedElement;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Eq Statement</b></em>'.
+ * An implementation of the model object '<em><b>Assert Equal Statement</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.EqStatementImpl#getLhs <em>Lhs</em>}</li>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.EqStatementImpl#getExpr <em>Expr</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.AssertEqualStatementImpl#getId <em>Id</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.AssertEqualStatementImpl#getExpr <em>Expr</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class EqStatementImpl extends ElementImpl implements EqStatement
+public class AssertEqualStatementImpl extends SpecStatementImpl implements AssertEqualStatement
 {
   /**
-   * The cached value of the '{@link #getLhs() <em>Lhs</em>}' containment reference list.
+   * The cached value of the '{@link #getId() <em>Id</em>}' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getLhs()
+   * @see #getId()
    * @generated
    * @ordered
    */
-  protected EList<Arg> lhs;
+  protected NamedElement id;
 
   /**
    * The cached value of the '{@link #getExpr() <em>Expr</em>}' containment reference.
@@ -65,7 +58,7 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
    * <!-- end-user-doc -->
    * @generated
    */
-  protected EqStatementImpl()
+  protected AssertEqualStatementImpl()
   {
     super();
   }
@@ -78,7 +71,7 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
   @Override
   protected EClass eStaticClass()
   {
-    return AgreePackage.Literals.EQ_STATEMENT;
+    return AgreePackage.Literals.ASSERT_EQUAL_STATEMENT;
   }
 
   /**
@@ -87,13 +80,43 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
    * @generated
    */
   @Override
-  public EList<Arg> getLhs()
+  public NamedElement getId()
   {
-    if (lhs == null)
+    if (id != null && ((EObject)id).eIsProxy())
     {
-      lhs = new EObjectContainmentEList<Arg>(Arg.class, this, AgreePackage.EQ_STATEMENT__LHS);
+      InternalEObject oldId = (InternalEObject)id;
+      id = (NamedElement)eResolveProxy(oldId);
+      if (id != oldId)
+      {
+        if (eNotificationRequired())
+          eNotify(new ENotificationImpl(this, Notification.RESOLVE, AgreePackage.ASSERT_EQUAL_STATEMENT__ID, oldId, id));
+      }
     }
-    return lhs;
+    return id;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NamedElement basicGetId()
+  {
+    return id;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setId(NamedElement newId)
+  {
+    NamedElement oldId = id;
+    id = newId;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.ASSERT_EQUAL_STATEMENT__ID, oldId, id));
   }
 
   /**
@@ -118,7 +141,7 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
     expr = newExpr;
     if (eNotificationRequired())
     {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.EQ_STATEMENT__EXPR, oldExpr, newExpr);
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR, oldExpr, newExpr);
       if (msgs == null) msgs = notification; else msgs.add(notification);
     }
     return msgs;
@@ -136,14 +159,14 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
     {
       NotificationChain msgs = null;
       if (expr != null)
-        msgs = ((InternalEObject)expr).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.EQ_STATEMENT__EXPR, null, msgs);
+        msgs = ((InternalEObject)expr).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR, null, msgs);
       if (newExpr != null)
-        msgs = ((InternalEObject)newExpr).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.EQ_STATEMENT__EXPR, null, msgs);
+        msgs = ((InternalEObject)newExpr).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR, null, msgs);
       msgs = basicSetExpr(newExpr, msgs);
       if (msgs != null) msgs.dispatch();
     }
     else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.EQ_STATEMENT__EXPR, newExpr, newExpr));
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR, newExpr, newExpr));
   }
 
   /**
@@ -156,9 +179,7 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
   {
     switch (featureID)
     {
-      case AgreePackage.EQ_STATEMENT__LHS:
-        return ((InternalEList<?>)getLhs()).basicRemove(otherEnd, msgs);
-      case AgreePackage.EQ_STATEMENT__EXPR:
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR:
         return basicSetExpr(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -174,9 +195,10 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
   {
     switch (featureID)
     {
-      case AgreePackage.EQ_STATEMENT__LHS:
-        return getLhs();
-      case AgreePackage.EQ_STATEMENT__EXPR:
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__ID:
+        if (resolve) return getId();
+        return basicGetId();
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR:
         return getExpr();
     }
     return super.eGet(featureID, resolve, coreType);
@@ -187,17 +209,15 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
    * <!-- end-user-doc -->
    * @generated
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
     switch (featureID)
     {
-      case AgreePackage.EQ_STATEMENT__LHS:
-        getLhs().clear();
-        getLhs().addAll((Collection<? extends Arg>)newValue);
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__ID:
+        setId((NamedElement)newValue);
         return;
-      case AgreePackage.EQ_STATEMENT__EXPR:
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR:
         setExpr((Expr)newValue);
         return;
     }
@@ -214,10 +234,10 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
   {
     switch (featureID)
     {
-      case AgreePackage.EQ_STATEMENT__LHS:
-        getLhs().clear();
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__ID:
+        setId((NamedElement)null);
         return;
-      case AgreePackage.EQ_STATEMENT__EXPR:
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR:
         setExpr((Expr)null);
         return;
     }
@@ -234,12 +254,12 @@ public class EqStatementImpl extends ElementImpl implements EqStatement
   {
     switch (featureID)
     {
-      case AgreePackage.EQ_STATEMENT__LHS:
-        return lhs != null && !lhs.isEmpty();
-      case AgreePackage.EQ_STATEMENT__EXPR:
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__ID:
+        return id != null;
+      case AgreePackage.ASSERT_EQUAL_STATEMENT__EXPR:
         return expr != null;
     }
     return super.eIsSet(featureID);
   }
 
-} //EqStatementImpl
+} //AssertEqualStatementImpl

@@ -77,11 +77,11 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
       case AgreePackage.SYNCH_STATEMENT: return createSynchStatement();
       case AgreePackage.ORDER_STATEMENT: return createOrderStatement();
       case AgreePackage.ABSTRACTION: return createAbstraction();
-      case AgreePackage.PROPERTY_STATEMENT: return createPropertyStatement();
+      case AgreePackage.BOOL_OUTPUT_STATEMENT: return createBoolOutputStatement();
       case AgreePackage.CONST_STATEMENT: return createConstStatement();
-      case AgreePackage.EQ_STATEMENT: return createEqStatement();
+      case AgreePackage.OUTPUT_STATEMENT: return createOutputStatement();
       case AgreePackage.INPUT_STATEMENT: return createInputStatement();
-      case AgreePackage.ASSIGN_STATEMENT: return createAssignStatement();
+      case AgreePackage.ASSERT_EQUAL_STATEMENT: return createAssertEqualStatement();
       case AgreePackage.FN_DEF: return createFnDef();
       case AgreePackage.LIBRARY_FN_DEF: return createLibraryFnDef();
       case AgreePackage.LINEARIZATION_DEF: return createLinearizationDef();
@@ -330,10 +330,10 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
    * @generated
    */
   @Override
-  public PropertyStatement createPropertyStatement()
+  public BoolOutputStatement createBoolOutputStatement()
   {
-    PropertyStatementImpl propertyStatement = new PropertyStatementImpl();
-    return propertyStatement;
+    BoolOutputStatementImpl boolOutputStatement = new BoolOutputStatementImpl();
+    return boolOutputStatement;
   }
 
   /**
@@ -354,10 +354,10 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
    * @generated
    */
   @Override
-  public EqStatement createEqStatement()
+  public OutputStatement createOutputStatement()
   {
-    EqStatementImpl eqStatement = new EqStatementImpl();
-    return eqStatement;
+    OutputStatementImpl outputStatement = new OutputStatementImpl();
+    return outputStatement;
   }
 
   /**
@@ -378,10 +378,10 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
    * @generated
    */
   @Override
-  public AssignStatement createAssignStatement()
+  public AssertEqualStatement createAssertEqualStatement()
   {
-    AssignStatementImpl assignStatement = new AssignStatementImpl();
-    return assignStatement;
+    AssertEqualStatementImpl assertEqualStatement = new AssertEqualStatementImpl();
+    return assertEqualStatement;
   }
 
   /**

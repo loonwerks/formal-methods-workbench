@@ -66,7 +66,7 @@ import com.rockwellcollins.atc.agree.agree.ArrayLiteralExpr;
 import com.rockwellcollins.atc.agree.agree.ArraySubExpr;
 import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
 import com.rockwellcollins.atc.agree.agree.AssertStatement;
-import com.rockwellcollins.atc.agree.agree.AssignStatement;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
@@ -77,7 +77,7 @@ import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.FlatmapExpr;
@@ -107,7 +107,7 @@ import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.PatternStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
@@ -279,7 +279,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private AgreeNode getAgreeNode(ComponentInstance compInst, boolean isTop) {
 		List<AgreeVar> inputs = new ArrayList<>();
 		List<AgreeVar> outputs = new ArrayList<>();
-		List<AgreeVar> locals = new ArrayList<>();
 		List<AgreeAADLConnection> aadlConnections = new ArrayList<>();
 		List<AgreeOverriddenConnection> userDefinedConections = new ArrayList<>();
 		List<AgreeConnection> connections = new ArrayList<>();
@@ -288,8 +287,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		List<AgreeStatement> assumptions = new ArrayList<>();
 		List<AgreeStatement> guarantees = new ArrayList<>();
 		List<AgreeStatement> lemmas = new ArrayList<>();
-		List<AgreeEquation> localEquations = new ArrayList<>();
-		List<AgreeStatement> patternProps = Collections.emptyList();
 		timeOfVarMap = new HashMap<>();
 		timeRiseVarMap = new HashMap<>();
 		timeFallVarMap = new HashMap<>();
@@ -326,7 +323,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 				curInst = compInst;
 				assertions.addAll(getAssertionStatements(contract.getSpecs()));
-				getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
+				getEquationStatements(contract.getSpecs()).addAllTo(new ArrayList<>(), assertions, guarantees);
 				assertions.addAll(getPropertyStatements(contract.getSpecs()));
 				assertions.addAll(getAssignmentStatements(contract.getSpecs()));
 				userDefinedConections.addAll(getConnectionStatements(contract.getSpecs()));
@@ -375,7 +372,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				guarantees.addAll(getGuaranteeStatements(contract.getSpecs()));
 			}
 			// we count eqstatements with expressions as assertions
-			getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
+			getEquationStatements(contract.getSpecs()).addAllTo(new ArrayList<>(), assertions, guarantees);
 			assertions.addAll(getPropertyStatements(contract.getSpecs()));
 			outputs.addAll(getEquationVars(contract.getSpecs(), compInst));
 			getAgreeInputVars(contract.getSpecs(), compInst).addAllTo(inputs, assumptions, guarantees);
@@ -399,8 +396,8 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		AgreeNodeBuilder builder = new AgreeNodeBuilder(id);
 		builder.addInput(inputs);
 		builder.addOutput(outputs);
-		builder.addLocal(locals);
-//		builder.addLocalEquation(localEquations);
+		builder.addLocal(new ArrayList<>());
+		builder.addLocalEquation(new ArrayList<>());
 		builder.addConnection(connections);
 		builder.addSubNode(subNodes);
 
@@ -415,7 +412,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		builder.addAssumption(assumptions);
 		builder.addGuarantee(guarantees);
 		builder.addLemma(lemmas);
-		builder.addPatternProp(patternProps);
+		builder.addPatternProp(Collections.emptyList());
 		builder.setClockConstraint(clockConstraint);
 		builder.setInitialConstraint(initialConstraint);
 		builder.setClockVar(clockVar);
@@ -593,14 +590,14 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private List<AgreeVar> getEquationVars(EList<SpecStatement> specs, ComponentInstance compInst) {
 		List<AgreeVar> agreeVars = new ArrayList<>();
 		for (SpecStatement spec : specs) {
-			if (spec instanceof EqStatement) {
-				EList<Arg> args = ((EqStatement) spec).getLhs();
+			if (spec instanceof OutputStatement) {
+				EList<Arg> args = ((OutputStatement) spec).getLhs();
 				List<VarDecl> vars = agreeVarsFromArgs(args, compInst);
 				for (VarDecl var : vars) {
 					agreeVars.add((AgreeVar) var);
 				}
-			} else if (spec instanceof PropertyStatement) {
-				agreeVars.add(new AgreeVar(((PropertyStatement) spec).getName(), NamedType.BOOL, spec, compInst, null));
+			} else if (spec instanceof BoolOutputStatement) {
+				agreeVars.add(new AgreeVar(((BoolOutputStatement) spec).getName(), NamedType.BOOL, spec, compInst, null));
 			}
 		}
 		return agreeVars;
@@ -1151,9 +1148,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private List<AgreeStatement> getAssignmentStatements(EList<SpecStatement> specs) {
 		List<AgreeStatement> assigns = new ArrayList<>();
 		for (SpecStatement spec : specs) {
-			if (spec instanceof AssignStatement) {
-				Expr expr = doSwitch(((AssignStatement) spec).getExpr());
-				NamedElement id = ((AssignStatement) spec).getId();
+			if (spec instanceof AssertEqualStatement) {
+				Expr expr = doSwitch(((AssertEqualStatement) spec).getExpr());
+				NamedElement id = ((AssertEqualStatement) spec).getId();
 				expr = new BinaryExpr(new IdExpr(id.getName()), BinaryOp.EQUAL,
 						expr);
 				assigns.add(new AgreeStatement("", expr, spec));
@@ -1165,9 +1162,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private List<AgreeStatement> getPropertyStatements(EList<SpecStatement> specs) {
 		List<AgreeStatement> props = new ArrayList<>();
 		for (SpecStatement spec : specs) {
-			if (spec instanceof PropertyStatement) {
-				Expr expr = doSwitch(((PropertyStatement) spec).getExpr());
-				expr = new BinaryExpr(new IdExpr(((PropertyStatement) spec).getName()), BinaryOp.EQUAL, expr);
+			if (spec instanceof BoolOutputStatement) {
+				Expr expr = doSwitch(((BoolOutputStatement) spec).getExpr());
+				expr = new BinaryExpr(new IdExpr(((BoolOutputStatement) spec).getName()), BinaryOp.EQUAL, expr);
 				props.add(new AgreeStatement("", expr, spec));
 			}
 		}
@@ -1177,8 +1174,8 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private GatheredVariablesAndConstraints getEquationStatements(EList<SpecStatement> specs) {
 		GatheredVariablesAndConstraints result = new GatheredVariablesAndConstraints();
 		for (SpecStatement spec : specs) {
-			if (spec instanceof EqStatement) {
-				EqStatement eq = (EqStatement) spec;
+			if (spec instanceof OutputStatement) {
+				OutputStatement eq = (OutputStatement) spec;
 				EList<Arg> lhs = eq.getLhs();
 				if (eq.getExpr() != null) {
 
@@ -1205,7 +1202,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 
 
-	private PropertyExpression getPropertyExpression (AbstractNamedValue nv) {
+	private PropertyExpression getPropertyExpression(AbstractNamedValue nv) {
 		if (nv instanceof PropertyConstant) {
 			return ((PropertyConstant) nv).getConstantValue();
 		}

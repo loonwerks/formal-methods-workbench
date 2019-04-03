@@ -28,7 +28,7 @@
             class="edu.uah.rsesc.agree.ge.businessObjectHandlers.EnumerationStatementHandler">
       </handler>
       <handler
-            class="edu.uah.rsesc.agree.ge.businessObjectHandlers.EquationStatementHandler">
+            class="edu.uah.rsesc.agree.ge.businessObjectHandlers.OutputStatementHandler">
       </handler>
       <handler
             class="edu.uah.rsesc.agree.ge.businessObjectHandlers.GuaranteeStatementHandler">
@@ -43,7 +43,7 @@
             class="edu.uah.rsesc.agree.ge.businessObjectHandlers.NodeDefHandler">
       </handler>
       <handler
-            class="edu.uah.rsesc.agree.ge.businessObjectHandlers.PropertyStatementHandler">
+            class="edu.uah.rsesc.agree.ge.businessObjectHandlers.BoolOutputStatementHandler">
       </handler>
       <handler
             class="edu.uah.rsesc.agree.ge.businessObjectHandlers.RecordDefExpressionHandler">

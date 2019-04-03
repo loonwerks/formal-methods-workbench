@@ -3,8 +3,8 @@
 package com.rockwellcollins.atc.agree.agree.impl;
 
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.Expr;
-import com.rockwellcollins.atc.agree.agree.PropertyStatement;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -18,18 +18,18 @@ import org.osate.aadl2.impl.NamedElementImpl;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Property Statement</b></em>'.
+ * An implementation of the model object '<em><b>Bool Output Statement</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.PropertyStatementImpl#getExpr <em>Expr</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.BoolOutputStatementImpl#getExpr <em>Expr</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class PropertyStatementImpl extends NamedElementImpl implements PropertyStatement
+public class BoolOutputStatementImpl extends NamedElementImpl implements BoolOutputStatement
 {
   /**
    * The cached value of the '{@link #getExpr() <em>Expr</em>}' containment reference.
@@ -46,7 +46,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
    * <!-- end-user-doc -->
    * @generated
    */
-  protected PropertyStatementImpl()
+  protected BoolOutputStatementImpl()
   {
     super();
   }
@@ -59,7 +59,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
   @Override
   protected EClass eStaticClass()
   {
-    return AgreePackage.Literals.PROPERTY_STATEMENT;
+    return AgreePackage.Literals.BOOL_OUTPUT_STATEMENT;
   }
 
   /**
@@ -84,7 +84,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
     expr = newExpr;
     if (eNotificationRequired())
     {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.PROPERTY_STATEMENT__EXPR, oldExpr, newExpr);
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR, oldExpr, newExpr);
       if (msgs == null) msgs = notification; else msgs.add(notification);
     }
     return msgs;
@@ -102,14 +102,14 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
     {
       NotificationChain msgs = null;
       if (expr != null)
-        msgs = ((InternalEObject)expr).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.PROPERTY_STATEMENT__EXPR, null, msgs);
+        msgs = ((InternalEObject)expr).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR, null, msgs);
       if (newExpr != null)
-        msgs = ((InternalEObject)newExpr).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.PROPERTY_STATEMENT__EXPR, null, msgs);
+        msgs = ((InternalEObject)newExpr).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR, null, msgs);
       msgs = basicSetExpr(newExpr, msgs);
       if (msgs != null) msgs.dispatch();
     }
     else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.PROPERTY_STATEMENT__EXPR, newExpr, newExpr));
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR, newExpr, newExpr));
   }
 
   /**
@@ -122,7 +122,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
   {
     switch (featureID)
     {
-      case AgreePackage.PROPERTY_STATEMENT__EXPR:
+      case AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR:
         return basicSetExpr(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -138,7 +138,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
   {
     switch (featureID)
     {
-      case AgreePackage.PROPERTY_STATEMENT__EXPR:
+      case AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR:
         return getExpr();
     }
     return super.eGet(featureID, resolve, coreType);
@@ -154,7 +154,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
   {
     switch (featureID)
     {
-      case AgreePackage.PROPERTY_STATEMENT__EXPR:
+      case AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR:
         setExpr((Expr)newValue);
         return;
     }
@@ -171,7 +171,7 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
   {
     switch (featureID)
     {
-      case AgreePackage.PROPERTY_STATEMENT__EXPR:
+      case AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR:
         setExpr((Expr)null);
         return;
     }
@@ -188,10 +188,10 @@ public class PropertyStatementImpl extends NamedElementImpl implements PropertyS
   {
     switch (featureID)
     {
-      case AgreePackage.PROPERTY_STATEMENT__EXPR:
+      case AgreePackage.BOOL_OUTPUT_STATEMENT__EXPR:
         return expr != null;
     }
     return super.eIsSet(featureID);
   }
 
-} //PropertyStatementImpl
+} //BoolOutputStatementImpl

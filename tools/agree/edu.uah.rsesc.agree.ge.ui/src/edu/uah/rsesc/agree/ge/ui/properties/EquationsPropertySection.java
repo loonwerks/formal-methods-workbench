@@ -3,12 +3,12 @@ package edu.uah.rsesc.agree.ge.ui.properties;
 import org.eclipse.jface.viewers.IFilter;
 import org.osate.ge.ui.properties.PropertySectionUtil;
 
-import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 
-import edu.uah.rsesc.agree.ge.businessObjectHandlers.EquationStatementHandler;
+import edu.uah.rsesc.agree.ge.businessObjectHandlers.OutputStatementHandler;
 
 public class EquationsPropertySection extends GenericPropertySection {
-	private final EquationStatementHandler handler = new EquationStatementHandler();
+	private final OutputStatementHandler handler = new OutputStatementHandler();
 
 	public static class Filter implements IFilter {
 		@Override
@@ -25,12 +25,12 @@ public class EquationsPropertySection extends GenericPropertySection {
 
 	@Override
 	protected String getName(final Object element) {
-		return handler.getName((EqStatement) element);
+		return handler.getName((OutputStatement) element);
 	}
 
 	@Override
 	protected Object[] getSpecStatements() {
-		return getSpecStatements(AgreePropertySectionUtil::asComponentClassifier, EqStatement.class);
+		return getSpecStatements(AgreePropertySectionUtil::asComponentClassifier, OutputStatement.class);
 	}
 
 }
