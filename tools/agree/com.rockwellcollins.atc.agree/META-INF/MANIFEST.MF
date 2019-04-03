@@ -20,8 +20,7 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.eclipse.xtext.util,
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
- org.eclipse.xtext.common.types ,
- org.antlr.runtime
+ org.eclipse.xtext.common.types
 Bundle-ClassPath: .,
  dependencies/jkind-api.jar,
  dependencies/gson-2.8.5.jar,

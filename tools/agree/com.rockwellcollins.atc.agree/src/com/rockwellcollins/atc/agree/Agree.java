@@ -127,7 +127,7 @@ public class Agree {
 
 	// global types: Classifier, ArrayType, PrimType, EnumStatement, RecordDef
 
-	// global contract nodes: ComponentClassifier
+	// global node contracts: ComponentClassifier
 
 	// global simple nodes: NodeDef, FnDef, LinearizationDef
 
