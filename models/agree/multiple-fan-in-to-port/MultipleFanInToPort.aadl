@@ -70,18 +70,32 @@ public
 			B_to_C : port B.Request_out -> C.Request_in;
 		annex agree{**
 			----------------------------------
-			-- BEGIN SECTION 
+			-- BEGIN SECTION 1
 			----------------------------------
-			-- Would like to autopopulate the info in this section 
+			-- Would like to autogenerate the text in this section 
 			--  for any input port with multiple fan in (C.Request_in in this example)	
+			
 			connection A_to_C : true;
 			connection B_to_C : true;
+			----------------------------------
+			-- END SECTION 1
+			----------------------------------			
+			----------------------------------
+			-- BEGIN SECTION 2
+			----------------------------------
+			-- Would like to autogenerate the text in this section 
+			--  for any input port with multiple fan in (C.Request_in in this example) 
+			--  together with the following note/warning to the user
 			
+			-- Note: This assertion is not an accurate statement for a queue, 
+			--  which may be working off a backlog of messages and not using 
+			--  one of the current inputs to C.Request_in
+				
 			assert "C.Request_in is equal to A.Request_out or B.Request_out":
 				(C. Request_in = A.Request_out)
 				or (C. Request_in = B.Request_out);
 			----------------------------------
-			-- END SECTION 
+			-- END SECTION 2
 			----------------------------------
 			
 			lemma "After the initial timestep, the ID in C's output message is always that of A or B":
