@@ -1113,6 +1113,16 @@ public class AgreeXtext {
 			}
 
 		}
+
+		if (c instanceof ComponentImplementation) {
+			Map<String, Nenola.NodeGen> ccResult = extractNodeGenMap(((ComponentImplementation) c).getType());
+			result.putAll(ccResult);
+
+			for (Subcomponent sub : ((ComponentImplementation) c).getAllSubcomponents()) {
+				Map<String, Nenola.NodeGen> subResult = extractNodeGenMap(sub.getClassifier());
+				result.putAll(subResult);
+			}
+		}
 		return result;
 	}
 
