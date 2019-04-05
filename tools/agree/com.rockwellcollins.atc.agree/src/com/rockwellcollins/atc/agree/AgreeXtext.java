@@ -91,6 +91,9 @@ import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NamedID;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
+import com.rockwellcollins.atc.agree.agree.NodeEq;
+import com.rockwellcollins.atc.agree.agree.NodeLemma;
+import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
@@ -385,7 +388,7 @@ public class AgreeXtext {
 		} else if (c instanceof ComponentClassifier) {
 
 
-			Map<String, Nenola.Port> ports = new HashMap<>();
+			Map<String, Nenola.Channel> channels = new HashMap<>();
 			Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
 			List<Nenola.Spec> contractList = new ArrayList<Nenola.Spec>();
 
@@ -446,9 +449,9 @@ public class AgreeXtext {
 								if (feature.getArrayDimensions().size() == 0) {
 									Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
 									if (typeDef instanceof DataContract) {
-										Nenola.Port port = new Nenola.Port(fieldName,
+										Nenola.Channel channel = new Nenola.Channel(fieldName,
 												(DataContract) typeDef, direction, isEvent);
-										ports.putIfAbsent(fieldName, port);
+										channels.putIfAbsent(fieldName, channel);
 									}
 								} else if (feature.getArrayDimensions().size() == 1) {
 									ArrayDimension ad = feature.getArrayDimensions().get(0);
@@ -456,9 +459,9 @@ public class AgreeXtext {
 									Nenola.Contract stem = toContractFromClassifier(feature.getClassifier());
 									if (stem instanceof Nenola.DataContract) {
 										DataContract typeDef = new ArrayContract("", (Nenola.DataContract) stem, size);
-										Nenola.Port port = new Nenola.Port(fieldName, typeDef,
+										Nenola.Channel channel = new Nenola.Channel(fieldName, typeDef,
 												direction, isEvent);
-										ports.putIfAbsent(fieldName, port);
+										channels.putIfAbsent(fieldName, channel);
 									}
 
 								}
@@ -484,10 +487,10 @@ public class AgreeXtext {
 								Nenola.Contract typeDef = toContractFromNamedElm(arg);
 
 								if (typeDef instanceof DataContract) {
-									Nenola.Port port = new Nenola.Port(fieldName,
+									Nenola.Channel channel = new Nenola.Channel(fieldName,
 											(DataContract) typeDef,
 											new Nenola.Out(Optional.empty()), false);
-									ports.putIfAbsent(fieldName, port);
+									channels.putIfAbsent(fieldName, channel);
 								}
 
 							}
@@ -501,7 +504,7 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new Nenola.NodeContract(name, ports, subNodes, contractList, c);
+			return new Nenola.NodeContract(name, channels, subNodes, contractList, c);
 
 		}
 
@@ -699,8 +702,8 @@ public class AgreeXtext {
 				}
 
 			} else if (targetType instanceof Nenola.NodeContract) {
-				Map<String, Nenola.Port> ports = ((Nenola.NodeContract) targetType).ports;
-				for (Entry<String, Nenola.Port> entry : ports.entrySet()) {
+				Map<String, Nenola.Channel> channels = ((Nenola.NodeContract) targetType).channels;
+				for (Entry<String, Nenola.Channel> entry : channels.entrySet()) {
 					if (entry.getKey().equals(name)) {
 						return entry.getValue().dataContract;
 					}
@@ -1009,20 +1012,20 @@ public class AgreeXtext {
 		return String.join("__", segments);
 	}
 
-	public static Nenola.Port toInputFromArg(Arg arg) {
+	public static Nenola.Channel toChannelFromArg(Arg arg, Nenola.Direc direc) {
 		Nenola.Contract contract = toContractFromType(arg.getType());
 
-		return new Nenola.Port(arg.getName(), (DataContract) contract, new Nenola.In(), false);
+		return new Nenola.Channel(arg.getName(), (DataContract) contract, direc, false);
 
 	}
 
-	public static Map<String, Nenola.Port> toInputsFromArgs(EList<Arg> args) {
-		Map<String, Nenola.Port> ports = new HashMap<>();
+	public static Map<String, Nenola.Channel> toChannelsFromArgs(EList<Arg> args, Nenola.Direc direc) {
+		Map<String, Nenola.Channel> channels = new HashMap<>();
 		for (Arg arg : args) {
-			Nenola.Port port = toInputFromArg(arg);
-			ports.put(port.name, port);
+			Nenola.Channel channel = toChannelFromArg(arg, direc);
+			channels.put(channel.name, channel);
 		}
-		return ports;
+		return channels;
 	}
 
 	public static Nenola.Expr toExprFromExpr(Expr expr) {
@@ -1030,29 +1033,66 @@ public class AgreeXtext {
 		return null;
 	}
 
-	public static NodeGen toNodeGenFromNodeDef(NodeDef spec) {
-		// TODO Auto-generated method stub
-		return null;
+	public static NodeGen toNodeGenFromNodeDef(NodeDef nodeDef) {
+
+		String nodeName = getNodeName(nodeDef);
+
+		Map<String, Nenola.Channel> inputs = toChannelsFromArgs(nodeDef.getArgs(), new Nenola.In());
+		Map<String, Nenola.Channel> outputs = toChannelsFromArgs(nodeDef.getRets(), new Nenola.Out(Optional.empty()));
+		Map<String, Nenola.Channel> internals = toChannelsFromArgs(nodeDef.getNodeBody().getLocs(), new Nenola.Bi());
+
+		Map<String, Nenola.Channel> channels = new HashMap<>();
+		channels.putAll(inputs);
+		channels.putAll(outputs);
+		channels.putAll(internals);
+
+		List<Nenola.DataFlow> dataFlows = new ArrayList<>();
+		List<String> properties = new ArrayList<>();
+
+		String lemmaName = "__nodeLemma";
+		int lemmaIndex = 0;
+		for (NodeStmt stmt : nodeDef.getNodeBody().getStmts()) {
+			if (stmt instanceof NodeLemma) {
+				NodeLemma nodeLemma = (NodeLemma) stmt;
+				String propName = lemmaName + lemmaIndex++;
+				internals.put(propName, new Nenola.Channel(propName, Nenola.Prim.BoolContract, new Nenola.Bi(), false));
+				Nenola.Expr eqExpr = toExprFromExpr(nodeLemma.getExpr());
+				Nenola.DataFlow eq = new Nenola.DataFlow(propName, eqExpr);
+				dataFlows.add(eq);
+				properties.add(propName);
+			} else if (stmt instanceof NodeEq) {
+				Nenola.Expr expr = toExprFromExpr(stmt.getExpr());
+				List<String> ids = new ArrayList<>();
+				for (Arg arg : ((NodeEq) stmt).getLhs()) {
+					ids.add(arg.getName());
+				}
+				Nenola.DataFlow df = new Nenola.DataFlow(ids, expr);
+				dataFlows.add(df);
+			}
+		}
+
+		return new Nenola.NodeGen(nodeName, channels, dataFlows, properties);
+
 	}
 
 
 	private static NodeGen toNodeGenFromFnDef(FnDef fnDef) {
 		String nodeName = getNodeName(fnDef).replace("::", "__");
-		Map<String, Nenola.Port> ports = toInputsFromArgs(fnDef.getArgs());
+		Map<String, Nenola.Channel> channels = toChannelsFromArgs(fnDef.getArgs(), new Nenola.In());
 		Nenola.Expr bodyExpr = toExprFromExpr(fnDef.getExpr());
 
 		Nenola.Contract outContract = toContractFromType(fnDef.getType());
 
 		String outputName = "_outvar";
-		Nenola.Port output = new Nenola.Port(outputName, (DataContract) outContract,
+		Nenola.Channel output = new Nenola.Channel(outputName, (DataContract) outContract,
 				new Nenola.Out(Optional.empty()), false);
 
-		ports.put(outputName, output);
+		channels.put(outputName, output);
 
 		Nenola.DataFlow dataFlow = new Nenola.DataFlow("_outvar", bodyExpr);
 		List<Nenola.DataFlow> dataFlows = Collections.singletonList(dataFlow);
 
-		return new NodeGen(nodeName, ports, dataFlows);
+		return new NodeGen(nodeName, channels, dataFlows, Collections.emptyList());
 
 	}
 

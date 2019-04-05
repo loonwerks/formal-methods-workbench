@@ -1,6 +1,7 @@
 package com.rockwellcollins.atc.agree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -273,6 +274,14 @@ public class Nenola {
 		}
 	}
 
+	public static class Bi implements Direc {
+
+		public Bi() {
+
+		}
+
+	}
+
 
 
 	public static class RecordContract implements DataContract {
@@ -362,13 +371,13 @@ public class Nenola {
 
 	}
 
-	public static class Port {
+	public static class Channel {
 		public final String name;
 		public final DataContract dataContract;
 		public final Direc direction;
 		public final boolean isEvent;
 
-		public Port(String name, DataContract dataContract, Direc direction, boolean isEvent) {
+		public Channel(String name, DataContract dataContract, Direc direction, boolean isEvent) {
 			this.name = name;
 			this.dataContract = dataContract;
 			this.direction = direction;
@@ -380,18 +389,18 @@ public class Nenola {
 	public static class NodeContract implements Contract {
 
 		private final String name;
-		public final Map<String, Port> ports;
+		public final Map<String, Channel> channels;
 		public final Map<String, NodeContract> subNodes;
 		public final List<Spec> specList;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
-		public NodeContract(String name, Map<String, Port> ports, Map<String, NodeContract> subNodes,
+		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
 				List<Spec> specList, NamedElement namedElement) {
 			this.name = name;
-			this.ports = new HashMap<>();
-			this.ports.putAll(ports);
+			this.channels = new HashMap<>();
+			this.channels.putAll(channels);
 			this.subNodes = new HashMap<>();
 			this.subNodes.putAll(subNodes);
 			this.specList = specList;
@@ -409,7 +418,7 @@ public class Nenola {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
-			for (Entry<String, Port> entry : ports.entrySet()) {
+			for (Entry<String, Channel> entry : channels.entrySet()) {
 				String key = entry.getKey();
 				jkind.lustre.Type lt = entry.getValue().dataContract.getLustreType();
 				if (lt != null) {
@@ -433,11 +442,16 @@ public class Nenola {
 	}
 
 	public static class DataFlow {
-		public final String tgt;
+		public final List<String> tgts;
 		public final Expr src;
 
+		public DataFlow(List<String> tgts, Expr src) {
+			this.tgts = tgts;
+			this.src = src;
+		}
+
 		public DataFlow(String tgt, Expr src) {
-			this.tgt = tgt;
+			this.tgts = Collections.singletonList(tgt);
 			this.src = src;
 		}
 	}
@@ -445,13 +459,15 @@ public class Nenola {
 	public static class NodeGen {
 
 		public final String name;
-		public final Map<String, Port> ports;
+		public final Map<String, Channel> channels;
 		public final List<DataFlow> dataFlows;
+		public final List<String> properties;
 
-		public NodeGen(String name, Map<String, Port> ports, List<DataFlow> dataFlows) {
+		public NodeGen(String name, Map<String, Channel> channels, List<DataFlow> dataFlows, List<String> properties) {
 			this.name = name;
-			this.ports = ports;
+			this.channels = channels;
 			this.dataFlows = dataFlows;
+			this.properties = properties;
 		}
 
 	}
@@ -478,8 +494,8 @@ public class Nenola {
 	// local assumptions: AssumeStatement
 	// local guarantees: GuaranteeStatement
 	// local lemmas: LemmaStatement
-	// local input ports: Feature, InputStatement
-	// local output ports: Feature, BoolOutputStatement, OutputStatement
+	// local input channels: Feature, InputStatement
+	// local output channels: Feature, BoolOutputStatement, OutputStatement
 	// local subNodes: Subcomponent
 	// local connections: ConnectedElement, ConnectionStatement
 
