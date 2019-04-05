@@ -48,6 +48,7 @@ import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.rockwellcollins.atc.agree.Nenola.ArrayContract;
+import com.rockwellcollins.atc.agree.Nenola.Contract;
 import com.rockwellcollins.atc.agree.Nenola.DataContract;
 import com.rockwellcollins.atc.agree.Nenola.EnumContract;
 import com.rockwellcollins.atc.agree.Nenola.NodeGen;
@@ -972,8 +973,96 @@ public class AgreeXtext {
 		return Optional.empty();
 	}
 
+
+
+	private static Map<String, Contract> extractContractMapFromArgs(List<Arg> args) {
+
+		Map<String, Contract> result = new HashMap<>();
+
+		for (Arg arg : args) {
+			Contract contract = toContractFromType(arg.getType());
+			result.put(contract.getName(), contract);
+		}
+
+		return result;
+
+	}
+
+	private static Map<String, Contract> extractContractMapFromSpecStatement(SpecStatement spec) {
+
+		Map<String, Contract> result = new HashMap<>();
+		if (spec instanceof NodeDef) {
+			EList<Arg> inputArgs = ((NodeDef) spec).getArgs();
+			EList<Arg> outputArgs = ((NodeDef) spec).getRets();
+			EList<Arg> internalArgs = ((NodeDef) spec).getNodeBody().getLocs();
+
+			List<Arg> argList = new ArrayList<>();
+			argList.addAll(inputArgs);
+			argList.addAll(outputArgs);
+			argList.addAll(internalArgs);
+
+			result.putAll(extractContractMapFromArgs(argList));
+
+		} else if (spec instanceof FnDef) {
+			List<Arg> argList = new ArrayList<>();
+			argList.addAll(((FnDef) spec).getArgs());
+			result.putAll(extractContractMapFromArgs(argList));
+
+		} else if (spec instanceof LinearizationDef) {
+			List<Arg> argList = new ArrayList<>();
+			argList.addAll(((LinearizationDef) spec).getArgs());
+			result.putAll(extractContractMapFromArgs(argList));
+
+		} else if (spec instanceof OutputStatement) {
+			List<Arg> argList = new ArrayList<>();
+			argList.addAll(((OutputStatement) spec).getLhs());
+			result.putAll(extractContractMapFromArgs(argList));
+
+		} else if (spec instanceof InputStatement) {
+			List<Arg> argList = new ArrayList<>();
+			argList.addAll(((InputStatement) spec).getLhs());
+			result.putAll(extractContractMapFromArgs(argList));
+
+		}
+
+		return result;
+	}
+
+
 	public static Map<String, Nenola.Contract> extractContractMap(ComponentClassifier c) {
 		Map<String, Nenola.Contract> result = new HashMap<String, Nenola.Contract>();
+		AgreeContractSubclause annex = getAgreeAnnex(c);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement spec : contract.getSpecs()) {
+
+				Map<String, Nenola.Contract> specResult = extractContractMapFromSpecStatement(spec);
+				result.putAll(specResult);
+
+			}
+
+		}
+
+		if (c instanceof ComponentImplementation) {
+			Map<String, Nenola.Contract> ccResult = extractContractMap(((ComponentImplementation) c).getType());
+			result.putAll(ccResult);
+
+			for (Subcomponent sub : ((ComponentImplementation) c).getAllSubcomponents()) {
+
+				Nenola.Contract contract = toContractFromClassifier(sub.getClassifier());
+				result.put(contract.getName(), contract);
+
+				Map<String, Nenola.Contract> subResult = extractContractMap(sub.getClassifier());
+				result.putAll(subResult);
+			}
+		} else if (c instanceof ComponentClassifier) {
+			for (Feature feature : c.getAllFeatures()) {
+
+				Nenola.Contract contract = toContractFromClassifier(feature.getClassifier());
+				result.put(contract.getName(), contract);
+			}
+		}
 		return result;
 	}
 
