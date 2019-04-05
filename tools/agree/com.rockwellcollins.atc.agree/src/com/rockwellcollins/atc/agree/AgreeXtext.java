@@ -209,6 +209,7 @@ public class AgreeXtext {
 
 
 	private static List<Nenola.Spec> extractContractList(Classifier c) {
+		// TODO
 		List<Nenola.Spec> result = new ArrayList<Nenola.Spec>();
 		return result;
 	}
