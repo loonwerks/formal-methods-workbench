@@ -443,7 +443,7 @@ public class Agree {
 
 	// global contracts: Classifier, ArrayType, PrimType, EnumStatement, RecordDef, ComponentClassifier
 
-	// global simple nodes: NodeDef, FnDef, LinearizationDef / or should these be contracts?
+	// global node generator: NodeDef, FnDef, LinearizationDef
 
 	// local assertions: AssertionStatement, AssertEqualStatement,
 	// local assumptions: AssumeStatement
