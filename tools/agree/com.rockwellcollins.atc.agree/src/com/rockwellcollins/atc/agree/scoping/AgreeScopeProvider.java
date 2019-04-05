@@ -38,9 +38,9 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.Agree;
-import com.rockwellcollins.atc.agree.Agree.Contract;
-import com.rockwellcollins.atc.agree.Agree.RecordContract;
+import com.rockwellcollins.atc.agree.Nenola;
+import com.rockwellcollins.atc.agree.Nenola.Contract;
+import com.rockwellcollins.atc.agree.Nenola.RecordContract;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
@@ -560,8 +560,8 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 		if (typ instanceof RecordContract) {
 			NamedElement ne = ((RecordContract) typ).namedElement;
 			return Scopes.scopeFor(getFieldsOfNE(ne));
-		} else if (typ instanceof Agree.NodeContract) {
-			NamedElement ne = ((Agree.NodeContract) typ).namedElement;
+		} else if (typ instanceof Nenola.NodeContract) {
+			NamedElement ne = ((Nenola.NodeContract) typ).namedElement;
 			return Scopes.scopeFor(getFieldsOfNE(ne));
 
 		}

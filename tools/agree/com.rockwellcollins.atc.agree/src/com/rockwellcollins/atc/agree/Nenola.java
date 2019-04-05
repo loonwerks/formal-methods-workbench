@@ -12,7 +12,8 @@ import org.osate.aadl2.NamedElement;
 import jkind.lustre.EnumType;
 import jkind.lustre.NamedType;
 
-public class Agree {
+//Nenola = Nested Node Language
+public class Nenola {
 
 
 	public static class Name {
@@ -362,11 +363,13 @@ public class Agree {
 	}
 
 	public static class Port {
+		public final String name;
 		public final DataContract dataContract;
 		public final Direc direction;
 		public final boolean isEvent;
 
-		public Port(DataContract dataContract, Direc direction, boolean isEvent) {
+		public Port(String name, DataContract dataContract, Direc direction, boolean isEvent) {
+			this.name = name;
 			this.dataContract = dataContract;
 			this.direction = direction;
 			this.isEvent = isEvent;
@@ -429,13 +432,39 @@ public class Agree {
 		return t1.staticEquals(t2);
 	}
 
+	public static class DataFlow {
+		public final String tgt;
+		public final Expr src;
+
+		public DataFlow(String tgt, Expr src) {
+			this.tgt = tgt;
+			this.src = src;
+		}
+	}
+
+	public static class NodeGen {
+
+		public final String name;
+		public final Map<String, Port> ports;
+		public final List<DataFlow> dataFlows;
+
+		public NodeGen(String name, Map<String, Port> ports, List<DataFlow> dataFlows) {
+			this.name = name;
+			this.ports = ports;
+			this.dataFlows = dataFlows;
+		}
+
+	}
+
 	public static class Program {
 		public final Contract main;
 		public final Map<String, Contract> contractMap;
+		public final Map<String, NodeGen> nodeGenMap;
 
-		public Program(Contract main, Map<String, Contract> contractMap) {
+		public Program(Contract main, Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap) {
 			this.main = main;
 			this.contractMap = contractMap;
+			this.nodeGenMap = nodeGenMap;
 		}
 	}
 

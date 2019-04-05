@@ -50,10 +50,10 @@ import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.google.common.collect.HashMultimap;
-import com.rockwellcollins.atc.agree.Agree;
-import com.rockwellcollins.atc.agree.Agree.ArrayContract;
-import com.rockwellcollins.atc.agree.Agree.Contract;
-import com.rockwellcollins.atc.agree.Agree.RecordContract;
+import com.rockwellcollins.atc.agree.Nenola;
+import com.rockwellcollins.atc.agree.Nenola.ArrayContract;
+import com.rockwellcollins.atc.agree.Nenola.Contract;
+import com.rockwellcollins.atc.agree.Nenola.RecordContract;
 import com.rockwellcollins.atc.agree.AgreeAADLEnumerationUtils;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.Abstraction;
@@ -339,7 +339,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Contract lhsType = (AgreeXtext.inferContractFromNamedElement(namedEl));
 		Contract rhsType = (AgreeXtext.inferContract(expr));
 
-		if (!Agree.staticEqual(lhsType, rhsType)) {
+		if (!Nenola.staticEqual(lhsType, rhsType)) {
 			error(assign, "The left hand side of the assignment statement is of type '" + lhsType.getName()
 					+ "' but the right hand side is of type '" + rhsType.getName() + "'");
 		}
@@ -413,19 +413,19 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataImplementation) {
-				if (Agree.staticEqual(AgreeXtext.toContractFromType(recType),
-						Agree.Prim.ErrorContract)) {
+				if (Nenola.staticEqual(AgreeXtext.toContractFromType(recType),
+						Nenola.Prim.ErrorContract)) {
 					error(recType, "Data Implementations with no subcomponents must extend"
 							+ " a Base_Type that AGREE can reason about.");
 					return;
 				}
 				if (((DataImplementation) finalId).getAllSubcomponents().size() != 0) {
-					if (Agree.staticEqual(AgreeXtext.toContractFromType(recType),
-							Agree.Prim.BoolContract)
-							|| Agree.staticEqual(AgreeXtext.toContractFromType(recType),
-									Agree.Prim.IntContract)
-							|| Agree.staticEqual(AgreeXtext.toContractFromType(recType),
-									Agree.Prim.RealContract)) {
+					if (Nenola.staticEqual(AgreeXtext.toContractFromType(recType),
+							Nenola.Prim.BoolContract)
+							|| Nenola.staticEqual(AgreeXtext.toContractFromType(recType),
+									Nenola.Prim.IntContract)
+							|| Nenola.staticEqual(AgreeXtext.toContractFromType(recType),
+									Nenola.Prim.RealContract)) {
 						error(finalId, "Data implementations with subcomponents cannot be"
 								+ " interpreted by AGREE if they extend Base_Types");
 					}
@@ -436,8 +436,8 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			}
 
 			if (finalId instanceof DataType) {
-				if (Agree.staticEqual(AgreeXtext.toContractFromType(recType),
-						Agree.Prim.ErrorContract)) {
+				if (Nenola.staticEqual(AgreeXtext.toContractFromType(recType),
+						Nenola.Prim.ErrorContract)) {
 					error(recType, "AADL Datatypes must extend" + " a Base_Type that AGREE can reason about.");
 					return;
 				}
@@ -472,7 +472,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkTypeExists(floor.getExpr());
 		Contract exprType = AgreeXtext.inferContract(floor.getExpr());
 
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 			error(floor, "Argument of floor cast is of type '" + exprType.getName()
 			+ "' but must be of type 'real'");
 		}
@@ -488,7 +488,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkTypeExists(real.getExpr());
 		Contract exprType = AgreeXtext.inferContract(real.getExpr());
 
-		if (!Agree.staticEqual(Agree.Prim.IntContract, exprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.IntContract, exprType)) {
 			error(real, "Argument of real cast is of type '" + exprType.getName()
 			+ "' but must be of type 'int'");
 		}
@@ -761,7 +761,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Expr expr = assume.getExpr();
 		if (expr != null) {
 			Contract exprType = AgreeXtext.inferContract(expr);
-			if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+			if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 				error(assume, "Expression for assume statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
 			}
@@ -776,7 +776,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		Contract exprType = AgreeXtext.inferContract(statement.getExpr());
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 			error(statement,
 					"Expression for 'initially' statement is of type '" + exprType.getName()
 					+ "' but must be of type 'bool'");
@@ -813,7 +813,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Expr expr = asser.getExpr();
 		if (expr != null) {
 			Contract exprType = AgreeXtext.inferContract(expr);
-			if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+			if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 				error(asser, "Expression for assert statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
 			}
@@ -863,7 +863,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Expr expr = guar.getExpr();
 		if (expr != null) {
 			Contract exprType = AgreeXtext.inferContract(expr);
-			if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+			if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 				error(guar, "Expression for guarantee statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
 			}
@@ -885,7 +885,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(event);
 
 		Contract eventType = AgreeXtext.inferContract(event);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, eventType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, eventType)) {
 			error(event, "Expression is of type '" + eventType + "' but must be of type 'bool'");
 		}
 
@@ -934,7 +934,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(event);
 
 		Contract eventType = AgreeXtext.inferContract(event);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, eventType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, eventType)) {
 			error(event, "Expression is of type '" + eventType + "' but must be of type 'bool'");
 		}
 
@@ -981,12 +981,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		Contract type = AgreeXtext.inferContract(condition);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(condition,
 					"The condition of a when statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
 		type = AgreeXtext.inferContract(event);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(event, "The effect of a when statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
 	}
@@ -1001,17 +1001,17 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(event);
 
 		Contract type = AgreeXtext.inferContract(condition);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(condition,
 					"The condition of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
 		type = AgreeXtext.inferContract(event);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(event,
 					"The effect of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
 		}
 		type = AgreeXtext.inferContract(times);
-		if (!Agree.staticEqual(Agree.Prim.IntContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.IntContract, type)) {
 			error(event,
 					"The 'times' of the 'when' statement is of type '" + type + "'" + " but must be of type 'int'");
 		}
@@ -1027,12 +1027,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(effect);
 
 		Contract type = AgreeXtext.inferContract(cause);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
 		type = AgreeXtext.inferContract(effect);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(effect,
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
@@ -1047,12 +1047,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(effect);
 
 		Contract type = AgreeXtext.inferContract(cause);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
 		type = AgreeXtext.inferContract(effect);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(effect,
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
@@ -1067,12 +1067,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(effect);
 
 		Contract type = AgreeXtext.inferContract(cause);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
 		type = AgreeXtext.inferContract(effect);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(effect,
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
@@ -1089,19 +1089,19 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkExprIsIdentifier(rhs);
 
 		Contract type = AgreeXtext.inferContract(cause);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(cause,
 					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
 
 		type = AgreeXtext.inferContract(lhs);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(lhs, "The left hand side of the 'implies' of the 'whenever' statement is of type '" + type + "' "
 					+ "but must be of type 'bool'");
 		}
 
 		type = AgreeXtext.inferContract(rhs);
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(lhs, "The rhs hand side of the 'implies' of the 'whenever' statement is of type '" + type + "' "
 					+ "but must be of type 'bool'");
 		}
@@ -1151,7 +1151,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	public void checkTimeExpr(EObject expr, NamedElement id) {
 		Contract type = AgreeXtext.inferContractFromNamedElement(id);
 
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, type)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
 			error(expr, "Time functions can be applied only to Boolean identifiers");
 		}
 
@@ -1167,7 +1167,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Expr expr = lemma.getExpr();
 		if (expr != null) {
 			Contract exprType = AgreeXtext.inferContract(expr);
-			if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+			if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 				error(lemma, "Expression for lemma statement is of type '" + exprType.getName()
 				+ "' but must be of type 'bool'");
 			}
@@ -1197,14 +1197,14 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 		switch (op) {
 		case "-":
-			if (!Agree.staticEqual(Agree.Prim.IntContract, typeRight)
-					&& !Agree.staticEqual(Agree.Prim.RealContract, typeRight)) {
+			if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeRight)
+					&& !Nenola.staticEqual(Nenola.Prim.RealContract, typeRight)) {
 				error(unaryExpr, "right side of unary expression '" + op + "' is of type '" + typeRight
 						+ "' but must be of type 'int' or 'real'");
 			}
 			break;
 		case "not":
-			if (!Agree.staticEqual(Agree.Prim.BoolContract, typeRight)) {
+			if (!Nenola.staticEqual(Nenola.Prim.BoolContract, typeRight)) {
 				error(unaryExpr, "right side of unary expression '" + op + "' is of type '" + typeRight
 						+ "' but must be of type 'bool'");
 			}
@@ -1222,7 +1222,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		Contract exprType = AgreeXtext.inferContract(propStat.getExpr());
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 			error(propStat, "Property statement '" + propStat.getName() + "' is of type '" + exprType
 					+ "' but must be of type 'bool'");
 		}
@@ -1258,7 +1258,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			checkTypeExists(upExpr.getExpr());
 			Contract expType = AgreeXtext.inferContract(upExpr.getExpr());
 
-			if (!Agree.staticEqual(keyType, expType)) {
+			if (!Nenola.staticEqual(keyType, expType)) {
 				error(upExpr, "the update field is of type '" + keyType.getName() + "', but the expression is of type '"
 						+ expType.getName() + "'");
 			}
@@ -1293,7 +1293,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		for (Expr e : exprs) {
 			checkTypeExists(e);
 			Contract t2 = AgreeXtext.inferContract(e);
-			if (!Agree.staticEqual(t1, t2)) {
+			if (!Nenola.staticEqual(t1, t2)) {
 				error(e, "type of element must be " + t1.getName() + ", but has type " + t2.getName());
 			}
 
@@ -1314,7 +1314,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		if (arrType instanceof ArrayContract) {
 			Contract t = ((ArrayContract) arrType).stemContract;
 			Contract elmType = AgreeXtext.inferContract(exprs.get(0));
-			if (!Agree.staticEqual(elmType, t)) {
+			if (!Nenola.staticEqual(elmType, t)) {
 				error(exprs.get(0),
 						"type of element must be " + elmType.getName() + ", but has type " + t.getName());
 			}
@@ -1345,7 +1345,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Expr index = asub.getIndex();
 		checkTypeExists(index);
 		Contract indexType = AgreeXtext.inferContract(index);
-		if (!Agree.staticEqual(indexType, Agree.Prim.IntContract)) {
+		if (!Nenola.staticEqual(indexType, Nenola.Prim.IntContract)) {
 			error(index, "index must be an int");
 		}
 
@@ -1409,7 +1409,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			checkTypeExists(argExprs.get(i));
 			Contract exprType = AgreeXtext.inferContract(argExprs.get(i));
 
-			if (!Agree.staticEqual(defType, exprType)) {
+			if (!Nenola.staticEqual(defType, exprType)) {
 				error(recExpr, "The expression assigned to '" + actArgName + "' does not match its definition type of '"
 						+ defType + "'");
 			}
@@ -1597,7 +1597,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Contract expected = AgreeXtext.toContractFromType(constStat.getType());
 		Contract actual = AgreeXtext.inferContract(constStat.getExpr());
 
-		if (!Agree.staticEqual(expected, actual)) {
+		if (!Nenola.staticEqual(expected, actual)) {
 			error(constStat, "The assumed type of constant statement '" + constStat.getName() + "' is '" + expected
 					+ "' but the actual type is '" + actual + "'");
 		}
@@ -1892,7 +1892,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			Contract lhsType = agreeLhsTypes.get(i);
 			Contract rhsType = agreeRhsTypes.get(i);
 
-			if (!Agree.staticEqual(rhsType, lhsType)) {
+			if (!Nenola.staticEqual(rhsType, lhsType)) {
 				error(src, "The variable '" + lhsArgs.get(i).getName() + "' on the left side of equation is of type '"
 						+ lhsType.getName() + "' but must be of type '" + rhsType.getName() + "'");
 			}
@@ -2035,7 +2035,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	@Check(CheckType.FAST)
 	public void checkNodeLemma(NodeLemma nodeLemma) {
 		Contract exprType = AgreeXtext.inferContract(nodeLemma.getExpr());
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, exprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, exprType)) {
 			error(nodeLemma, "Expression for lemma statement is of type '" + exprType + "' but must be of type 'bool'");
 		}
 	}
@@ -2128,7 +2128,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		// Check that the formal args are all of real type
 		for (Arg arg : linDefExpr.getArgs()) {
 			Contract argType = AgreeXtext.toContractFromType(arg.getType());
-			if (!Agree.staticEqual(argType, Agree.Prim.RealContract)) {
+			if (!Nenola.staticEqual(argType, Nenola.Prim.RealContract)) {
 				error(arg, "Linearizations formal arguments must be of real type, but found type " + argType);
 			}
 		}
@@ -2144,7 +2144,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Expr precisionExpr = linDefExpr.getPrecision();
 		if (precisionExpr != null) {
 			Contract precisionExprType = AgreeXtext.inferContract(precisionExpr);
-			if (!Agree.staticEqual(Agree.Prim.RealContract, precisionExprType)) {
+			if (!Nenola.staticEqual(Nenola.Prim.RealContract, precisionExprType)) {
 				error(precisionExpr,
 						"Linearization precision must be of real type, but found type " + precisionExprType);
 			}
@@ -2164,10 +2164,10 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Contract endExprType = AgreeXtext.inferContract(endExpr);
 
 		// The type of the interval start and end must be of real type
-		if (!Agree.staticEqual(Agree.Prim.RealContract, startExprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.RealContract, startExprType)) {
 			error(startExpr, message + ", found type " + startExprType + ".");
 		}
-		if (!Agree.staticEqual(Agree.Prim.RealContract, endExprType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.RealContract, endExprType)) {
 			error(endExpr, message + ", found type " + endExprType + ".");
 		}
 
@@ -2220,7 +2220,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkTypeExists(prevExpr.getInit());
 		Contract initType = AgreeXtext.inferContract(prevExpr.getInit());
 
-		if (!Agree.staticEqual(initType, delayType)) {
+		if (!Nenola.staticEqual(initType, delayType)) {
 			error(prevExpr, "The first and second arguments of the 'prev' function are of non-matching types '"
 					+ delayType + "' and '" + initType + "'");
 		}
@@ -2300,7 +2300,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			Contract callType = argCallTypes.get(i);
 			Contract defType = inDefTypes.get(i);
 
-			if (!Agree.staticEqual(defType, callType)) {
+			if (!Nenola.staticEqual(defType, callType)) {
 				error(call, "Argument " + i + " of function call '" + callName + "' is of type '" + callType
 						+ "' but must be of type '" + defType + "'");
 			}
@@ -2340,7 +2340,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		Contract fnType = AgreeXtext.toContractFromType(fnDef.getType());
 
 		Contract exprType = AgreeXtext.inferContract(fnDef.getExpr());
-		if (!Agree.staticEqual(exprType, fnType)) {
+		if (!Nenola.staticEqual(exprType, fnType)) {
 			error(fnDef, "Function '" + fnDef.getName() + "' is of type '" + fnType.getName()
 					+ "' but its expression is of type '" + exprType.getName() + "'");
 		}
@@ -2392,11 +2392,11 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		checkTypeExists(expr.getC());
 		Contract elseType = AgreeXtext.inferContract(expr.getC());
 
-		if (!Agree.staticEqual(Agree.Prim.BoolContract, condType)) {
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, condType)) {
 			error(expr, "The condition of the if statement is of type '" + condType + "' but must be of type 'bool'");
 		}
 
-		if (!Agree.staticEqual(elseType, thenType)) {
+		if (!Nenola.staticEqual(elseType, thenType)) {
 			error(expr, "The 'then' and 'else' expressions are of non-matching types '" + thenType + "' and '"
 					+ elseType + "'");
 		}
@@ -2431,7 +2431,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			if (isInLinearizationBodyExpr) {
 				error(binExpr, "Arrow '->' expressions are not allowed in linearization body expressions.");
 			} else {
-				if (!Agree.staticEqual(typeRight, typeLeft)) {
+				if (!Nenola.staticEqual(typeRight, typeLeft)) {
 					error(binExpr,
 							"left and right sides of binary expression '" + op + "' are of type '"
 									+ typeLeft.getName() + "' and '" + typeRight.getName()
@@ -2448,12 +2448,12 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 				error(binExpr,
 						"Logical expressions (like '" + op + "') are not allowed in linearization body expressions.");
 			} else {
-				if (!Agree.staticEqual(Agree.Prim.BoolContract, typeLeft)) {
+				if (!Nenola.staticEqual(Nenola.Prim.BoolContract, typeLeft)) {
 					error(binExpr, "left side of binary expression '" + op + "' is of type '"
 							+ typeLeft.getName()
 							+ "' but must be of " + "type 'bool'");
 				}
-				if (!Agree.staticEqual(Agree.Prim.BoolContract, typeRight)) {
+				if (!Nenola.staticEqual(Nenola.Prim.BoolContract, typeRight)) {
 					error(binExpr, "right side of binary expression '" + op + "' is of type '"
 							+ typeRight.getName()
 							+ "' but must be of" + " type 'bool'");
@@ -2468,7 +2468,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 				error(binExpr, "Logical comparison expressions (like '" + op
 						+ "') are not allowed in linearization body expressions.");
 			} else {
-				if (!Agree.staticEqual(typeRight, typeLeft)) {
+				if (!Nenola.staticEqual(typeRight, typeLeft)) {
 					error(binExpr,
 							"left and right sides of binary expression '" + op + "' are of type '"
 									+ typeLeft.getName() + "' and '" + typeRight.getName()
@@ -2485,19 +2485,19 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 				error(binExpr, "Comparison expressions (like '" + op
 						+ "') are not allowed in linearization body expressions.");
 			} else {
-				if (!Agree.staticEqual(typeRight, typeLeft)) {
+				if (!Nenola.staticEqual(typeRight, typeLeft)) {
 					error(binExpr,
 							"left and right sides of binary expression '" + op + "' are of type '"
 									+ typeLeft.getName() + "' and '" + typeRight.getName()
 									+ "', but must be of the same type");
 				}
-				if (!Agree.staticEqual(Agree.Prim.IntContract, typeLeft)
-						&& !Agree.staticEqual(Agree.Prim.RealContract, typeLeft)) {
+				if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeLeft)
+						&& !Nenola.staticEqual(Nenola.Prim.RealContract, typeLeft)) {
 					error(binExpr, "left side of binary expression '" + op + "' is of type '" + typeLeft.getName()
 					+ "' but must be of type" + "'int' or 'real'");
 				}
-				if (!Agree.staticEqual(Agree.Prim.IntContract, typeRight)
-						&& !Agree.staticEqual(Agree.Prim.RealContract, typeRight)) {
+				if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeRight)
+						&& !Nenola.staticEqual(Nenola.Prim.RealContract, typeRight)) {
 					error(binExpr,
 							"right side of binary expression '" + op + "' is of type '" + typeRight.getName()
 							+ "' but must be of type" + "'int' or 'real'");
@@ -2508,18 +2508,18 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		case "+":
 		case "-":
 		case "*":
-			if (!Agree.staticEqual(typeRight, typeLeft)) {
+			if (!Nenola.staticEqual(typeRight, typeLeft)) {
 				error(binExpr,
 						"left and right sides of binary expression '" + op + "' are of type '" + typeLeft.getName()
 								+ "' and '" + typeRight.getName() + "', but must be of the same type");
 			}
-			if (!Agree.staticEqual(Agree.Prim.IntContract, typeLeft)
-					&& !Agree.staticEqual(Agree.Prim.RealContract, typeLeft)) {
+			if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeLeft)
+					&& !Nenola.staticEqual(Nenola.Prim.RealContract, typeLeft)) {
 				error(binExpr, "left side of binary expression '" + op + "' is of type '" + typeLeft.getName()
 				+ "' but must be of type" + "'int' or 'real'");
 			}
-			if (!Agree.staticEqual(Agree.Prim.IntContract, typeRight)
-					&& !Agree.staticEqual(Agree.Prim.RealContract, typeRight)) {
+			if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeRight)
+					&& !Nenola.staticEqual(Nenola.Prim.RealContract, typeRight)) {
 				error(binExpr, "right side of binary expression '" + op + "' is of type '" + typeRight.getName()
 				+ "' but must be of type" + "'int' or 'real'");
 			}
@@ -2540,11 +2540,11 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 				error(binExpr, "Integer operation expressions (like '" + op
 						+ "') are not allowed in linearization body expressions.");
 			} else {
-				if (!Agree.staticEqual(Agree.Prim.IntContract, typeLeft)) {
+				if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeLeft)) {
 					error(binExpr, "left side of binary expression '" + op + "' is of type '" + typeLeft.getName()
 					+ "' but must be of type 'int'");
 				}
-				if (!Agree.staticEqual(Agree.Prim.IntContract, typeRight)) {
+				if (!Nenola.staticEqual(Nenola.Prim.IntContract, typeRight)) {
 					error(binExpr,
 							"right side of binary expression '" + op + "' is of type '" + typeRight.getName()
 							+ "' but must be of type 'int'");
@@ -2559,11 +2559,11 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			return;
 
 		case "/":
-			if (!Agree.staticEqual(Agree.Prim.RealContract, typeLeft)) {
+			if (!Nenola.staticEqual(Nenola.Prim.RealContract, typeLeft)) {
 				error(binExpr, "left side of binary expression '" + op + "' is of type '" + typeLeft.getName()
 				+ "' but must be of type 'real'");
 			}
-			if (!Agree.staticEqual(Agree.Prim.RealContract, typeRight)) {
+			if (!Nenola.staticEqual(Nenola.Prim.RealContract, typeRight)) {
 				error(binExpr, "right side of binary expression '" + op + "' is of type '" + typeRight.getName()
 				+ "' but must be of type 'real'");
 			}

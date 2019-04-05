@@ -56,7 +56,7 @@ import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-import com.rockwellcollins.atc.agree.Agree;
+import com.rockwellcollins.atc.agree.Nenola;
 import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -1219,14 +1219,14 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		return null;
 	}
 
-	private List<Expr> getConstraintsFromTypeDef(String name, Agree.Contract typeDef) {
+	private List<Expr> getConstraintsFromTypeDef(String name, Nenola.Contract typeDef) {
 		List<Expr> constraints = new ArrayList<>();
 
-		if (typeDef instanceof Agree.RangeIntContract) {
+		if (typeDef instanceof Nenola.RangeIntContract) {
 
 			Expr childName = new IdExpr(name);
-			long lowl = ((Agree.RangeIntContract) typeDef).low;
-			long highl = ((Agree.RangeIntContract) typeDef).high;
+			long lowl = ((Nenola.RangeIntContract) typeDef).low;
+			long highl = ((Nenola.RangeIntContract) typeDef).high;
 			Expr lowVal = new IntExpr(BigInteger.valueOf(lowl));
 			Expr highVal = new IntExpr(BigInteger.valueOf(highl));
 			Expr lowBound = new BinaryExpr(lowVal, BinaryOp.LESSEQUAL, childName);
@@ -1234,12 +1234,12 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			constraints.add(lowBound);
 			constraints.add(highBound);
 
-		} else if (typeDef instanceof Agree.RangeRealContract) {
+		} else if (typeDef instanceof Nenola.RangeRealContract) {
 
 			Expr childName = new IdExpr(name);
 
-			double lowd = ((Agree.RangeRealContract) typeDef).low;
-			double highd = ((Agree.RangeRealContract) typeDef).high;
+			double lowd = ((Nenola.RangeRealContract) typeDef).low;
+			double highd = ((Nenola.RangeRealContract) typeDef).high;
 			Expr lowVal = new RealExpr(BigDecimal.valueOf(lowd));
 			Expr highVal = new RealExpr(BigDecimal.valueOf(highd));
 			Expr lowBound = new BinaryExpr(lowVal, BinaryOp.LESSEQUAL, childName);
@@ -1247,19 +1247,19 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			constraints.add(lowBound);
 			constraints.add(highBound);
 
-		} else if (typeDef instanceof Agree.ArrayContract) {
-			Agree.Contract stemType = ((Agree.ArrayContract) typeDef).stemContract;
-			int size = ((Agree.ArrayContract) typeDef).size;
+		} else if (typeDef instanceof Nenola.ArrayContract) {
+			Nenola.Contract stemType = ((Nenola.ArrayContract) typeDef).stemContract;
+			int size = ((Nenola.ArrayContract) typeDef).size;
 			for (int i = 0; i < size; ++i) {
 				String childName = name + "[" + i + "]";
 				constraints.addAll(getConstraintsFromTypeDef(childName, stemType));
 			}
 
-		} else if (typeDef instanceof Agree.RecordContract) {
-			Map<String, Agree.DataContract> fields = ((Agree.RecordContract) typeDef).fields;
-			for (Entry<String, Agree.DataContract> entry : fields.entrySet()) {
+		} else if (typeDef instanceof Nenola.RecordContract) {
+			Map<String, Nenola.DataContract> fields = ((Nenola.RecordContract) typeDef).fields;
+			for (Entry<String, Nenola.DataContract> entry : fields.entrySet()) {
 				String childName = name + "." + entry.getKey();
-				Agree.Contract childType = entry.getValue();
+				Nenola.Contract childType = entry.getValue();
 				constraints.addAll(getConstraintsFromTypeDef(childName, childType));
 			}
 
@@ -1959,10 +1959,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseIndicesExpr(IndicesExpr expr) {
-		Agree.Contract arrayTypeDef = AgreeXtext.inferContract(expr.getArray());
+		Nenola.Contract arrayTypeDef = AgreeXtext.inferContract(expr.getArray());
 
-		if (arrayTypeDef instanceof Agree.ArrayContract) {
-			int size = ((Agree.ArrayContract) arrayTypeDef).size;
+		if (arrayTypeDef instanceof Nenola.ArrayContract) {
+			int size = ((Nenola.ArrayContract) arrayTypeDef).size;
 			List<Expr> elems = new ArrayList<>();
 			for (int i = 0; i < size; i++) {
 				elems.add(new IntExpr(i));
@@ -2092,10 +2092,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		com.rockwellcollins.atc.agree.agree.Expr arrayExpr = expr.getArray();
 		Expr array = doSwitch(arrayExpr);
 
-		Agree.Contract agreeType = AgreeXtext.inferContract(arrayExpr);
+		Nenola.Contract agreeType = AgreeXtext.inferContract(arrayExpr);
 		int size = 0;
-		if (agreeType instanceof Agree.ArrayContract) {
-			size = ((Agree.ArrayContract) agreeType).size;
+		if (agreeType instanceof Nenola.ArrayContract) {
+			size = ((Nenola.ArrayContract) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseForallExpr - '" + agreeType.getClass() + "' not handled");
 		}
@@ -2116,10 +2116,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		com.rockwellcollins.atc.agree.agree.Expr arrayExpr = expr.getArray();
 		Expr array = doSwitch(arrayExpr);
 
-		Agree.Contract agreeType = AgreeXtext.inferContract(arrayExpr);
+		Nenola.Contract agreeType = AgreeXtext.inferContract(arrayExpr);
 		int size = 0;
-		if (agreeType instanceof Agree.ArrayContract) {
-			size = ((Agree.ArrayContract) agreeType).size;
+		if (agreeType instanceof Nenola.ArrayContract) {
+			size = ((Nenola.ArrayContract) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseExistsExpr - '" + agreeType.getClass() + "' not handled");
 		}
@@ -2137,10 +2137,10 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFlatmapExpr(FlatmapExpr expr) {
-		Agree.Contract agreeType = AgreeXtext.inferContract(expr.getArray());
+		Nenola.Contract agreeType = AgreeXtext.inferContract(expr.getArray());
 		int size = 0;
-		if (agreeType instanceof Agree.ArrayContract) {
-			size = ((Agree.ArrayContract) agreeType).size;
+		if (agreeType instanceof Nenola.ArrayContract) {
+			size = ((Nenola.ArrayContract) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseFlatmapExpr");
 		}
@@ -2151,9 +2151,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			Expr arrayAccess = new ArrayAccessExpr(array, i);
 			Expr body = substitute(doSwitch(expr.getExpr()), binding.getName(), arrayAccess);
 
-			Agree.Contract innerArrType = AgreeXtext.inferContract(expr.getExpr());
-			if (innerArrType instanceof Agree.ArrayContract) {
-				int innerSize = ((Agree.ArrayContract) innerArrType).size;
+			Nenola.Contract innerArrType = AgreeXtext.inferContract(expr.getExpr());
+			if (innerArrType instanceof Nenola.ArrayContract) {
+				int innerSize = ((Nenola.ArrayContract) innerArrType).size;
 				for (int j = 0; j < innerSize; j++) {
 					Expr innerAccess = new ArrayAccessExpr(body, j);
 					elems.add(innerAccess);
@@ -2167,11 +2167,11 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFoldLeftExpr(FoldLeftExpr expr) {
-		Agree.Contract agreeType = AgreeXtext.inferContract(expr.getArray());
+		Nenola.Contract agreeType = AgreeXtext.inferContract(expr.getArray());
 
 		int size = 0;
-		if (agreeType instanceof Agree.ArrayContract) {
-			size = ((Agree.ArrayContract) agreeType).size;
+		if (agreeType instanceof Nenola.ArrayContract) {
+			size = ((Nenola.ArrayContract) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseFoldLeftExpr");
 		}
@@ -2189,11 +2189,11 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 	@Override
 	public Expr caseFoldRightExpr(FoldRightExpr expr) {
-		Agree.Contract agreeType = AgreeXtext.inferContract(expr.getArray());
+		Nenola.Contract agreeType = AgreeXtext.inferContract(expr.getArray());
 
 		int size = 0;
-		if (agreeType instanceof Agree.ArrayContract) {
-			size = ((Agree.ArrayContract) agreeType).size;
+		if (agreeType instanceof Nenola.ArrayContract) {
+			size = ((Nenola.ArrayContract) agreeType).size;
 		} else {
 			throw new AgreeException("ERROR: caseFoldRightExpr");
 		}

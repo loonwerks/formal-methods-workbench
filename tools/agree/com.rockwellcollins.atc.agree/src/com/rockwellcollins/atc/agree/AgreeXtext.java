@@ -1,6 +1,7 @@
 package com.rockwellcollins.atc.agree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
+import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AadlReal;
 import org.osate.aadl2.AbstractNamedValue;
 import org.osate.aadl2.AnnexSubclause;
@@ -45,14 +47,13 @@ import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
-import com.rockwellcollins.atc.agree.Agree.ArrayContract;
-import com.rockwellcollins.atc.agree.Agree.Contract;
-import com.rockwellcollins.atc.agree.Agree.DataContract;
-import com.rockwellcollins.atc.agree.Agree.EnumContract;
-import com.rockwellcollins.atc.agree.Agree.Prim;
-import com.rockwellcollins.atc.agree.Agree.RangeIntContract;
-import com.rockwellcollins.atc.agree.Agree.RangeRealContract;
-import com.rockwellcollins.atc.agree.Agree.RecordContract;
+import com.rockwellcollins.atc.agree.Nenola.ArrayContract;
+import com.rockwellcollins.atc.agree.Nenola.DataContract;
+import com.rockwellcollins.atc.agree.Nenola.EnumContract;
+import com.rockwellcollins.atc.agree.Nenola.NodeGen;
+import com.rockwellcollins.atc.agree.Nenola.Prim;
+import com.rockwellcollins.atc.agree.Nenola.RangeIntContract;
+import com.rockwellcollins.atc.agree.Nenola.RangeRealContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
@@ -63,13 +64,13 @@ import com.rockwellcollins.atc.agree.agree.ArrayType;
 import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
-import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -90,10 +91,10 @@ import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NamedID;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
@@ -112,7 +113,7 @@ import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 
 public class AgreeXtext {
 
-	public static Contract toContractFromType(Type t) {
+	public static Nenola.Contract toContractFromType(Type t) {
 
 		if (t instanceof PrimType) {
 
@@ -124,63 +125,63 @@ public class AgreeXtext {
 
 			if (((PrimType) t).getName().equals("int")) {
 				if (lowStr == null || highStr == null) {
-					return Prim.IntContract;
+					return Nenola.Prim.IntContract;
 				} else {
 
 					long low = Long.valueOf(lowStr) * lowSign;
 					long high = Long.valueOf(highStr) * highSign;
-					return new RangeIntContract(low, high);
+					return new Nenola.RangeIntContract(low, high);
 				}
 			} else if (((PrimType) t).getName().equals("real")) {
 				if (lowStr == null || highStr == null) {
-					return Prim.RealContract;
+					return Nenola.Prim.RealContract;
 				} else {
 					double low = Double.valueOf(lowStr) * lowSign;
 					double high = Double.valueOf(highStr) * highSign;
-					return new RangeRealContract(low, high);
+					return new Nenola.RangeRealContract(low, high);
 				}
 			} else if (((PrimType) t).getName().equals("bool")) {
-				return Prim.BoolContract;
+				return Nenola.Prim.BoolContract;
 			} else {
-				return Prim.ErrorContract;
+				return Nenola.Prim.ErrorContract;
 			}
 
 		} else if (t instanceof ArrayType) {
 			String size = ((ArrayType) t).getSize();
-			Contract baseTypeDef = toContractFromType(((ArrayType) t).getStem());
+			Nenola.Contract baseTypeDef = toContractFromType(((ArrayType) t).getStem());
 
-			if (baseTypeDef instanceof Agree.DataContract) {
-				return new ArrayContract("", (Agree.DataContract) baseTypeDef, Integer.parseInt(size));
+			if (baseTypeDef instanceof Nenola.DataContract) {
+				return new Nenola.ArrayContract("", (Nenola.DataContract) baseTypeDef, Integer.parseInt(size));
 			}
 		} else if (t instanceof DoubleDotRef) {
 			return toContractFromNamedElm(((DoubleDotRef) t).getElm());
 
 		}
 
-		return Prim.ErrorContract;
+		return Nenola.Prim.ErrorContract;
 
 
 
 	}
 
-	public static Contract toContractFromNamedElm(NamedElement ne) {
+	public static Nenola.Contract toContractFromNamedElm(NamedElement ne) {
 		if (ne instanceof Classifier) {
 			return toContractFromClassifier((Classifier) ne);
 
 		} else if (ne instanceof RecordDef) {
 
 			EList<Arg> args = ((RecordDef) ne).getArgs();
-			Map<String, Agree.DataContract> fields = new HashMap<>();
+			Map<String, Nenola.DataContract> fields = new HashMap<>();
 			for (Arg arg : args) {
 				String key = arg.getName();
-				Contract typeDef = toContractFromType(arg.getType());
+				Nenola.Contract typeDef = toContractFromType(arg.getType());
 
-				if (typeDef instanceof DataContract) {
-					fields.putIfAbsent(key, (DataContract) typeDef);
+				if (typeDef instanceof Nenola.DataContract) {
+					fields.putIfAbsent(key, (Nenola.DataContract) typeDef);
 				}
 			}
 
-			return new RecordContract(ne.getQualifiedName(), fields, ne);
+			return new Nenola.RecordContract(ne.getQualifiedName(), fields, ne);
 
 		} else if (ne instanceof EnumStatement) {
 			String name = ne.getQualifiedName();
@@ -191,32 +192,32 @@ public class AgreeXtext {
 				enumValues.add(enumValue);
 			}
 
-			return new EnumContract(name, enumValues);
+			return new Nenola.EnumContract(name, enumValues);
 
 		} else if (ne instanceof Arg) {
 			return toContractFromType(((Arg) ne).getType());
 
 		} else {
-			return Prim.ErrorContract;
+			return Nenola.Prim.ErrorContract;
 
 		}
 	}
 
 
-	private static List<Agree.Spec> extractContractList(Classifier c) {
-		List<Agree.Spec> result = new ArrayList<Agree.Spec>();
+	private static List<Nenola.Spec> extractContractList(Classifier c) {
+		List<Nenola.Spec> result = new ArrayList<Nenola.Spec>();
 		return result;
 	}
 
-	public static Contract toContractFromClassifier(Classifier c) {
+	public static Nenola.Contract toContractFromClassifier(Classifier c) {
 
 		if (c instanceof AadlBoolean || c.getName().contains("Boolean")) {
-			return Prim.BoolContract;
+			return Nenola.Prim.BoolContract;
 		} else if (c instanceof AadlInteger || c.getName().contains("Integer") || c.getName().contains("Natural")
 				|| c.getName().contains("Unsigned")) {
-			return Prim.IntContract;
+			return Nenola.Prim.IntContract;
 		} else if (c instanceof AadlReal || c.getName().contains("Float")) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 		} else if (c instanceof DataType) {
 			Classifier ext = c.getExtended();
 			if (ext != null && (ext instanceof AadlInteger || ext.getName().contains("Integer")
@@ -238,12 +239,12 @@ public class AgreeXtext {
 								long max = intFromPropExp(rangeValue.getMaximum()).get();
 								return new RangeIntContract(min, max);
 							} catch (Exception e) {
-								return Prim.ErrorContract;
+								return Nenola.Prim.ErrorContract;
 							}
 						}
 					}
 				}
-				return Prim.IntContract;
+				return Nenola.Prim.IntContract;
 
 			} else if (ext != null && (ext instanceof AadlReal || ext.getName().contains("Float"))) {
 
@@ -263,19 +264,19 @@ public class AgreeXtext {
 								double max = realFromPropExp(rangeValue.getMaximum()).get();
 								return new RangeRealContract(min, max);
 							} catch (Exception e) {
-								return Prim.ErrorContract;
+								return Nenola.Prim.ErrorContract;
 							}
 						}
 					}
 				}
-				return Prim.RealContract;
+				return Nenola.Prim.RealContract;
 			}
 
 			List<PropertyAssociation> pas = c.getAllPropertyAssociations();
 
 			boolean prop_isArray = false;
 			int prop_arraySize = 0;
-			Contract prop_arrayBaseType = null;
+			Nenola.Contract prop_arrayBaseType = null;
 
 			boolean prop_isEnum = false;
 			List<String> prop_enumValues = null;
@@ -332,9 +333,9 @@ public class AgreeXtext {
 			}
 
 			if (prop_isArray && prop_arraySize > 0 && prop_arrayBaseType != null
-					&& prop_arrayBaseType instanceof Agree.DataContract) {
+					&& prop_arrayBaseType instanceof Nenola.DataContract) {
 
-				return new ArrayContract(c.getQualifiedName(), (Agree.DataContract) prop_arrayBaseType, prop_arraySize);
+				return new ArrayContract(c.getQualifiedName(), (Nenola.DataContract) prop_arrayBaseType, prop_arraySize);
 
 			} else if (prop_isEnum && prop_enumValues != null) {
 				String name = c.getQualifiedName();
@@ -343,7 +344,7 @@ public class AgreeXtext {
 			}
 		} else if (c instanceof DataImplementation) {
 
-			Map<String, Agree.DataContract> fields = new HashMap<>();
+			Map<String, Nenola.DataContract> fields = new HashMap<>();
 
 			DataImplementation currClsfr = (DataImplementation) c;
 			while (currClsfr != null) {
@@ -354,19 +355,18 @@ public class AgreeXtext {
 					if (sub.getClassifier() != null) {
 
 						if (sub.getArrayDimensions().size() == 0) {
-							Contract typeDef = toContractFromClassifier(sub.getClassifier());
-							if (typeDef instanceof Agree.DataContract) {
-								fields.putIfAbsent(fieldName, (Agree.DataContract) typeDef);
+							Nenola.Contract typeDef = toContractFromClassifier(sub.getClassifier());
+							if (typeDef instanceof Nenola.DataContract) {
+								fields.putIfAbsent(fieldName, (Nenola.DataContract) typeDef);
 							}
 
 						} else if (sub.getArrayDimensions().size() == 1) {
 
-
-							Contract stemContract = toContractFromClassifier(sub.getClassifier());
-							if (stemContract instanceof Agree.DataContract) {
+							Nenola.Contract stemContract = toContractFromClassifier(sub.getClassifier());
+							if (stemContract instanceof Nenola.DataContract) {
 								long size = getArraySize(sub.getArrayDimensions().get(0));
-								DataContract arrayContract = new Agree.ArrayContract("",
-										(Agree.DataContract) stemContract, Math.toIntExact(size));
+								DataContract arrayContract = new Nenola.ArrayContract("",
+										(Nenola.DataContract) stemContract, Math.toIntExact(size));
 								fields.putIfAbsent(fieldName, arrayContract);
 
 							}
@@ -380,21 +380,21 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new Agree.RecordContract(name, fields, c);
+			return new Nenola.RecordContract(name, fields, c);
 
 		} else if (c instanceof ComponentClassifier) {
 
 
-			Map<String, Agree.Port> ports = new HashMap<>();
-			Map<String, Agree.NodeContract> subNodes = new HashMap<>();
-			List<Agree.Spec> contractList = new ArrayList<Agree.Spec>();
+			Map<String, Nenola.Port> ports = new HashMap<>();
+			Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
+			List<Nenola.Spec> contractList = new ArrayList<Nenola.Spec>();
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
 
 
 
-				List<Agree.Spec> localContractList = extractContractList(currClsfr);
+				List<Nenola.Spec> localContractList = extractContractList(currClsfr);
 				contractList.addAll(localContractList);
 
 				ComponentType ct = null;
@@ -406,9 +406,9 @@ public class AgreeXtext {
 						if (sub.getClassifier() != null) {
 
 							if (sub.getArrayDimensions().size() == 0) {
-								Contract typeDef = toContractFromClassifier(sub.getClassifier());
-								if (typeDef instanceof Agree.NodeContract) {
-									subNodes.putIfAbsent(fieldName, (Agree.NodeContract) typeDef);
+								Nenola.Contract typeDef = toContractFromClassifier(sub.getClassifier());
+								if (typeDef instanceof Nenola.NodeContract) {
+									subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
 								}
 
 							} else if (sub.getArrayDimensions().size() == 1) {
@@ -429,13 +429,13 @@ public class AgreeXtext {
 						String fieldName = feature.getName();
 
 						boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
-						Agree.Direc direction = null;
+						Nenola.Direc direction = null;
 						if (feature instanceof Port) {
 							int v = ((Port) feature).getDirection().getValue();
 							if (v == DirectionType.IN_VALUE) {
-								direction = new Agree.In();
+								direction = new Nenola.In();
 							} else if (v == DirectionType.OUT_VALUE) {
-								direction = new Agree.Out(Optional.empty());
+								direction = new Nenola.Out(Optional.empty());
 							}
 						}
 
@@ -444,18 +444,20 @@ public class AgreeXtext {
 
 							if (feature.getClassifier() != null) {
 								if (feature.getArrayDimensions().size() == 0) {
-									Contract typeDef = toContractFromClassifier(feature.getClassifier());
+									Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
 									if (typeDef instanceof DataContract) {
-										Agree.Port port = new Agree.Port((DataContract) typeDef, direction, isEvent);
+										Nenola.Port port = new Nenola.Port(fieldName,
+												(DataContract) typeDef, direction, isEvent);
 										ports.putIfAbsent(fieldName, port);
 									}
 								} else if (feature.getArrayDimensions().size() == 1) {
 									ArrayDimension ad = feature.getArrayDimensions().get(0);
 									int size = Math.toIntExact(getArraySize(ad));
-									Contract stem = toContractFromClassifier(feature.getClassifier());
-									if (stem instanceof Agree.DataContract) {
-										DataContract typeDef = new ArrayContract("", (Agree.DataContract) stem, size);
-										Agree.Port port = new Agree.Port(typeDef, direction, isEvent);
+									Nenola.Contract stem = toContractFromClassifier(feature.getClassifier());
+									if (stem instanceof Nenola.DataContract) {
+										DataContract typeDef = new ArrayContract("", (Nenola.DataContract) stem, size);
+										Nenola.Port port = new Nenola.Port(fieldName, typeDef,
+												direction, isEvent);
 										ports.putIfAbsent(fieldName, port);
 									}
 
@@ -479,11 +481,12 @@ public class AgreeXtext {
 
 							for (Arg arg : args) {
 								String fieldName = arg.getName();
-								Contract typeDef = toContractFromNamedElm(arg);
+								Nenola.Contract typeDef = toContractFromNamedElm(arg);
 
 								if (typeDef instanceof DataContract) {
-									Agree.Port port = new Agree.Port((DataContract) typeDef,
-											new Agree.Out(Optional.empty()), false);
+									Nenola.Port port = new Nenola.Port(fieldName,
+											(DataContract) typeDef,
+											new Nenola.Out(Optional.empty()), false);
 									ports.putIfAbsent(fieldName, port);
 								}
 
@@ -498,15 +501,15 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new Agree.NodeContract(name, ports, subNodes, contractList, c);
+			return new Nenola.NodeContract(name, ports, subNodes, contractList, c);
 
 		}
 
-		return Prim.ErrorContract;
+		return Nenola.Prim.ErrorContract;
 
 	}
 
-	public static Contract inferContractFromNamedElement(NamedElement ne) {
+	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
 
 		if (ne instanceof BoolOutputStatement) {
 			return inferContract(((BoolOutputStatement) ne).getExpr());
@@ -547,7 +550,7 @@ public class AgreeXtext {
 			}
 
 			if (arrExpr != null) {
-				Contract arrType = inferContract(arrExpr);
+				Nenola.Contract arrType = inferContract(arrExpr);
 				if (arrType instanceof ArrayContract) {
 					return ((ArrayContract) arrType).stemContract;
 				}
@@ -555,12 +558,12 @@ public class AgreeXtext {
 
 			if (container instanceof FoldLeftExpr) {
 				Expr initExpr = ((FoldLeftExpr) container).getInitial();
-				Contract initType = inferContract(initExpr);
+				Nenola.Contract initType = inferContract(initExpr);
 				return initType;
 
 			} else if (container instanceof FoldRightExpr) {
 				Expr initExpr = ((FoldRightExpr) container).getInitial();
-				Contract initType = inferContract(initExpr);
+				Nenola.Contract initType = inferContract(initExpr);
 				return initType;
 			}
 
@@ -575,24 +578,24 @@ public class AgreeXtext {
 			Subcomponent sub = (Subcomponent) ne;
 			Classifier cl = sub.getClassifier();
 			List<ArrayDimension> dims = sub.getArrayDimensions();
-			Contract clsTypeDef = toContractFromClassifier(cl);
+			Nenola.Contract clsTypeDef = toContractFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
-			} else if (dims.size() == 1 && clsTypeDef instanceof Agree.DataContract) {
+			} else if (dims.size() == 1 && clsTypeDef instanceof Nenola.DataContract) {
 				long size = getArraySize(dims.get(0));
-				return new ArrayContract("", (Agree.DataContract) clsTypeDef, Math.toIntExact(size));
+				return new ArrayContract("", (Nenola.DataContract) clsTypeDef, Math.toIntExact(size));
 			}
 
 		} else if (ne instanceof Feature) {
 
 			Classifier cl = ((Feature) ne).getClassifier();
 			List<ArrayDimension> dims = ((Feature) ne).getArrayDimensions();
-			Contract clsTypeDef = toContractFromClassifier(cl);
+			Nenola.Contract clsTypeDef = toContractFromClassifier(cl);
 			if (dims.size() == 0) {
 				return clsTypeDef;
-			} else if (dims.size() == 1 && clsTypeDef instanceof Agree.DataContract) {
+			} else if (dims.size() == 1 && clsTypeDef instanceof Nenola.DataContract) {
 				long size = getArraySize(dims.get(0));
-				return new ArrayContract("", (Agree.DataContract) clsTypeDef, Math.toIntExact(size));
+				return new ArrayContract("", (Nenola.DataContract) clsTypeDef, Math.toIntExact(size));
 
 			}
 
@@ -602,7 +605,7 @@ public class AgreeXtext {
 
 		}
 
-		return Prim.ErrorContract;
+		return Nenola.Prim.ErrorContract;
 
 	}
 
@@ -660,12 +663,12 @@ public class AgreeXtext {
 		return Optional.empty();
 	}
 
-	private static Contract inferContractFromPropExp(PropertyExpression pe) {
+	private static Nenola.Contract inferContractFromPropExp(PropertyExpression pe) {
 		if (pe instanceof IntegerLiteral) {
-			return Prim.IntContract;
+			return Nenola.Prim.IntContract;
 
 		} else if (pe instanceof RealLiteral) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (pe instanceof NamedValue) {
 			NamedValue nv = (NamedValue) pe;
@@ -675,29 +678,29 @@ public class AgreeXtext {
 			}
 		}
 
-		return Prim.ErrorContract;
+		return Nenola.Prim.ErrorContract;
 
 	}
 
-	public static Contract inferContract(Expr expr) {
+	public static Nenola.Contract inferContract(Expr expr) {
 
 		if (expr instanceof SelectionExpr) {
 
 			Expr target = ((SelectionExpr) expr).getTarget();
-			Contract targetType = inferContract(target);
+			Nenola.Contract targetType = inferContract(target);
 			String name = ((SelectionExpr) expr).getField().getName();
 
-			if (targetType instanceof Agree.RecordContract) {
-				Map<String, Agree.DataContract> fields = ((Agree.RecordContract) targetType).fields;
-				for (Entry<String, Agree.DataContract> entry : fields.entrySet()) {
+			if (targetType instanceof Nenola.RecordContract) {
+				Map<String, Nenola.DataContract> fields = ((Nenola.RecordContract) targetType).fields;
+				for (Entry<String, Nenola.DataContract> entry : fields.entrySet()) {
 					if (entry.getKey().equals(name)) {
 						return entry.getValue();
 					}
 				}
 
-			} else if (targetType instanceof Agree.NodeContract) {
-				Map<String, Agree.Port> ports = ((Agree.NodeContract) targetType).ports;
-				for (Entry<String, Agree.Port> entry : ports.entrySet()) {
+			} else if (targetType instanceof Nenola.NodeContract) {
+				Map<String, Nenola.Port> ports = ((Nenola.NodeContract) targetType).ports;
+				for (Entry<String, Nenola.Port> entry : ports.entrySet()) {
 					if (entry.getKey().equals(name)) {
 						return entry.getValue().dataContract;
 					}
@@ -713,41 +716,41 @@ public class AgreeXtext {
 				case "_CLK":
 				case "_INSERT":
 				case "_REMOVE":
-					return Prim.BoolContract;
+					return Nenola.Prim.BoolContract;
 				case "_COUNT":
-					return Prim.IntContract;
+					return Nenola.Prim.IntContract;
 				}
 			}
 
 		} else if (expr instanceof ArraySubExpr) {
 			Expr arrExpr = ((ArraySubExpr) expr).getExpr();
-			Contract arrType = inferContract(arrExpr);
+			Nenola.Contract arrType = inferContract(arrExpr);
 			if (arrType instanceof ArrayContract) {
 				return ((ArrayContract) arrType).stemContract;
 			}
 
 		} else if (expr instanceof IndicesExpr) {
-			Contract arrType = inferContract(((IndicesExpr) expr).getArray());
+			Nenola.Contract arrType = inferContract(((IndicesExpr) expr).getArray());
 			if (arrType instanceof ArrayContract) {
 				int size = ((ArrayContract) arrType).size;
-				return new ArrayContract("", Prim.IntContract, size);
+				return new ArrayContract("", Nenola.Prim.IntContract, size);
 			}
 
 		} else if (expr instanceof ForallExpr) {
-			return Prim.BoolContract;
+			return Nenola.Prim.BoolContract;
 
 		} else if (expr instanceof ExistsExpr) {
-			return Prim.BoolContract;
+			return Nenola.Prim.BoolContract;
 
 		} else if (expr instanceof FlatmapExpr) {
-			Contract innerArrType = inferContract(((FlatmapExpr) expr).getExpr());
+			Nenola.Contract innerArrType = inferContract(((FlatmapExpr) expr).getExpr());
 			if (innerArrType instanceof ArrayContract) {
-				Contract stemType = ((ArrayContract) innerArrType).stemContract;
-				Contract arrType = inferContract(((FlatmapExpr) expr).getArray());
+				Nenola.Contract stemType = ((ArrayContract) innerArrType).stemContract;
+				Nenola.Contract arrType = inferContract(((FlatmapExpr) expr).getArray());
 
-				if (arrType instanceof ArrayContract && arrType instanceof Agree.DataContract) {
+				if (arrType instanceof ArrayContract && arrType instanceof Nenola.DataContract) {
 					int size = ((ArrayContract) arrType).size;
-					return new ArrayContract("", (Agree.DataContract) stemType, size);
+					return new ArrayContract("", (Nenola.DataContract) stemType, size);
 				}
 			}
 
@@ -758,7 +761,7 @@ public class AgreeXtext {
 			return inferContract(((FoldRightExpr) expr).getExpr());
 
 		} else if (expr instanceof BinaryExpr) {
-			Contract leftType = inferContract(((BinaryExpr) expr).getLeft());
+			Nenola.Contract leftType = inferContract(((BinaryExpr) expr).getLeft());
 			String op = ((BinaryExpr) expr).getOp();
 
 			switch (op) {
@@ -775,7 +778,7 @@ public class AgreeXtext {
 			case ">":
 			case ">=":
 			case "=":
-				return Prim.BoolContract;
+				return Nenola.Prim.BoolContract;
 			case "+":
 			case "-":
 			case "*":
@@ -841,25 +844,25 @@ public class AgreeXtext {
 			}
 
 		} else if (expr instanceof IntLitExpr) {
-			return Prim.IntContract;
+			return Nenola.Prim.IntContract;
 
 		} else if (expr instanceof RealLitExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof BoolLitExpr) {
-			return Prim.BoolContract;
+			return Nenola.Prim.BoolContract;
 
 		} else if (expr instanceof FloorCast) {
-			return Prim.IntContract;
+			return Nenola.Prim.IntContract;
 
 		} else if (expr instanceof RealCast) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof EventExpr) {
-			return Prim.BoolContract;
+			return Nenola.Prim.BoolContract;
 
 		} else if (expr instanceof TimeExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof EnumLitExpr) {
 			return toContractFromType(((EnumLitExpr) expr).getEnumType());
@@ -868,22 +871,22 @@ public class AgreeXtext {
 			return inferContract(((LatchedExpr) expr).getExpr());
 
 		} else if (expr instanceof TimeOfExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof TimeRiseExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof TimeFallExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof TimeOfExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof TimeRiseExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof TimeFallExpr) {
-			return Prim.RealContract;
+			return Nenola.Prim.RealContract;
 
 		} else if (expr instanceof PreExpr) {
 			return inferContract(((PreExpr) expr).getExpr());
@@ -892,10 +895,10 @@ public class AgreeXtext {
 			EList<Expr> elems = ((ArrayLiteralExpr) expr).getElems();
 			Expr first = elems.get(0);
 			int size = elems.size();
-			Contract firstType = inferContract(first);
+			Nenola.Contract firstType = inferContract(first);
 
-			if (firstType instanceof Agree.DataContract) {
-				return new ArrayContract("", (Agree.DataContract) firstType, size);
+			if (firstType instanceof Nenola.DataContract) {
+				return new ArrayContract("", (Nenola.DataContract) firstType, size);
 			}
 
 		} else if (expr instanceof ArrayUpdateExpr) {
@@ -920,7 +923,7 @@ public class AgreeXtext {
 			if (isInLinearizationBody(fnCall)) {
 				// extract in/out arguments
 				if (namedEl instanceof LinearizationDef) {
-					return Prim.RealContract;
+					return Nenola.Prim.RealContract;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
 					return toContractFromType(fnDef.getType());
@@ -938,7 +941,7 @@ public class AgreeXtext {
 						return toContractFromType(outDefTypes.get(0));
 					}
 				} else if (namedEl instanceof LinearizationDef) {
-					return Prim.RealContract;
+					return Nenola.Prim.RealContract;
 				} else if (namedEl instanceof LibraryFnDef) {
 					LibraryFnDef fnDef = (LibraryFnDef) namedEl;
 					return toContractFromType(fnDef.getType());
@@ -947,7 +950,7 @@ public class AgreeXtext {
 			}
 
 		}
-		return Prim.ErrorContract;
+		return Nenola.Prim.ErrorContract;
 
 	}
 
@@ -966,15 +969,118 @@ public class AgreeXtext {
 		return Optional.empty();
 	}
 
-	public static Map<String, Agree.Contract> extractContractMap(Classifier c) {
-		Map<String, Agree.Contract> result = new HashMap<String, Agree.Contract>();
+	public static Map<String, Nenola.Contract> extractContractMap(ComponentClassifier c) {
+		Map<String, Nenola.Contract> result = new HashMap<String, Nenola.Contract>();
 		return result;
 	}
 
-	public static Agree.Program toProgram(ComponentImplementation ci) {
-		Contract main = toContractFromClassifier(ci);
-		Map<String, Agree.Contract> specMap = extractContractMap(ci);
-		return new Agree.Program(main, specMap);
+	private static AgreeContractSubclause getAgreeAnnex(ComponentClassifier comp) {
+		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(comp,
+				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
+			if (annex instanceof AgreeContractSubclause) {
+				// in newer versions of osate the annex this returns annexes in
+				// the type
+				// as well as the implementation. We want the annex in the
+				// specific component
+				EObject container = annex.eContainer();
+				while (!(container instanceof ComponentClassifier)) {
+					container = container.eContainer();
+				}
+				if (container == comp) {
+					return (AgreeContractSubclause) annex;
+				}
+			}
+		}
+		return null;
+	}
+
+	public static String getNodeName(NamedElement nodeDef) {
+		EObject container = nodeDef.eContainer();
+		List<String> segments = new ArrayList<>();
+
+		segments.add(nodeDef.getName());
+		while (container != null) {
+			if (container instanceof ComponentClassifier || container instanceof AadlPackage) {
+				segments.add(0, ((NamedElement) container).getName().replace(".", "__"));
+			}
+			container = container.eContainer();
+		}
+
+		return String.join("__", segments);
+	}
+
+	public static Nenola.Port toInputFromArg(Arg arg) {
+		Nenola.Contract contract = toContractFromType(arg.getType());
+
+		return new Nenola.Port(arg.getName(), (DataContract) contract, new Nenola.In(), false);
+
+	}
+
+	public static Map<String, Nenola.Port> toInputsFromArgs(EList<Arg> args) {
+		Map<String, Nenola.Port> ports = new HashMap<>();
+		for (Arg arg : args) {
+			Nenola.Port port = toInputFromArg(arg);
+			ports.put(port.name, port);
+		}
+		return ports;
+	}
+
+	public static Nenola.Expr toExprFromExpr(Expr expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static NodeGen toNodeGenFromNodeDef(NodeDef spec) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	private static NodeGen toNodeGenFromFnDef(FnDef fnDef) {
+		String nodeName = getNodeName(fnDef).replace("::", "__");
+		Map<String, Nenola.Port> ports = toInputsFromArgs(fnDef.getArgs());
+		Nenola.Expr bodyExpr = toExprFromExpr(fnDef.getExpr());
+
+		Nenola.Contract outContract = toContractFromType(fnDef.getType());
+
+		String outputName = "_outvar";
+		Nenola.Port output = new Nenola.Port(outputName, (DataContract) outContract,
+				new Nenola.Out(Optional.empty()), false);
+
+		ports.put(outputName, output);
+
+		Nenola.DataFlow dataFlow = new Nenola.DataFlow("_outvar", bodyExpr);
+		List<Nenola.DataFlow> dataFlows = Collections.singletonList(dataFlow);
+
+		return new NodeGen(nodeName, ports, dataFlows);
+
+	}
+
+	public static Map<String, Nenola.NodeGen> extractNodeGenMap(ComponentClassifier c) {
+		Map<String, Nenola.NodeGen> result = new HashMap<String, Nenola.NodeGen>();
+		AgreeContractSubclause annex = getAgreeAnnex(c);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement spec : contract.getSpecs()) {
+				if (spec instanceof NodeDef) {
+					Nenola.NodeGen ng = toNodeGenFromNodeDef((NodeDef) spec);
+					result.putIfAbsent(ng.name, ng);
+				} else if (spec instanceof FnDef) {
+					Nenola.NodeGen ng = toNodeGenFromFnDef((FnDef) spec);
+					result.putIfAbsent(ng.name, ng);
+				}
+			}
+
+		}
+		return result;
+	}
+
+	public static Nenola.Program toProgram(ComponentImplementation ci) {
+		Nenola.Contract main = toContractFromClassifier(ci);
+		Map<String, Nenola.Contract> specMap = extractContractMap(ci);
+		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(ci);
+		return new Nenola.Program(main, specMap, nodeGenMap);
 	}
 
 }
