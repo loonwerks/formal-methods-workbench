@@ -298,7 +298,9 @@ public class AgreeXtext {
 			for (SpecStatement specStatement : contract.getSpecs()) {
 
 				Nenola.Spec spec = extractSpecFromSpecStatement(specStatement);
-				result.add(spec);
+				if (spec != null) {
+					result.add(spec);
+				}
 
 			}
 
