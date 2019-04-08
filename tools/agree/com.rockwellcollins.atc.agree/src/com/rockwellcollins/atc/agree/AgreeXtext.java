@@ -19,6 +19,7 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.ArraySize;
 import org.osate.aadl2.ArraySizeProperty;
+import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentClassifier;
@@ -243,7 +244,7 @@ public class AgreeXtext {
 			String description = "";
 			Nenola.Expr leftExpr = new Nenola.IdExpr(((AssertEqualStatement) spec).getId().getQualifiedName());
 			Nenola.Expr rightExpr = toExprFromExpr(((AssertEqualStatement) spec).getExpr());
-			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.Rator.Eq, rightExpr);
+			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.Rator.Equal, rightExpr);
 			Nenola.Prop prop = new Nenola.ExprProp(expr);
 			return new Nenola.Spec(Nenola.SpecTag.Assert, name, description, prop);
 
@@ -1303,43 +1304,105 @@ public class AgreeXtext {
 					toExprFromExpr(update));
 
 		} else if (expr instanceof BinaryExpr) {
-			String op = ((BinaryExpr) expr).getOp();
 
-			switch (op) {
+			Expr left = ((BinaryExpr) expr).getLeft();
+			Expr right = ((BinaryExpr) expr).getRight();
+			Nenola.Rator rator = null;
+
+			switch (((BinaryExpr) expr).getOp()) {
 			case "->":
+				rator = Nenola.Rator.Seq;
 			case "=>":
+				rator = Nenola.Rator.Implies;
 			case "<=>":
+				rator = Nenola.Rator.Equiv;
 			case "and":
+				rator = Nenola.Rator.Conj;
 			case "or":
+				rator = Nenola.Rator.Disj;
 			case "<>":
+				rator = Nenola.Rator.NotEqual;
 			case "!=":
+				rator = Nenola.Rator.NotEqual;
 			case "<":
+				rator = Nenola.Rator.LessThan;
 			case "<=":
+				rator = Nenola.Rator.LessEq;
 			case ">":
+				rator = Nenola.Rator.GreatThan;
 			case ">=":
+				rator = Nenola.Rator.GreatEq;
 			case "=":
+				rator = Nenola.Rator.Equal;
 			case "+":
+				rator = Nenola.Rator.Plus;
 			case "-":
+				rator = Nenola.Rator.Minus;
 			case "*":
+				rator = Nenola.Rator.Mult;
 			case "/":
+				rator = Nenola.Rator.Div;
 			case "mod":
+				rator = Nenola.Rator.Mod;
 			case "div":
+				rator = Nenola.Rator.Div;
 			case "^":
+				rator = Nenola.Rator.Pow;
 			}
+
+			return new Nenola.BinExpr(toExprFromExpr(left), rator, toExprFromExpr(right));
 
 		} else if (expr instanceof UnaryExpr) {
 
+			Expr rand = ((UnaryExpr) expr).getExpr();
+			Nenola.Rator rator = null;
+
+			switch (((BinaryExpr) expr).getOp()) {
+			case "-":
+				rator = Nenola.Rator.Neg;
+			case "not":
+				rator = Nenola.Rator.Not;
+			}
+
+			return new Nenola.UnaryExpr(rator, toExprFromExpr(rand));
+
 		} else if (expr instanceof IfThenElseExpr) {
 
+			Expr a = ((IfThenElseExpr) expr).getA();
+			Expr b = ((IfThenElseExpr) expr).getB();
+			Expr c = ((IfThenElseExpr) expr).getC();
+
+			return new Nenola.DistinctionExpr(toExprFromExpr(a), toExprFromExpr(b), toExprFromExpr(c));
+
 		} else if (expr instanceof PrevExpr) {
+			Expr body = ((PrevExpr) expr).getDelay();
+			Expr init = ((PrevExpr) expr).getInit();
+
+			return new Nenola.PrevExpr(toExprFromExpr(body), toExprFromExpr(init));
 
 		} else if (expr instanceof GetPropertyExpr) {
 
+			ComponentRef ref = ((GetPropertyExpr) expr).getComponentRef();
+			String propName = ((GetPropertyExpr) expr).getProp().getName();
+			if (ref instanceof ThisRef) {
+				return new Nenola.LocalProperty(propName);
+			} else if (ref instanceof DoubleDotRef) {
+				String nodeName = ((DoubleDotRef) ref).getElm().getQualifiedName().replace("::", "__").replace(".",
+						"__");
+				return new Nenola.ForeignProperty(nodeName, propName);
+			}
+
 		} else if (expr instanceof IntLitExpr) {
+			String val = ((IntLitExpr) expr).getVal();
+			return new Nenola.IntLit(val);
 
 		} else if (expr instanceof RealLitExpr) {
+			String val = ((RealLitExpr) expr).getVal();
+			return new Nenola.RealLit(val);
 
 		} else if (expr instanceof BoolLitExpr) {
+			BooleanLiteral val = ((BoolLitExpr) expr).getVal();
+			return new Nenola.BoolLit(val.getValue());
 
 		} else if (expr instanceof FloorCast) {
 

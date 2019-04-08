@@ -26,7 +26,7 @@ public class Nenola {
 	}
 
 	public static enum Rator {
-		Eq
+		Equal, Seq, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod, Pow, Neg, Not
 	}
 
 	public static enum Tag {
@@ -73,10 +73,84 @@ public class Nenola {
 		public final Rator rator;
 		public final Expr e2;
 
-		public BinExpr(Expr e1, Rator rator, Expr expr) {
+		public BinExpr(Expr e1, Rator rator, Expr e2) {
 			this.e1 = e1;
 			this.rator = rator;
-			this.e2 = expr;
+			this.e2 = e2;
+		}
+	}
+
+	public static class DistinctionExpr implements Expr {
+		public final Expr condition;
+		public final Expr trueBody;
+		public final Expr falseBody;
+
+		public DistinctionExpr(Expr condition, Expr trueBody, Expr falseBody) {
+			this.condition = condition;
+			this.trueBody = trueBody;
+			this.falseBody = falseBody;
+		}
+	}
+
+	public static class PrevExpr implements Expr {
+		public final Expr body;
+		public final Expr init;
+
+		public PrevExpr(Expr body, Expr init) {
+			this.body = body;
+			this.init = init;
+		}
+	}
+
+	public static class LocalProperty implements Expr {
+		public final String propName;
+
+		public LocalProperty(String propName) {
+			this.propName = propName;
+		}
+	}
+
+	public static class ForeignProperty implements Expr {
+		public final String nodeName;
+		public final String propName;
+
+		public ForeignProperty(String nodeName, String propName) {
+			this.nodeName = nodeName;
+			this.propName = propName;
+		}
+	}
+
+	public static class IntLit implements Expr {
+		String val;
+
+		public IntLit(String val) {
+			this.val = val;
+		}
+	}
+
+	public static class RealLit implements Expr {
+		String val;
+
+		public RealLit(String val) {
+			this.val = val;
+		}
+	}
+
+	public static class BoolLit implements Expr {
+		boolean val;
+
+		public BoolLit(boolean val) {
+			this.val = val;
+		}
+	}
+
+	public static class UnaryExpr implements Expr {
+		public final Rator rator;
+		public final Expr rand;
+
+		public UnaryExpr(Rator rator, Expr rand) {
+			this.rator = rator;
+			this.rand = rand;
 		}
 	}
 
