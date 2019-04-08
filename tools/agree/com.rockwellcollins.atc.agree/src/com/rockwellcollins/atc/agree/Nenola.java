@@ -144,6 +144,88 @@ public class Nenola {
 		}
 	}
 
+	public static class Floor implements Expr {
+		Expr arg;
+
+		public Floor(Expr arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class RealCast implements Expr {
+		Expr arg;
+
+		public RealCast(Expr arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class Latch implements Expr {
+		Expr arg;
+
+		public Latch(Expr arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class Pre implements Expr {
+		Expr arg;
+
+		public Pre(Expr arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class Event implements Expr {
+		String arg;
+
+		public Event(String arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class TimeOf implements Expr {
+		String arg;
+
+		public TimeOf(String arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class TimeRise implements Expr {
+		String arg;
+
+		public TimeRise(String arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class TimeFall implements Expr {
+		String arg;
+
+		public TimeFall(String arg) {
+			this.arg = arg;
+		}
+	}
+
+	public static class Time implements Expr {
+
+		public Time() {
+
+		}
+	}
+
+	public static class EnumLit implements Expr {
+		public final String contractName;
+		public final String variantName;
+
+		public EnumLit(String contractName, String variantName) {
+			this.contractName = contractName;
+			this.variantName = variantName;
+
+		}
+	}
+
 	public static class UnaryExpr implements Expr {
 		public final Rator rator;
 		public final Expr rand;

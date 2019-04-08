@@ -986,15 +986,6 @@ public class AgreeXtext {
 		} else if (expr instanceof TimeFallExpr) {
 			return Nenola.Prim.RealContract;
 
-		} else if (expr instanceof TimeOfExpr) {
-			return Nenola.Prim.RealContract;
-
-		} else if (expr instanceof TimeRiseExpr) {
-			return Nenola.Prim.RealContract;
-
-		} else if (expr instanceof TimeFallExpr) {
-			return Nenola.Prim.RealContract;
-
 		} else if (expr instanceof PreExpr) {
 			return inferContract(((PreExpr) expr).getExpr());
 
@@ -1405,30 +1396,47 @@ public class AgreeXtext {
 			return new Nenola.BoolLit(val.getValue());
 
 		} else if (expr instanceof FloorCast) {
+			Expr arg = ((FloorCast) expr).getExpr();
+			return new Nenola.Floor(toExprFromExpr(arg));
 
 		} else if (expr instanceof RealCast) {
+			Expr arg = ((RealCast) expr).getExpr();
+			return new Nenola.RealCast(toExprFromExpr(arg));
 
 		} else if (expr instanceof EventExpr) {
+			String arg = ((EventExpr) expr).getId().getName();
+			return new Nenola.Event(arg);
 
 		} else if (expr instanceof TimeExpr) {
+			return new Nenola.Time();
 
 		} else if (expr instanceof EnumLitExpr) {
 
+			String contractName = ((EnumLitExpr) expr).getEnumType().getElm().getQualifiedName().replace("::", "__")
+					.replace(".", "__");
+			String variantName = ((EnumLitExpr) expr).getValue();
+
+			return new Nenola.EnumLit(contractName, variantName);
+
 		} else if (expr instanceof LatchedExpr) {
+			Expr arg = ((LatchedExpr) expr).getExpr();
+			return new Nenola.Latch(toExprFromExpr(arg));
 
 		} else if (expr instanceof TimeOfExpr) {
+			String arg = ((TimeOfExpr) expr).getId().getName();
+			return new Nenola.TimeOf(arg);
 
 		} else if (expr instanceof TimeRiseExpr) {
+			String arg = ((TimeRiseExpr) expr).getId().getName();
+			return new Nenola.TimeRise(arg);
 
 		} else if (expr instanceof TimeFallExpr) {
-
-		} else if (expr instanceof TimeOfExpr) {
-
-		} else if (expr instanceof TimeRiseExpr) {
-
-		} else if (expr instanceof TimeFallExpr) {
+			String arg = ((TimeFallExpr) expr).getId().getName();
+			return new Nenola.TimeFall(arg);
 
 		} else if (expr instanceof PreExpr) {
+			Expr arg = ((PreExpr) expr).getExpr();
+			return new Nenola.Pre(toExprFromExpr(arg));
 
 		} else if (expr instanceof ArrayLiteralExpr) {
 
@@ -1439,6 +1447,8 @@ public class AgreeXtext {
 		} else if (expr instanceof RecordUpdateExpr) {
 
 		} else if (expr instanceof NamedElmExpr) {
+			String name = ((NamedElmExpr) expr).getElm().getName();
+			return new Nenola.IdExpr(name);
 
 		} else if (expr instanceof CallExpr) {
 
