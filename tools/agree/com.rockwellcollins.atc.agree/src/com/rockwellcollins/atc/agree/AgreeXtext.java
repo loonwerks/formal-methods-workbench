@@ -220,12 +220,11 @@ public class AgreeXtext {
 	}
 
 	private static Nenola.Prop extractPropFromExpr(Expr expr) {
-		// TODO Auto-generated method stub
-		return null;
+		Nenola.Expr nenolaExpr = toExprFromExpr(expr);
+		return new Nenola.ExprProp(nenolaExpr);
 	}
 
 	private static Spec extractSpecFromSpecStatement(SpecStatement spec) {
-		// TODO
 
 		if (spec instanceof AssertStatement) {
 			String name = ((AssertStatement) spec).getName();
@@ -249,10 +248,40 @@ public class AgreeXtext {
 			return new Nenola.Spec(Nenola.SpecTag.Assert, name, description, prop);
 
 		} else if (spec instanceof LemmaStatement) {
+			String name = ((LemmaStatement) spec).getName();
+			String description = ((LemmaStatement) spec).getStr();
+			Nenola.Prop prop = null;
+			if (((LemmaStatement) spec).getExpr() != null) {
+				prop = extractPropFromExpr(((LemmaStatement) spec).getExpr());
+			} else if (((LemmaStatement) spec).getPattern() != null) {
+				prop = extractPropFromPattern(((LemmaStatement) spec).getPattern());
+			}
+
+			return new Nenola.Spec(Nenola.SpecTag.Lemma, name, description, prop);
 
 		} else if (spec instanceof AssumeStatement) {
+			String name = ((AssumeStatement) spec).getName();
+			String description = ((AssumeStatement) spec).getStr();
+			Nenola.Prop prop = null;
+			if (((AssumeStatement) spec).getExpr() != null) {
+				prop = extractPropFromExpr(((AssumeStatement) spec).getExpr());
+			} else if (((AssumeStatement) spec).getPattern() != null) {
+				prop = extractPropFromPattern(((AssumeStatement) spec).getPattern());
+			}
+
+			return new Nenola.Spec(Nenola.SpecTag.Assume, name, description, prop);
 
 		} else if (spec instanceof GuaranteeStatement) {
+			String name = ((GuaranteeStatement) spec).getName();
+			String description = ((GuaranteeStatement) spec).getStr();
+			Nenola.Prop prop = null;
+			if (((GuaranteeStatement) spec).getExpr() != null) {
+				prop = extractPropFromExpr(((GuaranteeStatement) spec).getExpr());
+			} else if (((GuaranteeStatement) spec).getPattern() != null) {
+				prop = extractPropFromPattern(((GuaranteeStatement) spec).getPattern());
+			}
+
+			return new Nenola.Spec(Nenola.SpecTag.Guarantee, name, description, prop);
 
 		}
 
