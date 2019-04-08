@@ -1220,7 +1220,166 @@ public class AgreeXtext {
 	}
 
 	public static Nenola.Expr toExprFromExpr(Expr expr) {
-		// TODO Auto-generated method stub
+
+		// TODO
+
+		if (expr instanceof SelectionExpr) {
+
+			Expr target = ((SelectionExpr) expr).getTarget();
+			Nenola.Expr nenolaTarget = toExprFromExpr(target);
+
+			String selection = ((SelectionExpr) expr).getField().getName();
+			return new Nenola.SelectionExpr(nenolaTarget, selection);
+
+		} else if (expr instanceof TagExpr) {
+
+			String tag = ((TagExpr) expr).getTag();
+			Nenola.Expr target = toExprFromExpr(((TagExpr) expr).getStem());
+			if (tag != null) {
+				switch (tag) {
+				case "_CLK":
+					return new Nenola.TagExpr(target, Nenola.Tag.Clock);
+				case "_INSERT":
+					return new Nenola.TagExpr(target, Nenola.Tag.Insert);
+				case "_REMOVE":
+					return new Nenola.TagExpr(target, Nenola.Tag.Remove);
+				case "_COUNT":
+					return new Nenola.TagExpr(target, Nenola.Tag.Count);
+				}
+			}
+
+		} else if (expr instanceof ArraySubExpr) {
+			Expr arrExpr = ((ArraySubExpr) expr).getExpr();
+			Expr index = ((ArraySubExpr) expr).getIndex();
+			return new Nenola.ArraySubExpr(toExprFromExpr(arrExpr), toExprFromExpr(index));
+
+		} else if (expr instanceof IndicesExpr) {
+			Expr array = ((IndicesExpr) expr).getArray();
+			return new Nenola.IndicesExpr(toExprFromExpr(array));
+
+		} else if (expr instanceof ForallExpr) {
+
+			String binding = ((ForallExpr) expr).getBinding().getName();
+			Expr array = ((ForallExpr) expr).getArray();
+			Expr body = ((ForallExpr) expr).getExpr();
+
+			return new Nenola.ForallExpr(binding, toExprFromExpr(array), toExprFromExpr(body));
+
+		} else if (expr instanceof ExistsExpr) {
+
+			String binding = ((ExistsExpr) expr).getBinding().getName();
+			Expr array = ((ExistsExpr) expr).getArray();
+			Expr body = ((ExistsExpr) expr).getExpr();
+
+			return new Nenola.ExistsExpr(binding, toExprFromExpr(array), toExprFromExpr(body));
+
+		} else if (expr instanceof FlatmapExpr) {
+			String binding = ((FlatmapExpr) expr).getBinding().getName();
+			Expr array = ((FlatmapExpr) expr).getArray();
+			Expr body = ((FlatmapExpr) expr).getExpr();
+
+			return new Nenola.FlatmapExpr(binding, toExprFromExpr(array), toExprFromExpr(body));
+
+
+		} else if (expr instanceof FoldLeftExpr) {
+			String binding = ((FlatmapExpr) expr).getBinding().getName();
+			Expr array = ((FlatmapExpr) expr).getArray();
+			String acc = ((FoldLeftExpr) expr).getAccumulator().getName();
+			Expr init = ((FoldLeftExpr) expr).getInitial();
+			Expr update = ((FoldLeftExpr) expr).getExpr();
+
+			return new Nenola.FoldLeftExpr(binding, toExprFromExpr(array), acc, toExprFromExpr(init),
+					toExprFromExpr(update));
+
+
+		} else if (expr instanceof FoldRightExpr) {
+			String binding = ((FlatmapExpr) expr).getBinding().getName();
+			Expr array = ((FlatmapExpr) expr).getArray();
+			String acc = ((FoldRightExpr) expr).getAccumulator().getName();
+			Expr init = ((FoldLeftExpr) expr).getInitial();
+			Expr update = ((FoldRightExpr) expr).getExpr();
+
+			return new Nenola.FoldRightExpr(binding, toExprFromExpr(array), acc, toExprFromExpr(init),
+					toExprFromExpr(update));
+
+		} else if (expr instanceof BinaryExpr) {
+			String op = ((BinaryExpr) expr).getOp();
+
+			switch (op) {
+			case "->":
+			case "=>":
+			case "<=>":
+			case "and":
+			case "or":
+			case "<>":
+			case "!=":
+			case "<":
+			case "<=":
+			case ">":
+			case ">=":
+			case "=":
+			case "+":
+			case "-":
+			case "*":
+			case "/":
+			case "mod":
+			case "div":
+			case "^":
+			}
+
+		} else if (expr instanceof UnaryExpr) {
+
+		} else if (expr instanceof IfThenElseExpr) {
+
+		} else if (expr instanceof PrevExpr) {
+
+		} else if (expr instanceof GetPropertyExpr) {
+
+		} else if (expr instanceof IntLitExpr) {
+
+		} else if (expr instanceof RealLitExpr) {
+
+		} else if (expr instanceof BoolLitExpr) {
+
+		} else if (expr instanceof FloorCast) {
+
+		} else if (expr instanceof RealCast) {
+
+		} else if (expr instanceof EventExpr) {
+
+		} else if (expr instanceof TimeExpr) {
+
+		} else if (expr instanceof EnumLitExpr) {
+
+		} else if (expr instanceof LatchedExpr) {
+
+		} else if (expr instanceof TimeOfExpr) {
+
+		} else if (expr instanceof TimeRiseExpr) {
+
+		} else if (expr instanceof TimeFallExpr) {
+
+		} else if (expr instanceof TimeOfExpr) {
+
+		} else if (expr instanceof TimeRiseExpr) {
+
+		} else if (expr instanceof TimeFallExpr) {
+
+		} else if (expr instanceof PreExpr) {
+
+		} else if (expr instanceof ArrayLiteralExpr) {
+
+		} else if (expr instanceof ArrayUpdateExpr) {
+
+		} else if (expr instanceof RecordLitExpr) {
+
+		} else if (expr instanceof RecordUpdateExpr) {
+
+		} else if (expr instanceof NamedElmExpr) {
+
+		} else if (expr instanceof CallExpr) {
+
+		}
 		return null;
 	}
 

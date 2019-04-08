@@ -29,8 +29,23 @@ public class Nenola {
 		Eq
 	}
 
+	public static enum Tag {
+		Clock, Insert, Remove, Count
+	}
+
 	public static interface Expr {
 
+	}
+
+	public static class TagExpr implements Expr {
+
+		public final Expr target;
+		public final Tag tag;
+
+		public TagExpr(Expr target, Tag tag) {
+			this.target = target;
+			this.tag = tag;
+		}
 	}
 
 	public static class IdExpr implements Expr {
@@ -38,6 +53,17 @@ public class Nenola {
 
 		public IdExpr(String name) {
 			this.name = name;
+		}
+	}
+
+	public static class SelectionExpr implements Expr {
+		public final Expr target;
+		public final String selection;
+
+		public SelectionExpr(Expr target, String selection) {
+			this.target = target;
+			this.selection = selection;
+
 		}
 	}
 
@@ -52,6 +78,103 @@ public class Nenola {
 			this.rator = rator;
 			this.e2 = expr;
 		}
+	}
+
+	public static class ArraySubExpr implements Expr {
+		public final Expr array;
+		public final Expr index;
+
+		public ArraySubExpr(Expr array, Expr index) {
+			this.array = array;
+			this.index = index;
+		}
+	}
+
+	public static class IndicesExpr implements Expr {
+		public final Expr array;
+
+		public IndicesExpr(Expr array) {
+			this.array = array;
+		}
+
+	}
+
+	public static class ForallExpr implements Expr {
+		public final String binding;
+		public final Expr array;
+		public final Expr body;
+
+		public ForallExpr(String binding, Expr array, Expr body) {
+			this.binding = binding;
+			this.array = array;
+			this.body = body;
+
+		}
+
+	}
+
+	public static class ExistsExpr implements Expr {
+		public final String binding;
+		public final Expr array;
+		public final Expr body;
+
+		public ExistsExpr(String binding, Expr array, Expr body) {
+			this.binding = binding;
+			this.array = array;
+			this.body = body;
+
+		}
+
+	}
+
+	public static class FlatmapExpr implements Expr {
+		public final String binding;
+		public final Expr array;
+		public final Expr body;
+
+		public FlatmapExpr(String binding, Expr array, Expr body) {
+			this.binding = binding;
+			this.array = array;
+			this.body = body;
+
+		}
+
+	}
+
+	public static class FoldLeftExpr implements Expr {
+		public final String binding;
+		public final Expr array;
+		public final String acc;
+		public final Expr initial;
+		public final Expr update;
+
+		public FoldLeftExpr(String binding, Expr array, String acc, Expr initial, Expr update) {
+			this.binding = binding;
+			this.array = array;
+			this.acc = acc;
+			this.initial = initial;
+			this.update = update;
+
+		}
+
+	}
+
+	public static class FoldRightExpr implements Expr {
+		public final String binding;
+		public final Expr array;
+		public final String acc;
+		public final Expr initial;
+		public final Expr update;
+
+		public FoldRightExpr(String binding, Expr array, String acc, Expr initial, Expr update) {
+			this.binding = binding;
+			this.array = array;
+			this.acc = acc;
+			this.initial = initial;
+			this.update = update;
+
+		}
+
 	}
 
 
