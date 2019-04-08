@@ -41,7 +41,6 @@ import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.FnDef;
 import com.rockwellcollins.atc.agree.agree.GetPropertyExpr;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NamedID;
@@ -96,7 +95,6 @@ public class AgreeLinkingService extends PropertiesLinkingService {
 
 
 		if (context instanceof DoubleDotRef || context instanceof ThisRef
-				|| context instanceof LiftStatement
 				|| context instanceof TagExpr
 				|| context instanceof SelectionExpr
 				|| context instanceof NamedElmExpr

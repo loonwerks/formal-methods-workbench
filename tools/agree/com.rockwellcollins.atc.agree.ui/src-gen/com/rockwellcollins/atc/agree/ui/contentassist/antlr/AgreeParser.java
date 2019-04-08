@@ -90,8 +90,6 @@ public class AgreeParser extends AbstractPartialContentAssistParser {
 					put(grammarAccess.getAgreeContractAccess().getGroup(), "rule__AgreeContract__Group__0");
 					put(grammarAccess.getSpecStatementAccess().getGroup_1(), "rule__SpecStatement__Group_1__0");
 					put(grammarAccess.getSpecStatementAccess().getGroup_2(), "rule__SpecStatement__Group_2__0");
-					put(grammarAccess.getSpecStatementAccess().getGroup_3(), "rule__SpecStatement__Group_3__0");
-					put(grammarAccess.getSpecStatementAccess().getGroup_4(), "rule__SpecStatement__Group_4__0");
 					put(grammarAccess.getNamedSpecStatementAccess().getGroup_0(), "rule__NamedSpecStatement__Group_0__0");
 					put(grammarAccess.getNamedSpecStatementAccess().getGroup_1(), "rule__NamedSpecStatement__Group_1__0");
 					put(grammarAccess.getNamedSpecStatementAccess().getGroup_2(), "rule__NamedSpecStatement__Group_2__0");
@@ -346,11 +344,8 @@ public class AgreeParser extends AbstractPartialContentAssistParser {
 					put(grammarAccess.getAgreeSubclauseAccess().getContractAssignment_1(), "rule__AgreeSubclause__ContractAssignment_1");
 					put(grammarAccess.getAgreeContractAccess().getSpecsAssignment_1(), "rule__AgreeContract__SpecsAssignment_1");
 					put(grammarAccess.getSpecStatementAccess().getExprAssignment_1_3(), "rule__SpecStatement__ExprAssignment_1_3");
-					put(grammarAccess.getSpecStatementAccess().getExprAssignment_2_2(), "rule__SpecStatement__ExprAssignment_2_2");
-					put(grammarAccess.getSpecStatementAccess().getTypeAssignment_2_4(), "rule__SpecStatement__TypeAssignment_2_4");
-					put(grammarAccess.getSpecStatementAccess().getSubcompAssignment_3_2(), "rule__SpecStatement__SubcompAssignment_3_2");
-					put(grammarAccess.getSpecStatementAccess().getConnAssignment_4_2(), "rule__SpecStatement__ConnAssignment_4_2");
-					put(grammarAccess.getSpecStatementAccess().getExprAssignment_4_4(), "rule__SpecStatement__ExprAssignment_4_4");
+					put(grammarAccess.getSpecStatementAccess().getConnAssignment_2_2(), "rule__SpecStatement__ConnAssignment_2_2");
+					put(grammarAccess.getSpecStatementAccess().getExprAssignment_2_4(), "rule__SpecStatement__ExprAssignment_2_4");
 					put(grammarAccess.getNamedSpecStatementAccess().getNameAssignment_0_2(), "rule__NamedSpecStatement__NameAssignment_0_2");
 					put(grammarAccess.getNamedSpecStatementAccess().getStrAssignment_0_3(), "rule__NamedSpecStatement__StrAssignment_0_3");
 					put(grammarAccess.getNamedSpecStatementAccess().getExprAssignment_0_5_0(), "rule__NamedSpecStatement__ExprAssignment_0_5_0");

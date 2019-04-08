@@ -48,8 +48,6 @@ AgreeContract returns Contract:
 SpecStatement:
 	NamedSpecStatement
 |	{InitialStatement} 'initially' ':' expr=Expr  ';'
-|	{ParamStatement} 'parameter' expr=Expr ':' type=Type ';'
-|	{LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';'
 |	{ConnectionStatement} 'connection' conn=[aadl2::NamedElement] ':' expr=Expr ';'
 |	SynchStatement
 |	OrderStatement

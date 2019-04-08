@@ -53,7 +53,6 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -70,7 +69,6 @@ import com.rockwellcollins.atc.agree.agree.OpenRightTimeInterval;
 import com.rockwellcollins.atc.agree.agree.OpenTimeInterval;
 import com.rockwellcollins.atc.agree.agree.OrderStatement;
 import com.rockwellcollins.atc.agree.agree.OutputStatement;
-import com.rockwellcollins.atc.agree.agree.ParamStatement;
 import com.rockwellcollins.atc.agree.agree.PatternStatement;
 import com.rockwellcollins.atc.agree.agree.PeriodicStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
@@ -387,20 +385,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   private EClass initialStatementEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass paramStatementEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass liftStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -1859,61 +1843,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
   public EReference getInitialStatement_Expr()
   {
     return (EReference)initialStatementEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EClass getParamStatement()
-  {
-    return paramStatementEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getParamStatement_Expr()
-  {
-    return (EReference)paramStatementEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getParamStatement_Type()
-  {
-    return (EReference)paramStatementEClass.getEStructuralFeatures().get(1);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EClass getLiftStatement()
-  {
-    return liftStatementEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getLiftStatement_Subcomp()
-  {
-    return (EReference)liftStatementEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -3724,13 +3653,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     initialStatementEClass = createEClass(INITIAL_STATEMENT);
     createEReference(initialStatementEClass, INITIAL_STATEMENT__EXPR);
 
-    paramStatementEClass = createEClass(PARAM_STATEMENT);
-    createEReference(paramStatementEClass, PARAM_STATEMENT__EXPR);
-    createEReference(paramStatementEClass, PARAM_STATEMENT__TYPE);
-
-    liftStatementEClass = createEClass(LIFT_STATEMENT);
-    createEReference(liftStatementEClass, LIFT_STATEMENT__SUBCOMP);
-
     connectionStatementEClass = createEClass(CONNECTION_STATEMENT);
     createEReference(connectionStatementEClass, CONNECTION_STATEMENT__CONN);
     createEReference(connectionStatementEClass, CONNECTION_STATEMENT__EXPR);
@@ -4025,8 +3947,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     agreeContractSubclauseEClass.getESuperTypes().add(this.getAgreeSubclause());
     agreeContractEClass.getESuperTypes().add(this.getContract());
     initialStatementEClass.getESuperTypes().add(this.getSpecStatement());
-    paramStatementEClass.getESuperTypes().add(this.getSpecStatement());
-    liftStatementEClass.getESuperTypes().add(this.getSpecStatement());
     connectionStatementEClass.getESuperTypes().add(this.getSpecStatement());
     assumeStatementEClass.getESuperTypes().add(this.getNamedSpecStatement());
     guaranteeStatementEClass.getESuperTypes().add(this.getNamedSpecStatement());
@@ -4214,13 +4134,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
 
     initEClass(initialStatementEClass, InitialStatement.class, "InitialStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getInitialStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, InitialStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-    initEClass(paramStatementEClass, ParamStatement.class, "ParamStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getParamStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, ParamStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getParamStatement_Type(), this.getType(), null, "type", null, 0, 1, ParamStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-    initEClass(liftStatementEClass, LiftStatement.class, "LiftStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getLiftStatement_Subcomp(), theAadl2Package.getNamedElement(), null, "subcomp", null, 0, 1, LiftStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(connectionStatementEClass, ConnectionStatement.class, "ConnectionStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getConnectionStatement_Conn(), theAadl2Package.getNamedElement(), null, "conn", null, 0, 1, ConnectionStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

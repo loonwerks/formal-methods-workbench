@@ -45,17 +45,16 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.google.common.collect.HashMultimap;
+import com.rockwellcollins.atc.agree.AgreeAADLEnumerationUtils;
+import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.Nenola;
 import com.rockwellcollins.atc.agree.Nenola.ArrayContract;
 import com.rockwellcollins.atc.agree.Nenola.Contract;
 import com.rockwellcollins.atc.agree.Nenola.RecordContract;
-import com.rockwellcollins.atc.agree.AgreeAADLEnumerationUtils;
-import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.Abstraction;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
@@ -77,6 +76,7 @@ import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
+import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
@@ -94,11 +94,9 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
-import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NamedID;
 import com.rockwellcollins.atc.agree.agree.NamedSpecStatement;
@@ -780,25 +778,6 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			error(statement,
 					"Expression for 'initially' statement is of type '" + exprType.getName()
 					+ "' but must be of type 'bool'");
-		}
-	}
-
-	@Check(CheckType.FAST)
-	public void checkLift(LiftStatement lift) {
-
-
-		if (!(lift.getSubcomp() instanceof NamedElement)) {
-			error(lift, "Lift statements can be applied only to direct subcomponents."
-					+ "Place a lift statement in the subcomponents contract for heavy lifting");
-		}
-
-		NamedElement namedEl = lift.getSubcomp();
-
-		if (namedEl != null) {
-			if (!(namedEl instanceof SubcomponentImpl)) {
-				error(lift, "Lift statements must apply to subcomponent implementations. '" + namedEl.getName()
-				+ "' is not a subcomponent.");
-			}
 		}
 	}
 

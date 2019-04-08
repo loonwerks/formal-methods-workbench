@@ -365,24 +365,6 @@ public interface AgreeFactory extends EFactory
   InitialStatement createInitialStatement();
 
   /**
-   * Returns a new object of class '<em>Param Statement</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Param Statement</em>'.
-   * @generated
-   */
-  ParamStatement createParamStatement();
-
-  /**
-   * Returns a new object of class '<em>Lift Statement</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Lift Statement</em>'.
-   * @generated
-   */
-  LiftStatement createLiftStatement();
-
-  /**
    * Returns a new object of class '<em>Connection Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
