@@ -38,10 +38,10 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
+import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.Nenola;
 import com.rockwellcollins.atc.agree.Nenola.Contract;
 import com.rockwellcollins.atc.agree.Nenola.RecordContract;
-import com.rockwellcollins.atc.agree.AgreeXtext;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractLibrary;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;

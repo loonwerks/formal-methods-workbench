@@ -55,6 +55,7 @@ import com.rockwellcollins.atc.agree.Nenola.NodeGen;
 import com.rockwellcollins.atc.agree.Nenola.Prim;
 import com.rockwellcollins.atc.agree.Nenola.RangeIntContract;
 import com.rockwellcollins.atc.agree.Nenola.RangeRealContract;
+import com.rockwellcollins.atc.agree.Nenola.Spec;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
@@ -63,6 +64,9 @@ import com.rockwellcollins.atc.agree.agree.ArrayLiteralExpr;
 import com.rockwellcollins.atc.agree.agree.ArraySubExpr;
 import com.rockwellcollins.atc.agree.agree.ArrayType;
 import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
+import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
+import com.rockwellcollins.atc.agree.agree.AssertStatement;
+import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
@@ -82,11 +86,13 @@ import com.rockwellcollins.atc.agree.agree.FoldLeftExpr;
 import com.rockwellcollins.atc.agree.agree.FoldRightExpr;
 import com.rockwellcollins.atc.agree.agree.ForallExpr;
 import com.rockwellcollins.atc.agree.agree.GetPropertyExpr;
+import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IndicesExpr;
 import com.rockwellcollins.atc.agree.agree.InputStatement;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedExpr;
+import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
@@ -96,6 +102,7 @@ import com.rockwellcollins.atc.agree.agree.NodeEq;
 import com.rockwellcollins.atc.agree.agree.NodeLemma;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.OutputStatement;
+import com.rockwellcollins.atc.agree.agree.PatternStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
@@ -207,12 +214,75 @@ public class AgreeXtext {
 		}
 	}
 
+	private static Nenola.Prop extractPropFromPattern(PatternStatement pattern) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	private static List<Nenola.Spec> extractContractList(Classifier c) {
+	private static Nenola.Prop extractPropFromExpr(Expr expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static Spec extractSpecFromSpecStatement(SpecStatement spec) {
 		// TODO
-		List<Nenola.Spec> result = new ArrayList<Nenola.Spec>();
+
+		if (spec instanceof AssertStatement) {
+			String name = ((AssertStatement) spec).getName();
+			String description = ((AssertStatement) spec).getStr();
+			Nenola.Prop prop = null;
+			if (((AssertStatement) spec).getExpr() != null) {
+				prop = extractPropFromExpr(((AssertStatement) spec).getExpr());
+			} else if (((AssertStatement) spec).getPattern() != null) {
+				prop = extractPropFromPattern(((AssertStatement) spec).getPattern());
+			}
+
+			return new Nenola.Spec(Nenola.SpecTag.Assert, name, description, prop);
+
+		} else if (spec instanceof AssertEqualStatement) {
+			String name = "";
+			String description = "";
+			Nenola.Expr leftExpr = new Nenola.IdExpr(((AssertEqualStatement) spec).getId().getQualifiedName());
+			Nenola.Expr rightExpr = toExprFromExpr(((AssertEqualStatement) spec).getExpr());
+			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.Rator.Eq, rightExpr);
+			Nenola.Prop prop = new Nenola.ExprProp(expr);
+			return new Nenola.Spec(Nenola.SpecTag.Assert, name, description, prop);
+
+		} else if (spec instanceof LemmaStatement) {
+
+		} else if (spec instanceof AssumeStatement) {
+
+		} else if (spec instanceof GuaranteeStatement) {
+
+		}
+
+		return null;
+	}
+
+
+	private static List<Nenola.Spec> extractSpecList(ComponentClassifier c) {
+		List<Nenola.Spec> result = new ArrayList<>();
+		AgreeContractSubclause annex = getAgreeAnnex(c);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement specStatement : contract.getSpecs()) {
+
+				Nenola.Spec spec = extractSpecFromSpecStatement(specStatement);
+				result.add(spec);
+
+			}
+
+		}
+
+		if (c instanceof ComponentImplementation) {
+			List<Nenola.Spec> ccResult = extractSpecList(((ComponentImplementation) c).getType());
+			result.addAll(ccResult);
+		}
+
 		return result;
 	}
+
 
 	public static Nenola.Contract toContractFromClassifier(Classifier c) {
 
@@ -392,15 +462,15 @@ public class AgreeXtext {
 
 			Map<String, Nenola.Channel> channels = new HashMap<>();
 			Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
-			List<Nenola.Spec> contractList = new ArrayList<Nenola.Spec>();
+			List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
 
 
 
-				List<Nenola.Spec> localContractList = extractContractList(currClsfr);
-				contractList.addAll(localContractList);
+				List<Nenola.Spec> localSpecs = extractSpecList((ComponentClassifier) currClsfr);
+				specs.addAll(localSpecs);
 
 				ComponentType ct = null;
 				if (currClsfr instanceof ComponentImplementation) {
@@ -506,7 +576,7 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new Nenola.NodeContract(name, channels, subNodes, contractList, c);
+			return new Nenola.NodeContract(name, channels, subNodes, specs, c);
 
 		}
 

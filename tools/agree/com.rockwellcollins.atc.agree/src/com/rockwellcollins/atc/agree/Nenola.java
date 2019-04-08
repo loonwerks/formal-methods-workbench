@@ -25,9 +25,35 @@ public class Nenola {
 		}
 	}
 
+	public static enum Rator {
+		Eq
+	}
+
 	public static interface Expr {
 
 	}
+
+	public static class IdExpr implements Expr {
+		public final String name;
+
+		public IdExpr(String name) {
+			this.name = name;
+		}
+	}
+
+	public static class BinExpr implements Expr {
+
+		public final Expr e1;
+		public final Rator rator;
+		public final Expr e2;
+
+		public BinExpr(Expr e1, Rator rator, Expr expr) {
+			this.e1 = e1;
+			this.rator = rator;
+			this.e2 = expr;
+		}
+	}
+
 
 	public static interface Prop {
 
@@ -61,7 +87,7 @@ public class Nenola {
 		Assume, Guarantee, Lemma, Assert
 	}
 
-	public class Spec {
+	public static class Spec {
 
 		public final SpecTag specTag;
 		public final String name;
@@ -491,9 +517,9 @@ public class Nenola {
 	// global node generator: NodeDef, FnDef, LinearizationDef
 
 	// local assertions: AssertionStatement, AssertEqualStatement,
+	// local lemmas: LemmaStatement
 	// local assumptions: AssumeStatement
 	// local guarantees: GuaranteeStatement
-	// local lemmas: LemmaStatement
 	// local input channels: Feature, InputStatement
 	// local output channels: Feature, BoolOutputStatement, OutputStatement
 	// local subNodes: Subcomponent

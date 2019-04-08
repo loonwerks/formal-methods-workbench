@@ -68,8 +68,6 @@ SpecStatement:
 NamedSpecStatement:
 	{AssumeStatement} 'assume' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
 	| {GuaranteeStatement} 'guarantee' (name=ID)? str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
-	
-	//remove AssertStatement; use 'assert equal' instead??.
 	| {AssertStatement} 'assert' ((name=ID)? str=STRING ':')? (expr=Expr | pattern=PatternStatement) ';'
 	| {LemmaStatement} 'lemma' (name=ID)?  str=STRING ':' (expr=Expr | pattern=PatternStatement) ';'
 	;
