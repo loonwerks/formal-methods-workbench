@@ -26,7 +26,7 @@ public class Nenola {
 	}
 
 	public static enum Rator {
-		Equal, Seq, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod, Pow, Neg, Not
+		Equal, StreamCons, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod, Pow, Neg, Not
 	}
 
 	public static enum Tag {
@@ -872,18 +872,21 @@ public class Nenola {
 		private final String name;
 		public final Map<String, Channel> channels;
 		public final Map<String, NodeContract> subNodes;
+		public final Map<String, Connection> connections;
 		public final List<Spec> specList;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
-				List<Spec> specList, NamedElement namedElement) {
+				Map<String, Connection> connections, List<Spec> specList, NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
 			this.channels.putAll(channels);
 			this.subNodes = new HashMap<>();
 			this.subNodes.putAll(subNodes);
+			this.connections = new HashMap<>();
+			this.connections.putAll(connections);
 			this.specList = specList;
 			this.namedElement = namedElement;
 

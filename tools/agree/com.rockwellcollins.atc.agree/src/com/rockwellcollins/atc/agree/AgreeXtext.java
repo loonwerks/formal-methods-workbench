@@ -25,6 +25,7 @@ import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.DirectionType;
@@ -76,6 +77,7 @@ import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ClosedTimeInterval;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
+import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
@@ -421,6 +423,34 @@ public class AgreeXtext {
 		return result;
 	}
 
+	private static Map<String, Nenola.Connection> extractConnections(ComponentImplementation currClsfr) {
+
+		// TODO
+
+		Map<String, Connection> aadlConnectionMap = new HashMap<>();
+		for (Connection conn :  currClsfr.getAllConnections()) {
+			String name = conn.getQualifiedName().replace("::", "__").replace(".", "__");
+
+		}
+
+
+		Map<String, Nenola.Connection> connections = new HashMap<>();
+
+		List<ConnectionStatement> connectionSpecs = new ArrayList<>();
+		AgreeContractSubclause annex = getAgreeAnnex(currClsfr);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement specStatement : contract.getSpecs()) {
+				if (specStatement instanceof ConnectionStatement) {
+					connectionSpecs.add((ConnectionStatement) specStatement);
+				}
+			}
+		}
+
+		return null;
+	}
+
 
 	public static Nenola.Contract toContractFromClassifier(Classifier c) {
 
@@ -600,6 +630,7 @@ public class AgreeXtext {
 
 			Map<String, Nenola.Channel> channels = new HashMap<>();
 			Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
+			Map<String, Nenola.Connection> connections = new HashMap<>();
 			List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
 			Classifier currClsfr = c;
@@ -629,6 +660,10 @@ public class AgreeXtext {
 							}
 						}
 					}
+
+
+					connections.putAll(extractConnections((ComponentImplementation) currClsfr));
+
 
 					ct = ((ComponentImplementation) currClsfr).getType();
 				} else if (c instanceof ComponentType) {
@@ -714,13 +749,14 @@ public class AgreeXtext {
 
 			String name = c.getQualifiedName();
 
-			return new Nenola.NodeContract(name, channels, subNodes, specs, c);
+			return new Nenola.NodeContract(name, channels, subNodes, connections, specs, c);
 
 		}
 
 		return Nenola.Prim.ErrorContract;
 
 	}
+
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
 
@@ -1406,7 +1442,7 @@ public class AgreeXtext {
 
 			switch (((BinaryExpr) expr).getOp()) {
 			case "->":
-				rator = Nenola.Rator.Seq;
+				rator = Nenola.Rator.StreamCons;
 			case "=>":
 				rator = Nenola.Rator.Implies;
 			case "<=>":
