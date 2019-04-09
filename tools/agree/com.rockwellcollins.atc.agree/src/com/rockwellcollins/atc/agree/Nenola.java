@@ -394,21 +394,149 @@ public class Nenola {
 		}
 	}
 
-	public static interface WheneverProp extends Prop {
-
-	}
-
-	public static interface WhenProp extends Prop {
-
-	}
-
-	public static interface RealTimeProp extends Prop {
-
-	}
 
 	public static class AlwaysProp implements Prop {
 
+		public final Expr expr;
+
+		public AlwaysProp(Expr expr) {
+			this.expr = expr;
+		}
+
 	}
+
+	public static class Interval {
+		public final boolean lowOpen;
+		public final Expr low;
+		public final Expr high;
+		public final boolean highOpen;
+
+		public Interval(boolean lowOpen, Expr low, Expr high, boolean highOpen) {
+			this.lowOpen = lowOpen;
+			this.low = low;
+			this.high = high;
+			this.highOpen = highOpen;
+		}
+	}
+
+	public static class WhenHoldsProp implements Prop {
+
+		public final Expr condition;
+		public final Interval conditionInterval;
+		public final Expr event;
+		public final boolean exclusive;
+		public final Interval eventInterval;
+
+		public WhenHoldsProp(Expr condition, Interval conditionInterval, Expr event, boolean exclusive,
+				Interval eventInterval) {
+			this.condition = condition;
+			this.conditionInterval = conditionInterval;
+			this.event = event;
+			this.exclusive = exclusive;
+			this.eventInterval = eventInterval;
+		}
+	}
+
+	public static class WhenOccursProp implements Prop {
+		public final Expr condition;
+		public final Expr frequency;
+		public final Interval interval;
+		public final boolean exclusive;
+		public final Expr event;
+
+		public WhenOccursProp(Expr condition, Expr frequency, Interval interval, boolean exclusive, Expr event) {
+			this.condition = condition;
+			this.frequency = frequency;
+			this.interval = interval;
+			this.exclusive = exclusive;
+			this.event = event;
+		}
+	}
+
+
+	public static class WheneverOccursProp implements Prop {
+		public final Expr cause;
+		public final Expr effect;
+		public final boolean exclusive;
+		public final Interval interval;
+
+		public WheneverOccursProp(Expr cause, Expr effect, boolean exclusive, Interval interval) {
+			this.cause = cause;
+			this.effect = effect;
+			this.exclusive = exclusive;
+			this.interval = interval;
+		}
+	}
+
+	public static class WheneverBecomesTrueProp implements Prop {
+		public final Expr cause;
+		public final Expr effect;
+		public final boolean exclusive;
+		public final Interval interval;
+
+		public WheneverBecomesTrueProp(Expr cause, Expr effect, boolean exclusive, Interval interval) {
+			this.cause = cause;
+			this.effect = effect;
+			this.exclusive = exclusive;
+			this.interval = interval;
+		}
+	}
+
+	public static class WheneverHoldsProp implements Prop {
+		public final Expr cause;
+		public final Expr effect;
+		public final boolean exclusive;
+		public final Interval interval;
+
+		public WheneverHoldsProp(Expr cause, Expr effect, boolean exclusive, Interval interval) {
+			this.cause = cause;
+			this.effect = effect;
+			this.exclusive = exclusive;
+			this.interval = interval;
+		}
+	}
+
+	public static class WheneverImpliesProp implements Prop {
+		public final Expr cause;
+		public final Expr lhs;
+		public final Expr rhs;
+		public final boolean exclusive;
+		public final Interval interval;
+
+		public WheneverImpliesProp(Expr cause, Expr lhs, Expr rhs, boolean exclusive, Interval interval) {
+			this.cause = cause;
+			this.lhs = lhs;
+			this.rhs = rhs;
+			this.exclusive = exclusive;
+			this.interval = interval;
+		}
+	}
+
+	public static class PeriodicProp implements Prop {
+		public final Expr event;
+		public final Expr period;
+		public final Optional<Expr> jitterOp;
+
+		public PeriodicProp(Expr event, Expr period, Optional<Expr> jitterOp) {
+			this.event = event;
+			this.period = period;
+			this.jitterOp = jitterOp;
+		}
+	}
+
+
+	public static class SporadicProp implements Prop {
+		public final Expr event;
+		public final Expr iat;
+		public final Optional<Expr> jitterOp;
+
+		public SporadicProp(Expr event, Expr iat, Optional<Expr> jitterOp) {
+			this.event = event;
+			this.iat = iat;
+			this.jitterOp = jitterOp;
+		}
+	}
+
 
 	public enum SpecTag {
 		Assume, Guarantee, Lemma, Assert
