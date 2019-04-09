@@ -52,6 +52,7 @@ import com.rockwellcollins.atc.agree.Nenola.ArrayContract;
 import com.rockwellcollins.atc.agree.Nenola.Contract;
 import com.rockwellcollins.atc.agree.Nenola.DataContract;
 import com.rockwellcollins.atc.agree.Nenola.EnumContract;
+import com.rockwellcollins.atc.agree.Nenola.Interval;
 import com.rockwellcollins.atc.agree.Nenola.NodeGen;
 import com.rockwellcollins.atc.agree.Nenola.Prim;
 import com.rockwellcollins.atc.agree.Nenola.RangeIntContract;
@@ -60,6 +61,7 @@ import com.rockwellcollins.atc.agree.Nenola.Spec;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
+import com.rockwellcollins.atc.agree.agree.AlwaysStatement;
 import com.rockwellcollins.atc.agree.agree.Arg;
 import com.rockwellcollins.atc.agree.agree.ArrayLiteralExpr;
 import com.rockwellcollins.atc.agree.agree.ArraySubExpr;
@@ -72,6 +74,7 @@ import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
+import com.rockwellcollins.atc.agree.agree.ClosedTimeInterval;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
@@ -102,8 +105,12 @@ import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.NodeEq;
 import com.rockwellcollins.atc.agree.agree.NodeLemma;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
+import com.rockwellcollins.atc.agree.agree.OpenLeftTimeInterval;
+import com.rockwellcollins.atc.agree.agree.OpenRightTimeInterval;
+import com.rockwellcollins.atc.agree.agree.OpenTimeInterval;
 import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.PatternStatement;
+import com.rockwellcollins.atc.agree.agree.PeriodicStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
@@ -114,14 +121,22 @@ import com.rockwellcollins.atc.agree.agree.RecordLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordUpdateExpr;
 import com.rockwellcollins.atc.agree.agree.SelectionExpr;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
+import com.rockwellcollins.atc.agree.agree.SporadicStatement;
 import com.rockwellcollins.atc.agree.agree.TagExpr;
 import com.rockwellcollins.atc.agree.agree.ThisRef;
 import com.rockwellcollins.atc.agree.agree.TimeExpr;
 import com.rockwellcollins.atc.agree.agree.TimeFallExpr;
+import com.rockwellcollins.atc.agree.agree.TimeInterval;
 import com.rockwellcollins.atc.agree.agree.TimeOfExpr;
 import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
+import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
+import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
+import com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement;
+import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
+import com.rockwellcollins.atc.agree.agree.WheneverImpliesStatement;
+import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 
 public class AgreeXtext {
 
@@ -215,10 +230,101 @@ public class AgreeXtext {
 		}
 	}
 
-	private static Nenola.Prop extractPropFromPattern(PatternStatement pattern) {
-		// TODO Auto-generated method stub
-		return null;
+	private static Interval toInterval(TimeInterval interval) {
+		boolean lowOpen = false;
+		Nenola.Expr low = toExprFromExpr(interval.getLow());
+		Nenola.Expr high = toExprFromExpr(interval.getHigh());
+		boolean highOpen = false;
+
+		if (interval instanceof OpenTimeInterval) {
+			lowOpen = true;
+			highOpen = true;
+		} else if (interval instanceof OpenLeftTimeInterval) {
+			lowOpen = true;
+			highOpen = false;
+		} else if (interval instanceof OpenRightTimeInterval) {
+			lowOpen = false;
+			highOpen = true;
+		} else if (interval instanceof ClosedTimeInterval) {
+			lowOpen = false;
+			highOpen = false;
+		}
+
+		return new Nenola.Interval(lowOpen, low, high, highOpen);
 	}
+
+	private static Nenola.Prop extractPropFromPattern(PatternStatement pattern) {
+		if (pattern instanceof AlwaysStatement) {
+			Nenola.Expr expr = toExprFromExpr(((AlwaysStatement) pattern).getExpr());
+			return new Nenola.AlwaysProp(expr);
+		} else if (pattern instanceof PeriodicStatement) {
+			Nenola.Expr event = toExprFromExpr(((PeriodicStatement) pattern).getEvent());
+
+			Expr jitter = ((PeriodicStatement) pattern).getJitter();
+			Optional<Nenola.Expr> jitterOp = jitter != null ?
+				Optional.of(toExprFromExpr(jitter)) : Optional.empty();
+
+			Nenola.Expr period = toExprFromExpr(((PeriodicStatement) pattern).getPeriod());
+
+			return new Nenola.PeriodicProp(event, period, jitterOp);
+		} else if (pattern instanceof SporadicStatement) {
+			Nenola.Expr event = toExprFromExpr(((SporadicStatement) pattern).getEvent());
+			Expr jitter = ((SporadicStatement) pattern).getJitter();
+			Optional<Nenola.Expr> jitterOp = (jitter != null) ?
+				Optional.of(toExprFromExpr(jitter)) : Optional.empty();
+
+			Nenola.Expr iat = toExprFromExpr(((SporadicStatement) pattern).getIat());
+
+			return new Nenola.SporadicProp(event, iat, jitterOp);
+		} else if (pattern instanceof WheneverHoldsStatement ) {
+			Nenola.Expr cause = toExprFromExpr(((WheneverHoldsStatement) pattern).getCause());
+			Nenola.Expr effect = toExprFromExpr(((WheneverHoldsStatement) pattern).getEffect());
+			boolean exclusive = ((WheneverHoldsStatement) pattern).getExcl() != null;
+
+			Nenola.Interval interval = toInterval(((WheneverHoldsStatement) pattern).getInterval());
+
+			return new Nenola.WheneverHoldsProp(cause, effect, exclusive, interval);
+		} else if (pattern instanceof WheneverImpliesStatement) {
+			throw new RuntimeException("We do not support this pattern currently");
+
+		} else if (pattern instanceof WheneverOccursStatement) {
+			Nenola.Expr cause = toExprFromExpr(((WheneverOccursStatement) pattern).getCause());
+			Nenola.Expr effect = toExprFromExpr(((WheneverOccursStatement) pattern).getEffect());
+			boolean exclusive = ((WheneverOccursStatement) pattern).getExcl() != null;
+			Interval interval = toInterval(((WheneverOccursStatement) pattern).getInterval());
+
+			return new Nenola.WheneverOccursProp(cause, effect, exclusive, interval);
+
+		} else if (pattern instanceof WheneverBecomesTrueStatement) {
+			Nenola.Expr cause = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getCause());
+			Nenola.Expr effect = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getEffect());
+			boolean exclusive = ((WheneverBecomesTrueStatement) pattern).getExcl() != null;
+			Nenola.Interval interval = toInterval(((WheneverBecomesTrueStatement) pattern).getInterval());
+			return new Nenola.WheneverBecomesTrueProp(cause, effect, exclusive, interval);
+		} else if (pattern instanceof WhenHoldsStatement) {
+			Nenola.Expr condition = toExprFromExpr(((WhenHoldsStatement) pattern).getCondition());
+			Nenola.Expr effect = toExprFromExpr(((WhenHoldsStatement) pattern).getEvent());
+			boolean exclusive = ((WhenHoldsStatement) pattern).getExcl() != null;
+			Nenola.Interval conditionInterval = toInterval(((WhenHoldsStatement) pattern).getConditionInterval());
+			Nenola.Interval effectInterval = toInterval(((WhenHoldsStatement) pattern).getEventInterval());
+
+			return new Nenola.WhenHoldsProp(condition, conditionInterval, effect, exclusive, effectInterval);
+
+		} else if (pattern instanceof WhenOccursStatment) {
+			Nenola.Expr condition = toExprFromExpr(((WhenOccursStatment) pattern).getCondition());
+			Nenola.Expr frequency = toExprFromExpr(((WhenOccursStatment) pattern).getTimes());
+			boolean exclusive = ((WhenOccursStatment) pattern).getExcl() != null;
+			Nenola.Interval interval = toInterval(((WhenOccursStatment) pattern).getInterval());
+			Nenola.Expr event = toExprFromExpr(((WhenOccursStatment) pattern).getEvent());
+
+			return new  Nenola.WhenOccursProp(condition, frequency, interval, exclusive, event);
+		}
+
+		throw new RuntimeException("Pattern not recognized: " + pattern);
+
+
+	}
+
 
 	private static Nenola.Prop extractPropFromExpr(Expr expr) {
 		Nenola.Expr nenolaExpr = toExprFromExpr(expr);
