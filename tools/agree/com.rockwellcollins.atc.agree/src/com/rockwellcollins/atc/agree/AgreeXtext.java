@@ -1213,8 +1213,6 @@ public class AgreeXtext {
 
 	public static Nenola.Expr toExprFromExpr(Expr expr) {
 
-		// TODO
-
 		if (expr instanceof SelectionExpr) {
 
 			Expr target = ((SelectionExpr) expr).getTarget();
@@ -1439,18 +1437,73 @@ public class AgreeXtext {
 			return new Nenola.Pre(toExprFromExpr(arg));
 
 		} else if (expr instanceof ArrayLiteralExpr) {
+			List<Nenola.Expr> elements = new ArrayList<>();
+			for (Expr e : ((ArrayLiteralExpr) expr).getElems()) {
+				elements.add(toExprFromExpr(e));
+			}
+			return new Nenola.ArrayLit(elements);
 
 		} else if (expr instanceof ArrayUpdateExpr) {
 
+			List<Nenola.Expr> indices = new ArrayList<>();
+			for (Expr e : ((ArrayUpdateExpr) expr).getIndices()) {
+				indices.add(toExprFromExpr(e));
+			}
+
+			List<Nenola.Expr> elements = new ArrayList<>();
+			for (Expr e : ((ArrayUpdateExpr) expr).getValueExprs()) {
+				elements.add(toExprFromExpr(e));
+			}
+			return new Nenola.ArrayUpdate(indices, elements);
+
+
 		} else if (expr instanceof RecordLitExpr) {
 
+			Map<String, Nenola.Expr> fields = new HashMap<>();
+			for (int i = 0; i < ((RecordLitExpr) expr).getArgs().size(); i++) {
+				String key = ((RecordLitExpr) expr).getArgs().get(i).getName();
+				Nenola.Expr value = toExprFromExpr(((RecordLitExpr) expr).getArgExpr().get(i));
+
+				fields.put(key, value);
+
+			}
+
+			return new Nenola.RecordLit(fields);
+
 		} else if (expr instanceof RecordUpdateExpr) {
+			Nenola.Expr record = toExprFromExpr(((RecordUpdateExpr) expr).getRecord());
+
+			String key = ((RecordUpdateExpr) expr).getKey().getName();
+			Nenola.Expr value = toExprFromExpr(((RecordUpdateExpr) expr).getExpr());
+
+			return new Nenola.RecordUpdate(record, key, value);
 
 		} else if (expr instanceof NamedElmExpr) {
 			String name = ((NamedElmExpr) expr).getElm().getName();
 			return new Nenola.IdExpr(name);
 
 		} else if (expr instanceof CallExpr) {
+
+			NamedElement nodeDef = ((CallExpr) expr).getRef().getElm();
+			EObject container = nodeDef.eContainer();
+			List<String> segments = new ArrayList<>();
+
+			segments.add(nodeDef.getName());
+			while (container != null) {
+				if (container instanceof ComponentClassifier || container instanceof AadlPackage) {
+					segments.add(0, ((NamedElement) container).getName().replace(".", "__"));
+				}
+				container = container.eContainer();
+			}
+
+			String fnName = String.join("__", segments);
+
+			List<Nenola.Expr> args = new ArrayList<>();
+			for (Expr e : ((CallExpr) expr).getArgs()) {
+				args.add(toExprFromExpr(e));
+			}
+
+			return new Nenola.App(fnName, args);
 
 		}
 		return null;

@@ -226,6 +226,54 @@ public class Nenola {
 		}
 	}
 
+	public static class ArrayLit implements Expr {
+		public final List<Expr> elements;
+
+		public ArrayLit(List<Expr> elements) {
+			this.elements = elements;
+		}
+	}
+
+	public static class ArrayUpdate implements Expr {
+		public final List<Expr> indices;
+		public final List<Expr> elements;
+
+		public ArrayUpdate(List<Expr> indices, List<Expr> elements) {
+			this.indices = indices;
+			this.elements = elements;
+		}
+	}
+
+	public static class RecordLit implements Expr {
+		public final Map<String, Expr> fields;
+
+		public RecordLit(Map<String, Expr> fields) {
+			this.fields = fields;
+		}
+	}
+
+	public static class RecordUpdate implements Expr {
+		public final Expr record;
+		public final String selector;
+		public final Expr element;
+
+		public RecordUpdate(Expr record, String selector, Expr element) {
+			this.record = record;
+			this.selector = selector;
+			this.element = element;
+		}
+	}
+
+	public static class App implements Expr {
+		public final String fnName;
+		public final List<Expr> args;
+
+		public App(String fnName, List<Expr> args) {
+			this.fnName = fnName;
+			this.args = args;
+		}
+	}
+
 	public static class UnaryExpr implements Expr {
 		public final Rator rator;
 		public final Expr rand;
