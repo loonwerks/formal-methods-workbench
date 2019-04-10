@@ -40,3 +40,8 @@ TAGS
 *.class
 *~HEAD
 target
+
+\#*\#
+
+*.xtendbin
+*._trace

@@ -178,11 +178,9 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					return;
 				}
 
-
 				// TODO: Add CASE_Model_Transformations rename, if not already present
 
 				// TODO: check to see if the comm driver already has an attestation manager?
-
 
 				// Create Attestation Manager thread type
 				final ThreadType attestationManagerThreadType = (ThreadType) pkgSection
@@ -242,7 +240,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 				}
 
-
 				// Add the ports for communicating attestation requests/responses with the Comm Driver
 				final EventDataPort amReq = attestationManagerThreadType.createOwnedEventDataPort();
 				final EventDataPort amRes = attestationManagerThreadType.createOwnedEventDataPort();
@@ -269,8 +266,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
 						resource.getResourceSet());
 				// CASE_Properties::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerThreadType,
-						casePropSet)) {
+				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerThreadType, casePropSet)) {
 //					return;
 				}
 				// CASE_Properties::COMP_IMPL property
@@ -283,10 +279,9 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Parse the ID from the Attestation Manager AGREE property
 				String attestationPropId = "";
 				try {
-					attestationPropId = attestationAgreeProperty
-						.substring(attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-								attestationAgreeProperty.indexOf("\""))
-						.trim();
+					attestationPropId = attestationAgreeProperty.substring(
+							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+							attestationAgreeProperty.indexOf("\"")).trim();
 				} catch (IndexOutOfBoundsException e) {
 					// agree property is malformed, so leave blank
 				}
@@ -335,8 +330,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Make a copy of the process component implementation
-				final ProcessImplementation procImpl = (ProcessImplementation) commDriver
-						.getContainingComponentImpl();
+				final ProcessImplementation procImpl = (ProcessImplementation) commDriver.getContainingComponentImpl();
 				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
 				// Give it a unique name
 				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
@@ -406,8 +400,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						final ConnectedElement connSrc = portConnOut.createSource();
 						connSrc.setContext(attestationManagerThreadSubComp);
 						for (Feature feature : attestationManagerThreadType.getAllFeatures()) {
-							if (feature.getName().equalsIgnoreCase(
-									"am_" + conn.getSource().getConnectionEnd().getName() + "_out")) {
+							if (feature.getName()
+									.equalsIgnoreCase("am_" + conn.getSource().getConnectionEnd().getName() + "_out")) {
 								connSrc.setConnectionEnd(feature);
 								break;
 							}
@@ -421,8 +415,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						// Rewire connections from comm driver into attestation manager
 						conn.getDestination().setContext(attestationManagerThreadSubComp);
 						for (Feature feature : attestationManagerThreadType.getAllFeatures()) {
-							if (feature.getName().equalsIgnoreCase(
-									"am_" + conn.getSource().getConnectionEnd().getName() + "_in")) {
+							if (feature.getName()
+									.equalsIgnoreCase("am_" + conn.getSource().getConnectionEnd().getName() + "_in")) {
 								conn.getDestination().setConnectionEnd(feature);
 							}
 						}
@@ -485,48 +479,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					RequirementsManager.getInstance().modifyRequirement(attestationResoluteClause, resource,
 							new AddAttestationManagerClaim(commDriverThreadType, attestationManagerThreadType));
 
-//					// Add arguments to prove statements in components
-//					// TODO: Make sure they are just the components connected to the selected comm driver
-//					for (Subcomponent comp : ci.getOwnedSubcomponents()) {
-//						if (comp instanceof ThreadSubcomponent) {
-//							final ThreadType clauseThread = (ThreadType) comp.getComponentType();
-//							String sourceText = "";
-//							for (AnnexSubclause annexSubclause : clauseThread.getOwnedAnnexSubclauses()) {
-//								// Get the Resolute clause
-//								if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
-//									DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
-//									sourceText = annexSubclauseImpl.getSourceText();
-//									if (sourceText.contains(attestationResoluteClause + "(")) {
-//										// Add arguments
-//										int startIdx = sourceText.indexOf(attestationResoluteClause + "(")
-//												+ attestationResoluteClause.length() + 1;
-//										String args = sourceText.substring(startIdx, sourceText.indexOf(")", startIdx));
-//										sourceText = sourceText.replace(attestationResoluteClause + "(" + args + ")",
-//												attestationResoluteClause + "(" + args + ", "
-//														+ commDriverThreadType.getName() + ", "
-//														+ attestationManagerThreadType.getName() + ")");
-//										annexSubclauseImpl.setSourceText(sourceText);
-//									}
-//									break;
-//								}
-//							}
-//							if (!sourceText.isEmpty()) {
-//								clauseThread.getOwnedAnnexSubclauses()
-//										.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
-//								DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
-//								newSubclause.setName("resolute");
-//								newSubclause.setSourceText(sourceText);
-//							}
-//
-//						}
-//					}
-//
-//					// Add add_attestation claims to *_CASE_Claims file
-//					// If the prove statement exists, the *_CASE_Claims file should also already
-//					// exist, but double check just to be sure, and create it if it doesn't
-////					ClaimsManager.getInstance().addAttestationManager(attestationResoluteClause);
-////					CaseClaimsManager.getInstance(aadlPkg).addAttestationManager(attestationResoluteClause);
-
 				}
 
 				// Propagate Agree Guarantees from comm driver, if there are any
@@ -572,8 +524,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 									// Replace comm driver out port name with attestation manager out port name
 									for (Feature feature : commDriver.getComponentType().getOwnedFeatures()) {
-										expr = expr.replace(feature.getName(),
-												"am_" + feature.getName() + "_out");
+										expr = expr.replace(feature.getName(), "am_" + feature.getName() + "_out");
 									}
 
 									guarantee = "guarantee " + id + " " + desc + " : " + expr + ";";
@@ -604,51 +555,5 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		});
 
 	}
-
-
-//	/**
-//	 * Collects Resolute prove() clauses from each subcomponent in the implementation
-//	 * @param ci - Implementation
-//	 * @return List<String> - List of Resolute prove clauses
-//	 */
-//	private List<String> getResoluteClauses(String selectedSubcomponent, ComponentImplementation ci) {
-//
-//		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-//
-//		return xtextEditor.getDocument().readOnly(resource -> {
-//
-//			List<String> resoluteClauses = new ArrayList<>();
-//
-//			for (Subcomponent comp : ci.getOwnedSubcomponents()) {
-//
-//				final ComponentType compType = comp.getComponentType();
-//				for (AnnexSubclause annexSubclause : compType.getOwnedAnnexSubclauses()) {
-//					// See if there's a resolute annex
-//					DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-//					if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-//						ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
-//								.getParsedAnnexSubclause();
-//						// See if there are any 'prove' clauses
-//						for (AnalysisStatement as : resoluteClause.getProves()) {
-//							if (as instanceof ProveStatement) {
-//								ProveStatement prove = (ProveStatement) as;
-//								Expr expr = prove.getExpr();
-//								if (expr instanceof FnCallExpr) {
-//									FnCallExpr fnCall = (FnCallExpr) expr;
-//									if (fnCall.getFn().getName() != null
-//											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
-//										resoluteClauses.add(fnCall.getFn().getName());
-//									}
-//								}
-//							}
-//						}
-//						break;
-//					}
-//				}
-//			}
-//
-//			return resoluteClauses;
-//		});
-//	}
 
 }

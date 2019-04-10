@@ -1,0 +1,170 @@
+---------------------
+-- The top_level system looks like this:
+--
+--  A_______ 
+--          |____C
+--  B_______|
+--
+---------------------
+
+package MultipleFanInToEventPort
+public
+	with Base_Types;
+		
+	data Message		
+	end Message;
+	
+	data implementation Message.impl
+		subcomponents
+			ID : data Base_Types::Integer;
+			msg_details : data Base_Types::Integer;
+	end Message.impl;
+	
+	system A
+		features
+			Request_out : out event data port Message.impl;	
+		annex agree {**
+			const My_ID : int = 1; 			
+			
+			guarantee "Request Message ID equals GOLDEN_ID":
+				event(Request_out) =>
+					(Request_out.ID = My_ID);
+		**};
+	end A;
+	
+	system B
+		features
+			Request_out : out event data port Message.impl;	
+		annex agree {**
+			const My_ID : int = 2; 			
+			
+			guarantee "Request Message ID equals GOLDEN_ID":
+				event(Request_out) =>
+					(Request_out.ID = My_ID);
+		**};
+	end B;
+	
+	system C
+		features
+			Request_in : in event data port Message.impl;
+			Response_out : out event data port Message.impl;	
+		annex agree {**
+
+			guarantee "No spurious responses--we only send a response after receiving a request":
+				event(Response_out) => prev(event(Request_in), false);
+
+			guarantee "Response Message ID equals the previous Request Message ID":
+				event(Response_out) =>
+					(Response_out.ID = prev(Request_in.ID, 0));
+
+		**};
+	end C;
+	
+	system top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to get AGREE to run": true;
+		**};
+	end top_level;
+	
+	system implementation top_level.impl
+		subcomponents
+			A : system A;
+			B : system B;
+			C : system C;
+		connections
+			A_to_C : port A.Request_out -> C.Request_in;
+			B_to_C : port B.Request_out -> C.Request_in;
+		annex agree{**
+			----------------------------------
+			-- BEGIN SECTION 1
+			----------------------------------
+			-- Would like to autopopulate the info in this section 
+			--   for any event input port with multiple fan in (C.Request_in in this example)	
+			
+			connection A_to_C : true;
+			connection B_to_C : true;
+
+			----------------------------------
+			-- END SECTION 1
+			----------------------------------
+
+			----------------------------------
+			-- BEGIN SECTION 2
+			----------------------------------
+			-- Would like to autopopulate the info in this section 
+			--   for any event input port with multiple fan in (C.Request_in in this example)
+			--   together with the following note/warning to the user				
+
+			-- Note: These assertions are not accurate statements for a queue, which may be working off a backlog of messages and not using 
+			--  one of the current inputs to C.Request_in	
+			
+			assert "If there is no output event for A or B, then there is no input event for C":
+				not(event(A.Request_out) or event(B.Request_out)) => not(event(C.Request_in));
+			
+			assert "If only A.Request_out has an output event, assign C.Request_in to A.Request_out":
+				(event(A.Request_out) and not(event(B.Request_out))) =>
+					(event(C.Request_in)
+						and (C.Request_in = A.Request_out) 
+					);
+					
+			assert "If only B.Request_out has an output event, assign C.Request_in to B.Request_out":
+				(event(B.Request_out) and not(event(A.Request_out))) =>
+					(event(C.Request_in)
+						and (C.Request_in = B.Request_out) 
+					);	
+			----------------------------------
+			-- END SECTION 2
+			----------------------------------
+			
+			----------------------------------
+			-- BEGIN SECTION 3
+			----------------------------------	
+			--Would like to autopopulate Option 2 or, as a stretch goal, Option 1 with user input on priorities
+			--   for any event input port with multiple fan in (C.Request_in in this example)
+			--   together with the note/warning shown for each of the options
+			
+			----------------------------------			
+			--Option 1: A.Request_out has priority over B.Request_out
+
+			-- Note: This assertion is not an accurate statement for a queue, which may be working off a backlog of messages and not using 
+			--  one of the current inputs to C.Request_in					
+--			assert "Option 1: A.Request_out has priority over B.Request_out":
+--				(event(A.Request_out) =>
+--					(event(C.Request_in)
+--						and (C.Request_in = A.Request_out) 
+--					)
+--				);
+			
+			----------------------------------		
+			--Option 2: Nondeterministic choice between A and B
+			
+			eq flip_a_coin : bool;
+
+			-- Note: This assertion is not an accurate statement for a queue, which may be working off a backlog of messages and not using 
+			--  one of the current inputs to C.Request_in						
+			assert "Option 2: Nondeterministic choice between A.Request_out and B.Request_out":
+				(event(A.Request_out) and event(B.Request_out)) =>
+					(event(C.Request_in)
+						and (C.Request_in = if flip_a_coin then 
+												A.Request_out
+											else 
+												B.Request_out
+							)
+					);
+			----------------------------------		
+			----------------------------------
+			-- END SECTION 3
+			----------------------------------
+					
+			lemma "There is an event on C.Request_in if and only if there is an event on A.Request_out or B.Request_out":
+				event(C.Request_in) = (event(A.Request_out) or event(B.Request_out));
+			
+			lemma "After the initial timestep, the ID in C's output message is always that of A or B":
+				true ->
+					(event(C.Response_out) => 
+						((C.Response_out.ID = A.My_ID)
+						or (C.Response_out.ID = B.My_ID)));
+		**};
+	end top_level.impl;
+	
+end MultipleFanInToEventPort;
