@@ -12,7 +12,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.agree.json.plugin.AgreeJson;
+import com.collins.fmw.cyres.json.plugin.AgreeJson;
 
 public class GenerateRequirementsHandler extends AbstractHandler {
 
