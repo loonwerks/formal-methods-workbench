@@ -851,21 +851,21 @@ public class Nenola {
 		private final String name;
 		public final Map<String, Channel> channels;
 		public final Map<String, NodeContract> subNodes;
-		public final Map<String, Connection> connections;
+		public final List<Connection> connections;
 		public final List<Spec> specList;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
-				Map<String, Connection> connections, List<Spec> specList, NamedElement namedElement) {
+				List<Connection> connections, List<Spec> specList, NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
 			this.channels.putAll(channels);
 			this.subNodes = new HashMap<>();
 			this.subNodes.putAll(subNodes);
-			this.connections = new HashMap<>();
-			this.connections.putAll(connections);
+			this.connections = new ArrayList<>();
+			this.connections.addAll(connections);
 			this.specList = specList;
 			this.namedElement = namedElement;
 

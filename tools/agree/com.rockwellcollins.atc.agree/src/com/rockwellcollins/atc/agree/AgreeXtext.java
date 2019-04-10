@@ -54,6 +54,7 @@ import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
 
 import com.rockwellcollins.atc.agree.Nenola.ArrayContract;
+import com.rockwellcollins.atc.agree.Nenola.Channel;
 import com.rockwellcollins.atc.agree.Nenola.Contract;
 import com.rockwellcollins.atc.agree.Nenola.DataContract;
 import com.rockwellcollins.atc.agree.Nenola.EnumContract;
@@ -437,7 +438,7 @@ public class AgreeXtext {
 
 	}
 
-	private static Map<String, Nenola.Connection> extractConnections(ComponentImplementation currClsfr) {
+	private static List<Nenola.Connection> extractConnections(ComponentImplementation currClsfr) {
 
 		Map<String, Expr> exprMap = new HashMap<>();
 
@@ -454,23 +455,109 @@ public class AgreeXtext {
 			}
 		}
 
-		Map<String, Nenola.Connection> connections = new HashMap<>();
+		List<Nenola.Connection> connections = new ArrayList<>();
 		for (Connection aadlConn : currClsfr.getAllConnections()) {
 			String name = aadlConn.getName();
 
 			Nenola.Expr sourceExpr = toExprFromConnectedElement(aadlConn.getSource());
 			Nenola.Expr destExpr = toExprFromConnectedElement(aadlConn.getDestination());
 
+			// TODO handle featureGroup case
+
 			Expr expr = exprMap.get(name);
 			Optional<Nenola.Expr> connExpr = expr == null ? Optional.empty() : Optional.of(toExprFromExpr(expr));
 
 			Nenola.Connection conn = new Nenola.Connection(name, sourceExpr, destExpr, connExpr);
 
-			connections.put(name, conn);
+			connections.add(conn);
 
 		}
 
 		return connections;
+	}
+
+
+	private static Map<String, Channel> extractChannels(String prefix, Classifier ct) {
+		Map<String, Channel> channels = new HashMap<>();
+		EList<Feature> features = ct.getAllFeatures();
+		for (Feature feature : features) {
+
+
+			if (feature instanceof FeatureGroup) {
+
+				channels.putAll(extractChannels(prefix + feature.getName() + "__", feature.getClassifier()));
+
+			} else {
+				boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
+				Nenola.Direc direction = null;
+				if (feature instanceof Port) {
+					int v = ((Port) feature).getDirection().getValue();
+					if (v == DirectionType.IN_VALUE) {
+						direction = new Nenola.In();
+					} else if (v == DirectionType.OUT_VALUE) {
+						direction = new Nenola.Out(Optional.empty());
+					}
+				}
+
+				if (direction != null) {
+
+					String fieldName = prefix + feature.getName();
+					if (feature.getClassifier() != null) {
+						if (feature.getArrayDimensions().size() == 0) {
+							Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
+							if (typeDef instanceof DataContract) {
+								Nenola.Channel channel = new Nenola.Channel(fieldName,
+										(DataContract) typeDef, direction, isEvent);
+								channels.putIfAbsent(fieldName, channel);
+							}
+						} else if (feature.getArrayDimensions().size() == 1) {
+							ArrayDimension ad = feature.getArrayDimensions().get(0);
+							int size = Math.toIntExact(getArraySize(ad));
+							Nenola.Contract stem = toContractFromClassifier(feature.getClassifier());
+							if (stem instanceof Nenola.DataContract) {
+								DataContract typeDef = new ArrayContract("", (Nenola.DataContract) stem,
+										size);
+								Nenola.Channel channel = new Nenola.Channel(fieldName, typeDef, direction,
+										isEvent);
+								channels.putIfAbsent(fieldName, channel);
+							}
+
+						}
+					}
+				}
+			}
+		}
+
+		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(ct,
+				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
+			AgreeContract contract = (AgreeContract) ((AgreeContractSubclause) annex).getContract();
+
+			for (SpecStatement spec : contract.getSpecs()) {
+
+				List<Arg> args = new ArrayList<>();
+				if (spec instanceof OutputStatement) {
+					args = ((OutputStatement) spec).getLhs();
+				} else if (spec instanceof InputStatement) {
+					args = ((InputStatement) spec).getLhs();
+				}
+
+				for (Arg arg : args) {
+					String fieldName = arg.getName();
+					Nenola.Contract typeDef = toContractFromNamedElm(arg);
+
+					if (typeDef instanceof DataContract) {
+						Nenola.Channel channel = new Nenola.Channel(fieldName,
+								(DataContract) typeDef,
+								new Nenola.Out(Optional.empty()), false);
+						channels.putIfAbsent(fieldName, channel);
+					}
+
+				}
+			}
+
+		}
+
+		return channels;
 	}
 
 	public static Nenola.Contract toContractFromClassifier(Classifier c) {
@@ -651,7 +738,7 @@ public class AgreeXtext {
 
 			Map<String, Nenola.Channel> channels = new HashMap<>();
 			Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
-			Map<String, Nenola.Connection> connections = new HashMap<>();
+			List<Nenola.Connection> connections = new ArrayList<>();
 			List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
 			Classifier currClsfr = c;
@@ -683,7 +770,7 @@ public class AgreeXtext {
 					}
 
 
-					connections.putAll(extractConnections((ComponentImplementation) currClsfr));
+					connections.addAll(extractConnections((ComponentImplementation) currClsfr));
 
 
 					ct = ((ComponentImplementation) currClsfr).getType();
@@ -693,85 +780,9 @@ public class AgreeXtext {
 
 				if (ct != null) {
 
-					EList<Feature> features = ct.getAllFeatures();
-					for (Feature feature : features) {
+					channels.putAll(extractChannels("", ct));
 
-						String fieldName = feature.getName();
 
-						if (feature instanceof FeatureGroup) {
-							Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
-							if (typeDef instanceof Nenola.NodeContract) {
-								subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
-							}
-
-						} else {
-							boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
-							Nenola.Direc direction = null;
-							if (feature instanceof Port) {
-								int v = ((Port) feature).getDirection().getValue();
-								if (v == DirectionType.IN_VALUE) {
-									direction = new Nenola.In();
-								} else if (v == DirectionType.OUT_VALUE) {
-									direction = new Nenola.Out(Optional.empty());
-								}
-							}
-
-							if (direction != null) {
-
-								if (feature.getClassifier() != null) {
-									if (feature.getArrayDimensions().size() == 0) {
-										Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
-										if (typeDef instanceof DataContract) {
-											Nenola.Channel channel = new Nenola.Channel(fieldName,
-													(DataContract) typeDef, direction, isEvent);
-											channels.putIfAbsent(fieldName, channel);
-										}
-									} else if (feature.getArrayDimensions().size() == 1) {
-										ArrayDimension ad = feature.getArrayDimensions().get(0);
-										int size = Math.toIntExact(getArraySize(ad));
-										Nenola.Contract stem = toContractFromClassifier(feature.getClassifier());
-										if (stem instanceof Nenola.DataContract) {
-											DataContract typeDef = new ArrayContract("", (Nenola.DataContract) stem,
-													size);
-											Nenola.Channel channel = new Nenola.Channel(fieldName, typeDef, direction,
-													isEvent);
-											channels.putIfAbsent(fieldName, channel);
-										}
-
-									}
-								}
-							}
-						}
-					}
-
-					for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(currClsfr,
-							AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
-						AgreeContract contract = (AgreeContract) ((AgreeContractSubclause) annex).getContract();
-
-						for (SpecStatement spec : contract.getSpecs()) {
-
-							List<Arg> args = new ArrayList<>();
-							if (spec instanceof OutputStatement) {
-								args = ((OutputStatement) spec).getLhs();
-							} else if (spec instanceof InputStatement) {
-								args = ((InputStatement) spec).getLhs();
-							}
-
-							for (Arg arg : args) {
-								String fieldName = arg.getName();
-								Nenola.Contract typeDef = toContractFromNamedElm(arg);
-
-								if (typeDef instanceof DataContract) {
-									Nenola.Channel channel = new Nenola.Channel(fieldName,
-											(DataContract) typeDef,
-											new Nenola.Out(Optional.empty()), false);
-									channels.putIfAbsent(fieldName, channel);
-								}
-
-							}
-						}
-
-					}
 				}
 
 				currClsfr = currClsfr.getExtended();
@@ -1395,7 +1406,24 @@ public class AgreeXtext {
 			Nenola.Expr nenolaTarget = toExprFromExpr(target);
 
 			String selection = ((SelectionExpr) expr).getField().getName();
-			return new Nenola.SelectionExpr(nenolaTarget, selection);
+
+			if (target instanceof NamedElmExpr) {
+				NamedElement base = ((NamedElmExpr) target).getElm();
+				if (base instanceof AadlPackage || base instanceof Subcomponent || base instanceof FeatureGroup) {
+					NamedElement field = ((SelectionExpr) expr).getField();
+					if (field instanceof ConstStatement) {
+						// constant propagation
+						return toExprFromExpr(((ConstStatement) field).getExpr());
+					} else {
+						return new Nenola.IdExpr(base.getName() + "__" + field.getName());
+					}
+				} else {
+
+					return new Nenola.SelectionExpr(nenolaTarget, selection);
+				}
+			} else {
+				return new Nenola.SelectionExpr(nenolaTarget, selection);
+			}
 
 		} else if (expr instanceof TagExpr) {
 
