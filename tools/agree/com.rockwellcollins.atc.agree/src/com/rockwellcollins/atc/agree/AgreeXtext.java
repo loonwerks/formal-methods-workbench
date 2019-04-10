@@ -1400,6 +1400,11 @@ public class AgreeXtext {
 
 	public static Nenola.Expr toExprFromExpr(Expr expr) {
 
+		// TODO : handle extraction of names into Nenola.IdExpr or Nenola.SelectionExpr
+		// Feature groups are flattened into IdExpr with '__'
+		// Subcomponents are not flattened. turned into SelectionExpr??
+		// Will feature groups be represented as Xtext.SelectionExpr or just a dotted Xtext.NameExpr?
+
 		if (expr instanceof SelectionExpr) {
 
 			Expr target = ((SelectionExpr) expr).getTarget();
@@ -1409,7 +1414,7 @@ public class AgreeXtext {
 
 			if (target instanceof NamedElmExpr) {
 				NamedElement base = ((NamedElmExpr) target).getElm();
-				if (base instanceof AadlPackage || base instanceof Subcomponent || base instanceof FeatureGroup) {
+				if (/* base instanceof AadlPackage || base instanceof Subcomponent || */base instanceof FeatureGroup) {
 					NamedElement field = ((SelectionExpr) expr).getField();
 					if (field instanceof ConstStatement) {
 						// constant propagation
