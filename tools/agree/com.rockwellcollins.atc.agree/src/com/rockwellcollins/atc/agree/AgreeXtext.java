@@ -36,6 +36,7 @@ import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.FeatureGroup;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
@@ -694,41 +695,50 @@ public class AgreeXtext {
 
 					EList<Feature> features = ct.getAllFeatures();
 					for (Feature feature : features) {
+
 						String fieldName = feature.getName();
 
-						boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
-						Nenola.Direc direction = null;
-						if (feature instanceof Port) {
-							int v = ((Port) feature).getDirection().getValue();
-							if (v == DirectionType.IN_VALUE) {
-								direction = new Nenola.In();
-							} else if (v == DirectionType.OUT_VALUE) {
-								direction = new Nenola.Out(Optional.empty());
+						if (feature instanceof FeatureGroup) {
+							Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
+							if (typeDef instanceof Nenola.NodeContract) {
+								subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
 							}
-						}
 
-						if (direction != null) {
+						} else {
+							boolean isEvent = feature instanceof EventDataPort || feature instanceof EventPort;
+							Nenola.Direc direction = null;
+							if (feature instanceof Port) {
+								int v = ((Port) feature).getDirection().getValue();
+								if (v == DirectionType.IN_VALUE) {
+									direction = new Nenola.In();
+								} else if (v == DirectionType.OUT_VALUE) {
+									direction = new Nenola.Out(Optional.empty());
+								}
+							}
 
+							if (direction != null) {
 
-							if (feature.getClassifier() != null) {
-								if (feature.getArrayDimensions().size() == 0) {
-									Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
-									if (typeDef instanceof DataContract) {
-										Nenola.Channel channel = new Nenola.Channel(fieldName,
-												(DataContract) typeDef, direction, isEvent);
-										channels.putIfAbsent(fieldName, channel);
+								if (feature.getClassifier() != null) {
+									if (feature.getArrayDimensions().size() == 0) {
+										Nenola.Contract typeDef = toContractFromClassifier(feature.getClassifier());
+										if (typeDef instanceof DataContract) {
+											Nenola.Channel channel = new Nenola.Channel(fieldName,
+													(DataContract) typeDef, direction, isEvent);
+											channels.putIfAbsent(fieldName, channel);
+										}
+									} else if (feature.getArrayDimensions().size() == 1) {
+										ArrayDimension ad = feature.getArrayDimensions().get(0);
+										int size = Math.toIntExact(getArraySize(ad));
+										Nenola.Contract stem = toContractFromClassifier(feature.getClassifier());
+										if (stem instanceof Nenola.DataContract) {
+											DataContract typeDef = new ArrayContract("", (Nenola.DataContract) stem,
+													size);
+											Nenola.Channel channel = new Nenola.Channel(fieldName, typeDef, direction,
+													isEvent);
+											channels.putIfAbsent(fieldName, channel);
+										}
+
 									}
-								} else if (feature.getArrayDimensions().size() == 1) {
-									ArrayDimension ad = feature.getArrayDimensions().get(0);
-									int size = Math.toIntExact(getArraySize(ad));
-									Nenola.Contract stem = toContractFromClassifier(feature.getClassifier());
-									if (stem instanceof Nenola.DataContract) {
-										DataContract typeDef = new ArrayContract("", (Nenola.DataContract) stem, size);
-										Nenola.Channel channel = new Nenola.Channel(fieldName, typeDef,
-												direction, isEvent);
-										channels.putIfAbsent(fieldName, channel);
-									}
-
 								}
 							}
 						}
@@ -1285,9 +1295,9 @@ public class AgreeXtext {
 	}
 
 
-	public static Map<String, Nenola.Contract> extractContractMap(ComponentClassifier c) {
+	public static Map<String, Nenola.Contract> extractContractMap(Classifier classifier) {
 		Map<String, Nenola.Contract> result = new HashMap<String, Nenola.Contract>();
-		AgreeContractSubclause annex = getAgreeAnnex(c);
+		AgreeContractSubclause annex = getAgreeAnnex(classifier);
 		if (annex != null) {
 			AgreeContract contract = (AgreeContract) annex.getContract();
 
@@ -1300,11 +1310,12 @@ public class AgreeXtext {
 
 		}
 
-		if (c instanceof ComponentImplementation) {
-			Map<String, Nenola.Contract> ccResult = extractContractMap(((ComponentImplementation) c).getType());
+		if (classifier instanceof ComponentImplementation) {
+			Map<String, Nenola.Contract> ccResult = extractContractMap(
+					((ComponentImplementation) classifier).getType());
 			result.putAll(ccResult);
 
-			for (Subcomponent sub : ((ComponentImplementation) c).getAllSubcomponents()) {
+			for (Subcomponent sub : ((ComponentImplementation) classifier).getAllSubcomponents()) {
 
 				Nenola.Contract contract = toContractFromClassifier(sub.getClassifier());
 				result.put(contract.getName(), contract);
@@ -1312,18 +1323,21 @@ public class AgreeXtext {
 				Map<String, Nenola.Contract> subResult = extractContractMap(sub.getClassifier());
 				result.putAll(subResult);
 			}
-		} else if (c instanceof ComponentClassifier) {
-			for (Feature feature : c.getAllFeatures()) {
+		} else if (classifier instanceof ComponentClassifier) {
+			for (Feature feature : classifier.getAllFeatures()) {
 
 				Nenola.Contract contract = toContractFromClassifier(feature.getClassifier());
 				result.put(contract.getName(), contract);
+
+				Map<String, Nenola.Contract> subResult = extractContractMap(feature.getClassifier());
+				result.putAll(subResult);
 			}
 		}
 		return result;
 	}
 
-	private static AgreeContractSubclause getAgreeAnnex(ComponentClassifier comp) {
-		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(comp,
+	private static AgreeContractSubclause getAgreeAnnex(Classifier classifier) {
+		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(classifier,
 				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
 			if (annex instanceof AgreeContractSubclause) {
 				// in newer versions of osate the annex this returns annexes in
@@ -1334,7 +1348,7 @@ public class AgreeXtext {
 				while (!(container instanceof ComponentClassifier)) {
 					container = container.eContainer();
 				}
-				if (container == comp) {
+				if (container == classifier) {
 					return (AgreeContractSubclause) annex;
 				}
 			}
