@@ -32,7 +32,7 @@ import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddMonitorDialog;
 
-public class AddMonitor extends AadlHandler {
+public class AddMonitorHandler extends AadlHandler {
 
 	static final String MONITOR_COMP_BASE_NAME = "Monitor";
 	static final String MONITOR_PORT_IN_NAME = "monitor_in";

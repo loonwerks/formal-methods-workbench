@@ -22,10 +22,9 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.CaseClaimsManager;
 import com.collins.fmw.cyres.architecture.dialogs.SelectImplementationDialog;
 
-public class SelectImplementation extends AadlHandler {
+public class SelectImplementationHandler extends AadlHandler {
 
 //	private String legacyComponentImplementationType;
 	private String legacyComponentImplementationLocation;
@@ -185,7 +184,7 @@ public class SelectImplementation extends AadlHandler {
 //				}
 
 				// Add the corresponding resolute claim in the _CASE_Claims file
-				CaseClaimsManager.getInstance().addLegacyComponentVerification();
+//				ClaimsManager.getInstance().addLegacyComponentVerification();
 
 				// Delete and re-insert this component from package section
 				// This seems to be the only way to get the formatting (mostly) correct

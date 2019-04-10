@@ -30,13 +30,15 @@ public class ResoluteAnnexParser implements AnnexParser {
         return getParser().getGrammarAccess();
     }
 
-    public AnnexLibrary parseAnnexLibrary(String annexName, String source, String filename,
+    @Override
+	public AnnexLibrary parseAnnexLibrary(String annexName, String source, String filename,
             int line, int column, ParseErrorReporter errReporter) {
         return (AnnexLibrary) AnnexParseUtil.parse(getParser(),source, getGrammarAccess().getResoluteLibraryRule(), filename, line,
                 column, errReporter);
     }
 
-    public AnnexSubclause parseAnnexSubclause(String annexName, String source, String filename,
+    @Override
+	public AnnexSubclause parseAnnexSubclause(String annexName, String source, String filename,
             int line, int column, ParseErrorReporter errReporter) {
         return (AnnexSubclause) AnnexParseUtil.parse(getParser(),source,getGrammarAccess().getResoluteSubclauseRule(),filename,line,column, errReporter);
     }

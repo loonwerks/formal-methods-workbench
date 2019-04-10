@@ -25,7 +25,7 @@ import org.osate.ui.dialogs.Dialog;
 import com.rockwellcollins.atc.agree.agree.impl.AssumeStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.GuaranteeStatementImpl;
 
-public class VerifyLegacyImplementation extends AadlHandler {
+public class VerifyLegacyImplementationHandler extends AadlHandler {
 
 	@Override
 	public void runCommand(URI uri) {
