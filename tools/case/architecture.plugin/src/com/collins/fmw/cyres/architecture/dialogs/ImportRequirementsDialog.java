@@ -20,7 +20,6 @@ import org.osate.aadl2.Classifier;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
-import com.collins.fmw.cyres.architecture.requirements.JsonRequirementsFile.JsonRequirement;
 
 public class ImportRequirementsDialog extends TitleAreaDialog {
 
@@ -33,8 +32,8 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 
 	List<CyberRequirement> importedRequirements = new ArrayList<>();
 	List<CyberRequirement> omittedRequirements = new ArrayList<>();
-	List<JsonRequirement> newRequirements = null;
-//	List<CyberRequirement> newRequirements = null;
+//	List<JsonRequirement> newRequirements = null;
+	List<CyberRequirement> newRequirements = null;
 
 	public ImportRequirementsDialog(Shell parentShell) {
 		super(parentShell);
@@ -100,15 +99,15 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Add requirements
-//		for (CyberRequirement req : newRequirements) {
-		for (JsonRequirement req : newRequirements) {
+		for (CyberRequirement req : newRequirements) {
+//		for (JsonRequirement req : newRequirements) {
 			addRequirement(req, container);
 		}
 
 	}
 
-//	private void addRequirement(CyberRequirement req, Composite container) {
-	private void addRequirement(JsonRequirement req, Composite container) {
+	private void addRequirement(CyberRequirement req, Composite container) {
+//	private void addRequirement(JsonRequirement req, Composite container) {
 
 		Button btnReq = new Button(container, SWT.CHECK);
 		btnReq.setText(req.getType());
@@ -211,27 +210,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		return true;
 	}
 
-//	private Classifier getClassifier(String qualifiedName) {
-//		Classifier classifier = null;
-//		if (!qualifiedName.contains("::")) {
-//			return null;
-//		}
-//		String pkgName = Aadl2Util.getPackageName(qualifiedName);
-//
-//		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
-//			if (pkg.getName().equalsIgnoreCase(pkgName)) {
-//				for (Classifier c : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {
-//					if (c.getQualifiedName().equalsIgnoreCase(qualifiedName)) {
-//						classifier = c;
-//						break;
-//					}
-//				}
-//				break;
-//			}
-//		}
-//
-//		return classifier;
-//	}
 
 	@Override
 	protected void okPressed() {
@@ -251,8 +229,8 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	}
 
 
-//	public void setRequirements(List<CyberRequirement> requirements) {
-	public void setRequirements(List<JsonRequirement> requirements) {
+	public void setRequirements(List<CyberRequirement> requirements) {
+//	public void setRequirements(List<JsonRequirement> requirements) {
 		this.newRequirements = requirements;
 	}
 

@@ -18,7 +18,7 @@ public class ClaimCallBuilder {
 
 	public ClaimCallBuilder(FunctionDefinition fd) {
 		this.def = fd;
-		args = new ArrayList<>();
+		this.args = new ArrayList<>();
 	}
 
 	public ClaimCallBuilder(ProveStatement prove) {
@@ -28,14 +28,16 @@ public class ClaimCallBuilder {
 		if (prove.getExpr() instanceof FnCallExpr) {
 			FnCallExpr fnCallExpr = (FnCallExpr) prove.getExpr();
 			this.def = fnCallExpr.getFn();
-			this.args = fnCallExpr.getArgs();
+			for (Expr expr : fnCallExpr.getArgs()) {
+				this.args.add(expr);
+			}
 		} else {
 			throw new RuntimeException("Prove statement can only contain a claim call.");
 		}
 	}
 
 	public Expr addArg(Expr e) {
-		args.add(e);
+		this.args.add(e);
 		return e;
 	}
 
@@ -43,8 +45,10 @@ public class ClaimCallBuilder {
 		ProveStatement prove = f.createProveStatement();
 
 		FnCallExpr fn = f.createFnCallExpr();
-		fn.setFn(def);
-		args.forEach(a -> fn.getArgs().add(a));
+		fn.setFn(this.def);
+		for (Expr expr : this.args) {
+			fn.getArgs().add(expr);
+		}
 
 		prove.setExpr(fn);
 		return prove;

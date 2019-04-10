@@ -335,7 +335,8 @@ public class AddFilterHandler extends AadlHandler {
 				// Add add_filter claims to resolute prove statement, if applicable
 				if (!filterResoluteClause.isEmpty()) {
 
-					RequirementsManager.getInstance().modifyRequirement(filterResoluteClause, new AddFilterClaim());
+					RequirementsManager.getInstance().modifyRequirement(filterResoluteClause, resource,
+							new AddFilterClaim(dataFeatureClassifier));
 
 //					// Add arguments to prove statement in destination component
 //					final ThreadType clauseThread = (ThreadType) selectedConnection.getDestination().getConnectionEnd()

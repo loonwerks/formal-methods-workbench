@@ -1,48 +1,38 @@
 package com.collins.fmw.cyres.architecture.requirements;
 
-import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
-import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.osate.aadl2.NamedElement;
+
+import com.rockwellcollins.atc.resolute.resolute.Arg;
+import com.rockwellcollins.atc.resolute.resolute.Expr;
 
 public class AddFilterClaim extends BuiltInClaim {
 
 	private static final String ADD_FILTER = "Add_Filter";
 
-	public AddFilterClaim() {
+	private final NamedElement msgType;
+
+	public AddFilterClaim(NamedElement msgType) {
 		super(ADD_FILTER);
+		this.msgType = msgType;
 	}
 
 	@Override
-	public FunctionDefinition buildClaimDefinition() {
-		return null;
+	public List<Expr> getCallArgs() {
+		List<Expr> callArgs = new ArrayList<>();
+		callArgs.add(Create.THIS());
+		callArgs.add(Create.id(this.msgType));
+		return callArgs;
 	}
 
 	@Override
-	public ProveStatement buildClaimCall() {
-		return null;
+	public List<Arg> getDefinitionParams() {
+		List<Arg> defParams = new ArrayList<>();
+		defParams.add(Create.arg("c", Create.baseType("component")));
+		defParams.add(Create.arg("msg_type", Create.baseType("data")));
+		return defParams;
 	}
-
-//	@Override
-//	public boolean modifyClaimDefinition(FunctionDefinition funDef) {
-//
-//		// Get the Add_Filter function definition from the CASE package
-//
-//		// Create the Add_Filter claim call
-//
-//		// Add the claim call to the funDef body
-//
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean modifyClaimCall(ProveStatement prove) {
-//
-//		// Get the claim call from the prove statement
-//
-//		// Get the args from the claim call
-//
-//		// Add additional args for the filter model transformation
-//
-//		return false;
-//	}
 
 }

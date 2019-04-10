@@ -18,7 +18,6 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
@@ -41,14 +40,11 @@ import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddAttestationManagerDialog;
+import com.collins.fmw.cyres.architecture.requirements.AddAttestationManagerClaim;
+import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.unparsing.AgreeAnnexUnparser;
-import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
-import com.rockwellcollins.atc.resolute.resolute.Expr;
-import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
-import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
-import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
 
 public class AddAttestationManagerHandler extends AadlHandler {
 
@@ -95,7 +91,10 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		for (Subcomponent comp : ci.getAllSubcomponents()) {
 			subcomponents.add(comp.getName());
 		}
-		wizard.create(selectedSubcomponent, subcomponents, getResoluteClauses(selectedSubcomponent, ci));
+		List<String> resoluteClauses = new ArrayList<>();
+		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
+//		wizard.create(selectedSubcomponent, subcomponents, getResoluteClauses(selectedSubcomponent, ci));
+		wizard.create(selectedSubcomponent, subcomponents, resoluteClauses);
 		if (wizard.open() == Window.OK) {
 			commDriverComponent = wizard.getCommDriverComponent();
 			implementationName = wizard.getImplementationName();
@@ -482,47 +481,51 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				// Add add_attestation claims to resolute prove statement, if applicable
 				if (!attestationResoluteClause.isEmpty()) {
-					// Add arguments to prove statements in components
-					// TODO: Make sure they are just the components connected to the selected comm driver
-					for (Subcomponent comp : ci.getOwnedSubcomponents()) {
-						if (comp instanceof ThreadSubcomponent) {
-							final ThreadType clauseThread = (ThreadType) comp.getComponentType();
-							String sourceText = "";
-							for (AnnexSubclause annexSubclause : clauseThread.getOwnedAnnexSubclauses()) {
-								// Get the Resolute clause
-								if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
-									DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
-									sourceText = annexSubclauseImpl.getSourceText();
-									if (sourceText.contains(attestationResoluteClause + "(")) {
-										// Add arguments
-										int startIdx = sourceText.indexOf(attestationResoluteClause + "(")
-												+ attestationResoluteClause.length() + 1;
-										String args = sourceText.substring(startIdx, sourceText.indexOf(")", startIdx));
-										sourceText = sourceText.replace(attestationResoluteClause + "(" + args + ")",
-												attestationResoluteClause + "(" + args + ", "
-														+ commDriverThreadType.getName() + ", "
-														+ attestationManagerThreadType.getName() + ")");
-										annexSubclauseImpl.setSourceText(sourceText);
-									}
-									break;
-								}
-							}
-							if (!sourceText.isEmpty()) {
-								clauseThread.getOwnedAnnexSubclauses()
-										.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
-								DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
-								newSubclause.setName("resolute");
-								newSubclause.setSourceText(sourceText);
-							}
 
-						}
-					}
+					RequirementsManager.getInstance().modifyRequirement(attestationResoluteClause, resource,
+							new AddAttestationManagerClaim(commDriverThreadType, attestationManagerThreadType));
 
-					// Add add_attestation claims to *_CASE_Claims file
-					// If the prove statement exists, the *_CASE_Claims file should also already
-					// exist, but double check just to be sure, and create it if it doesn't
-//					ClaimsManager.getInstance().addAttestationManager(attestationResoluteClause);
-//					CaseClaimsManager.getInstance(aadlPkg).addAttestationManager(attestationResoluteClause);
+//					// Add arguments to prove statements in components
+//					// TODO: Make sure they are just the components connected to the selected comm driver
+//					for (Subcomponent comp : ci.getOwnedSubcomponents()) {
+//						if (comp instanceof ThreadSubcomponent) {
+//							final ThreadType clauseThread = (ThreadType) comp.getComponentType();
+//							String sourceText = "";
+//							for (AnnexSubclause annexSubclause : clauseThread.getOwnedAnnexSubclauses()) {
+//								// Get the Resolute clause
+//								if (annexSubclause.getName().equalsIgnoreCase("resolute")) {
+//									DefaultAnnexSubclause annexSubclauseImpl = (DefaultAnnexSubclause) annexSubclause;
+//									sourceText = annexSubclauseImpl.getSourceText();
+//									if (sourceText.contains(attestationResoluteClause + "(")) {
+//										// Add arguments
+//										int startIdx = sourceText.indexOf(attestationResoluteClause + "(")
+//												+ attestationResoluteClause.length() + 1;
+//										String args = sourceText.substring(startIdx, sourceText.indexOf(")", startIdx));
+//										sourceText = sourceText.replace(attestationResoluteClause + "(" + args + ")",
+//												attestationResoluteClause + "(" + args + ", "
+//														+ commDriverThreadType.getName() + ", "
+//														+ attestationManagerThreadType.getName() + ")");
+//										annexSubclauseImpl.setSourceText(sourceText);
+//									}
+//									break;
+//								}
+//							}
+//							if (!sourceText.isEmpty()) {
+//								clauseThread.getOwnedAnnexSubclauses()
+//										.removeIf(annex -> annex.getName().equalsIgnoreCase("resolute"));
+//								DefaultAnnexSubclause newSubclause = clauseThread.createOwnedAnnexSubclause();
+//								newSubclause.setName("resolute");
+//								newSubclause.setSourceText(sourceText);
+//							}
+//
+//						}
+//					}
+//
+//					// Add add_attestation claims to *_CASE_Claims file
+//					// If the prove statement exists, the *_CASE_Claims file should also already
+//					// exist, but double check just to be sure, and create it if it doesn't
+////					ClaimsManager.getInstance().addAttestationManager(attestationResoluteClause);
+////					CaseClaimsManager.getInstance(aadlPkg).addAttestationManager(attestationResoluteClause);
 
 				}
 
@@ -603,49 +606,49 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	}
 
 
-	/**
-	 * Collects Resolute prove() clauses from each subcomponent in the implementation
-	 * @param ci - Implementation
-	 * @return List<String> - List of Resolute prove clauses
-	 */
-	private List<String> getResoluteClauses(String selectedSubcomponent, ComponentImplementation ci) {
-
-		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-
-		return xtextEditor.getDocument().readOnly(resource -> {
-
-			List<String> resoluteClauses = new ArrayList<>();
-
-			for (Subcomponent comp : ci.getOwnedSubcomponents()) {
-
-				final ComponentType compType = comp.getComponentType();
-				for (AnnexSubclause annexSubclause : compType.getOwnedAnnexSubclauses()) {
-					// See if there's a resolute annex
-					DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-					if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-						ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
-								.getParsedAnnexSubclause();
-						// See if there are any 'prove' clauses
-						for (AnalysisStatement as : resoluteClause.getProves()) {
-							if (as instanceof ProveStatement) {
-								ProveStatement prove = (ProveStatement) as;
-								Expr expr = prove.getExpr();
-								if (expr instanceof FnCallExpr) {
-									FnCallExpr fnCall = (FnCallExpr) expr;
-									if (fnCall.getFn().getName() != null
-											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
-										resoluteClauses.add(fnCall.getFn().getName());
-									}
-								}
-							}
-						}
-						break;
-					}
-				}
-			}
-
-			return resoluteClauses;
-		});
-	}
+//	/**
+//	 * Collects Resolute prove() clauses from each subcomponent in the implementation
+//	 * @param ci - Implementation
+//	 * @return List<String> - List of Resolute prove clauses
+//	 */
+//	private List<String> getResoluteClauses(String selectedSubcomponent, ComponentImplementation ci) {
+//
+//		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+//
+//		return xtextEditor.getDocument().readOnly(resource -> {
+//
+//			List<String> resoluteClauses = new ArrayList<>();
+//
+//			for (Subcomponent comp : ci.getOwnedSubcomponents()) {
+//
+//				final ComponentType compType = comp.getComponentType();
+//				for (AnnexSubclause annexSubclause : compType.getOwnedAnnexSubclauses()) {
+//					// See if there's a resolute annex
+//					DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
+//					if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
+//						ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
+//								.getParsedAnnexSubclause();
+//						// See if there are any 'prove' clauses
+//						for (AnalysisStatement as : resoluteClause.getProves()) {
+//							if (as instanceof ProveStatement) {
+//								ProveStatement prove = (ProveStatement) as;
+//								Expr expr = prove.getExpr();
+//								if (expr instanceof FnCallExpr) {
+//									FnCallExpr fnCall = (FnCallExpr) expr;
+//									if (fnCall.getFn().getName() != null
+//											&& !resoluteClauses.contains(fnCall.getFn().getName())) {
+//										resoluteClauses.add(fnCall.getFn().getName());
+//									}
+//								}
+//							}
+//						}
+//						break;
+//					}
+//				}
+//			}
+//
+//			return resoluteClauses;
+//		});
+//	}
 
 }

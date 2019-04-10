@@ -66,11 +66,6 @@ public class ClaimBuilder {
 		return claimArg;
 	}
 
-//	public Expr setClaimExpr(Expr e) {
-//		this.claimExpr = e;
-//		return e;
-//	}
-
 	public Expr addClaimExpr(Expr e) {
 		// Remove "true" or "false" claim, if they exist
 		if (this.claimExpr instanceof BoolExpr || this.claimExpr == null) {

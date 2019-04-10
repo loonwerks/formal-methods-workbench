@@ -10,48 +10,49 @@ public class JsonRequirementsFile {
 	private String implementation = "";
 	private long date = 0L;
 	private String hash = "";
-	private List<JsonRequirement> requirements = null;
+//	private List<JsonRequirement> requirements = null;
+	private List<CyberRequirement> requirements = null;
 
-	public class JsonRequirement {
-		private String type = "";
-		private String text = "";
-		private String context = "";
+//	public class JsonRequirement {
+//		private String type = "";
+//		private String text = "";
+//		private String context = "";
+//
+//		public JsonRequirement(String type, String text, String context) {
+//			this.type = type;
+//			this.text = text;
+//			this.context = context;
+//		}
+//
+//		public String getType() {
+//			return this.type;
+//		}
+//
+//		public String getText() {
+//			return this.text;
+//		}
+//
+//		public String getContext() {
+//			return this.context;
+//		}
+//
+//		public void setType(String type) {
+//			this.type = type;
+//		}
+//
+//		public void setText(String text) {
+//			this.text = text;
+//		}
+//
+//		public void setContext(String context) {
+//			this.context = context;
+//		}
+//	}
 
-		public JsonRequirement(String type, String text, String context) {
-			this.type = type;
-			this.text = text;
-			this.context = context;
-		}
-
-		public String getType() {
-			return this.type;
-		}
-
-		public String getText() {
-			return this.text;
-		}
-
-		public String getContext() {
-			return this.context;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
-
-		public void setContext(String context) {
-			this.context = context;
-		}
-	}
-
-//	public JsonRequirementsFile(String tool, long date, String implementation, String hash,
-//			List<CyberRequirement> requirements) {
 	public JsonRequirementsFile(String tool, long date, String implementation, String hash,
-			List<JsonRequirement> requirements) {
+			List<CyberRequirement> requirements) {
+//	public JsonRequirementsFile(String tool, long date, String implementation, String hash,
+//			List<JsonRequirement> requirements) {
 		this.tool = tool;
 		this.implementation = implementation;
 		this.date = date;
@@ -79,8 +80,8 @@ public class JsonRequirementsFile {
 		return this.hash;
 	}
 
-//	public List<CyberRequirement> getRequirements() {
-	public List<JsonRequirement> getRequirements() {
+	public List<CyberRequirement> getRequirements() {
+//	public List<JsonRequirement> getRequirements() {
 		return this.requirements;
 	}
 
