@@ -17,14 +17,6 @@ import jkind.lustre.NamedType;
 public class Nenola {
 
 
-	public static class Name {
-		String name;
-
-		public Name(String name) {
-			this.name = name;
-		}
-	}
-
 	public static enum Rator {
 		Equal, StreamCons, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod, Pow, Neg, Not
 	}
@@ -565,30 +557,17 @@ public class Nenola {
 		}
 	}
 
-	public class Parameter {
-		public final Expr expr;
-
-		public Parameter(Expr expr) {
-			this.expr = expr;
-		}
-	}
-
-
-	public static class Lift {
-		public final Name fieldName;
-
-		public Lift(Name fieldName) {
-			this.fieldName = fieldName;
-		}
-	}
-
 	public static class Connection {
-		public final Name connName;
-		public final Expr expr;
+		public final String name;
+		public final Expr src;
+		public final Expr dst;
+		public final Optional<Expr> exprOp;
 
-		public Connection(Name connName, Expr expr) {
-			this.connName = connName;
-			this.expr = expr;
+		public Connection(String name, Expr src, Expr dst, Optional<Expr> exprOp) {
+			this.name = name;
+			this.src = src;
+			this.dst = dst;
+			this.exprOp = exprOp;
 		}
 	}
 

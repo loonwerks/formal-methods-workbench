@@ -25,7 +25,10 @@ import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Connection;
+import org.osate.aadl2.ConnectionEnd;
+import org.osate.aadl2.Context;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.DirectionType;
@@ -423,34 +426,51 @@ public class AgreeXtext {
 		return result;
 	}
 
+
+	private static Nenola.Expr toExprFromConnectedElement(ConnectedElement ce) {
+		Context context = ce.getContext();
+		ConnectionEnd end = ce.getConnectionEnd();
+
+		Nenola.Expr idExpr = new Nenola.IdExpr(context.getName());
+		return new Nenola.SelectionExpr(idExpr, end.getName());
+
+	}
+
 	private static Map<String, Nenola.Connection> extractConnections(ComponentImplementation currClsfr) {
 
-		// TODO
+		Map<String, Expr> exprMap = new HashMap<>();
 
-		Map<String, Connection> aadlConnectionMap = new HashMap<>();
-		for (Connection conn :  currClsfr.getAllConnections()) {
-			String name = conn.getQualifiedName().replace("::", "__").replace(".", "__");
-
-		}
-
-
-		Map<String, Nenola.Connection> connections = new HashMap<>();
-
-		List<ConnectionStatement> connectionSpecs = new ArrayList<>();
 		AgreeContractSubclause annex = getAgreeAnnex(currClsfr);
 		if (annex != null) {
 			AgreeContract contract = (AgreeContract) annex.getContract();
 
 			for (SpecStatement specStatement : contract.getSpecs()) {
 				if (specStatement instanceof ConnectionStatement) {
-					connectionSpecs.add((ConnectionStatement) specStatement);
+					String connName = ((ConnectionStatement) specStatement).getConn().getName();
+					Expr expr = ((ConnectionStatement) specStatement).getExpr();
+					exprMap.put(connName, expr);
 				}
 			}
 		}
 
-		return null;
-	}
+		Map<String, Nenola.Connection> connections = new HashMap<>();
+		for (Connection aadlConn : currClsfr.getAllConnections()) {
+			String name = aadlConn.getName();
 
+			Nenola.Expr sourceExpr = toExprFromConnectedElement(aadlConn.getSource());
+			Nenola.Expr destExpr = toExprFromConnectedElement(aadlConn.getDestination());
+
+			Expr expr = exprMap.get(name);
+			Optional<Nenola.Expr> connExpr = expr == null ? Optional.empty() : Optional.of(toExprFromExpr(expr));
+
+			Nenola.Connection conn = new Nenola.Connection(name, sourceExpr, destExpr, connExpr);
+
+			connections.put(name, conn);
+
+		}
+
+		return connections;
+	}
 
 	public static Nenola.Contract toContractFromClassifier(Classifier c) {
 
@@ -1651,6 +1671,7 @@ public class AgreeXtext {
 		return null;
 	}
 
+
 	public static NodeGen toNodeGenFromNodeDef(NodeDef nodeDef) {
 
 		String nodeName = getNodeName(nodeDef);
@@ -1707,7 +1728,7 @@ public class AgreeXtext {
 
 		channels.put(outputName, output);
 
-		Nenola.DataFlow dataFlow = new Nenola.DataFlow("_outvar", bodyExpr);
+		Nenola.DataFlow dataFlow = new Nenola.DataFlow(outputName, bodyExpr);
 		List<Nenola.DataFlow> dataFlows = Collections.singletonList(dataFlow);
 
 		return new NodeGen(nodeName, channels, dataFlows, Collections.emptyList());
