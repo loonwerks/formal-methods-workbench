@@ -355,6 +355,9 @@ public class AgreeXtext {
 		} else if (spec instanceof AssertEqualStatement) {
 			String name = "";
 			String description = "";
+
+			// TODO - handle turning Xtext.NamedElement into Nenola.SelectionExpr
+			// getName vs getFullName vs getQualifiedName().replace....
 			Nenola.Expr leftExpr = new Nenola.IdExpr(((AssertEqualStatement) spec).getId().getQualifiedName());
 			Nenola.Expr rightExpr = toExprFromExpr(((AssertEqualStatement) spec).getExpr());
 			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.Rator.Equal, rightExpr);
@@ -1414,7 +1417,7 @@ public class AgreeXtext {
 
 			if (target instanceof NamedElmExpr) {
 				NamedElement base = ((NamedElmExpr) target).getElm();
-				if (/* base instanceof AadlPackage || base instanceof Subcomponent || */base instanceof FeatureGroup) {
+				if (/* base instanceof AadlPackage || */ base instanceof Subcomponent || base instanceof FeatureGroup) {
 					NamedElement field = ((SelectionExpr) expr).getField();
 					if (field instanceof ConstStatement) {
 						// constant propagation

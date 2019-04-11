@@ -150,6 +150,9 @@ InputStatement:
 //'assign' migrates to 'assert'
 AssertEqualStatement:
 	'assign' id=[aadl2::NamedElement|QCPREF] '=' expr=Expr ';';
+	
+// TODO - change assign to:
+//		'assign' id=SelectionExpr '=' expr=Expr ';';
 
 FnDef:
 	'fun' name=ID '(' args+=Arg (',' args+=Arg)* ')' ':' type=Type '=' expr=Expr ';';
