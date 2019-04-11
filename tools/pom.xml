@@ -42,12 +42,33 @@
 	</modules>
 
 	<profiles>
-	  <profile>
-	    <id>build-update-site</id>
-	    <modules>
-	      <module>update-site</module>
-	    </modules>
-	  </profile>
+		<profile>
+			<id>macos</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<!-- THE FOLLOWING LINE MUST NOT BE BROKEN BY AUTOFORMATTING -->
+				<platformSystemProperties>-XstartOnFirstThread</platformSystemProperties>
+			</properties>
+		</profile>
+		<profile>
+			<id>jdk9-or-newer</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<properties>
+				<moduleProperties>--add-modules=ALL-SYSTEM</moduleProperties>
+			</properties>
+		</profile>
+		<profile>
+			<id>build-update-site</id>
+			<modules>
+				<module>update-site</module>
+			</modules>
+		</profile>
 	</profiles>
 
 	<build>
@@ -353,29 +374,6 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	<profiles>
-		<profile>
-			<id>macos</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-			<properties>
-				<!-- THE FOLLOWING LINE MUST NOT BE BROKEN BY AUTOFORMATTING -->
-				<platformSystemProperties>-XstartOnFirstThread</platformSystemProperties>
-			</properties>
-		</profile>
-		<profile>
-			<id>jdk9-or-newer</id>
-			<activation>
-				<jdk>[9,)</jdk>
-			</activation>
-			<properties>
-				<moduleProperties>--add-modules=ALL-SYSTEM</moduleProperties>
-			</properties>
-		</profile>
-	</profiles>
 
 	<dependencies>
 		<dependency>
