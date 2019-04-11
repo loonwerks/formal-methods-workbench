@@ -356,9 +356,7 @@ public class AgreeXtext {
 			String name = "";
 			String description = "";
 
-			// TODO - handle turning Xtext.NamedElement into Nenola.SelectionExpr
-			// getName vs getFullName vs getQualifiedName().replace....
-			Nenola.Expr leftExpr = new Nenola.IdExpr(((AssertEqualStatement) spec).getId().getQualifiedName());
+			Nenola.Expr leftExpr = new Nenola.IdExpr(((AssertEqualStatement) spec).getId().getName());
 			Nenola.Expr rightExpr = toExprFromExpr(((AssertEqualStatement) spec).getExpr());
 			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.Rator.Equal, rightExpr);
 			Nenola.Prop prop = new Nenola.ExprProp(expr);
@@ -746,8 +744,6 @@ public class AgreeXtext {
 
 			Classifier currClsfr = c;
 			while (currClsfr != null) {
-
-
 
 				List<Nenola.Spec> localSpecs = extractSpecList((ComponentClassifier) currClsfr);
 				specs.addAll(localSpecs);
@@ -1401,37 +1397,52 @@ public class AgreeXtext {
 		return channels;
 	}
 
-	public static Nenola.Expr toExprFromExpr(Expr expr) {
+	private static Optional<Nenola.Expr> toChainedExpr(SelectionExpr expr, String chain) {
+		Expr target = expr.getTarget();
+		NamedElement field = expr.getField();
+		String fieldName = field.getName();
 
-		// TODO : handle extraction of names into Nenola.IdExpr or Nenola.SelectionExpr
-		// Feature groups are flattened into IdExpr with '__'
-		// Subcomponents are not flattened. turned into SelectionExpr??
-		// Will feature groups be represented as Xtext.SelectionExpr or just a dotted Xtext.NameExpr?
+		if (target instanceof NamedElmExpr) {
+			NamedElement ne = ((NamedElmExpr) target).getElm();
+			if (ne instanceof FeatureGroup) {
+				return Optional.of(new Nenola.IdExpr(ne.getName() + "__" + fieldName + "__" + chain));
+			} else if (ne instanceof Subcomponent) {
+
+				if (field instanceof ConstStatement) {
+					// constant propagation
+					return Optional.of(toExprFromExpr(((ConstStatement) field).getExpr()));
+				}
+
+				return Optional.of(new Nenola.SelectionExpr(new Nenola.IdExpr(ne.getName()), fieldName + "__" + chain));
+			}
+		} else if (target instanceof SelectionExpr) {
+			return toChainedExpr((SelectionExpr) target, fieldName + "__" + chain);
+
+		}
+
+		return Optional.empty();
+
+
+	}
+
+
+	public static Nenola.Expr toExprFromExpr(Expr expr) {
 
 		if (expr instanceof SelectionExpr) {
 
-			Expr target = ((SelectionExpr) expr).getTarget();
-			Nenola.Expr nenolaTarget = toExprFromExpr(target);
+			Optional<Nenola.Expr> chainOp = toChainedExpr((SelectionExpr) expr, "");
 
-			String selection = ((SelectionExpr) expr).getField().getName();
-
-			if (target instanceof NamedElmExpr) {
-				NamedElement base = ((NamedElmExpr) target).getElm();
-				if (/* base instanceof AadlPackage || */ base instanceof Subcomponent || base instanceof FeatureGroup) {
-					NamedElement field = ((SelectionExpr) expr).getField();
-					if (field instanceof ConstStatement) {
-						// constant propagation
-						return toExprFromExpr(((ConstStatement) field).getExpr());
-					} else {
-						return new Nenola.IdExpr(base.getName() + "__" + field.getName());
-					}
-				} else {
-
-					return new Nenola.SelectionExpr(nenolaTarget, selection);
-				}
+			if (chainOp.isPresent()) {
+				return chainOp.get();
 			} else {
+
+				Expr target = ((SelectionExpr) expr).getTarget();
+				Nenola.Expr nenolaTarget = toExprFromExpr(target);
+				String selection = ((SelectionExpr) expr).getField().getName();
 				return new Nenola.SelectionExpr(nenolaTarget, selection);
+
 			}
+
 
 		} else if (expr instanceof TagExpr) {
 
