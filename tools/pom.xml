@@ -41,6 +41,15 @@
 		<module>repository</module>
 	</modules>
 
+	<profiles>
+	  <profile>
+	    <id>build-update-site</id>
+	    <modules>
+	      <module>update-site</module>
+	    </modules>
+	  </profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
