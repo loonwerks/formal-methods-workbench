@@ -37,6 +37,7 @@ import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.FeatureGroup;
+import org.osate.aadl2.FeatureGroupType;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
@@ -429,14 +430,47 @@ public class AgreeXtext {
 		return result;
 	}
 
+	private static List<String> toNameListFromFGT(FeatureGroupType fgt, String prefix) {
+		List<String> names = new ArrayList<>();
 
-	private static Nenola.Expr toExprFromConnectedElement(ConnectedElement ce) {
+		for (Feature feat : fgt.getAllFeatures()) {
+
+			String name = prefix + "__" + feat.getName();
+			if (feat instanceof FeatureGroup) {
+
+				FeatureGroupType nextFgt = ((FeatureGroup) feat).getFeatureGroupType();
+				names.addAll(toNameListFromFGT(nextFgt, name));
+
+			} else {
+				names.add(name);
+			}
+
+		}
+
+		return names;
+	}
+
+	private static List<Nenola.Expr> toExprFromConnectedElement(ConnectedElement ce) {
+
+		List<Nenola.Expr> exprs = new ArrayList<>();
+
 		Context context = ce.getContext();
 		ConnectionEnd end = ce.getConnectionEnd();
-
 		Nenola.Expr idExpr = new Nenola.IdExpr(context.getName());
-		return new Nenola.SelectionExpr(idExpr, end.getName());
 
+		if (end instanceof FeatureGroup) {
+
+			FeatureGroupType fgt = ((FeatureGroup) end).getFeatureGroupType();
+			List<String> fgtNames = toNameListFromFGT(fgt, end.getName());
+			for (String fgtName : fgtNames) {
+				exprs.add(new Nenola.SelectionExpr(idExpr, fgtName));
+			}
+
+		} else {
+			exprs.add(new Nenola.SelectionExpr(idExpr, end.getName()));
+		}
+
+		return exprs;
 	}
 
 	private static List<Nenola.Connection> extractConnections(ComponentImplementation currClsfr) {
@@ -459,24 +493,35 @@ public class AgreeXtext {
 		List<Nenola.Connection> connections = new ArrayList<>();
 		for (Connection aadlConn : currClsfr.getAllConnections()) {
 			String name = aadlConn.getName();
-
-			Nenola.Expr sourceExpr = toExprFromConnectedElement(aadlConn.getSource());
-			Nenola.Expr destExpr = toExprFromConnectedElement(aadlConn.getDestination());
-
-			// TODO handle featureGroup case
-
 			Expr expr = exprMap.get(name);
 			Optional<Nenola.Expr> connExpr = expr == null ? Optional.empty() : Optional.of(toExprFromExpr(expr));
-
-			Nenola.Connection conn = new Nenola.Connection(name, sourceExpr, destExpr, connExpr);
-
-			connections.add(conn);
+			connections.addAll(toConnectionListFromConnection(aadlConn, connExpr));
 
 		}
 
 		return connections;
 	}
 
+
+	private static List<Nenola.Connection> toConnectionListFromConnection(Connection aadlConn,
+			Optional<Nenola.Expr> connExpr) {
+
+		String name = aadlConn.getName();
+		List<Nenola.Expr> sourceExprList = toExprFromConnectedElement(aadlConn.getSource());
+		List<Nenola.Expr> destExprList = toExprFromConnectedElement(aadlConn.getDestination());
+
+		List<Nenola.Connection> connections = new ArrayList<>();
+		int size = sourceExprList.size();
+		for (int i = 0; i < size; i++) {
+			Nenola.Expr sourceExpr = sourceExprList.get(i);
+			Nenola.Expr destExpr = destExprList.get(i);
+
+			Nenola.Connection conn = new Nenola.Connection(name, sourceExpr, destExpr, connExpr);
+			connections.add(conn);
+		}
+
+		return connections;
+	}
 
 	private static Map<String, Channel> extractChannels(String prefix, Classifier ct) {
 		Map<String, Channel> channels = new HashMap<>();
