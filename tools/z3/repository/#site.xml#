@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-  <feature id="com.rockwellcollins.atc.agree.feature"/>
-  <category-def name="adsf" label="asdf">
-    <description>
-      adsf
-    </description>
-  </category-def>
-</site>

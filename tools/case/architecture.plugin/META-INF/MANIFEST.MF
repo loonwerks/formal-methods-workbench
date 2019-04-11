@@ -14,11 +14,9 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
 Import-Package: com.collins.fmw.cyres.util.plugin,
  com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.agree.impl,
- com.rockwellcollins.atc.agree.parsing,
  com.rockwellcollins.atc.agree.unparsing,
  com.rockwellcollins.atc.resolute.parsing,
  com.rockwellcollins.atc.resolute.resolute,
- jkind.lustre,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.part,
@@ -34,9 +32,7 @@ Import-Package: com.collins.fmw.cyres.util.plugin,
  org.osate.ge.internal.services,
  org.osate.ge.internal.services.impl,
  org.osate.pluginsupport,
- org.osate.ui.dialogs,
- org.osate.ui.navigator,
- org.osate.ui.utils
+ org.osate.ui.dialogs
 Bundle-Activator: com.collins.fmw.cyres.architecture.Activator
 Export-Package: com.collins.fmw.cyres.architecture,
  com.collins.fmw.cyres.architecture.preferences

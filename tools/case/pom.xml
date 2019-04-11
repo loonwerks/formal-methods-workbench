@@ -6,20 +6,18 @@
 
 	<parent>
 		<groupId>com.collins.fmw</groupId>
-		<artifactId>com.collins.fmw</artifactId>
-		<version>0.0.0</version>
-		<relativePath>..</relativePath>
+		<artifactId>com.collins.fmw.aggregator</artifactId>
+		<version>2.4.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.collins.fmw</groupId>
-	<artifactId>com.collins.fmw.cyres</artifactId>
-	<version>0.0.0</version>
+	<groupId>com.collins.fmw.cyres</groupId>
+	<artifactId>com.collins.fmw.cyres.parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	
 
 	<modules>
-		<module>json.plugin</module>
 		<module>util.plugin</module>
+		<module>json.plugin</module>
 		<module>splat.plugin</module>
 		<module>architecture.plugin</module>
 		<module>toolcheck.plugin</module>
