@@ -33,7 +33,7 @@ import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.ModelAnnotationsDialog;
 
-public class ModelAnnotations extends AadlHandler {
+public class ModelAnnotationsHandler extends AadlHandler {
 
 	public enum CIA {
 		HIGH, MEDIUM, LOW, NULL

@@ -25,7 +25,7 @@ import org.osate.aadl2.impl.ProcessImplementationImpl;
 import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.ui.dialogs.Dialog;
 
-public class AddRouter extends AadlHandler {
+public class AddRouterHandler extends AadlHandler {
 
 	static final String ROUTER_COMP_BASE_NAME = "Router";
 	static final String ROUTER_PORT_IN_NAME = "router_in";

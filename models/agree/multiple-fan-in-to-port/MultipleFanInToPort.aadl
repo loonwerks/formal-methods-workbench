@@ -1,0 +1,108 @@
+---------------------
+-- The top_level system looks like this:
+--
+--  A_______ 
+--          |____C
+--  B_______|
+--
+---------------------
+
+package MultipleFanInToPort
+public
+	with Base_Types;
+		
+	data Message		
+	end Message;
+	
+	data implementation Message.impl
+		subcomponents
+			ID : data Base_Types::Integer;
+			msg_details : data Base_Types::Integer;
+	end Message.impl;
+	
+	system A
+		features
+			Request_out : out data port Message.impl;	
+		annex agree {**
+			const My_ID : int = 1; 			
+			
+			guarantee "Request Message ID equals GOLDEN_ID":
+				Request_out.ID = My_ID;
+		**};
+	end A;
+	
+	system B
+		features
+			Request_out : out data port Message.impl;	
+		annex agree {**
+			const My_ID : int = 2; 			
+			
+			guarantee "Request Message ID equals GOLDEN_ID":
+				Request_out.ID = My_ID;
+		**};
+	end B;
+	
+	system C
+		features
+			Request_in : in data port Message.impl;
+			Response_out : out data port Message.impl;	
+		annex agree {**
+
+			guarantee "Response Message ID equals the previous Request Message ID":
+				Response_out.ID = prev(Request_in.ID, 0);
+
+		**};
+	end C;
+	
+	system top_level
+		annex agree {**
+			guarantee "Placeholder guarantee to get AGREE to run": true;
+		**};
+	end top_level;
+	
+	system implementation top_level.impl
+		subcomponents
+			A : system A;
+			B : system B;
+			C : system C;
+		connections
+			A_to_C : port A.Request_out -> C.Request_in;
+			B_to_C : port B.Request_out -> C.Request_in;
+		annex agree{**
+			----------------------------------
+			-- BEGIN SECTION 1
+			----------------------------------
+			-- Would like to autogenerate the text in this section 
+			--  for any input port with multiple fan in (C.Request_in in this example)	
+			
+			connection A_to_C : true;
+			connection B_to_C : true;
+			----------------------------------
+			-- END SECTION 1
+			----------------------------------			
+			----------------------------------
+			-- BEGIN SECTION 2
+			----------------------------------
+			-- Would like to autogenerate the text in this section 
+			--  for any input port with multiple fan in (C.Request_in in this example) 
+			--  together with the following note/warning to the user
+			
+			-- Note: This assertion is not an accurate statement for a queue, 
+			--  which may be working off a backlog of messages and not using 
+			--  one of the current inputs to C.Request_in
+				
+			assert "C.Request_in is equal to A.Request_out or B.Request_out":
+				(C. Request_in = A.Request_out)
+				or (C. Request_in = B.Request_out);
+			----------------------------------
+			-- END SECTION 2
+			----------------------------------
+			
+			lemma "After the initial timestep, the ID in C's output message is always that of A or B":
+				true -> 
+					((C.Response_out.ID = A.My_ID)
+					or (C.Response_out.ID = B.My_ID));
+		**};
+	end top_level.impl;
+	
+end MultipleFanInToPort;
