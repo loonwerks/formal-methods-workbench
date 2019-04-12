@@ -5,8 +5,9 @@ env:
 before_install:
  - sh -e /etc/init.d/xvfb start - sleep 10
 script:
- - cd tools
+ - pushd tools
  - mvn clean verify
+ - popd
 
 before_deploy:
   - export RELEASE_PKG_FILE=$(ls tools/repository/target/com.collins.fmw.aggregator.repository-*.zip)
