@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.resource.XtextResource;
@@ -282,34 +281,42 @@ public class AddFilterHandler extends AadlHandler {
 				// TODO: original needs to be renamed, transformed implementation should keep original name
 				final ProcessImplementation procImpl = (ProcessImplementation) selectedConnection
 						.getContainingComponentImpl();
-				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
-				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
+//				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
+//				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
 
-				// Change selectedConnection to refer to the connection on the new implementation
-				for (PortConnection c : newImpl.getOwnedPortConnections()) {
-					if (c.getName().equalsIgnoreCase(selectedConnection.getName())) {
-						selectedConnection = c;
-						break;
-					}
-				}
+//				// Change selectedConnection to refer to the connection on the new implementation
+//				for (PortConnection c : newImpl.getOwnedPortConnections()) {
+//					if (c.getName().equalsIgnoreCase(selectedConnection.getName())) {
+//						selectedConnection = c;
+//						break;
+//					}
+//				}
 
 				// Insert filter feature in process component implementation
-				final ThreadSubcomponent filterThreadSubComp = newImpl.createOwnedThreadSubcomponent();
+//				final ThreadSubcomponent filterThreadSubComp = newImpl.createOwnedThreadSubcomponent();
+				final ThreadSubcomponent filterThreadSubComp = procImpl.createOwnedThreadSubcomponent();
 
 				// Give it a unique name
+//				filterThreadSubComp
+//						.setName(getUniqueName(filterImplementationName, true, newImpl.getOwnedSubcomponents()));
 				filterThreadSubComp
-						.setName(getUniqueName(filterImplementationName, true, newImpl.getOwnedSubcomponents()));
+						.setName(getUniqueName(filterImplementationName, true, procImpl.getOwnedSubcomponents()));
+
 				filterThreadSubComp.setThreadSubcomponentType(filterThreadImpl);
 
 				// Put it in the right place
 				destName = selectedConnection.getDestination().getContext().getName();
-				newImpl.getOwnedThreadSubcomponents().move(getIndex(destName, newImpl.getOwnedThreadSubcomponents()),
-						newImpl.getOwnedThreadSubcomponents().size() - 1);
+//				newImpl.getOwnedThreadSubcomponents().move(getIndex(destName, newImpl.getOwnedThreadSubcomponents()),
+//						newImpl.getOwnedThreadSubcomponents().size() - 1);
+				procImpl.getOwnedThreadSubcomponents().move(getIndex(destName, procImpl.getOwnedThreadSubcomponents()),
+						procImpl.getOwnedThreadSubcomponents().size() - 1);
 
 				// Create connection from filter to connection destination
-				final PortConnection portConnOut = newImpl.createOwnedPortConnection();
+//				final PortConnection portConnOut = newImpl.createOwnedPortConnection();
+				final PortConnection portConnOut = procImpl.createOwnedPortConnection();
 				// Give it a unique name
-				portConnOut.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
+//				portConnOut.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
+				portConnOut.setName(getUniqueName(CONNECTION_IMPL_NAME, false, procImpl.getOwnedPortConnections()));
 				portConnOut.setBidirectional(false);
 				final ConnectedElement filterOutSrc = portConnOut.createSource();
 				filterOutSrc.setContext(filterThreadSubComp);
@@ -320,13 +327,15 @@ public class AddFilterHandler extends AadlHandler {
 
 				// Put portConnOut in right place (after portConnIn)
 				destName = selectedConnection.getName();
-				newImpl.getOwnedPortConnections().move(getIndex(destName, newImpl.getOwnedPortConnections()) + 1,
-						newImpl.getOwnedPortConnections().size() - 1);
+//				newImpl.getOwnedPortConnections().move(getIndex(destName, newImpl.getOwnedPortConnections()) + 1,
+//						newImpl.getOwnedPortConnections().size() - 1);
+				procImpl.getOwnedPortConnections().move(getIndex(destName, procImpl.getOwnedPortConnections()) + 1,
+						procImpl.getOwnedPortConnections().size() - 1);
 
-				// Add new implementation to package and place immediately above original implementation
-				pkgSection.getOwnedClassifiers().add(newImpl);
-				pkgSection.getOwnedClassifiers().move(getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
-						pkgSection.getOwnedClassifiers().size() - 1);
+//				// Add new implementation to package and place immediately above original implementation
+//				pkgSection.getOwnedClassifiers().add(newImpl);
+//				pkgSection.getOwnedClassifiers().move(getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
+//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Add add_filter claims to resolute prove statement, if applicable
 				if (!filterResoluteClause.isEmpty()) {

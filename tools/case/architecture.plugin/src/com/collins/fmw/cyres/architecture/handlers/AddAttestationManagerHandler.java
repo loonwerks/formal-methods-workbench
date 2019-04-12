@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.resource.XtextResource;
@@ -331,31 +330,37 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				// Make a copy of the process component implementation
 				final ProcessImplementation procImpl = (ProcessImplementation) commDriver.getContainingComponentImpl();
-				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
-				// Give it a unique name
-				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
+//				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
+//				// Give it a unique name
+//				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
 
-				// Change commDriver to refer to the subcomponent on the new implementation
-				for (ThreadSubcomponent c : newImpl.getOwnedThreadSubcomponents()) {
-					if (c.getName().equalsIgnoreCase(commDriver.getName())) {
-						commDriver = c;
-						break;
-					}
-				}
+//				// Change commDriver to refer to the subcomponent on the new implementation
+//				for (ThreadSubcomponent c : newImpl.getOwnedThreadSubcomponents()) {
+//					if (c.getName().equalsIgnoreCase(commDriver.getName())) {
+//						commDriver = c;
+//						break;
+//					}
+//				}
 
 				// Insert attestation manager in process component implementation
-				final ThreadSubcomponent attestationManagerThreadSubComp = newImpl.createOwnedThreadSubcomponent();
+//				final ThreadSubcomponent attestationManagerThreadSubComp = newImpl.createOwnedThreadSubcomponent();
+				final ThreadSubcomponent attestationManagerThreadSubComp = procImpl.createOwnedThreadSubcomponent();
 
 				// Give it a unique name
+//				attestationManagerThreadSubComp
+//						.setName(getUniqueName(implementationName, true, newImpl.getOwnedSubcomponents()));
 				attestationManagerThreadSubComp
-						.setName(getUniqueName(implementationName, true, newImpl.getOwnedSubcomponents()));
+						.setName(getUniqueName(implementationName, true, procImpl.getOwnedSubcomponents()));
 				// Assign thread implementation
 				attestationManagerThreadSubComp.setThreadSubcomponentType(attestationManagerThreadImpl);
 
 				// Put it in the right place
-				newImpl.getOwnedThreadSubcomponents().move(
-						getIndex(commDriver.getName(), newImpl.getOwnedThreadSubcomponents()) + 1,
-						newImpl.getOwnedThreadSubcomponents().size() - 1);
+//				newImpl.getOwnedThreadSubcomponents().move(
+//						getIndex(commDriver.getName(), newImpl.getOwnedThreadSubcomponents()) + 1,
+//						newImpl.getOwnedThreadSubcomponents().size() - 1);
+				procImpl.getOwnedThreadSubcomponents().move(
+						getIndex(commDriver.getName(), procImpl.getOwnedThreadSubcomponents()) + 1,
+						procImpl.getOwnedThreadSubcomponents().size() - 1);
 
 //				// Create attestation request / response connections between comm driver and attestation manager
 				List<PortConnection> newPortConns = new ArrayList<>();
@@ -387,7 +392,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				// Create new connections between comm driver / attestation manager / destination components
 				String connName = "";
-				for (PortConnection conn : newImpl.getOwnedPortConnections()) {
+//				for (PortConnection conn : newImpl.getOwnedPortConnections()) {
+				for (PortConnection conn : procImpl.getOwnedPortConnections()) {
 					// Ignore bus connections (destination context not null)
 					if (conn.getSource().getContext() == commDriver && conn.getDestination().getContext() != null) {
 						// Create connection from attestation manager to destination components
@@ -459,19 +465,24 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				int idxOffset = 1;
 				for (PortConnection newPortConn : newPortConns) {
 					// Make sure each new connection has a unique name
-					newPortConn.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
-					newImpl.getOwnedPortConnections().add(newPortConn);
+//					newPortConn.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
+					newPortConn.setName(getUniqueName(CONNECTION_IMPL_NAME, false, procImpl.getOwnedPortConnections()));
+//					newImpl.getOwnedPortConnections().add(newPortConn);
+					procImpl.getOwnedPortConnections().add(newPortConn);
 					// Move to right place
-					newImpl.getOwnedPortConnections().move(
-							getIndex(connName, newImpl.getOwnedPortConnections()) + idxOffset,
-							newImpl.getOwnedPortConnections().size() - 1);
+//					newImpl.getOwnedPortConnections().move(
+//							getIndex(connName, newImpl.getOwnedPortConnections()) + idxOffset,
+//							newImpl.getOwnedPortConnections().size() - 1);
+					procImpl.getOwnedPortConnections().move(
+							getIndex(connName, procImpl.getOwnedPortConnections()) + idxOffset,
+							procImpl.getOwnedPortConnections().size() - 1);
 					idxOffset++;
 				}
 
-				// Add new implementation to package and place immediately above original implementation
-				pkgSection.getOwnedClassifiers().add(newImpl);
-				pkgSection.getOwnedClassifiers().move(getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
-						pkgSection.getOwnedClassifiers().size() - 1);
+//				// Add new implementation to package and place immediately above original implementation
+//				pkgSection.getOwnedClassifiers().add(newImpl);
+//				pkgSection.getOwnedClassifiers().move(getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
+//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Add add_attestation claims to resolute prove statement, if applicable
 				if (!attestationResoluteClause.isEmpty()) {
