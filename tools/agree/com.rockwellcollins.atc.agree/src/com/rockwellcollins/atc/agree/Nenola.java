@@ -990,24 +990,27 @@ public class Nenola {
 			this.contractMap = contractMap;
 			this.nodeGenMap = nodeGenMap;
 		}
+
+		public jkind.lustre.Program toRecursiveLustreProgram() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public jkind.lustre.Program toRealizabilityLustreProgram() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public jkind.lustre.Program toMonolithicLustreProgram() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public jkind.lustre.Program toSingleLustreProgram() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
-
-	// inline: ConstStatement
-
-	// global contracts: Classifier, ArrayType, PrimType, EnumStatement, RecordDef, ComponentClassifier
-
-	// global node generator: NodeDef, FnDef, LinearizationDef
-
-	// local assertions: AssertionStatement, AssertEqualStatement,
-	// local lemmas: LemmaStatement
-	// local assumptions: AssumeStatement
-	// local guarantees: GuaranteeStatement
-	// local input channels: Feature, InputStatement
-	// local output channels: Feature, BoolOutputStatement, OutputStatement
-	// local subNodes: Subcomponent
-	// local connections: ConnectedElement, ConnectionStatement
-
-	// not implemented: LibraryFnDef
 
 
 

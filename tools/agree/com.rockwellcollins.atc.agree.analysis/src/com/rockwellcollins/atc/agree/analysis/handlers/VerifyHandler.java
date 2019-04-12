@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PartInitException;
@@ -39,6 +38,8 @@ import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.ui.dialogs.Dialog;
 
+import com.rockwellcollins.atc.agree.AgreeXtext;
+import com.rockwellcollins.atc.agree.Nenola;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.AgreeSubclause;
@@ -89,16 +90,30 @@ public abstract class VerifyHandler extends AadlHandler {
 	private Map<String, String> rerunAdviceMap = new HashMap<>();
 	private int adviceCount = 0;
 	private boolean calledFromRerun = false;
+	protected ProgramType programType = ProgramType.Monolithic;
 
+	protected enum ProgramType {
+		Recursive, Monolithic, Realizability, Single
+	}
 	private enum AnalysisType {
 		AssumeGuarantee, Consistency, Realizability
 	};
 
-	protected abstract boolean isRecursive();
+	protected final boolean isRecursive() {
+		return this.programType == ProgramType.Recursive;
+	};
 
-	protected abstract boolean isMonolithic();
+	protected final boolean isMonolithic() {
+		return this.programType == ProgramType.Monolithic;
+	}
 
-	protected abstract boolean isRealizability();
+	protected final boolean isRealizability() {
+		return this.programType == ProgramType.Realizability;
+	}
+
+	protected final boolean isSingle() {
+		return this.programType == ProgramType.Single;
+	}
 
 	protected SystemInstance getSysInstance(ComponentImplementation ci, EphemeralImplementationUtil implUtil) {
 		try {
@@ -160,6 +175,9 @@ public abstract class VerifyHandler extends AadlHandler {
 		return result;
 	}
 
+//START NEW STUFF>>>>>>>>>>>>>>>
+
+	// TLL - New runJob using Nenola.
 	@Override
 	protected IStatus runJob(Element root, IProgressMonitor monitor) {
 		EphemeralImplementationUtil implUtil = new EphemeralImplementationUtil(monitor);
@@ -177,43 +195,31 @@ public abstract class VerifyHandler extends AadlHandler {
 			// Make sure the user selected a component implementation
 			ComponentImplementation ci = getComponentImplementation(root, implUtil);
 
-			SystemInstance si = getSysInstance(ci, implUtil);
-
-			AnalysisResult result;
-			CompositeAnalysisResult wrapper = new CompositeAnalysisResult("");
-
-			ComponentType sysType = AgreeUtils.getInstanceType(si);
-			EList<AnnexSubclause> annexSubClauses = AnnexUtil.getAllAnnexSubclauses(sysType,
-					AgreePackage.eINSTANCE.getAgreeContractSubclause());
-
-			if (annexSubClauses.size() == 0) {
-				throw new AgreeException("There is not an AGREE annex in the '" + sysType.getName() + "' system type.");
-			}
+			Nenola.Program nenolaProgram = AgreeXtext.toProgram(ci);
 
 			if (isRecursive()) {
 				if (AgreeUtils.usingKind2()) {
-					throw new AgreeException("Kind2 only supports monolithic verification");
+					throw new RuntimeException("Kind2 only supports monolithic verification");
 				}
-				result = buildAnalysisResult(ci.getName(), si);
-				wrapper.addChild(result);
-				result = wrapper;
-			} else if (isRealizability()) {
-				AgreeProgram agreeProgram = new AgreeASTBuilder().getAgreeProgram(si, false);
 
-				Program program = LustreAstBuilder.getRealizabilityLustreProgram(agreeProgram);
-				wrapper.addChild(createVerification("Realizability Check", si, program, agreeProgram,
-						AnalysisType.Realizability));
-				result = wrapper;
-			} else {
-				CompositeAnalysisResult wrapperTop = new CompositeAnalysisResult(
-						"Verification for " + ci.getName());
-				wrapVerificationResult(si, wrapperTop);
-				wrapper.addChild(wrapperTop);
-				result = wrapper;
+				Program lustreProgram = nenolaProgram.toRecursiveLustreProgram();
+				return runLustreProgram(lustreProgram, ci, monitor);
+
+			} else if (isRealizability()) {
+				Program lustreProgram = nenolaProgram.toRealizabilityLustreProgram();
+				return runLustreProgram(lustreProgram, ci, monitor);
+
+			} else if (isMonolithic()) {
+				Program lustreProgram = nenolaProgram.toMonolithicLustreProgram();
+				return runLustreProgram(lustreProgram, ci, monitor);
+
+			} else if (isSingle()) {
+				Program lustreProgram = nenolaProgram.toSingleLustreProgram();
+				return runLustreProgram(lustreProgram, ci, monitor);
+
 			}
 
-			showView(result, linker);
-			return doAnalysis(ci, monitor);
+			throw new RuntimeException("Ananlysis type is not recognized");
 		} catch (Throwable e) {
 			String messages = getNestedMessages(e);
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, messages, e);
@@ -221,6 +227,83 @@ public abstract class VerifyHandler extends AadlHandler {
 			implUtil.cleanup();
 		}
 	}
+
+
+	private IStatus runLustreProgram(Program lustreProgram, ComponentImplementation ci, IProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		AnalysisResult result = makeCompositeAnalysisResult(lustreProgram);
+		showView(result, linker);
+		return null;
+	}
+
+	private AnalysisResult makeCompositeAnalysisResult(Program lustreProgram) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+//END NEW STUFF>>>>>>>>>>>>>>>
+
+// TLL - ORIGINAL runJob
+//	@Override
+//	protected IStatus runJob(Element root, IProgressMonitor monitor) {
+//		EphemeralImplementationUtil implUtil = new EphemeralImplementationUtil(monitor);
+//		// this flag is set by the rerun handler to prevent clearing the advice map
+//		if (!calledFromRerun) {
+//			rerunAdviceMap.clear();
+//		}
+//		calledFromRerun = false;
+//
+//		disableRerunHandler();
+//		handlerService = getWindow().getService(IHandlerService.class);
+//
+//		try {
+//
+//			// Make sure the user selected a component implementation
+//			ComponentImplementation ci = getComponentImplementation(root, implUtil);
+//
+//			SystemInstance si = getSysInstance(ci, implUtil);
+//
+//			AnalysisResult result;
+//			CompositeAnalysisResult wrapper = new CompositeAnalysisResult("");
+//
+//			ComponentType sysType = AgreeUtils.getInstanceType(si);
+//			EList<AnnexSubclause> annexSubClauses = AnnexUtil.getAllAnnexSubclauses(sysType,
+//					AgreePackage.eINSTANCE.getAgreeContractSubclause());
+//
+//			if (annexSubClauses.size() == 0) {
+//				throw new AgreeException("There is not an AGREE annex in the '" + sysType.getName() + "' system type.");
+//			}
+//
+//			if (isRecursive()) {
+//				if (AgreeUtils.usingKind2()) {
+//					throw new AgreeException("Kind2 only supports monolithic verification");
+//				}
+//				result = buildAnalysisResult(ci.getName(), si);
+//				wrapper.addChild(result);
+//				result = wrapper;
+//			} else if (isRealizability()) {
+//				AgreeProgram agreeProgram = new AgreeASTBuilder().getAgreeProgram(si, false);
+//
+//				Program program = LustreAstBuilder.getRealizabilityLustreProgram(agreeProgram);
+//				wrapper.addChild(createVerification("Realizability Check", si, program, agreeProgram,
+//						AnalysisType.Realizability));
+//				result = wrapper;
+//			} else {
+//				CompositeAnalysisResult wrapperTop = new CompositeAnalysisResult("Verification for " + ci.getName());
+//				wrapVerificationResult(si, wrapperTop);
+//				wrapper.addChild(wrapperTop);
+//				result = wrapper;
+//			}
+//
+//			showView(result, linker);
+//			return doAnalysis(ci, monitor);
+//		} catch (Throwable e) {
+//			String messages = getNestedMessages(e);
+//			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, messages, e);
+//		} finally {
+//			implUtil.cleanup();
+//		}
+//	}
 
 	private void wrapVerificationResult(ComponentInstance si, CompositeAnalysisResult wrapper) {
 		AgreeProgram agreeProgram = new AgreeASTBuilder().getAgreeProgram(si, isMonolithic());
