@@ -2,6 +2,7 @@ language: java
 env:
  global:
   - DISPLAY=:99.0
+ secure: "jRTwmxGN44/QLBhfbwrHYKDmjYfF6xcmC/8B/4dxyoqLJxccHKKSn6zKvZsYDf35n8nXKG/MlqHmyyNDutTmzIBx6d7ev4aUGVlD2zMHIRsIP1rjC8N9jery4AQA8rqUUybgYv2fbh0+7VfeuybAAehYX2wsvw2MC0dS8nITCa6nKI98lFJPVqKijcIm4sM07IErZefk0ABD2dm6rL7Dp7jyrHQxemGpAgjRVcQFdqMCuavKkN/7m8Sfhjx+Fe+BpJo2imOIIyEFaEN1cozvCpzDsUcKAWTpvoMwhFaWi0gDjaaJodo4rnbAp0gt8Ygc+MMZnwgVkjmBzD0Y45tgiKBkMT8t2JIO8PfEsCPHNY+wctyJsNUnEjvbxIO2KjD+WAp85DWccqcH5nFm1hUJ7eYRkWVVVMqBxKjXEZmfvgIX10L0RmS3zPHk59An0XNY7RKwxFrqkrzlshm1Wx9PVumabOTcmDMQODfx0VtWCTtvia92XXxh84PL/b9t8NTiVeuPwW1hm7TSrl64KratWtFd5f/oT9ePYd+bcPVxwOcKMuT9gWAZt7hiPfnbsueVm5dyKYu9s9d9X4gYdxr5WjbTZ3oaOkq9r433vpbsBX/gbGvoJA6ZAEMoO9umt8GtSZHL4pEBWf06AwjnDwhhyOt1YOOXcD5uQeeub89bAKo="
 before_install:
  - sh -e /etc/init.d/xvfb start - sleep 10
 script:
@@ -14,8 +15,7 @@ before_deploy:
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 deploy:
   provider: releases
-  api-key:
-    secure: ZQE9uhwa4iTjvYARVS/VD1ZY14f2/wK00xyZynaRKGksFzMqniEmlusZUhkaHw9ZmbEXUT81PLfEcQ+OXfGP97+4VV+Q3YCML+ShpoI4kIdu/spvH4rGaHOAyo6wkmUEK5BP1+dmmiNqaNU9MqB5huJxDmNkedu76JTFyxBWJFaJQlKtPfcVx+2n+goccjvEtQtyi2KIyJsOQvAEGEqMhMzPhJHN0CcSDh2ZhdRMssn3Re7cVf5K2jZOvXzy/sd3UypsrdztfOuLt8CZx8yuHXWki5v2GxbziFGRJEhmDzigfAosw/aTLP+ZVqjcaaEwTY3deMlGcFxLpa0CqVM1qSg+Ogd7TqkanFx9TFZLtjZn8fnihV+Bk5oJHC869GztLk3J0+O0L0DqaWDoijoztS8q21y8w0oHOFDh2pRgW0LkzGgWLfMxfKllYiqJ807138xZ5R4QQtNOKCMn2F/CZup3shcNnBJWPwNkvxjgYR1z478wlEs6gM59gb2Hb8RKhnY9awEXIVAgXpB9VB1AyhZvNSX4u2rzPyM62JjeCQyUSPfgxPgkhaRckt6Fcr5EmqJ7NnAbqSGi47mJVUu0IszSrXaXMzgroM7MJGBmQEk2agC6FC1yL+AccdRi6ksi+HAA8LCHqI069vSVRoNbEJTrYd1HVx2O1iJC7j/IVQY=
+  api-key: $GH_TOKEN
   file: "${RELEASE_PKG_FILE}"
   name: Nightly development build
   body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
