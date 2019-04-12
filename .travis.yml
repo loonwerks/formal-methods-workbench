@@ -22,5 +22,6 @@ deploy:
   overwrite: true
   target_commitish: $TRAVIS_COMMIT
   on:
+    type: cron
     branch: master
 
