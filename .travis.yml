@@ -7,3 +7,20 @@ before_install:
 script:
  - cd tools
  - mvn clean verify
+
+before_deploy:
+  - export RELEASE_PKG_FILE=$(ls tools/repository/target/com.collins.fmw.aggregator.repository-*.zip)
+  - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+deploy:
+  provider: releases
+  api-key:
+    secure: ZQE9uhwa4iTjvYARVS/VD1ZY14f2/wK00xyZynaRKGksFzMqniEmlusZUhkaHw9ZmbEXUT81PLfEcQ+OXfGP97+4VV+Q3YCML+ShpoI4kIdu/spvH4rGaHOAyo6wkmUEK5BP1+dmmiNqaNU9MqB5huJxDmNkedu76JTFyxBWJFaJQlKtPfcVx+2n+goccjvEtQtyi2KIyJsOQvAEGEqMhMzPhJHN0CcSDh2ZhdRMssn3Re7cVf5K2jZOvXzy/sd3UypsrdztfOuLt8CZx8yuHXWki5v2GxbziFGRJEhmDzigfAosw/aTLP+ZVqjcaaEwTY3deMlGcFxLpa0CqVM1qSg+Ogd7TqkanFx9TFZLtjZn8fnihV+Bk5oJHC869GztLk3J0+O0L0DqaWDoijoztS8q21y8w0oHOFDh2pRgW0LkzGgWLfMxfKllYiqJ807138xZ5R4QQtNOKCMn2F/CZup3shcNnBJWPwNkvxjgYR1z478wlEs6gM59gb2Hb8RKhnY9awEXIVAgXpB9VB1AyhZvNSX4u2rzPyM62JjeCQyUSPfgxPgkhaRckt6Fcr5EmqJ7NnAbqSGi47mJVUu0IszSrXaXMzgroM7MJGBmQEk2agC6FC1yL+AccdRi6ksi+HAA8LCHqI069vSVRoNbEJTrYd1HVx2O1iJC7j/IVQY=
+  file: "${RELEASE_PKG_FILE}"
+  name: Nightly development build
+  body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
+  prerelease: true
+  overwrite: true
+  target_commitish: $TRAVIS_COMMIT
+  on:
+    branch: master
+
