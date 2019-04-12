@@ -575,8 +575,49 @@ public class Nenola {
 
 	}
 
-	public static class SynchMode implements TimingMode {
+	public static class SyncMode implements TimingMode {
 
+		public final int v1;
+		public final Optional<Integer> v2Op;
+
+		public SyncMode(int v1, Optional<Integer> v2Op) {
+			this.v1 = v1;
+			this.v2Op = v2Op;
+		}
+
+	}
+
+	public static class AsyncMode implements TimingMode {
+		public AsyncMode() {
+
+		}
+	}
+
+	public static class LatchedMode implements TimingMode {
+		public LatchedMode() {
+
+		}
+	}
+
+	public static class MNSyncMode implements TimingMode {
+
+		public final List<String> subNodeList1;
+		public final List<String> subNodeList2;
+		public final List<Integer> maxList;
+		public final List<Integer> minList;
+
+		public MNSyncMode(List<String> subNodeList1, List<String> subNodeList2, List<Integer> maxList,
+				List<Integer> minList) {
+			this.subNodeList1 = new ArrayList<>();
+			this.subNodeList1.addAll(subNodeList1);
+			this.subNodeList2 = new ArrayList<>();
+			this.subNodeList2.addAll(subNodeList2);
+			this.maxList = new ArrayList<>();
+			this.maxList.addAll(maxList);
+			this.minList = new ArrayList<>();
+			this.minList.addAll(minList);
+
+		}
 	}
 
 	public static interface Contract {
@@ -853,12 +894,14 @@ public class Nenola {
 		public final Map<String, NodeContract> subNodes;
 		public final List<Connection> connections;
 		public final List<Spec> specList;
+		public final Optional<TimingMode> timingMode;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
-				List<Connection> connections, List<Spec> specList, NamedElement namedElement) {
+				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode,
+				NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
 			this.channels.putAll(channels);
@@ -867,6 +910,8 @@ public class Nenola {
 			this.connections = new ArrayList<>();
 			this.connections.addAll(connections);
 			this.specList = specList;
+			this.timingMode = timingMode;
+
 			this.namedElement = namedElement;
 
 		}

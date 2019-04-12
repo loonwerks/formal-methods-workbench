@@ -21,7 +21,6 @@ import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
-import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ClosedTimeInterval;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
@@ -276,9 +275,6 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 				return; 
 			case AgreePackage.BOOL_OUTPUT_STATEMENT:
 				sequence_BoolOutputStatement(context, (BoolOutputStatement) semanticObject); 
-				return; 
-			case AgreePackage.CALEN_STATEMENT:
-				sequence_SynchStatement(context, (CalenStatement) semanticObject); 
 				return; 
 			case AgreePackage.CALL_EXPR:
 				sequence_TermExpr(context, (CallExpr) semanticObject); 
@@ -1912,20 +1908,6 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 	 *     {AsynchStatement}
 	 */
 	protected void sequence_SynchStatement(ISerializationContext context, AsynchStatement semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
-	}
-	
-	
-	/**
-	 * Contexts:
-	 *     Element returns CalenStatement
-	 *     SpecStatement returns CalenStatement
-	 *     SynchStatement returns CalenStatement
-	 *
-	 * Constraint:
-	 *     (els+=[NamedElement|ID] els+=[NamedElement|ID]*)
-	 */
-	protected void sequence_SynchStatement(ISerializationContext context, CalenStatement semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	

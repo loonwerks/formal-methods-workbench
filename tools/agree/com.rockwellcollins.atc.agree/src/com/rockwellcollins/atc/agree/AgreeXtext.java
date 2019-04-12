@@ -77,6 +77,7 @@ import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
 import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
 import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
+import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
@@ -104,9 +105,11 @@ import com.rockwellcollins.atc.agree.agree.IndicesExpr;
 import com.rockwellcollins.atc.agree.agree.InputStatement;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedExpr;
+import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
+import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NamedID;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
@@ -130,6 +133,7 @@ import com.rockwellcollins.atc.agree.agree.RecordUpdateExpr;
 import com.rockwellcollins.atc.agree.agree.SelectionExpr;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.SporadicStatement;
+import com.rockwellcollins.atc.agree.agree.SynchStatement;
 import com.rockwellcollins.atc.agree.agree.TagExpr;
 import com.rockwellcollins.atc.agree.agree.ThisRef;
 import com.rockwellcollins.atc.agree.agree.TimeExpr;
@@ -606,6 +610,57 @@ public class AgreeXtext {
 		return channels;
 	}
 
+	private static Optional<Nenola.TimingMode> extractTimingMode(ComponentClassifier c) {
+		AgreeContractSubclause annex = getAgreeAnnex(c);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement specStatement : contract.getSpecs()) {
+
+				if (specStatement instanceof SynchStatement) {
+					int v1 = Integer.parseInt(((SynchStatement) specStatement).getVal());
+
+					String v2Str = ((SynchStatement) specStatement).getVal2();
+
+					Optional<Integer> v2Op = v2Str != null ? Optional.of(Integer.parseInt(v2Str)) : Optional.empty();
+
+					return Optional.of(new Nenola.SyncMode(v1, v2Op));
+				} else if (specStatement instanceof AsynchStatement) {
+					return Optional.of(new Nenola.AsyncMode());
+				} else if (specStatement instanceof MNSynchStatement) {
+					List<String> subNodeList1 = new ArrayList<>();
+					for (NamedElement ne : ((MNSynchStatement) specStatement).getComp1()) {
+						subNodeList1.add(ne.getName());
+					}
+
+					List<String> subNodeList2 = new ArrayList<>();
+					for (NamedElement ne : ((MNSynchStatement) specStatement).getComp2()) {
+						subNodeList2.add(ne.getName());
+					}
+
+					List<Integer> maxList = new ArrayList<>();
+					for (String str : ((MNSynchStatement) specStatement).getMax()) {
+						maxList.add(Integer.parseInt(str));
+					}
+
+					List<Integer> minList = new ArrayList<>();
+					for (String str : ((MNSynchStatement) specStatement).getMin()) {
+						minList.add(Integer.parseInt(str));
+					}
+
+					return Optional.of(new Nenola.MNSyncMode(subNodeList1, subNodeList2, maxList, minList));
+
+				} else if (specStatement instanceof LatchedStatement) {
+					return Optional.of(new Nenola.LatchedMode());
+				}
+
+			}
+
+		}
+
+		return Optional.empty();
+	}
+
 	public static Nenola.Contract toContractFromClassifier(Classifier c) {
 
 		if (c instanceof AadlBoolean || c.getName().contains("Boolean")) {
@@ -787,61 +842,59 @@ public class AgreeXtext {
 			List<Nenola.Connection> connections = new ArrayList<>();
 			List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
-			Classifier currClsfr = c;
-			while (currClsfr != null) {
+			Optional<Nenola.TimingMode> timingMode = extractTimingMode((ComponentClassifier) c);
 
-				List<Nenola.Spec> localSpecs = extractSpecList((ComponentClassifier) currClsfr);
-				specs.addAll(localSpecs);
+			List<Nenola.Spec> localSpecs = extractSpecList((ComponentClassifier) c);
+			specs.addAll(localSpecs);
 
-				ComponentType ct = null;
-				if (currClsfr instanceof ComponentImplementation) {
+			ComponentType ct = null;
+			if (c instanceof ComponentImplementation) {
 
-					EList<Subcomponent> subcomps = ((ComponentImplementation) currClsfr).getAllSubcomponents();
-					for (Subcomponent sub : subcomps) {
-						String fieldName = sub.getName();
-						if (sub.getClassifier() != null) {
+				EList<Subcomponent> subcomps = ((ComponentImplementation) c).getAllSubcomponents();
+				for (Subcomponent sub : subcomps) {
+					String fieldName = sub.getName();
+					if (sub.getClassifier() != null) {
 
-							if (sub.getArrayDimensions().size() == 0) {
-								Nenola.Contract typeDef = toContractFromClassifier(sub.getClassifier());
-								if (typeDef instanceof Nenola.NodeContract) {
-									subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
-								}
-
-							} else if (sub.getArrayDimensions().size() == 1) {
-								throw new RuntimeException("Arrays may not be used in node subcomponent");
+						if (sub.getArrayDimensions().size() == 0) {
+							Nenola.Contract typeDef = toContractFromClassifier(sub.getClassifier());
+							if (typeDef instanceof Nenola.NodeContract) {
+								subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
 							}
+
+						} else if (sub.getArrayDimensions().size() == 1) {
+							throw new RuntimeException("Arrays may not be used in node subcomponent");
 						}
 					}
-
-
-					connections.addAll(extractConnections((ComponentImplementation) currClsfr));
-
-
-					ct = ((ComponentImplementation) currClsfr).getType();
-				} else if (c instanceof ComponentType) {
-					ct = (ComponentType) currClsfr;
 				}
 
-				if (ct != null) {
 
-					channels.putAll(extractChannels("", ct));
+				connections.addAll(extractConnections((ComponentImplementation) c));
 
 
-				}
-
-				currClsfr = currClsfr.getExtended();
+				ct = ((ComponentImplementation) c).getType();
+			} else if (c instanceof ComponentType) {
+				ct = (ComponentType) c;
 			}
+
+			if (ct != null) {
+
+				channels.putAll(extractChannels("", ct));
+
+
+			}
+
+
 
 			String name = c.getQualifiedName();
 
-			return new Nenola.NodeContract(name, channels, subNodes, connections, specs, c);
+
+			return new Nenola.NodeContract(name, channels, subNodes, connections, specs, timingMode, c);
 
 		}
 
 		return Nenola.Prim.ErrorContract;
 
 	}
-
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
 
@@ -1747,9 +1800,15 @@ public class AgreeXtext {
 			return new Nenola.RecordUpdate(record, key, value);
 
 		} else if (expr instanceof NamedElmExpr) {
-			String name = ((NamedElmExpr) expr).getElm().getName();
-			return new Nenola.IdExpr(name);
 
+			NamedElement ne = ((NamedElmExpr) expr).getElm();
+			if (ne instanceof ConstStatement) {
+				// constant propagation
+				return toExprFromExpr(((ConstStatement) ne).getExpr());
+			} else {
+				String name = ((NamedElmExpr) expr).getElm().getName();
+				return new Nenola.IdExpr(name);
+			}
 		} else if (expr instanceof CallExpr) {
 
 			NamedElement nodeDef = ((CallExpr) expr).getRef().getElm();

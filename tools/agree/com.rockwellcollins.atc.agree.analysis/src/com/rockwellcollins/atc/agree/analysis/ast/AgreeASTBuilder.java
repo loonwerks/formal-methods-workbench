@@ -56,8 +56,8 @@ import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
-import com.rockwellcollins.atc.agree.Nenola;
 import com.rockwellcollins.atc.agree.AgreeXtext;
+import com.rockwellcollins.atc.agree.Nenola;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
@@ -65,19 +65,18 @@ import com.rockwellcollins.atc.agree.agree.Arg;
 import com.rockwellcollins.atc.agree.agree.ArrayLiteralExpr;
 import com.rockwellcollins.atc.agree.agree.ArraySubExpr;
 import com.rockwellcollins.atc.agree.agree.ArrayUpdateExpr;
-import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssertEqualStatement;
+import com.rockwellcollins.atc.agree.agree.AssertStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
-import com.rockwellcollins.atc.agree.agree.CalenStatement;
+import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
 import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
-import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.FlatmapExpr;
@@ -104,10 +103,10 @@ import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.NodeEq;
 import com.rockwellcollins.atc.agree.agree.NodeLemma;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
+import com.rockwellcollins.atc.agree.agree.OutputStatement;
 import com.rockwellcollins.atc.agree.agree.PatternStatement;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrevExpr;
-import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
 import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordDef;
@@ -567,9 +566,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			if (spec instanceof MNSynchStatement) {
 				return TimingModel.ASYNC;
 			}
-			if (spec instanceof CalenStatement) {
-				throw new AgreeException("The use of calendar statements has been depricated");
-			}
 			if (spec instanceof AsynchStatement) {
 				return TimingModel.ASYNC;
 			}
@@ -945,9 +941,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		for (SpecStatement spec : specs) {
 			if (spec instanceof MNSynchStatement) {
 				return getMNSynchConstraint((MNSynchStatement) spec);
-			}
-			if (spec instanceof CalenStatement) {
-				throw new AgreeException("The use of calendar statements has been depricated");
 			}
 			if (spec instanceof AsynchStatement) {
 				return new BoolExpr(true);

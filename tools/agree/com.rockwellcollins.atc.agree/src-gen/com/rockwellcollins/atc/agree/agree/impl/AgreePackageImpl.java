@@ -23,7 +23,6 @@ import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
 import com.rockwellcollins.atc.agree.agree.BoolOutputStatement;
-import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ClosedTimeInterval;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
@@ -518,13 +517,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   private EClass mnSynchStatementEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass calenStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -2258,28 +2250,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EClass getCalenStatement()
-  {
-    return calenStatementEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getCalenStatement_Els()
-  {
-    return (EReference)calenStatementEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
   public EClass getAsynchStatement()
   {
     return asynchStatementEClass;
@@ -3709,9 +3679,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     createEAttribute(mnSynchStatementEClass, MN_SYNCH_STATEMENT__MAX);
     createEAttribute(mnSynchStatementEClass, MN_SYNCH_STATEMENT__MIN);
 
-    calenStatementEClass = createEClass(CALEN_STATEMENT);
-    createEReference(calenStatementEClass, CALEN_STATEMENT__ELS);
-
     asynchStatementEClass = createEClass(ASYNCH_STATEMENT);
 
     latchedStatementEClass = createEClass(LATCHED_STATEMENT);
@@ -3966,7 +3933,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     openRightTimeIntervalEClass.getESuperTypes().add(this.getTimeInterval());
     openTimeIntervalEClass.getESuperTypes().add(this.getTimeInterval());
     mnSynchStatementEClass.getESuperTypes().add(this.getSynchStatement());
-    calenStatementEClass.getESuperTypes().add(this.getSynchStatement());
     asynchStatementEClass.getESuperTypes().add(this.getSynchStatement());
     latchedStatementEClass.getESuperTypes().add(this.getSynchStatement());
     nodeEqEClass.getESuperTypes().add(this.getNodeStmt());
@@ -4190,9 +4156,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     initEReference(getMNSynchStatement_Comp2(), theAadl2Package.getNamedElement(), null, "comp2", null, 0, -1, MNSynchStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getMNSynchStatement_Max(), theEcorePackage.getEString(), "max", null, 0, -1, MNSynchStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getMNSynchStatement_Min(), theEcorePackage.getEString(), "min", null, 0, -1, MNSynchStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-    initEClass(calenStatementEClass, CalenStatement.class, "CalenStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getCalenStatement_Els(), theAadl2Package.getNamedElement(), null, "els", null, 0, -1, CalenStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(asynchStatementEClass, AsynchStatement.class, "AsynchStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

@@ -121,7 +121,6 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
       case AgreePackage.OPEN_RIGHT_TIME_INTERVAL: return createOpenRightTimeInterval();
       case AgreePackage.OPEN_TIME_INTERVAL: return createOpenTimeInterval();
       case AgreePackage.MN_SYNCH_STATEMENT: return createMNSynchStatement();
-      case AgreePackage.CALEN_STATEMENT: return createCalenStatement();
       case AgreePackage.ASYNCH_STATEMENT: return createAsynchStatement();
       case AgreePackage.LATCHED_STATEMENT: return createLatchedStatement();
       case AgreePackage.NODE_EQ: return createNodeEq();
@@ -848,18 +847,6 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
   {
     MNSynchStatementImpl mnSynchStatement = new MNSynchStatementImpl();
     return mnSynchStatement;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public CalenStatement createCalenStatement()
-  {
-    CalenStatementImpl calenStatement = new CalenStatementImpl();
-    return calenStatement;
   }
 
   /**
