@@ -11,7 +11,10 @@ import java.util.Optional;
 import org.osate.aadl2.NamedElement;
 
 import jkind.lustre.EnumType;
+import jkind.lustre.Location;
 import jkind.lustre.NamedType;
+import jkind.lustre.Node;
+import jkind.lustre.TypeDef;
 
 //Nenola = Nested Node Language
 public class Nenola {
@@ -991,25 +994,81 @@ public class Nenola {
 			this.nodeGenMap = nodeGenMap;
 		}
 
-		public jkind.lustre.Program toRecursiveLustreProgram() {
+		public Map<String, jkind.lustre.Program> toRecursiveLustrePrograms() {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		public jkind.lustre.Program toRealizabilityLustreProgram() {
+		public Map<String, jkind.lustre.Program> toRealizabilityLustrePrograms() {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		public jkind.lustre.Program toMonolithicLustreProgram() {
+		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms() {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		public jkind.lustre.Program toSingleLustreProgram() {
+		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(boolean usingKind2) {
+			// TODO Auto-generated method stub
+
+			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
+
+			if (usingKind2) {
+				programMap.putAll(this.toContractPrograms());
+			} else {
+				programMap.putAll(this.toAssumeGuaranteePrograms());
+			}
+
+			return null;
+		}
+
+		private Map<String, jkind.lustre.Program> toContractPrograms() {
+			// TODO Auto-generated method stub
+
+			return null;
+		}
+
+		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms() {
+			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			lustreNodes.addAll(this.lustreNodesFromNodeGenList());
+			lustreNodes.addAll(this.lustreNodesFromNodeContracts());
+			jkind.lustre.Node mainNode = this.lustreNodeFromMain();
+			lustreNodes.add(mainNode);
+			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
+					mainNode.id);
+			Map<String, jkind.lustre.Program> programs = new HashMap<>();
+			programs.put("Contract Guarantees", program);
+			return programs;
+		}
+
+		private Node lustreNodeFromMain() {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		private List<Node> lustreNodesFromNodeContracts() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private List<TypeDef> lustreTypesFromDataContracts() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private List<Node> lustreNodesFromNodeGenList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
+			// TODO Auto-generated method stub
+
+			return null;
+		}
+
 	}
 
 

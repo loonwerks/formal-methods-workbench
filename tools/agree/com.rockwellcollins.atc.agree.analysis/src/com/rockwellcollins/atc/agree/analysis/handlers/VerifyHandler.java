@@ -202,20 +202,20 @@ public abstract class VerifyHandler extends AadlHandler {
 					throw new RuntimeException("Kind2 only supports monolithic verification");
 				}
 
-				Program lustreProgram = nenolaProgram.toRecursiveLustreProgram();
-				return runLustreProgram(lustreProgram, ci, monitor);
+				Map<String, Program> lustrePrograms = nenolaProgram.toRecursiveLustrePrograms();
+				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isRealizability()) {
-				Program lustreProgram = nenolaProgram.toRealizabilityLustreProgram();
-				return runLustreProgram(lustreProgram, ci, monitor);
+				Map<String, Program> lustrePrograms = nenolaProgram.toRealizabilityLustrePrograms();
+				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isMonolithic()) {
-				Program lustreProgram = nenolaProgram.toMonolithicLustreProgram();
-				return runLustreProgram(lustreProgram, ci, monitor);
+				Map<String, Program> lustrePrograms = nenolaProgram.toMonolithicLustrePrograms();
+				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isSingle()) {
-				Program lustreProgram = nenolaProgram.toSingleLustreProgram();
-				return runLustreProgram(lustreProgram, ci, monitor);
+				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms(AgreeUtils.usingKind2());
+				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			}
 
@@ -229,14 +229,15 @@ public abstract class VerifyHandler extends AadlHandler {
 	}
 
 
-	private IStatus runLustreProgram(Program lustreProgram, ComponentImplementation ci, IProgressMonitor monitor) {
+	private IStatus runLustrePrograms(Map<String, Program> lustrePrograms, ComponentImplementation ci,
+			IProgressMonitor monitor) {
 		// TODO Auto-generated method stub
-		AnalysisResult result = makeCompositeAnalysisResult(lustreProgram);
+		AnalysisResult result = makeCompositeAnalysisResult(lustrePrograms);
 		showView(result, linker);
-		return null;
+		return Status.OK_STATUS;
 	}
 
-	private AnalysisResult makeCompositeAnalysisResult(Program lustreProgram) {
+	private AnalysisResult makeCompositeAnalysisResult(Map<String, Program> lustrePrograms) {
 		// TODO Auto-generated method stub
 		return null;
 	}
