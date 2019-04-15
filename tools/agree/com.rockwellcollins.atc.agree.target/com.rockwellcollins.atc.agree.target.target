@@ -36,7 +36,7 @@
 		<repository location="http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.16.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-		<unit id="com.collins.trustedsystems.z3.feature.feature.group" version="4.8.4"/>
+		<unit id="com.collins.trustedsystems.z3.feature.feature.group" version="4.7.1"/>
 		<repository location="https://raw.githubusercontent.com/loonwerks/z3-plugin/master/com.collins.trustedsystems.z3.updates/target/repository"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
