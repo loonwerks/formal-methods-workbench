@@ -39,25 +39,25 @@ before_deploy:
 
 deploy:
   # Deploy update site back to repository
-  provider: script
-  script: python3 push_update_site.py $TRAVIS_TAG
-  on:
-    tags: true
+  - provider: script
+    script: python3 push_update_site.py $TRAVIS_TAG
+    on:
+      tags: true
   # Deploy nightly build to github releases
-  provider: releases
-  api-key: $GH_TOKEN
-  file: 
-    - "${RELEASE_PKG_FILE}"
-    - "${RELEASE_PRODUCT_LINUX}"
-    - "${RELEASE_PRODUCT_MACOSX}"
-    - "${RELEASE_PRODUCT_WIN}"
-  name: Nightly development build
-  body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
-    by Travis CI on $(date +'%F %T %Z').
-  prerelease: true
-  overwrite: true
-  skip_cleanup: true
-  target_commitish: $TRAVIS_COMMIT
-  on:
-    branch: develop-ci
-    condition: $TRAVIS_EVENT_TYPE = cron
+  - provider: releases
+    api-key: $GH_TOKEN
+    file: 
+      - "${RELEASE_PKG_FILE}"
+      - "${RELEASE_PRODUCT_LINUX}"
+      - "${RELEASE_PRODUCT_MACOSX}"
+      - "${RELEASE_PRODUCT_WIN}"
+    name: Nightly development build
+    body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
+      by Travis CI on $(date +'%F %T %Z').
+    prerelease: true
+    overwrite: true
+    skip_cleanup: true
+    target_commitish: $TRAVIS_COMMIT
+    on:
+      branch: develop-ci
+      # condition: $TRAVIS_EVENT_TYPE = cron
