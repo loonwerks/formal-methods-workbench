@@ -39,6 +39,7 @@
 		<module>tcg</module>
 		<module>simulator</module>
 		<module>repository</module>
+		<module>ide</module>
 	</modules>
 
 	<profiles>
