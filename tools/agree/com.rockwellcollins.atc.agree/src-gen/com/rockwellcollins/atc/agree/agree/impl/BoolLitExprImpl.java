@@ -66,7 +66,6 @@ public class BoolLitExprImpl extends ExprImpl implements BoolLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public BooleanLiteral getVal()
   {
     return val;
@@ -94,7 +93,6 @@ public class BoolLitExprImpl extends ExprImpl implements BoolLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setVal(BooleanLiteral newVal)
   {
     if (newVal != val)

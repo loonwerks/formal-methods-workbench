@@ -77,7 +77,6 @@ public class TimeIntervalImpl extends MinimalEObjectImpl.Container implements Ti
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getLow()
   {
     return low;
@@ -105,7 +104,6 @@ public class TimeIntervalImpl extends MinimalEObjectImpl.Container implements Ti
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setLow(Expr newLow)
   {
     if (newLow != low)
@@ -127,7 +125,6 @@ public class TimeIntervalImpl extends MinimalEObjectImpl.Container implements Ti
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getHigh()
   {
     return high;
@@ -155,7 +152,6 @@ public class TimeIntervalImpl extends MinimalEObjectImpl.Container implements Ti
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setHigh(Expr newHigh)
   {
     if (newHigh != high)

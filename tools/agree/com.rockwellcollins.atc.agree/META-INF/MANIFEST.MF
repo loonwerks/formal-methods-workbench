@@ -33,7 +33,7 @@ Export-Package: com.rockwellcollins.atc.agree,
  com.rockwellcollins.atc.agree.parser.antlr.internal,
  com.rockwellcollins.atc.agree.validation,
  com.rockwellcollins.atc.agree.scoping,
- com.rockwellcollins.atc.agree.formatting,
+ com.rockwellcollins.atc.agree.formatting2,
  com.rockwellcollins.atc.agree.linking,
  com.rockwellcollins.atc.agree.serializer,
  com.rockwellcollins.atc.agree.parser.antlr.lexer

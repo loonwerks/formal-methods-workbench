@@ -100,7 +100,6 @@ public class MNSynchStatementImpl extends SynchStatementImpl implements MNSynchS
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<NamedElement> getComp1()
   {
     if (comp1 == null)
@@ -115,7 +114,6 @@ public class MNSynchStatementImpl extends SynchStatementImpl implements MNSynchS
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<NamedElement> getComp2()
   {
     if (comp2 == null)
@@ -130,7 +128,6 @@ public class MNSynchStatementImpl extends SynchStatementImpl implements MNSynchS
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<String> getMax()
   {
     if (max == null)
@@ -145,7 +142,6 @@ public class MNSynchStatementImpl extends SynchStatementImpl implements MNSynchS
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<String> getMin()
   {
     if (min == null)
@@ -266,7 +262,7 @@ public class MNSynchStatementImpl extends SynchStatementImpl implements MNSynchS
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (max: ");
     result.append(max);
     result.append(", min: ");

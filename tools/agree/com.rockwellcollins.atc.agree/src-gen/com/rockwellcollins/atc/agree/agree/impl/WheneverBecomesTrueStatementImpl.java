@@ -65,7 +65,6 @@ public class WheneverBecomesTrueStatementImpl extends WheneverStatementImpl impl
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getEffect()
   {
     return effect;
@@ -93,7 +92,6 @@ public class WheneverBecomesTrueStatementImpl extends WheneverStatementImpl impl
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setEffect(Expr newEffect)
   {
     if (newEffect != effect)

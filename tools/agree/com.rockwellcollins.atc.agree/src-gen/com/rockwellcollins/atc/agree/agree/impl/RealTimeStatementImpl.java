@@ -76,7 +76,6 @@ public class RealTimeStatementImpl extends PatternStatementImpl implements RealT
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getEvent()
   {
     return event;
@@ -104,7 +103,6 @@ public class RealTimeStatementImpl extends PatternStatementImpl implements RealT
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setEvent(Expr newEvent)
   {
     if (newEvent != event)
@@ -126,7 +124,6 @@ public class RealTimeStatementImpl extends PatternStatementImpl implements RealT
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getJitter()
   {
     return jitter;
@@ -154,7 +151,6 @@ public class RealTimeStatementImpl extends PatternStatementImpl implements RealT
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setJitter(Expr newJitter)
   {
     if (newJitter != jitter)

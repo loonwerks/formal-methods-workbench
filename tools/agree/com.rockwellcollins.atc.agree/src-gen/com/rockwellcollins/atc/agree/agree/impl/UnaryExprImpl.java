@@ -86,7 +86,6 @@ public class UnaryExprImpl extends ExprImpl implements UnaryExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getOp()
   {
     return op;
@@ -97,7 +96,6 @@ public class UnaryExprImpl extends ExprImpl implements UnaryExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setOp(String newOp)
   {
     String oldOp = op;
@@ -111,7 +109,6 @@ public class UnaryExprImpl extends ExprImpl implements UnaryExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -139,7 +136,6 @@ public class UnaryExprImpl extends ExprImpl implements UnaryExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)
@@ -258,7 +254,7 @@ public class UnaryExprImpl extends ExprImpl implements UnaryExpr
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (op: ");
     result.append(op);
     result.append(')');

@@ -156,7 +156,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getName()
   {
     return name;
@@ -167,7 +166,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setName(String newName)
   {
     String oldName = name;
@@ -181,7 +179,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getLowNeg()
   {
     return lowNeg;
@@ -192,7 +189,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setLowNeg(String newLowNeg)
   {
     String oldLowNeg = lowNeg;
@@ -206,7 +202,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getRangeLow()
   {
     return rangeLow;
@@ -217,7 +212,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setRangeLow(String newRangeLow)
   {
     String oldRangeLow = rangeLow;
@@ -231,7 +225,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getHighNeg()
   {
     return highNeg;
@@ -242,7 +235,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setHighNeg(String newHighNeg)
   {
     String oldHighNeg = highNeg;
@@ -256,7 +248,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getRangeHigh()
   {
     return rangeHigh;
@@ -267,7 +258,6 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setRangeHigh(String newRangeHigh)
   {
     String oldRangeHigh = rangeHigh;
@@ -392,7 +382,7 @@ public class PrimTypeImpl extends TypeImpl implements PrimType
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (name: ");
     result.append(name);
     result.append(", lowNeg: ");
