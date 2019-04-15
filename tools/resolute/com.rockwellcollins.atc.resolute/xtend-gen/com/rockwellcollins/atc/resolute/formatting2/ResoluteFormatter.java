@@ -43,10 +43,12 @@ import com.rockwellcollins.atc.resolute.resolute.ThisExpr;
 import com.rockwellcollins.atc.resolute.resolute.UnaryExpr;
 import com.rockwellcollins.atc.resolute.services.ResoluteGrammarAccess;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.formatting2.IFormattableDocument;
 import org.eclipse.xtext.formatting2.IHiddenRegionFormatter;
+import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
@@ -72,19 +74,13 @@ public class ResoluteFormatter extends PropertiesFormatter {
   private ResoluteGrammarAccess _resoluteGrammarAccess;
   
   protected void _format(final ResoluteLibrary resolutelibrary, @Extension final IFormattableDocument document) {
-    int i = 0;
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.<ResoluteLibrary>surround(resolutelibrary, _function);
     EList<Definition> _definitions = resolutelibrary.getDefinitions();
     for (final Definition definitions : _definitions) {
-      {
-        if ((i != 0)) {
-          final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
-            it.setNewLines(2);
-          };
-          document.<Definition>prepend(definitions, _function);
-        }
-        this.format(definitions, document);
-        i = (i + 1);
-      }
+      this.format(definitions, document);
     }
   }
   
@@ -117,23 +113,27 @@ public class ResoluteFormatter extends PropertiesFormatter {
     final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
       it.noSpace();
     };
+    document.surround(this.textRegionExtensions.regionFor(functiondefinition).keyword("("), _function);
     final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
-      it.oneSpace();
-    };
-    document.append(document.prepend(this.textRegionExtensions.regionFor(functiondefinition).keyword("("), _function), _function_1);
-    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
-      it.oneSpace();
-    };
-    document.surround(this.textRegionExtensions.regionFor(functiondefinition).keyword(")"), _function_2);
-    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
       it.noSpace();
     };
-    document.prepend(this.textRegionExtensions.regionFor(functiondefinition).keyword(","), _function_3);
+    document.prepend(this.textRegionExtensions.regionFor(functiondefinition).keyword(")"), _function_1);
+    final Consumer<ISemanticRegion> _function_2 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_3);
+    };
+    this.textRegionExtensions.regionFor(functiondefinition).keywords(",").forEach(_function_2);
     EList<Arg> _args = functiondefinition.getArgs();
     for (final Arg args : _args) {
       this.format(args, document);
     }
     this.format(functiondefinition.getBody(), document);
+    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(2);
+    };
+    document.<FunctionDefinition>append(functiondefinition, _function_3);
   }
   
   protected void _format(final FunctionBody functionbody, @Extension final IFormattableDocument document) {
@@ -143,17 +143,20 @@ public class ResoluteFormatter extends PropertiesFormatter {
   
   protected void _format(final ClaimBody claimbody, @Extension final IFormattableDocument document) {
     final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.oneSpace();
+    };
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
       it.setNewLines(1);
     };
-    document.append(this.textRegionExtensions.regionFor(claimbody).keyword("<="), _function);
+    document.append(document.prepend(this.textRegionExtensions.regionFor(claimbody).keyword("<="), _function), _function_1);
     EList<ClaimText> _claim = claimbody.getClaim();
     for (final ClaimText claim : _claim) {
       this.format(claim, document);
     }
-    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
       it.setNewLines(1);
     };
-    document.<Expr>prepend(claimbody.getExpr(), _function_1);
+    document.<Expr>prepend(claimbody.getExpr(), _function_2);
     this.format(claimbody.getExpr(), document);
   }
   
@@ -226,6 +229,21 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final FnCallExpr fncallexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.surround(this.textRegionExtensions.regionFor(fncallexpr).keyword("("), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(fncallexpr).keyword(")"), _function_1);
+    final Consumer<ISemanticRegion> _function_2 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_3);
+    };
+    this.textRegionExtensions.regionFor(fncallexpr).keywords(",").forEach(_function_2);
     EList<Expr> _args = fncallexpr.getArgs();
     for (final Expr args : _args) {
       this.format(args, document);
@@ -275,15 +293,13 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final ResoluteSubclause resolutesubclause, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.<ResoluteSubclause>surround(resolutesubclause, _function);
     EList<AnalysisStatement> _proves = resolutesubclause.getProves();
     for (final AnalysisStatement proves : _proves) {
-      {
-        final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
-          it.setNewLines(1);
-        };
-        document.<AnalysisStatement>surround(proves, _function);
-        this.format(proves, document);
-      }
+      this.format(proves, document);
     }
   }
   
@@ -292,6 +308,10 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final ProveStatement provestatement, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    document.<ProveStatement>append(provestatement, _function);
     this.format(provestatement.getExpr(), document);
   }
   

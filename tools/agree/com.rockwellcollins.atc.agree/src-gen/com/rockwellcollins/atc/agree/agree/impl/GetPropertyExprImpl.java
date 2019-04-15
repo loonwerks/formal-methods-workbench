@@ -79,7 +79,6 @@ public class GetPropertyExprImpl extends ExprImpl implements GetPropertyExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public ComponentRef getComponentRef()
   {
     return componentRef;
@@ -107,7 +106,6 @@ public class GetPropertyExprImpl extends ExprImpl implements GetPropertyExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setComponentRef(ComponentRef newComponentRef)
   {
     if (newComponentRef != componentRef)
@@ -129,7 +127,6 @@ public class GetPropertyExprImpl extends ExprImpl implements GetPropertyExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedElement getProp()
   {
     if (prop != null && ((EObject)prop).eIsProxy())
@@ -160,7 +157,6 @@ public class GetPropertyExprImpl extends ExprImpl implements GetPropertyExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setProp(NamedElement newProp)
   {
     NamedElement oldProp = prop;

@@ -312,7 +312,7 @@ public class CyberRequirement {
 		if (!id.isEmpty()) {
 			assume += id + " ";
 		}
-		assume += "\"" + this.text + "\" : FALSE;";
+		assume += "\"" + this.text + "\" : false;";
 		AgreeAnnexParser parser = new AgreeAnnexParser();
 		NamedSpecStatement agreeSpec = parser.parseNamedSpecStatement(assume);
 

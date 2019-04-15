@@ -79,7 +79,6 @@ public class AssignStatementImpl extends SpecStatementImpl implements AssignStat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedElement getId()
   {
     if (id != null && ((EObject)id).eIsProxy())
@@ -110,7 +109,6 @@ public class AssignStatementImpl extends SpecStatementImpl implements AssignStat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setId(NamedElement newId)
   {
     NamedElement oldId = id;
@@ -124,7 +122,6 @@ public class AssignStatementImpl extends SpecStatementImpl implements AssignStat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -152,7 +149,6 @@ public class AssignStatementImpl extends SpecStatementImpl implements AssignStat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

@@ -71,7 +71,6 @@ public class EnumStatementImpl extends NamedElementImpl implements EnumStatement
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<NamedID> getEnums()
   {
     if (enums == null)

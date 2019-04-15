@@ -35,9 +35,7 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cResoluteSubclauseParserRuleCall = (RuleCall)rule.eContents().get(1);
 		
 		//AnnexSubclause aadl2::AnnexSubclause:
-		//	ResoluteSubclause
-		//	//|	LinterSubclause
-		//;
+		//	ResoluteSubclause;
 		@Override public ParserRule getRule() { return rule; }
 
 		//ResoluteSubclause
@@ -2650,8 +2648,6 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//ResoluteSubclause:
 		//	{ResoluteSubclause} proves+=AnalysisStatement*
 		//	//	proves+=ProveStatement*
-		//	//|	LinterSubclause
-		//	//	proves+=Statement*
 		//;
 		@Override public ParserRule getRule() { return rule; }
 
@@ -2661,7 +2657,6 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//{ResoluteSubclause}
 		public Action getResoluteSubclauseAction_0() { return cResoluteSubclauseAction_0; }
 
-		////	proves+=(ProveStatement | CheckStatement)*
 		//proves+=AnalysisStatement*
 		public Assignment getProvesAssignment_1() { return cProvesAssignment_1; }
 
@@ -2794,13 +2789,6 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cBodyRulesetBodyParserRuleCall_3_0 = (RuleCall)cBodyAssignment_3.eContents().get(0);
 		private final Keyword cRightCurlyBracketKeyword_4 = (Keyword)cGroup.eContents().get(4);
 		
-		////CheckStatement:
-		////	'check' expr=Expr
-		////;
-		////LinterSubclause:
-		////	{LinterSubclause}
-		////	checks+=CheckStatement*
-		////;
 		////RuleDefinition:
 		////	'rule' name=ID '(' (args+=Arg (',' args+=Arg)*)? ')' body=DefinitionBody
 		////;
@@ -3042,9 +3030,7 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 	}
 
 	//AnnexSubclause aadl2::AnnexSubclause:
-	//	ResoluteSubclause
-	//	//|	LinterSubclause
-	//;
+	//	ResoluteSubclause;
 	public AnnexSubclauseElements getAnnexSubclauseAccess() {
 		return pAnnexSubclause;
 	}
@@ -3463,8 +3449,6 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 	//ResoluteSubclause:
 	//	{ResoluteSubclause} proves+=AnalysisStatement*
 	//	//	proves+=ProveStatement*
-	//	//|	LinterSubclause
-	//	//	proves+=Statement*
 	//;
 	public ResoluteSubclauseElements getResoluteSubclauseAccess() {
 		return pResoluteSubclause;
@@ -3496,13 +3480,6 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		return getLintStatementAccess().getRule();
 	}
 
-	////CheckStatement:
-	////	'check' expr=Expr
-	////;
-	////LinterSubclause:
-	////	{LinterSubclause}
-	////	checks+=CheckStatement*
-	////;
 	////RuleDefinition:
 	////	'rule' name=ID '(' (args+=Arg (',' args+=Arg)*)? ')' body=DefinitionBody
 	////;

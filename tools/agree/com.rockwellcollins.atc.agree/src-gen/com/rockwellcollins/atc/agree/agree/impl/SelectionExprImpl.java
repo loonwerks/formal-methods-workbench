@@ -79,7 +79,6 @@ public class SelectionExprImpl extends ExprImpl implements SelectionExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getTarget()
   {
     return target;
@@ -107,7 +106,6 @@ public class SelectionExprImpl extends ExprImpl implements SelectionExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setTarget(Expr newTarget)
   {
     if (newTarget != target)
@@ -129,7 +127,6 @@ public class SelectionExprImpl extends ExprImpl implements SelectionExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedElement getField()
   {
     if (field != null && ((EObject)field).eIsProxy())
@@ -160,7 +157,6 @@ public class SelectionExprImpl extends ExprImpl implements SelectionExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setField(NamedElement newField)
   {
     NamedElement oldField = field;

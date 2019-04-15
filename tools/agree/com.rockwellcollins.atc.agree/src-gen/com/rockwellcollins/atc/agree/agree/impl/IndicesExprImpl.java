@@ -65,7 +65,6 @@ public class IndicesExprImpl extends ExprImpl implements IndicesExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getArray()
   {
     return array;
@@ -93,7 +92,6 @@ public class IndicesExprImpl extends ExprImpl implements IndicesExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setArray(Expr newArray)
   {
     if (newArray != array)

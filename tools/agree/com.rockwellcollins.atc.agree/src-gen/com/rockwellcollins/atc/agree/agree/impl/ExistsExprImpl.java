@@ -88,7 +88,6 @@ public class ExistsExprImpl extends ExprImpl implements ExistsExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedID getBinding()
   {
     return binding;
@@ -116,7 +115,6 @@ public class ExistsExprImpl extends ExprImpl implements ExistsExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setBinding(NamedID newBinding)
   {
     if (newBinding != binding)
@@ -138,7 +136,6 @@ public class ExistsExprImpl extends ExprImpl implements ExistsExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getArray()
   {
     return array;
@@ -166,7 +163,6 @@ public class ExistsExprImpl extends ExprImpl implements ExistsExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setArray(Expr newArray)
   {
     if (newArray != array)
@@ -188,7 +184,6 @@ public class ExistsExprImpl extends ExprImpl implements ExistsExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -216,7 +211,6 @@ public class ExistsExprImpl extends ExprImpl implements ExistsExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

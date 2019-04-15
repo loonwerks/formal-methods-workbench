@@ -72,7 +72,6 @@ public class IntLitExprImpl extends ExprImpl implements IntLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getVal()
   {
     return val;
@@ -83,7 +82,6 @@ public class IntLitExprImpl extends ExprImpl implements IntLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setVal(String newVal)
   {
     String oldVal = val;
@@ -168,7 +166,7 @@ public class IntLitExprImpl extends ExprImpl implements IntLitExpr
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (val: ");
     result.append(val);
     result.append(')');

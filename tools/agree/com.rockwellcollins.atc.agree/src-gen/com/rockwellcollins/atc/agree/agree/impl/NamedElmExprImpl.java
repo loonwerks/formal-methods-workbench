@@ -66,7 +66,6 @@ public class NamedElmExprImpl extends ExprImpl implements NamedElmExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedElement getElm()
   {
     if (elm != null && ((EObject)elm).eIsProxy())
@@ -97,7 +96,6 @@ public class NamedElmExprImpl extends ExprImpl implements NamedElmExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setElm(NamedElement newElm)
   {
     NamedElement oldElm = elm;

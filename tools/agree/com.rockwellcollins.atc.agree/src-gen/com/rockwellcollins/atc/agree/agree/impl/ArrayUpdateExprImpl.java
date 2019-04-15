@@ -94,7 +94,6 @@ public class ArrayUpdateExprImpl extends ExprImpl implements ArrayUpdateExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getArray()
   {
     return array;
@@ -122,7 +121,6 @@ public class ArrayUpdateExprImpl extends ExprImpl implements ArrayUpdateExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setArray(Expr newArray)
   {
     if (newArray != array)
@@ -144,7 +142,6 @@ public class ArrayUpdateExprImpl extends ExprImpl implements ArrayUpdateExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Expr> getIndices()
   {
     if (indices == null)
@@ -159,7 +156,6 @@ public class ArrayUpdateExprImpl extends ExprImpl implements ArrayUpdateExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Expr> getValueExprs()
   {
     if (valueExprs == null)
