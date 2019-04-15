@@ -3,6 +3,8 @@ dist: xenial
 services:
   - xvfb
 language: java
+jdk:
+  - oraclejdk8
 
 addons:
   apt:
