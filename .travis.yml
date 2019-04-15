@@ -1,5 +1,7 @@
 sudo: false
 dist: xenial
+services:
+  - xvfb
 language: java
 
 addons:
@@ -14,7 +16,6 @@ env:
   secure: "jRTwmxGN44/QLBhfbwrHYKDmjYfF6xcmC/8B/4dxyoqLJxccHKKSn6zKvZsYDf35n8nXKG/MlqHmyyNDutTmzIBx6d7ev4aUGVlD2zMHIRsIP1rjC8N9jery4AQA8rqUUybgYv2fbh0+7VfeuybAAehYX2wsvw2MC0dS8nITCa6nKI98lFJPVqKijcIm4sM07IErZefk0ABD2dm6rL7Dp7jyrHQxemGpAgjRVcQFdqMCuavKkN/7m8Sfhjx+Fe+BpJo2imOIIyEFaEN1cozvCpzDsUcKAWTpvoMwhFaWi0gDjaaJodo4rnbAp0gt8Ygc+MMZnwgVkjmBzD0Y45tgiKBkMT8t2JIO8PfEsCPHNY+wctyJsNUnEjvbxIO2KjD+WAp85DWccqcH5nFm1hUJ7eYRkWVVVMqBxKjXEZmfvgIX10L0RmS3zPHk59An0XNY7RKwxFrqkrzlshm1Wx9PVumabOTcmDMQODfx0VtWCTtvia92XXxh84PL/b9t8NTiVeuPwW1hm7TSrl64KratWtFd5f/oT9ePYd+bcPVxwOcKMuT9gWAZt7hiPfnbsueVm5dyKYu9s9d9X4gYdxr5WjbTZ3oaOkq9r433vpbsBX/gbGvoJA6ZAEMoO9umt8GtSZHL4pEBWf06AwjnDwhhyOt1YOOXcD5uQeeub89bAKo="
 
 before_install:
-  - sh -e /etc/init.d/xvfb start - sleep 10
   - pip3 install --user --upgrade setuptools
   - pip3 install --user GitPython github3.py
   - "./git-setup.sh"
