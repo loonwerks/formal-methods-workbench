@@ -627,7 +627,7 @@ public class Nenola {
 
 		public String getName();
 
-		public jkind.lustre.Type getLustreType();
+		public jkind.lustre.Type toLustreType();
 
 		public boolean staticEquals(Contract other);
 
@@ -656,7 +656,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 			return lustreType;
 		}
 
@@ -685,7 +685,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 			return NamedType.INT;
 		}
 
@@ -713,7 +713,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 			return NamedType.REAL;
 		}
 
@@ -740,7 +740,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 			List<String> enumValues = new ArrayList<String>();
 			for (String raw : values) {
@@ -811,13 +811,13 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
 			for (Entry<String, DataContract> entry : fields.entrySet()) {
 				String key = entry.getKey();
-				jkind.lustre.Type lt = entry.getValue().getLustreType();
+				jkind.lustre.Type lt = entry.getValue().toLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}
@@ -852,9 +852,9 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 
-			jkind.lustre.Type lustreBaseType = stemContract.getLustreType();
+			jkind.lustre.Type lustreBaseType = stemContract.toLustreType();
 			if (lustreBaseType != null) {
 				jkind.lustre.ArrayType lustreArrayType = new jkind.lustre.ArrayType(lustreBaseType, size);
 				return lustreArrayType;
@@ -925,13 +925,13 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Type getLustreType() {
+		public jkind.lustre.Type toLustreType() {
 			String lustreName = name.replace("::", "__").replace(".", "__");
 
 			Map<String, jkind.lustre.Type> lustreFields = new HashMap<>();
 			for (Entry<String, Channel> entry : channels.entrySet()) {
 				String key = entry.getKey();
-				jkind.lustre.Type lt = entry.getValue().dataContract.getLustreType();
+				jkind.lustre.Type lt = entry.getValue().dataContract.toLustreType();
 				if (lt != null) {
 					lustreFields.put(key, lt);
 				}
@@ -943,6 +943,12 @@ public class Nenola {
 		@Override
 		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
+		}
+
+		public List<Node> lustreNodesFromNesting() {
+			// TODO Auto-generated method stub
+			// see AgreeASTBuilder's flattenAgreeNode
+			return null;
 		}
 
 	}
@@ -981,14 +987,19 @@ public class Nenola {
 			this.properties = properties;
 		}
 
+		public Node toLustreNode() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class Program {
-		public final Contract main;
+		public final NodeContract main;
 		public final Map<String, Contract> contractMap;
 		public final Map<String, NodeGen> nodeGenMap;
 
-		public Program(Contract main, Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap) {
+		public Program(NodeContract main, Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap) {
 			this.main = main;
 			this.contractMap = contractMap;
 			this.nodeGenMap = nodeGenMap;
@@ -1033,35 +1044,49 @@ public class Nenola {
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.lustreNodesFromNodeGenList());
-			lustreNodes.addAll(this.lustreNodesFromNodeContracts());
-			jkind.lustre.Node mainNode = this.lustreNodeFromMain();
-			lustreNodes.add(mainNode);
+			lustreNodes.addAll(this.lustreNodesFromMain());
 			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
-					mainNode.id);
+					this.main.getName());
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
 			programs.put("Contract Guarantees", program);
 			return programs;
 		}
 
-		private Node lustreNodeFromMain() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 
-		private List<Node> lustreNodesFromNodeContracts() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 
-		private List<TypeDef> lustreTypesFromDataContracts() {
-			// TODO Auto-generated method stub
-			return null;
+		private List<Node> lustreNodesFromMain() {
+			return this.main.lustreNodesFromNesting();
 		}
 
 		private List<Node> lustreNodesFromNodeGenList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			for (NodeGen nodeGen : this.nodeGenMap.values()) {
+
+				jkind.lustre.Node lustreNode = nodeGen.toLustreNode();
+				lustreNodes.add(lustreNode);
+
+			}
+
+			return lustreNodes;
 		}
+
+		private List<TypeDef> lustreTypesFromDataContracts() {
+			List<jkind.lustre.TypeDef> lustreTypes = new ArrayList<>();
+			for (Entry<String, Contract> entry : this.contractMap.entrySet()) {
+
+				String name = entry.getKey();
+				Contract contract = entry.getValue();
+				if (contract instanceof DataContract) {
+					jkind.lustre.Type lustreType = ((DataContract) contract).toLustreType();
+					jkind.lustre.TypeDef lustreTypeDef = new jkind.lustre.TypeDef(name, lustreType);
+					lustreTypes.add(lustreTypeDef);
+
+				}
+			}
+
+			return lustreTypes;
+		}
+
 
 		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
 			// TODO Auto-generated method stub
@@ -1070,8 +1095,6 @@ public class Nenola {
 		}
 
 	}
-
-
 
 
 

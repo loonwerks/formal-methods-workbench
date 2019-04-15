@@ -1934,7 +1934,12 @@ public class AgreeXtext {
 		Nenola.Contract main = toContractFromClassifier(ci);
 		Map<String, Nenola.Contract> specMap = extractContractMap(ci);
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(ci);
-		return new Nenola.Program(main, specMap, nodeGenMap);
+
+		if (main instanceof Nenola.NodeContract) {
+			return new Nenola.Program((Nenola.NodeContract) main, specMap, nodeGenMap);
+		}
+
+		throw new RuntimeException("Component Implementation cannot be converted to Node Contract");
 	}
 
 }
