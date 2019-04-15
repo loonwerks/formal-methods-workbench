@@ -1,28 +1,50 @@
+sudo: false
+dist: xenial
 language: java
+
+addons:
+  apt:
+    packages:
+    - python3
+    - python3-pip
+
 env:
- global:
+  global:
   - DISPLAY=:99.0
- secure: "jRTwmxGN44/QLBhfbwrHYKDmjYfF6xcmC/8B/4dxyoqLJxccHKKSn6zKvZsYDf35n8nXKG/MlqHmyyNDutTmzIBx6d7ev4aUGVlD2zMHIRsIP1rjC8N9jery4AQA8rqUUybgYv2fbh0+7VfeuybAAehYX2wsvw2MC0dS8nITCa6nKI98lFJPVqKijcIm4sM07IErZefk0ABD2dm6rL7Dp7jyrHQxemGpAgjRVcQFdqMCuavKkN/7m8Sfhjx+Fe+BpJo2imOIIyEFaEN1cozvCpzDsUcKAWTpvoMwhFaWi0gDjaaJodo4rnbAp0gt8Ygc+MMZnwgVkjmBzD0Y45tgiKBkMT8t2JIO8PfEsCPHNY+wctyJsNUnEjvbxIO2KjD+WAp85DWccqcH5nFm1hUJ7eYRkWVVVMqBxKjXEZmfvgIX10L0RmS3zPHk59An0XNY7RKwxFrqkrzlshm1Wx9PVumabOTcmDMQODfx0VtWCTtvia92XXxh84PL/b9t8NTiVeuPwW1hm7TSrl64KratWtFd5f/oT9ePYd+bcPVxwOcKMuT9gWAZt7hiPfnbsueVm5dyKYu9s9d9X4gYdxr5WjbTZ3oaOkq9r433vpbsBX/gbGvoJA6ZAEMoO9umt8GtSZHL4pEBWf06AwjnDwhhyOt1YOOXcD5uQeeub89bAKo="
+  secure: "jRTwmxGN44/QLBhfbwrHYKDmjYfF6xcmC/8B/4dxyoqLJxccHKKSn6zKvZsYDf35n8nXKG/MlqHmyyNDutTmzIBx6d7ev4aUGVlD2zMHIRsIP1rjC8N9jery4AQA8rqUUybgYv2fbh0+7VfeuybAAehYX2wsvw2MC0dS8nITCa6nKI98lFJPVqKijcIm4sM07IErZefk0ABD2dm6rL7Dp7jyrHQxemGpAgjRVcQFdqMCuavKkN/7m8Sfhjx+Fe+BpJo2imOIIyEFaEN1cozvCpzDsUcKAWTpvoMwhFaWi0gDjaaJodo4rnbAp0gt8Ygc+MMZnwgVkjmBzD0Y45tgiKBkMT8t2JIO8PfEsCPHNY+wctyJsNUnEjvbxIO2KjD+WAp85DWccqcH5nFm1hUJ7eYRkWVVVMqBxKjXEZmfvgIX10L0RmS3zPHk59An0XNY7RKwxFrqkrzlshm1Wx9PVumabOTcmDMQODfx0VtWCTtvia92XXxh84PL/b9t8NTiVeuPwW1hm7TSrl64KratWtFd5f/oT9ePYd+bcPVxwOcKMuT9gWAZt7hiPfnbsueVm5dyKYu9s9d9X4gYdxr5WjbTZ3oaOkq9r433vpbsBX/gbGvoJA6ZAEMoO9umt8GtSZHL4pEBWf06AwjnDwhhyOt1YOOXcD5uQeeub89bAKo="
+
 before_install:
- - sh -e /etc/init.d/xvfb start - sleep 10
+  - sh -e /etc/init.d/xvfb start - sleep 10
+  - pip3 install --user --upgrade setuptools
+  - pip3 install --user GitPython github3.py
+  - "./git-setup.sh"
+
 script:
- - pushd tools
- - mvn clean verify
- - popd
+  - pushd tools
+  - mvn clean verify
+  - popd
 
 before_deploy:
   - export RELEASE_PKG_FILE=$(ls tools/repository/target/com.collins.fmw.aggregator.repository-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+
 deploy:
+  # Deploy update site back to repository
+  provider: script
+  script: python3 push_update_site.py $TRAVIS_TAG
+  on:
+    tags: true
+  # Deploy nightly build to github releases
   provider: releases
   api-key: $GH_TOKEN
   file: "${RELEASE_PKG_FILE}"
   name: Nightly development build
-  body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
+  body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
+    by Travis CI on $(date +'%F %T %Z').
   prerelease: true
   overwrite: true
-  target_commitish: $TRAVIS_COMMIT
+  target_commitish: "$TRAVIS_COMMIT"
+  skip_cleanup: true
   on:
-    type: cron
     branch: master
-
+    condition: $TRAVIS_EVENT_TYPE = cron
