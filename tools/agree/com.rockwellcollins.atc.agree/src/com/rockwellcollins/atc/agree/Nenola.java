@@ -10,12 +10,16 @@ import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
 
+import com.rockwellcollins.atc.agree.analysis.translation.LustreExprFactory;
+
 import jkind.lustre.BinaryOp;
 import jkind.lustre.EnumType;
+import jkind.lustre.Equation;
 import jkind.lustre.Location;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.TypeDef;
+import jkind.lustre.VarDecl;
 
 //Nenola = Nested Node Language
 public class Nenola {
@@ -635,6 +639,11 @@ public class Nenola {
 			this.dst = dst;
 			this.exprOp = exprOp;
 		}
+
+		public Equation toLustreEquation() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static interface TimingMode {
@@ -951,6 +960,11 @@ public class Nenola {
 			this.isEvent = isEvent;
 		}
 
+		public VarDecl toLustreVar() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class NodeContract implements Contract {
@@ -1027,76 +1041,85 @@ public class Nenola {
 			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("ASSUME__HIST");
 			inputs.add(new jkind.lustre.VarDecl(assumHist.id, NamedType.BOOL));
 
+			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
 			for (int i = 0; i < this.specList.size(); i++) {
 				Spec spec = this.specList.get(i);
 
-					String inputName = spec.specTag.name() + "__" + i;
+				String inputName = spec.specTag.name() + "__" + i;
 
-				if (spec.specTag == SpecTag.Assume && spec.specTag == SpecTag.Lemma) {
+				if (spec.specTag == SpecTag.Assume || spec.specTag == SpecTag.Lemma) {
 					inputs.add(new jkind.lustre.VarDecl(inputName, NamedType.BOOL));
 					assertions.add(new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL,
 							spec.prop.toLustreExpr()));
 
 				}
 
+				if (spec.specTag == SpecTag.Lemma) {
+					guarConjExpr = LustreExprFactory.makeANDExpr(spec.prop.toLustreExpr(), guarConjExpr);
+				}
+
+
+				if (spec.specTag == SpecTag.Guarantee) {
+
+					locals.add(new jkind.lustre.VarDecl(inputName, NamedType.BOOL));
+					jkind.lustre.IdExpr guarId = new jkind.lustre.IdExpr(inputName);
+					equations.add(new jkind.lustre.Equation(guarId, spec.prop.toLustreExpr()));
+					ivcs.add(guarId.id);
+					guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
+
+				}
+
+				if (spec.specTag == SpecTag.Assert) {
+					assertions.add(spec.prop.toLustreExpr());
+
+				}
+
 			}
 
+			assertions.add(new jkind.lustre.BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
+//
+
 //TODO <- modify from LustreASTBuilder's getLustreNode
+
 //
-//			int k = 0;
-//			Expr guarConjExpr = new BoolExpr(true);
-//			for (AgreeStatement statement : agreeNode.guarantees) {
-//				String inputName = guarSuffix + k++;
-//				locals.add(new AgreeVar(inputName, NamedType.BOOL, statement.reference, agreeNode.compInst, null));
-//				IdExpr guarId = new IdExpr(inputName);
-//				equations.add(new Equation(guarId, statement.expr));
-//				ivcs.add(guarId.id);
-//				guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
-//			}
-//			for (AgreeStatement statement : agreeNode.lemmas) {
-//				guarConjExpr = LustreExprFactory.makeANDExpr(statement.expr, guarConjExpr);
-//			}
-//
-//			// assert that if the assumptions have held historically, then the
-//			// gurantees hold
-//			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
-//
-//			for (AgreeStatement statement : agreeNode.assertions) {
-//				assertions.add(statement.expr);
-//			}
-//
-//			// create properties for the patterns
-//			int l = 0;
-//			for (AgreeStatement patternPropState : agreeNode.patternProps) {
-//				String patternVarName = patternPropSuffix + l++;
-//				inputs.add(new AgreeVar(patternVarName, NamedType.BOOL, patternPropState, agreeNode.compInst, null));
-//				assertions.add(new BinaryExpr(new IdExpr(patternVarName), BinaryOp.EQUAL, patternPropState.expr));
-//			}
-//
-//			Expr assertExpr = new BoolExpr(true);
-//			for (Expr expr : assertions) {
-//				assertExpr = LustreExprFactory.makeANDExpr(expr, assertExpr);
-//			}
-//
-//			String outputName = "__ASSERT";
-//			List<VarDecl> outputs = new ArrayList<>();
-//			outputs.add(new VarDecl(outputName, NamedType.BOOL));
-//			equations.add(new Equation(new IdExpr(outputName), assertExpr));
-//
-//			// gather the remaining inputs
-//			for (AgreeVar var : agreeNode.inputs) {
-//				inputs.add(var);
-//			}
-//			for (AgreeVar var : agreeNode.outputs) {
-//				inputs.add(var);
-//			}
-//			for (AgreeVar var : agreeNode.locals) {
-//				locals.add(var);
-//			}
-//
-//			for (AgreeEquation equation : agreeNode.localEquations) {
-//				equations.add(equation);
-//			}
+
+			List<jkind.lustre.VarDecl> outputs = new ArrayList<>();
+
+			jkind.lustre.Expr assertExpr = new jkind.lustre.BoolExpr(true);
+			for (jkind.lustre.Expr expr : assertions) {
+				assertExpr = LustreExprFactory.makeANDExpr(expr, assertExpr);
+			}
+
+			String outputName = "__ASSERT";
+			outputs.add(new jkind.lustre.VarDecl(outputName, NamedType.BOOL));
+			equations.add(new jkind.lustre.Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
+
+			for (Channel chan : this.channels.values()) {
+
+				if (chan.direction instanceof In) {
+
+					inputs.add(chan.toLustreVar());
+
+				} else if (chan.direction instanceof Out) {
+
+					outputs.add(chan.toLustreVar());
+
+				} else if (chan.direction instanceof Bi) {
+
+					locals.add(chan.toLustreVar());
+
+				}
+
+			}
+
+
+			for (Connection conn : this.connections) {
+				equations.add(conn.toLustreEquation());
+			}
+
+// TODO : add in equations/properties connecting to subnodes
+// TODO : add in properties for Nenola connections
+
 //
 //			NodeBuilder builder = new NodeBuilder(nodePrefix + agreeNode.id);
 //			builder.addInputs(inputs);
