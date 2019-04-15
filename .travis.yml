@@ -43,8 +43,8 @@ deploy:
     by Travis CI on $(date +'%F %T %Z').
   prerelease: true
   overwrite: true
-  target_commitish: "$TRAVIS_COMMIT"
   skip_cleanup: true
+  target_commitish: $TRAVIS_COMMIT
   on:
     branch: master
     condition: $TRAVIS_EVENT_TYPE = cron
