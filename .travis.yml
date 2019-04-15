@@ -27,6 +27,12 @@ script:
 before_deploy:
   - export RELEASE_PKG_FILE=$(ls tools/repository/target/com.collins.fmw.aggregator.repository-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+  - export RELEASE_PRODUCT_LINUX=$(ls tools/ide/target/products/com.collins.fmw.ide-*linux.gtk.x86_64.zip)
+  - echo "deploying $RELEASE_PRODUCT_LINUX to GitHub releases"
+  - export RELEASE_PRODUCT_MACOSX=$(ls tools/ide/target/products/com.collins.fmw.ide-*macosx.cocoa.x86_64.zip)
+  - echo "deploying $RELEASE_PRODUCT_MACOSX to GitHub releases"
+  - export RELEASE_PRODUCT_WIN=$(ls tools/ide/target/products/com.collins.fmw.ide-*win32.win32.x86_64.zip)
+  - echo "deploying $RELEASE_PRODUCT_WIN to GitHub releases"
 
 deploy:
   # Deploy update site back to repository
@@ -37,7 +43,11 @@ deploy:
   # Deploy nightly build to github releases
   provider: releases
   api-key: $GH_TOKEN
-  file: "${RELEASE_PKG_FILE}"
+  file: 
+    - "${RELEASE_PKG_FILE}"
+    - "${RELEASE_PRODUCT_LINUX}"
+    - "${RELEASE_PRODUCT_MACOSX}"
+    - "${RELEASE_PRODUCT_WIN}"
   name: Nightly development build
   body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
     by Travis CI on $(date +'%F %T %Z').
@@ -46,5 +56,5 @@ deploy:
   skip_cleanup: true
   target_commitish: $TRAVIS_COMMIT
   on:
-    branch: master
+    branch: develop-ci
     condition: $TRAVIS_EVENT_TYPE = cron
