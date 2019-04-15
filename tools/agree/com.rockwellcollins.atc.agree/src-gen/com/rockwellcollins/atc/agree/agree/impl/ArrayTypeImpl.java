@@ -86,7 +86,6 @@ public class ArrayTypeImpl extends TypeImpl implements ArrayType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Type getStem()
   {
     return stem;
@@ -114,7 +113,6 @@ public class ArrayTypeImpl extends TypeImpl implements ArrayType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setStem(Type newStem)
   {
     if (newStem != stem)
@@ -136,7 +134,6 @@ public class ArrayTypeImpl extends TypeImpl implements ArrayType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getSize()
   {
     return size;
@@ -147,7 +144,6 @@ public class ArrayTypeImpl extends TypeImpl implements ArrayType
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setSize(String newSize)
   {
     String oldSize = size;
@@ -258,7 +254,7 @@ public class ArrayTypeImpl extends TypeImpl implements ArrayType
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (size: ");
     result.append(size);
     result.append(')');

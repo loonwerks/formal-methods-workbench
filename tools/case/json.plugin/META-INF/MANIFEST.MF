@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.emf.common,
  org.eclipse.ui.console
 Import-Package: com.collins.fmw.cyres.util.plugin,
- com.google.gson,
  com.rockwellcollins.atc.agree.agree,
  org.eclipse.ui,
  org.eclipse.ui.console,

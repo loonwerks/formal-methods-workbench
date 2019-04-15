@@ -2384,8 +2384,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		
 		//LinearizationDef:
 		//	'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
-		//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)? ':'
-		//	exprBody=Expr ';';
+		//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)?
+		//	':' exprBody=Expr ';';
 		@Override public ParserRule getRule() { return rule; }
 
 		//'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')' 'over' '[' intervals+=LinearizationInterval (','
@@ -2894,8 +2894,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cDoubleDotRefParserRuleCall_1 = (RuleCall)cAlternatives.eContents().get(1);
 		
 		//BaseType Type:
-		//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT |
-		//	REAL_LIT) ']')?
+		//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT
+		//	| REAL_LIT) ']')?
 		//	| DoubleDotRef;
 		@Override public ParserRule getRule() { return rule; }
 
@@ -4678,8 +4678,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		@Override public ParserRule getRule() { return rule; }
 
 		//=> ({NamedElmExpr} elm=[aadl2::NamedElement|DCID]) | {TimeExpr} 'time' | {IndicesExpr} 'indices' '(' array=Expr ')' | =>
-		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef '{'
-		//args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
+		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef
+		//'{' args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
 		//({EnumLitExpr} 'enum' '(') enumType=DoubleDotRef ',' value=ID ')' | ArrayLiteralExpr | {IntLitExpr} val=INTEGER_LIT |
 		//{PreExpr} 'pre' '(' expr=Expr ')' | {EventExpr} 'event' '(' id=[aadl2::NamedElement] ')' | {LatchedExpr} 'latched' '('
 		//expr=Expr ')' | {TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')' | {TimeRiseExpr} 'timerise' '('
@@ -5872,8 +5872,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 
 	//LinearizationDef:
 	//	'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
-	//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)? ':'
-	//	exprBody=Expr ';';
+	//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)?
+	//	':' exprBody=Expr ';';
 	public LinearizationDefElements getLinearizationDefAccess() {
 		return pLinearizationDef;
 	}
@@ -5949,8 +5949,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 	}
 
 	//BaseType Type:
-	//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT |
-	//	REAL_LIT) ']')?
+	//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT
+	//	| REAL_LIT) ']')?
 	//	| DoubleDotRef;
 	public BaseTypeElements getBaseTypeAccess() {
 		return pBaseType;

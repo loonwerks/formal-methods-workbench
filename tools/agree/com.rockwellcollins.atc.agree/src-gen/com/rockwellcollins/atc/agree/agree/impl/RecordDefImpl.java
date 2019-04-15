@@ -71,7 +71,6 @@ public class RecordDefImpl extends NamedElementImpl implements RecordDef
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Arg> getArgs()
   {
     if (args == null)

@@ -86,7 +86,6 @@ public class EnumLitExprImpl extends ExprImpl implements EnumLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public DoubleDotRef getEnumType()
   {
     return enumType;
@@ -114,7 +113,6 @@ public class EnumLitExprImpl extends ExprImpl implements EnumLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setEnumType(DoubleDotRef newEnumType)
   {
     if (newEnumType != enumType)
@@ -136,7 +134,6 @@ public class EnumLitExprImpl extends ExprImpl implements EnumLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getValue()
   {
     return value;
@@ -147,7 +144,6 @@ public class EnumLitExprImpl extends ExprImpl implements EnumLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setValue(String newValue)
   {
     String oldValue = value;
@@ -258,7 +254,7 @@ public class EnumLitExprImpl extends ExprImpl implements EnumLitExpr
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (value: ");
     result.append(value);
     result.append(')');

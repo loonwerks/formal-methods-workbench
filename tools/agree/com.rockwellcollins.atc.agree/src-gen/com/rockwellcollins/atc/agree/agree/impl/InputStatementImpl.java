@@ -71,7 +71,6 @@ public class InputStatementImpl extends ElementImpl implements InputStatement
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Arg> getLhs()
   {
     if (lhs == null)

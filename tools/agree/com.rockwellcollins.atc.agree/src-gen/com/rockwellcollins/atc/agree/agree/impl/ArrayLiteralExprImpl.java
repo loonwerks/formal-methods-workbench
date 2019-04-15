@@ -69,7 +69,6 @@ public class ArrayLiteralExprImpl extends ExprImpl implements ArrayLiteralExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Expr> getElems()
   {
     if (elems == null)

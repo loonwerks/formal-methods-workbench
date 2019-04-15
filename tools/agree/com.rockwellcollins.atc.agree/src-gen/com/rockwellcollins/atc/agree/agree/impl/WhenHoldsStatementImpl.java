@@ -76,7 +76,6 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public TimeInterval getConditionInterval()
   {
     return conditionInterval;
@@ -104,7 +103,6 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setConditionInterval(TimeInterval newConditionInterval)
   {
     if (newConditionInterval != conditionInterval)
@@ -126,7 +124,6 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public TimeInterval getEventInterval()
   {
     return eventInterval;
@@ -154,7 +151,6 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setEventInterval(TimeInterval newEventInterval)
   {
     if (newEventInterval != eventInterval)

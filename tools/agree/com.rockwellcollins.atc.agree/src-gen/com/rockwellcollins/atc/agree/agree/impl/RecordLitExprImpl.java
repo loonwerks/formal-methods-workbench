@@ -98,7 +98,6 @@ public class RecordLitExprImpl extends ExprImpl implements RecordLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public DoubleDotRef getRecordType()
   {
     return recordType;
@@ -126,7 +125,6 @@ public class RecordLitExprImpl extends ExprImpl implements RecordLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setRecordType(DoubleDotRef newRecordType)
   {
     if (newRecordType != recordType)
@@ -148,7 +146,6 @@ public class RecordLitExprImpl extends ExprImpl implements RecordLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<NamedElement> getArgs()
   {
     if (args == null)
@@ -163,7 +160,6 @@ public class RecordLitExprImpl extends ExprImpl implements RecordLitExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Expr> getArgExpr()
   {
     if (argExpr == null)

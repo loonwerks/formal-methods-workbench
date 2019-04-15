@@ -65,7 +65,6 @@ public class RealCastImpl extends ExprImpl implements RealCast
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -93,7 +92,6 @@ public class RealCastImpl extends ExprImpl implements RealCast
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

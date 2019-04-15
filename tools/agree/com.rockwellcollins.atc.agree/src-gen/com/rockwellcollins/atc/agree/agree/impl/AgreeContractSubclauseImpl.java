@@ -65,7 +65,6 @@ public class AgreeContractSubclauseImpl extends AgreeSubclauseImpl implements Ag
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Contract getContract()
   {
     return contract;
@@ -93,7 +92,6 @@ public class AgreeContractSubclauseImpl extends AgreeSubclauseImpl implements Ag
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setContract(Contract newContract)
   {
     if (newContract != contract)

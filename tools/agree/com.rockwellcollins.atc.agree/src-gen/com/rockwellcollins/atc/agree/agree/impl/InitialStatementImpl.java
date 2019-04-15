@@ -65,7 +65,6 @@ public class InitialStatementImpl extends SpecStatementImpl implements InitialSt
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -93,7 +92,6 @@ public class InitialStatementImpl extends SpecStatementImpl implements InitialSt
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)
