@@ -30,9 +30,9 @@ script:
 before_deploy:
   - export RELEASE_PKG_FILE=$(ls tools/repository/target/com.collins.fmw.aggregator.repository-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
-  - export RELEASE_PRODUCT_LINUX=$(ls tools/ide/target/products/com.collins.fmw.ide-*linux.gtk.x86_64.zip)
+  - export RELEASE_PRODUCT_LINUX=$(ls tools/ide/target/products/com.collins.fmw.ide-*linux.gtk.x86_64.tar.gz)
   - echo "deploying $RELEASE_PRODUCT_LINUX to GitHub releases"
-  - export RELEASE_PRODUCT_MACOSX=$(ls tools/ide/target/products/com.collins.fmw.ide-*macosx.cocoa.x86_64.zip)
+  - export RELEASE_PRODUCT_MACOSX=$(ls tools/ide/target/products/com.collins.fmw.ide-*macosx.cocoa.x86_64.tar.gz)
   - echo "deploying $RELEASE_PRODUCT_MACOSX to GitHub releases"
   - export RELEASE_PRODUCT_WIN=$(ls tools/ide/target/products/com.collins.fmw.ide-*win32.win32.x86_64.zip)
   - echo "deploying $RELEASE_PRODUCT_WIN to GitHub releases"
