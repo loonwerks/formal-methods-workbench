@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
 
+import jkind.lustre.BinaryOp;
 import jkind.lustre.EnumType;
 import jkind.lustre.Location;
 import jkind.lustre.NamedType;
@@ -379,6 +380,8 @@ public class Nenola {
 
 	public static interface Prop {
 
+		jkind.lustre.Expr toLustreExpr();
+
 	}
 
 	public static class ExprProp implements Prop {
@@ -386,6 +389,12 @@ public class Nenola {
 
 		public ExprProp(Expr expr) {
 			this.expr = expr;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -396,6 +405,12 @@ public class Nenola {
 
 		public AlwaysProp(Expr expr) {
 			this.expr = expr;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -430,6 +445,12 @@ public class Nenola {
 			this.exclusive = exclusive;
 			this.eventInterval = eventInterval;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class WhenOccursProp implements Prop {
@@ -446,6 +467,12 @@ public class Nenola {
 			this.exclusive = exclusive;
 			this.event = event;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 
@@ -461,6 +488,12 @@ public class Nenola {
 			this.exclusive = exclusive;
 			this.interval = interval;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class WheneverBecomesTrueProp implements Prop {
@@ -475,6 +508,12 @@ public class Nenola {
 			this.exclusive = exclusive;
 			this.interval = interval;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class WheneverHoldsProp implements Prop {
@@ -488,6 +527,12 @@ public class Nenola {
 			this.effect = effect;
 			this.exclusive = exclusive;
 			this.interval = interval;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -505,6 +550,12 @@ public class Nenola {
 			this.exclusive = exclusive;
 			this.interval = interval;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class PeriodicProp implements Prop {
@@ -516,6 +567,12 @@ public class Nenola {
 			this.event = event;
 			this.period = period;
 			this.jitterOp = jitterOp;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -529,6 +586,12 @@ public class Nenola {
 			this.event = event;
 			this.iat = iat;
 			this.jitterOp = jitterOp;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -945,9 +1008,107 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		public List<Node> lustreNodesFromNesting() {
+		public List<Node> lustreNodesFromNesting(String prefix) {
+
+			List<Node> nodes = new ArrayList<>();
+			String name = prefix + "__" + this.getName();
+			for (NodeContract subNodeContract : this.subNodes.values()) {
+				nodes.addAll(subNodeContract.lustreNodesFromNesting(name));
+			}
+
+
+			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
+			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
+			List<jkind.lustre.Equation> equations = new ArrayList<>();
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+			List<String> ivcs = new ArrayList<>();
+//
+//			// add assumption history variable
+			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("ASSUME__HIST");
+			inputs.add(new jkind.lustre.VarDecl(assumHist.id, NamedType.BOOL));
+
+			for (int i = 0; i < this.specList.size(); i++) {
+				Spec spec = this.specList.get(i);
+
+					String inputName = spec.specTag.name() + "__" + i;
+
+				if (spec.specTag == SpecTag.Assume && spec.specTag == SpecTag.Lemma) {
+					inputs.add(new jkind.lustre.VarDecl(inputName, NamedType.BOOL));
+					assertions.add(new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL,
+							spec.prop.toLustreExpr()));
+
+				}
+
+			}
+
+//TODO <- modify from LustreASTBuilder's getLustreNode
+//
+//			int k = 0;
+//			Expr guarConjExpr = new BoolExpr(true);
+//			for (AgreeStatement statement : agreeNode.guarantees) {
+//				String inputName = guarSuffix + k++;
+//				locals.add(new AgreeVar(inputName, NamedType.BOOL, statement.reference, agreeNode.compInst, null));
+//				IdExpr guarId = new IdExpr(inputName);
+//				equations.add(new Equation(guarId, statement.expr));
+//				ivcs.add(guarId.id);
+//				guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
+//			}
+//			for (AgreeStatement statement : agreeNode.lemmas) {
+//				guarConjExpr = LustreExprFactory.makeANDExpr(statement.expr, guarConjExpr);
+//			}
+//
+//			// assert that if the assumptions have held historically, then the
+//			// gurantees hold
+//			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
+//
+//			for (AgreeStatement statement : agreeNode.assertions) {
+//				assertions.add(statement.expr);
+//			}
+//
+//			// create properties for the patterns
+//			int l = 0;
+//			for (AgreeStatement patternPropState : agreeNode.patternProps) {
+//				String patternVarName = patternPropSuffix + l++;
+//				inputs.add(new AgreeVar(patternVarName, NamedType.BOOL, patternPropState, agreeNode.compInst, null));
+//				assertions.add(new BinaryExpr(new IdExpr(patternVarName), BinaryOp.EQUAL, patternPropState.expr));
+//			}
+//
+//			Expr assertExpr = new BoolExpr(true);
+//			for (Expr expr : assertions) {
+//				assertExpr = LustreExprFactory.makeANDExpr(expr, assertExpr);
+//			}
+//
+//			String outputName = "__ASSERT";
+//			List<VarDecl> outputs = new ArrayList<>();
+//			outputs.add(new VarDecl(outputName, NamedType.BOOL));
+//			equations.add(new Equation(new IdExpr(outputName), assertExpr));
+//
+//			// gather the remaining inputs
+//			for (AgreeVar var : agreeNode.inputs) {
+//				inputs.add(var);
+//			}
+//			for (AgreeVar var : agreeNode.outputs) {
+//				inputs.add(var);
+//			}
+//			for (AgreeVar var : agreeNode.locals) {
+//				locals.add(var);
+//			}
+//
+//			for (AgreeEquation equation : agreeNode.localEquations) {
+//				equations.add(equation);
+//			}
+//
+//			NodeBuilder builder = new NodeBuilder(nodePrefix + agreeNode.id);
+//			builder.addInputs(inputs);
+//			builder.addOutputs(outputs);
+//			builder.addLocals(locals);
+//			builder.addEquations(equations);
+//			builder.addIvcs(ivcs);
+//
+//			return builder.build();
+
 			// TODO Auto-generated method stub
-			// see AgreeASTBuilder's flattenAgreeNode
+			// see LustreASTBuilder's flattenAgreeNode
 			return null;
 		}
 
@@ -1055,7 +1216,7 @@ public class Nenola {
 
 
 		private List<Node> lustreNodesFromMain() {
-			return this.main.lustreNodesFromNesting();
+			return this.main.lustreNodesFromNesting("");
 		}
 
 		private List<Node> lustreNodesFromNodeGenList() {
