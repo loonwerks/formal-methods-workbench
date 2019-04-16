@@ -20,6 +20,7 @@ import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.TypeDef;
 import jkind.lustre.VarDecl;
+import jkind.lustre.builders.NodeBuilder;
 
 //Nenola = Nested Node Language
 public class Nenola {
@@ -1022,13 +1023,16 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		public List<Node> lustreNodesFromNesting(String prefix) {
+		public List<Node> lustreNodesFromNesting(String prefix, List<String> timingPropKeys) {
+
+			// TODO - figure out proper naming scheme
+			String name = prefix + "__" + this.getName();
 
 			List<Node> nodes = new ArrayList<>();
-			String name = prefix + "__" + this.getName();
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.lustreNodesFromNesting(name));
+				nodes.addAll(subNodeContract.lustreNodesFromNesting(name, timingPropKeys));
 			}
+
 
 
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
@@ -1077,13 +1081,11 @@ public class Nenola {
 			}
 
 			assertions.add(new jkind.lustre.BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
-//
 
-//TODO <- modify from LustreASTBuilder's getLustreNode
 
-//
-
+			// inspired by LustreASTBuilder's getLustreNode
 			List<jkind.lustre.VarDecl> outputs = new ArrayList<>();
+
 
 			jkind.lustre.Expr assertExpr = new jkind.lustre.BoolExpr(true);
 			for (jkind.lustre.Expr expr : assertions) {
@@ -1101,8 +1103,8 @@ public class Nenola {
 					inputs.add(chan.toLustreVar());
 
 				} else if (chan.direction instanceof Out) {
-
-					outputs.add(chan.toLustreVar());
+					// Karl says it's correct for the output to translate into the input
+					inputs.add(chan.toLustreVar());
 
 				} else if (chan.direction instanceof Bi) {
 
@@ -1117,22 +1119,39 @@ public class Nenola {
 				equations.add(conn.toLustreEquation());
 			}
 
-// TODO : add in equations/properties connecting to subnodes
-// TODO : add in properties for Nenola connections
 
-//
-//			NodeBuilder builder = new NodeBuilder(nodePrefix + agreeNode.id);
-//			builder.addInputs(inputs);
-//			builder.addOutputs(outputs);
-//			builder.addLocals(locals);
-//			builder.addEquations(equations);
-//			builder.addIvcs(ivcs);
-//
-//			return builder.build();
+// TODO : add in equations/properties connecting to subnodes - see flattenAgreeNode
+// TODO : figure out how timing props are translated into parts of lustre node
+// TODO : add in properties for Nenola connections -  see ASTBuilder
 
-			// TODO Auto-generated method stub
-			// see LustreASTBuilder's flattenAgreeNode
-			return null;
+
+			NodeBuilder builder = new NodeBuilder(name);
+			builder.addInputs(inputs);
+			builder.addOutputs(outputs);
+			builder.addLocals(locals);
+			builder.addEquations(equations);
+			builder.addIvcs(ivcs);
+			Node topNode = builder.build();
+
+			nodes.add(topNode);
+
+			return nodes;
+		}
+
+		private List<String> toTimingPropKeys(String prefix) {
+
+			// TODO - figure out proper naming scheme
+			String name = prefix + "__" + this.getName();
+
+			List<String> keys = new ArrayList<>();
+
+			// TODO - extract local timing props from spec list
+
+			for (NodeContract subNodeContract : this.subNodes.values()) {
+				keys.addAll(subNodeContract.toTimingPropKeys(name));
+			}
+
+			return keys;
 		}
 
 	}
@@ -1236,11 +1255,10 @@ public class Nenola {
 			return programs;
 		}
 
-
-
 		private List<Node> lustreNodesFromMain() {
-			return this.main.lustreNodesFromNesting("");
+			return this.main.lustreNodesFromNesting("", this.main.toTimingPropKeys(""));
 		}
+
 
 		private List<Node> lustreNodesFromNodeGenList() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
