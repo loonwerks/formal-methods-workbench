@@ -1023,14 +1023,14 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		public List<Node> lustreNodesFromNesting(String prefix, List<String> timingPropKeys) {
+		public List<Node> lustreNodesFromNesting(String prefix, Map<String, jkind.lustre.Expr> map) {
 
 			// TODO - figure out proper naming scheme
 			String name = prefix + "__" + this.getName();
 
 			List<Node> nodes = new ArrayList<>();
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.lustreNodesFromNesting(name, timingPropKeys));
+				nodes.addAll(subNodeContract.lustreNodesFromNesting(name, map));
 			}
 
 
@@ -1138,20 +1138,20 @@ public class Nenola {
 			return nodes;
 		}
 
-		private List<String> toTimingPropKeys(String prefix) {
+		private Map<String, jkind.lustre.Expr> toTimingProps(String prefix) {
 
 			// TODO - figure out proper naming scheme
 			String name = prefix + "__" + this.getName();
 
-			List<String> keys = new ArrayList<>();
+			Map<String, jkind.lustre.Expr> props = new HashMap<>();
 
 			// TODO - extract local timing props from spec list
 
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				keys.addAll(subNodeContract.toTimingPropKeys(name));
+				props.putAll(subNodeContract.toTimingProps(name));
 			}
 
-			return keys;
+			return props;
 		}
 
 	}
@@ -1256,7 +1256,7 @@ public class Nenola {
 		}
 
 		private List<Node> lustreNodesFromMain() {
-			return this.main.lustreNodesFromNesting("", this.main.toTimingPropKeys(""));
+			return this.main.lustreNodesFromNesting("", this.main.toTimingProps(""));
 		}
 
 
