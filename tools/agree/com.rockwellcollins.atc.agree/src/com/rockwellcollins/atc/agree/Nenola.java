@@ -1025,15 +1025,12 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
+		private Optional<Node> lustreNodeCache = Optional.empty();
 		public Node toLustreNode() {
 
-			//// TODO : implement following methods - see flattenAgreeNode
-			Map<String, jkind.lustre.Expr> assumeMap = this.toLustreAssumeMap("");
-			Map<String, jkind.lustre.Expr> lemmaMap = this.toLustreLemmaMap("");
-			Map<String, jkind.lustre.Expr> guaranteeMap = this.toLustreGuaranteeMap("");
-			List<jkind.lustre.Expr> assertList = this.toLustreAssertList("");
-			Map<String, jkind.lustre.Expr> timingPropMap = this.toLustreTimingPropMap("");
-
+			if (this.lustreNodeCache.isPresent()) {
+				return lustreNodeCache.get();
+			}
 
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
@@ -1041,14 +1038,18 @@ public class Nenola {
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 			List<String> ivcs = new ArrayList<>();
 
-			for (Entry<String, jkind.lustre.Expr> entry : assumeMap.entrySet()) {
+			for (jkind.lustre.Expr expr : this.toLustreAssertList()) {
+				assertions.add(expr);
+			}
+
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap().entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
 				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : lemmaMap.entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap().entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -1056,7 +1057,7 @@ public class Nenola {
 			}
 
 			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
-			for (Entry<String, jkind.lustre.Expr> entry : guaranteeMap.entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap().entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				locals.add(new VarDecl(inputName, NamedType.BOOL));
@@ -1066,16 +1067,16 @@ public class Nenola {
 				guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : lemmaMap.entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap().entrySet()) {
 				jkind.lustre.Expr expr = entry.getValue();
 				guarConjExpr = LustreExprFactory.makeANDExpr(expr, guarConjExpr);
 			}
 
-			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("ASSUME__HIST");
+			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("__ASSUME__HIST");
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
-			for (Entry<String, jkind.lustre.Expr> entry : timingPropMap.entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreTimingPropMap().entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -1087,35 +1088,31 @@ public class Nenola {
 				assertExpr = LustreExprFactory.makeANDExpr(expr, assertExpr);
 			}
 
-			String outputName = "__ASSERT";
-			List<VarDecl> outputs = new ArrayList<>();
-			outputs.add(new VarDecl(outputName, NamedType.BOOL));
-			equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
 
 			// gather the remaining inputs
 
+			for (VarDecl v : this.toLustreChanInList()) {
+				inputs.add(v);
+			}
+
+			for (VarDecl v : this.toLustreChanOutList()) {
+				inputs.add(v);
+			}
+
 			for (Channel chan : this.channels.values()) {
-
-				if (chan.direction instanceof In) {
-
-					inputs.add(chan.toLustreVar());
-
-				} else if (chan.direction instanceof Out) {
-					// Karl says it's correct for the output to translate into the input
-					inputs.add(chan.toLustreVar());
-
-				} else if (chan.direction instanceof Bi) {
-
+				if (chan.direction instanceof Bi) {
 					locals.add(chan.toLustreVar());
-
 				}
-
 			}
 
 			for (Connection conn : this.connections) {
 				equations.add(conn.toLustreEquation());
 			}
 
+			String outputName = "__ASSERT";
+			List<VarDecl> outputs = new ArrayList<>();
+			outputs.add(new VarDecl(outputName, NamedType.BOOL));
+			equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
 
 			// TODO : add in properties for Nenola connections - see ASTBuilder
 
@@ -1126,10 +1123,220 @@ public class Nenola {
 			builder.addEquations(equations);
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
+			lustreNodeCache = Optional.of(node);
 			return node;
 		}
 
-		private Optional<Node> lustreNodeCache = Optional.empty();
+		private Optional<List<VarDecl>> chanOutListCache = Optional.empty();
+		private List<VarDecl> toLustreChanOutList() {
+
+			if (chanOutListCache.isPresent()) {
+				return chanOutListCache.get();
+			}
+
+			List<VarDecl> vars = new ArrayList<>();
+			for (Channel chan : this.channels.values()) {
+				if (chan.direction instanceof Out) {
+					vars.add(chan.toLustreVar());
+				}
+			}
+
+			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
+				String prefix = entry.getKey();
+				NodeContract nc = entry.getValue();
+
+				for (VarDecl nestedVar : nc.toLustreChanOutList()) {
+					String id = prefix + "__" + nestedVar.id;
+					jkind.lustre.Type type = nestedVar.type;
+					vars.add(new VarDecl(id, type));
+				}
+
+				for (String assumeKey : nc.toLustreAssumeMap().keySet()) {
+					String id = prefix + "__" + assumeKey;
+					vars.add(new VarDecl(id, NamedType.BOOL));
+				}
+
+				for (String propKey : nc.toLustreLemmaMap().keySet()) {
+					String id = prefix + "__" + propKey;
+					vars.add(new VarDecl(id, NamedType.BOOL));
+				}
+
+				for (String propKey : nc.toLustreTimingPropMap().keySet()) {
+					String id = prefix + "__" + propKey;
+					vars.add(new VarDecl(id, NamedType.BOOL));
+				}
+
+				vars.add(new VarDecl(prefix + "__ASSUME__HIST", NamedType.BOOL));
+
+			}
+
+			chanOutListCache = Optional.of(vars);
+
+			return vars;
+		}
+
+		private Optional<List<VarDecl>> chanInListCache = Optional.empty();
+		private List<VarDecl> toLustreChanInList() {
+
+			if (chanInListCache.isPresent()) {
+				return chanInListCache.get();
+			}
+
+			List<VarDecl> vars = new ArrayList<>();
+			for (Channel chan : this.channels.values()) {
+				if (chan.direction instanceof In) {
+					vars.add(chan.toLustreVar());
+				}
+			}
+
+			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
+				String prefix = entry.getKey();
+				NodeContract nc = entry.getValue();
+				for (VarDecl nestedVar : nc.toLustreChanInList()) {
+					String id = prefix + "__" + nestedVar.id;
+					jkind.lustre.Type type = nestedVar.type;
+					vars.add(new VarDecl(id, type));
+				}
+
+				// TODO - add clock var input
+
+			}
+
+			chanInListCache = Optional.of(vars);
+
+			return vars;
+		}
+
+
+		private Optional<Map<String, jkind.lustre.Expr>> timingPropMapCache = Optional.empty();
+		private Map<String, jkind.lustre.Expr> toLustreTimingPropMap() {
+			if (timingPropMapCache.isPresent()) {
+				return timingPropMapCache.get();
+			}
+
+			Map<String, jkind.lustre.Expr> props = new HashMap<>();
+			for (Spec spec : this.specList) {
+				if (!(spec.prop instanceof ExprProp)) {
+
+					// TODO - implement the timing prop
+					// props.put("PATTERN", );
+				}
+			}
+
+			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
+				String prefix = entry.getKey();
+				NodeContract nc = entry.getValue();
+
+				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustreTimingPropMap().entrySet()) {
+					String key = prefix + "__" + nestedEntry.getKey();
+					jkind.lustre.Expr expr = nestedEntry.getValue();
+					props.put(key, expr);
+				}
+
+			}
+			return props;
+		}
+
+		private Optional<List<jkind.lustre.Expr>> lustreAssertListCache = Optional.empty();
+
+		private List<jkind.lustre.Expr> toLustreAssertList() {
+
+			if (lustreAssertListCache.isPresent()) {
+				return lustreAssertListCache.get();
+			}
+
+			List<jkind.lustre.Expr> exprs = new ArrayList<>();
+
+			for (Spec spec : this.specList) {
+				if (spec.specTag == SpecTag.Assert) {
+					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
+					exprs.add(expr);
+				}
+
+			}
+
+			// TODO - gather asserts from subnodes
+			lustreAssertListCache = Optional.of(exprs);
+			return null;
+		}
+
+
+		private Optional<Map<String, jkind.lustre.Expr>> lustreGuaranteeMapCache = Optional.empty();
+		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap() {
+			if (lustreGuaranteeMapCache.isPresent()) {
+				return lustreGuaranteeMapCache.get();
+			}
+
+			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
+			int suffix = 0;
+			for (Spec spec : this.specList) {
+
+				if (spec.specTag == SpecTag.Guarantee) {
+					String key = SpecTag.Guarantee.name() + "__" + suffix;
+					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
+					exprMap.put(key, expr);
+
+					suffix = suffix + 1;
+				}
+
+			}
+
+			lustreGuaranteeMapCache = Optional.of(exprMap);
+
+			return exprMap;
+		}
+
+		private Optional<Map<String, jkind.lustre.Expr>> lustreLemmaMapCache = Optional.empty();
+		private Map<String, jkind.lustre.Expr> toLustreLemmaMap() {
+			if (lustreLemmaMapCache.isPresent()) {
+				return lustreLemmaMapCache.get();
+			}
+
+			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
+			int suffix = 0;
+			for (Spec spec : this.specList) {
+
+				if (spec.specTag == SpecTag.Lemma) {
+					String key = SpecTag.Lemma.name() + "__" + suffix;
+					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
+					exprMap.put(key, expr);
+
+					suffix = suffix + 1;
+				}
+
+			}
+
+			lustreLemmaMapCache = Optional.of(exprMap);
+
+			return exprMap;
+		}
+
+		private Optional<Map<String, jkind.lustre.Expr>> lustreAssumeMapCache = Optional.empty();
+		private Map<String, jkind.lustre.Expr> toLustreAssumeMap() {
+
+			if (lustreAssumeMapCache.isPresent()) {
+				return lustreAssumeMapCache.get();
+			}
+
+			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
+			int suffix = 0;
+			for (Spec spec : this.specList) {
+
+				if (spec.specTag == SpecTag.Assume) {
+					String key = SpecTag.Assume.name() + "__" + suffix;
+					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
+					exprMap.put(key, expr);
+
+					suffix = suffix + 1;
+				}
+
+			}
+
+			lustreAssumeMapCache = Optional.of(exprMap);
+
+			return exprMap;
+		}
+
 		public List<Node> toLustreNodesFromNesting() {
 
 			List<Node> nodes = new ArrayList<>();
@@ -1140,47 +1347,6 @@ public class Nenola {
 
 			return nodes;
 
-		}
-
-		private Map<String, jkind.lustre.Expr> toLustreTimingPropMap(String prefix) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private List<jkind.lustre.Expr> toLustreAssertList(String prefix) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(String prefix) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private Map<String, jkind.lustre.Expr> toLustreLemmaMap(String prefix) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private Map<String, jkind.lustre.Expr> toLustreAssumeMap(String prefix) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private Map<String, jkind.lustre.Expr> toTimingProps(String prefix) {
-
-			// TODO - figure out proper naming scheme
-			String name = prefix + "__" + this.getName();
-
-			Map<String, jkind.lustre.Expr> props = new HashMap<>();
-
-			// TODO - extract local timing props from spec list
-
-			for (NodeContract subNodeContract : this.subNodes.values()) {
-				props.putAll(subNodeContract.toTimingProps(name));
-			}
-
-			return props;
 		}
 
 	}
