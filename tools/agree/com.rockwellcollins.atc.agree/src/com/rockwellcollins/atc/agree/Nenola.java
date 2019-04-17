@@ -12,7 +12,9 @@ import org.osate.aadl2.NamedElement;
 
 import com.rockwellcollins.atc.agree.analysis.translation.LustreExprFactory;
 
+import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
+import jkind.lustre.BoolExpr;
 import jkind.lustre.EnumType;
 import jkind.lustre.Equation;
 import jkind.lustre.Location;
@@ -1023,16 +1025,14 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		public List<Node> lustreNodesFromNesting(String prefix, Map<String, jkind.lustre.Expr> map) {
+		public Node toLustreNode() {
 
-			// TODO - figure out proper naming scheme
-			String name = prefix + "__" + this.getName();
-
-			List<Node> nodes = new ArrayList<>();
-			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.lustreNodesFromNesting(name, map));
-			}
-
+			//// TODO : implement following methods - see flattenAgreeNode
+			Map<String, jkind.lustre.Expr> assumeMap = this.toLustreAssumeMap("");
+			Map<String, jkind.lustre.Expr> lemmaMap = this.toLustreLemmaMap("");
+			Map<String, jkind.lustre.Expr> guaranteeMap = this.toLustreGuaranteeMap("");
+			List<jkind.lustre.Expr> assertList = this.toLustreAssertList("");
+			Map<String, jkind.lustre.Expr> timingPropMap = this.toLustreTimingPropMap("");
 
 
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
@@ -1040,61 +1040,59 @@ public class Nenola {
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 			List<String> ivcs = new ArrayList<>();
-//
-//			// add assumption history variable
-			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("ASSUME__HIST");
-			inputs.add(new jkind.lustre.VarDecl(assumHist.id, NamedType.BOOL));
 
-			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
-			for (int i = 0; i < this.specList.size(); i++) {
-				Spec spec = this.specList.get(i);
-
-				String inputName = spec.specTag.name() + "__" + i;
-
-				if (spec.specTag == SpecTag.Assume || spec.specTag == SpecTag.Lemma) {
-					inputs.add(new jkind.lustre.VarDecl(inputName, NamedType.BOOL));
-					assertions.add(new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL,
-							spec.prop.toLustreExpr()));
-
-				}
-
-				if (spec.specTag == SpecTag.Lemma) {
-					guarConjExpr = LustreExprFactory.makeANDExpr(spec.prop.toLustreExpr(), guarConjExpr);
-				}
-
-
-				if (spec.specTag == SpecTag.Guarantee) {
-
-					locals.add(new jkind.lustre.VarDecl(inputName, NamedType.BOOL));
-					jkind.lustre.IdExpr guarId = new jkind.lustre.IdExpr(inputName);
-					equations.add(new jkind.lustre.Equation(guarId, spec.prop.toLustreExpr()));
-					ivcs.add(guarId.id);
-					guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
-
-				}
-
-				if (spec.specTag == SpecTag.Assert) {
-					assertions.add(spec.prop.toLustreExpr());
-
-				}
-
+			for (Entry<String, jkind.lustre.Expr> entry : assumeMap.entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				inputs.add(new VarDecl(inputName, NamedType.BOOL));
+				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
 			}
 
-			assertions.add(new jkind.lustre.BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
+			for (Entry<String, jkind.lustre.Expr> entry : lemmaMap.entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				inputs.add(new VarDecl(inputName, NamedType.BOOL));
+				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
+			}
 
+			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
+			for (Entry<String, jkind.lustre.Expr> entry : guaranteeMap.entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				locals.add(new VarDecl(inputName, NamedType.BOOL));
+				jkind.lustre.IdExpr guarId = new jkind.lustre.IdExpr(inputName);
+				equations.add(new Equation(guarId, expr));
+				ivcs.add(inputName);
+				guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
+			}
 
-			// inspired by LustreASTBuilder's getLustreNode
-			List<jkind.lustre.VarDecl> outputs = new ArrayList<>();
+			for (Entry<String, jkind.lustre.Expr> entry : lemmaMap.entrySet()) {
+				jkind.lustre.Expr expr = entry.getValue();
+				guarConjExpr = LustreExprFactory.makeANDExpr(expr, guarConjExpr);
+			}
 
+			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("ASSUME__HIST");
+			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
+			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
-			jkind.lustre.Expr assertExpr = new jkind.lustre.BoolExpr(true);
+			for (Entry<String, jkind.lustre.Expr> entry : timingPropMap.entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				inputs.add(new VarDecl(inputName, NamedType.BOOL));
+				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
+			}
+
+			jkind.lustre.Expr assertExpr = new BoolExpr(true);
 			for (jkind.lustre.Expr expr : assertions) {
 				assertExpr = LustreExprFactory.makeANDExpr(expr, assertExpr);
 			}
 
 			String outputName = "__ASSERT";
-			outputs.add(new jkind.lustre.VarDecl(outputName, NamedType.BOOL));
-			equations.add(new jkind.lustre.Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
+			List<VarDecl> outputs = new ArrayList<>();
+			outputs.add(new VarDecl(outputName, NamedType.BOOL));
+			equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
+
+			// gather the remaining inputs
 
 			for (Channel chan : this.channels.values()) {
 
@@ -1114,28 +1112,59 @@ public class Nenola {
 
 			}
 
-
 			for (Connection conn : this.connections) {
 				equations.add(conn.toLustreEquation());
 			}
 
 
-// TODO : add in equations/properties connecting to subnodes - see flattenAgreeNode
-// TODO : figure out how timing props are translated into parts of lustre node
-// TODO : add in properties for Nenola connections -  see ASTBuilder
+			// TODO : add in properties for Nenola connections - see ASTBuilder
 
-
-			NodeBuilder builder = new NodeBuilder(name);
+			NodeBuilder builder = new NodeBuilder(this.getName());
 			builder.addInputs(inputs);
 			builder.addOutputs(outputs);
 			builder.addLocals(locals);
 			builder.addEquations(equations);
 			builder.addIvcs(ivcs);
-			Node topNode = builder.build();
+			Node node = builder.build();
+			return node;
+		}
 
-			nodes.add(topNode);
+		private Optional<Node> lustreNodeCache = Optional.empty();
+		public List<Node> toLustreNodesFromNesting() {
+
+			List<Node> nodes = new ArrayList<>();
+			nodes.add(this.toLustreNode());
+			for (NodeContract subNodeContract : this.subNodes.values()) {
+				nodes.addAll(subNodeContract.toLustreNodesFromNesting());
+			}
 
 			return nodes;
+
+		}
+
+		private Map<String, jkind.lustre.Expr> toLustreTimingPropMap(String prefix) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private List<jkind.lustre.Expr> toLustreAssertList(String prefix) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(String prefix) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private Map<String, jkind.lustre.Expr> toLustreLemmaMap(String prefix) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private Map<String, jkind.lustre.Expr> toLustreAssumeMap(String prefix) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 		private Map<String, jkind.lustre.Expr> toTimingProps(String prefix) {
@@ -1246,7 +1275,7 @@ public class Nenola {
 		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms() {
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
-			lustreNodes.addAll(this.lustreNodesFromNodeGenList());
+			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
 			lustreNodes.addAll(this.lustreNodesFromMain());
 			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
 					this.main.getName());
@@ -1256,11 +1285,11 @@ public class Nenola {
 		}
 
 		private List<Node> lustreNodesFromMain() {
-			return this.main.lustreNodesFromNesting("", this.main.toTimingProps(""));
+			return this.main.toLustreNodesFromNesting();
 		}
 
 
-		private List<Node> lustreNodesFromNodeGenList() {
+		private List<Node> toLustreNodesFromNodeGenList() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
