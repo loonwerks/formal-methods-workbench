@@ -1198,15 +1198,21 @@ public class Nenola {
 					vars.add(new VarDecl(id, type));
 				}
 
-				// TODO - add clock var input
+				vars.add(nc.toLustreClockVar());
+
 
 			}
+
 
 			chanInListCache = Optional.of(vars);
 
 			return vars;
 		}
 
+
+		private VarDecl toLustreClockVar() {
+			return new jkind.lustre.VarDecl(this.getName() + "__CLOCK_", jkind.lustre.NamedType.BOOL);
+		}
 
 		private Optional<Map<String, jkind.lustre.Expr>> timingPropMapCache = Optional.empty();
 		private Map<String, jkind.lustre.Expr> toLustreTimingPropMap() {
