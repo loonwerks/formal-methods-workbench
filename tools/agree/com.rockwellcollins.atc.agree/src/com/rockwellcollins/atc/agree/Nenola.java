@@ -1051,11 +1051,17 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		private Optional<Node> lustreNodeCache = Optional.empty();
-		public Node toLustreNode() {
+		private Optional<Node> lustreMainNodeCache = Optional.empty();
+		private Optional<Node> lustreSubNodeCache = Optional.empty();
 
-			if (this.lustreNodeCache.isPresent()) {
-				return lustreNodeCache.get();
+		public Node toLustreNode(boolean isMain) {
+
+			if (isMain && this.lustreMainNodeCache.isPresent()) {
+				return lustreMainNodeCache.get();
+			}
+
+			if (!isMain && this.lustreSubNodeCache.isPresent()) {
+				return lustreSubNodeCache.get();
 			}
 
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
@@ -1102,7 +1108,7 @@ public class Nenola {
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternMap(isMain).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -1149,7 +1155,12 @@ public class Nenola {
 			builder.addEquations(equations);
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
-			lustreNodeCache = Optional.of(node);
+
+			if (isMain) {
+				lustreMainNodeCache = Optional.of(node);
+			} else {
+				lustreSubNodeCache = Optional.of(node);
+			}
 			return node;
 		}
 
@@ -1187,7 +1198,7 @@ public class Nenola {
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustrePatternMap().keySet()) {
+				for (String propKey : nc.toLustrePatternMap(false).keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
@@ -1384,12 +1395,12 @@ public class Nenola {
 			return exprMap;
 		}
 
-		public List<Node> toLustreNodesFromNesting() {
+		public List<Node> toLustreNodesFromNesting(boolean isMain) {
 
 			List<Node> nodes = new ArrayList<>();
-			nodes.add(this.toLustreNode());
+			nodes.add(this.toLustreNode(isMain));
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.toLustreNodesFromNesting());
+				nodes.addAll(subNodeContract.toLustreNodesFromNesting(false));
 			}
 
 			return nodes;
@@ -1498,7 +1509,7 @@ public class Nenola {
 		}
 
 		private List<Node> lustreNodesFromMain() {
-			return this.main.toLustreNodesFromNesting();
+			return this.main.toLustreNodesFromNesting(true);
 		}
 
 
