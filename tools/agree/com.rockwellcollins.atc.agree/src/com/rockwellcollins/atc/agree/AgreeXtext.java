@@ -268,7 +268,7 @@ public class AgreeXtext {
 	private static Nenola.Prop extractPropFromPattern(PatternStatement pattern) {
 		if (pattern instanceof AlwaysStatement) {
 			Nenola.Expr expr = toExprFromExpr(((AlwaysStatement) pattern).getExpr());
-			return new Nenola.AlwaysProp(expr);
+			return new Nenola.AlwaysPattern(expr);
 		} else if (pattern instanceof PeriodicStatement) {
 			Nenola.Expr event = toExprFromExpr(((PeriodicStatement) pattern).getEvent());
 
@@ -278,7 +278,7 @@ public class AgreeXtext {
 
 			Nenola.Expr period = toExprFromExpr(((PeriodicStatement) pattern).getPeriod());
 
-			return new Nenola.PeriodicProp(event, period, jitterOp);
+			return new Nenola.PeriodicPattern(event, period, jitterOp);
 		} else if (pattern instanceof SporadicStatement) {
 			Nenola.Expr event = toExprFromExpr(((SporadicStatement) pattern).getEvent());
 			Expr jitter = ((SporadicStatement) pattern).getJitter();
@@ -287,7 +287,7 @@ public class AgreeXtext {
 
 			Nenola.Expr iat = toExprFromExpr(((SporadicStatement) pattern).getIat());
 
-			return new Nenola.SporadicProp(event, iat, jitterOp);
+			return new Nenola.SporadicPattern(event, iat, jitterOp);
 		} else if (pattern instanceof WheneverHoldsStatement ) {
 			Nenola.Expr cause = toExprFromExpr(((WheneverHoldsStatement) pattern).getCause());
 			Nenola.Expr effect = toExprFromExpr(((WheneverHoldsStatement) pattern).getEffect());
@@ -295,7 +295,7 @@ public class AgreeXtext {
 
 			Nenola.Interval interval = toInterval(((WheneverHoldsStatement) pattern).getInterval());
 
-			return new Nenola.WheneverHoldsProp(cause, effect, exclusive, interval);
+			return new Nenola.WheneverHoldsPattern(cause, effect, exclusive, interval);
 		} else if (pattern instanceof WheneverImpliesStatement) {
 			throw new RuntimeException("We do not support this pattern currently");
 
@@ -305,14 +305,14 @@ public class AgreeXtext {
 			boolean exclusive = ((WheneverOccursStatement) pattern).getExcl() != null;
 			Interval interval = toInterval(((WheneverOccursStatement) pattern).getInterval());
 
-			return new Nenola.WheneverOccursProp(cause, effect, exclusive, interval);
+			return new Nenola.WheneverOccursPattern(cause, effect, exclusive, interval);
 
 		} else if (pattern instanceof WheneverBecomesTrueStatement) {
 			Nenola.Expr cause = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getCause());
 			Nenola.Expr effect = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getEffect());
 			boolean exclusive = ((WheneverBecomesTrueStatement) pattern).getExcl() != null;
 			Nenola.Interval interval = toInterval(((WheneverBecomesTrueStatement) pattern).getInterval());
-			return new Nenola.WheneverBecomesTrueProp(cause, effect, exclusive, interval);
+			return new Nenola.WheneverBecomesTruePattern(cause, effect, exclusive, interval);
 		} else if (pattern instanceof WhenHoldsStatement) {
 			Nenola.Expr condition = toExprFromExpr(((WhenHoldsStatement) pattern).getCondition());
 			Nenola.Expr effect = toExprFromExpr(((WhenHoldsStatement) pattern).getEvent());
@@ -320,7 +320,7 @@ public class AgreeXtext {
 			Nenola.Interval conditionInterval = toInterval(((WhenHoldsStatement) pattern).getConditionInterval());
 			Nenola.Interval effectInterval = toInterval(((WhenHoldsStatement) pattern).getEventInterval());
 
-			return new Nenola.WhenHoldsProp(condition, conditionInterval, effect, exclusive, effectInterval);
+			return new Nenola.WhenHoldsPattern(condition, conditionInterval, effect, exclusive, effectInterval);
 
 		} else if (pattern instanceof WhenOccursStatment) {
 			Nenola.Expr condition = toExprFromExpr(((WhenOccursStatment) pattern).getCondition());
@@ -329,7 +329,7 @@ public class AgreeXtext {
 			Nenola.Interval interval = toInterval(((WhenOccursStatment) pattern).getInterval());
 			Nenola.Expr event = toExprFromExpr(((WhenOccursStatment) pattern).getEvent());
 
-			return new  Nenola.WhenOccursProp(condition, frequency, interval, exclusive, event);
+			return new  Nenola.WhenOccursPattern(condition, frequency, interval, exclusive, event);
 		}
 
 		throw new RuntimeException("Pattern not recognized: " + pattern);

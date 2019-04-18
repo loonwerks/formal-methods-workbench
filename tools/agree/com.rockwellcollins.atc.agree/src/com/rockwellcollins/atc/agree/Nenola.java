@@ -406,11 +406,37 @@ public class Nenola {
 	}
 
 
-	public static class AlwaysProp implements Prop {
+
+
+	public static class PatternProp implements Prop {
+		public final Pattern pattern;
+
+		public PatternProp(Pattern pattern) {
+			this.pattern = pattern;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+
+
+	public static interface Pattern {
+		public jkind.lustre.Expr toLustreExpr();
+	}
+
+
+
+
+
+
+	public static class AlwaysPattern implements Pattern {
 
 		public final Expr expr;
 
-		public AlwaysProp(Expr expr) {
+		public AlwaysPattern(Expr expr) {
 			this.expr = expr;
 		}
 
@@ -436,7 +462,7 @@ public class Nenola {
 		}
 	}
 
-	public static class WhenHoldsProp implements Prop {
+	public static class WhenHoldsPattern implements Pattern {
 
 		public final Expr condition;
 		public final Interval conditionInterval;
@@ -444,7 +470,7 @@ public class Nenola {
 		public final boolean exclusive;
 		public final Interval eventInterval;
 
-		public WhenHoldsProp(Expr condition, Interval conditionInterval, Expr event, boolean exclusive,
+		public WhenHoldsPattern(Expr condition, Interval conditionInterval, Expr event, boolean exclusive,
 				Interval eventInterval) {
 			this.condition = condition;
 			this.conditionInterval = conditionInterval;
@@ -460,14 +486,14 @@ public class Nenola {
 		}
 	}
 
-	public static class WhenOccursProp implements Prop {
+	public static class WhenOccursPattern implements Pattern {
 		public final Expr condition;
 		public final Expr frequency;
 		public final Interval interval;
 		public final boolean exclusive;
 		public final Expr event;
 
-		public WhenOccursProp(Expr condition, Expr frequency, Interval interval, boolean exclusive, Expr event) {
+		public WhenOccursPattern(Expr condition, Expr frequency, Interval interval, boolean exclusive, Expr event) {
 			this.condition = condition;
 			this.frequency = frequency;
 			this.interval = interval;
@@ -483,13 +509,13 @@ public class Nenola {
 	}
 
 
-	public static class WheneverOccursProp implements Prop {
+	public static class WheneverOccursPattern implements Pattern {
 		public final Expr cause;
 		public final Expr effect;
 		public final boolean exclusive;
 		public final Interval interval;
 
-		public WheneverOccursProp(Expr cause, Expr effect, boolean exclusive, Interval interval) {
+		public WheneverOccursPattern(Expr cause, Expr effect, boolean exclusive, Interval interval) {
 			this.cause = cause;
 			this.effect = effect;
 			this.exclusive = exclusive;
@@ -503,13 +529,13 @@ public class Nenola {
 		}
 	}
 
-	public static class WheneverBecomesTrueProp implements Prop {
+	public static class WheneverBecomesTruePattern implements Pattern {
 		public final Expr cause;
 		public final Expr effect;
 		public final boolean exclusive;
 		public final Interval interval;
 
-		public WheneverBecomesTrueProp(Expr cause, Expr effect, boolean exclusive, Interval interval) {
+		public WheneverBecomesTruePattern(Expr cause, Expr effect, boolean exclusive, Interval interval) {
 			this.cause = cause;
 			this.effect = effect;
 			this.exclusive = exclusive;
@@ -523,13 +549,13 @@ public class Nenola {
 		}
 	}
 
-	public static class WheneverHoldsProp implements Prop {
+	public static class WheneverHoldsPattern implements Pattern {
 		public final Expr cause;
 		public final Expr effect;
 		public final boolean exclusive;
 		public final Interval interval;
 
-		public WheneverHoldsProp(Expr cause, Expr effect, boolean exclusive, Interval interval) {
+		public WheneverHoldsPattern(Expr cause, Expr effect, boolean exclusive, Interval interval) {
 			this.cause = cause;
 			this.effect = effect;
 			this.exclusive = exclusive;
@@ -543,14 +569,14 @@ public class Nenola {
 		}
 	}
 
-	public static class WheneverImpliesProp implements Prop {
+	public static class WheneverImpliesPattern implements Pattern {
 		public final Expr cause;
 		public final Expr lhs;
 		public final Expr rhs;
 		public final boolean exclusive;
 		public final Interval interval;
 
-		public WheneverImpliesProp(Expr cause, Expr lhs, Expr rhs, boolean exclusive, Interval interval) {
+		public WheneverImpliesPattern(Expr cause, Expr lhs, Expr rhs, boolean exclusive, Interval interval) {
 			this.cause = cause;
 			this.lhs = lhs;
 			this.rhs = rhs;
@@ -565,12 +591,12 @@ public class Nenola {
 		}
 	}
 
-	public static class PeriodicProp implements Prop {
+	public static class PeriodicPattern implements Pattern {
 		public final Expr event;
 		public final Expr period;
 		public final Optional<Expr> jitterOp;
 
-		public PeriodicProp(Expr event, Expr period, Optional<Expr> jitterOp) {
+		public PeriodicPattern(Expr event, Expr period, Optional<Expr> jitterOp) {
 			this.event = event;
 			this.period = period;
 			this.jitterOp = jitterOp;
@@ -584,12 +610,12 @@ public class Nenola {
 	}
 
 
-	public static class SporadicProp implements Prop {
+	public static class SporadicPattern implements Pattern {
 		public final Expr event;
 		public final Expr iat;
 		public final Optional<Expr> jitterOp;
 
-		public SporadicProp(Expr event, Expr iat, Optional<Expr> jitterOp) {
+		public SporadicPattern(Expr event, Expr iat, Optional<Expr> jitterOp) {
 			this.event = event;
 			this.iat = iat;
 			this.jitterOp = jitterOp;
@@ -1076,7 +1102,7 @@ public class Nenola {
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreTimingPropMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternMap().entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -1161,7 +1187,7 @@ public class Nenola {
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustreTimingPropMap().keySet()) {
+				for (String propKey : nc.toLustrePatternMap().keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
@@ -1214,17 +1240,17 @@ public class Nenola {
 			return new jkind.lustre.VarDecl(this.getName() + "__CLOCK_", jkind.lustre.NamedType.BOOL);
 		}
 
-		private Optional<Map<String, jkind.lustre.Expr>> timingPropMapCache = Optional.empty();
-		private Map<String, jkind.lustre.Expr> toLustreTimingPropMap() {
-			if (timingPropMapCache.isPresent()) {
-				return timingPropMapCache.get();
+		private Optional<Map<String, jkind.lustre.Expr>> lustrePatternMapCache = Optional.empty();
+		private Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+			if (lustrePatternMapCache.isPresent()) {
+				return lustrePatternMapCache.get();
 			}
 
 			Map<String, jkind.lustre.Expr> props = new HashMap<>();
 			for (Spec spec : this.specList) {
-				if (!(spec.prop instanceof ExprProp)) {
+				if (spec.prop instanceof PatternProp) {
 
-					// TODO - implement the timing prop
+					// TODO - implement the patterns
 					// props.put("PATTERN", );
 				}
 			}
@@ -1233,7 +1259,7 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustreTimingPropMap().entrySet()) {
+				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternMap().entrySet()) {
 					String key = prefix + "__" + nestedEntry.getKey();
 					jkind.lustre.Expr expr = nestedEntry.getValue();
 					props.put(key, expr);
@@ -1261,7 +1287,7 @@ public class Nenola {
 
 			}
 
-			// TODO - gather asserts from subnodes
+			// TODO : gather asserts from subnodes
 			lustreAssertListCache = Optional.of(exprs);
 			return null;
 		}
