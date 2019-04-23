@@ -22,7 +22,8 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WheneverOccursStatementImpl#getEffect <em>Effect</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WheneverOccursStatementImpl#getCauseEvent <em>Cause Event</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WheneverOccursStatementImpl#getEffectEvent <em>Effect Event</em>}</li>
  * </ul>
  *
  * @generated
@@ -30,14 +31,24 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class WheneverOccursStatementImpl extends WheneverStatementImpl implements WheneverOccursStatement
 {
   /**
-   * The cached value of the '{@link #getEffect() <em>Effect</em>}' containment reference.
+   * The cached value of the '{@link #getCauseEvent() <em>Cause Event</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getEffect()
+   * @see #getCauseEvent()
    * @generated
    * @ordered
    */
-  protected Expr effect;
+  protected Expr causeEvent;
+
+  /**
+   * The cached value of the '{@link #getEffectEvent() <em>Effect Event</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getEffectEvent()
+   * @generated
+   * @ordered
+   */
+  protected Expr effectEvent;
 
   /**
    * <!-- begin-user-doc -->
@@ -66,9 +77,9 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
    * @generated
    */
   @Override
-  public Expr getEffect()
+  public Expr getCauseEvent()
   {
-    return effect;
+    return causeEvent;
   }
 
   /**
@@ -76,13 +87,13 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
    * <!-- end-user-doc -->
    * @generated
    */
-  public NotificationChain basicSetEffect(Expr newEffect, NotificationChain msgs)
+  public NotificationChain basicSetCauseEvent(Expr newCauseEvent, NotificationChain msgs)
   {
-    Expr oldEffect = effect;
-    effect = newEffect;
+    Expr oldCauseEvent = causeEvent;
+    causeEvent = newCauseEvent;
     if (eNotificationRequired())
     {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT, oldEffect, newEffect);
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT, oldCauseEvent, newCauseEvent);
       if (msgs == null) msgs = notification; else msgs.add(notification);
     }
     return msgs;
@@ -94,20 +105,70 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
    * @generated
    */
   @Override
-  public void setEffect(Expr newEffect)
+  public void setCauseEvent(Expr newCauseEvent)
   {
-    if (newEffect != effect)
+    if (newCauseEvent != causeEvent)
     {
       NotificationChain msgs = null;
-      if (effect != null)
-        msgs = ((InternalEObject)effect).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT, null, msgs);
-      if (newEffect != null)
-        msgs = ((InternalEObject)newEffect).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT, null, msgs);
-      msgs = basicSetEffect(newEffect, msgs);
+      if (causeEvent != null)
+        msgs = ((InternalEObject)causeEvent).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT, null, msgs);
+      if (newCauseEvent != null)
+        msgs = ((InternalEObject)newCauseEvent).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT, null, msgs);
+      msgs = basicSetCauseEvent(newCauseEvent, msgs);
       if (msgs != null) msgs.dispatch();
     }
     else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT, newEffect, newEffect));
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT, newCauseEvent, newCauseEvent));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Expr getEffectEvent()
+  {
+    return effectEvent;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetEffectEvent(Expr newEffectEvent, NotificationChain msgs)
+  {
+    Expr oldEffectEvent = effectEvent;
+    effectEvent = newEffectEvent;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT, oldEffectEvent, newEffectEvent);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setEffectEvent(Expr newEffectEvent)
+  {
+    if (newEffectEvent != effectEvent)
+    {
+      NotificationChain msgs = null;
+      if (effectEvent != null)
+        msgs = ((InternalEObject)effectEvent).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT, null, msgs);
+      if (newEffectEvent != null)
+        msgs = ((InternalEObject)newEffectEvent).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT, null, msgs);
+      msgs = basicSetEffectEvent(newEffectEvent, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT, newEffectEvent, newEffectEvent));
   }
 
   /**
@@ -120,8 +181,10 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
   {
     switch (featureID)
     {
-      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT:
-        return basicSetEffect(null, msgs);
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT:
+        return basicSetCauseEvent(null, msgs);
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT:
+        return basicSetEffectEvent(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -136,8 +199,10 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
   {
     switch (featureID)
     {
-      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT:
-        return getEffect();
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT:
+        return getCauseEvent();
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT:
+        return getEffectEvent();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -152,8 +217,11 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
   {
     switch (featureID)
     {
-      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT:
-        setEffect((Expr)newValue);
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT:
+        setCauseEvent((Expr)newValue);
+        return;
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT:
+        setEffectEvent((Expr)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -169,8 +237,11 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
   {
     switch (featureID)
     {
-      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT:
-        setEffect((Expr)null);
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT:
+        setCauseEvent((Expr)null);
+        return;
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT:
+        setEffectEvent((Expr)null);
         return;
     }
     super.eUnset(featureID);
@@ -186,8 +257,10 @@ public class WheneverOccursStatementImpl extends WheneverStatementImpl implement
   {
     switch (featureID)
     {
-      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT:
-        return effect != null;
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT:
+        return causeEvent != null;
+      case AgreePackage.WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT:
+        return effectEvent != null;
     }
     return super.eIsSet(featureID);
   }

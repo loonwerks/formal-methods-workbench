@@ -80,21 +80,24 @@ PatternStatement returns PatternStatement:
 ;
 
 WhenStatement:
-	=> ({WhenHoldsStatement} 'when' condition=Expr 'holds') 'during' 
-        conditionInterval=TimeInterval event=Expr (excl='exclusively')? 'occurs' ('during' eventInterval=TimeInterval)? 
-|   => ({WhenOccursStatment} 'when' condition=Expr 'occurs')
-        times=Expr 'times' 'during' interval=TimeInterval (excl='exclusively')? 'raises' event=Expr 
+	=> ({WhenHoldsStatement} 'when' causeCondition=Expr 'holds') 'during' 
+        conditionInterval=TimeInterval effectEvent=Expr (excl='exclusively')? 'occurs' ('during' eventInterval=TimeInterval)? 
+|   => ({WhenOccursStatment} 'when' causeCondition=Expr 'occurs')
+        times=Expr 'times' 'during' interval=TimeInterval (excl='exclusively')? 'raises' effectCondition=Expr 
 ;
 
 WheneverStatement:
-	=> ({WheneverOccursStatement} 'whenever' cause=Expr 'occurs'
-	    effect=Expr (excl='exclusively')? ('occur' | 'occurs')) ('during' interval=TimeInterval)? 
+	=> ({WheneverOccursStatement} 'whenever' causeEvent=Expr 'occurs'
+	    effectEvent=Expr (excl='exclusively')? ('occur' | 'occurs')) ('during' interval=TimeInterval)? 
+
+|	=> ({WheneverHoldsStatement} 'whenever' causeEvent=Expr 'occurs'
+	    effectCondition=Expr (excl='exclusively')? ('holds')) ('during' interval=TimeInterval)? 
+	    
 |   => ({WheneverBecomesTrueStatement} 'whenever' cause=Expr 'becomes' 'true'
-	    effect=Expr (excl='exclusively')? ('occur' | 'occurs')) ('during' interval=TimeInterval)? 
-|	=> ({WheneverHoldsStatement} 'whenever' cause=Expr 'occurs'
-	    effect=Expr (excl='exclusively')? ('holds')) ('during' interval=TimeInterval)? 
-|   => ({WheneverImpliesStatement} 'whenever' cause=Expr 'occurs'
-	    lhs=Expr 'implies') rhs=Expr (excl='exclusively')? ('during' interval=TimeInterval)? 	    
+    effect=Expr (excl='exclusively')? ('occur' | 'occurs')) ('during' interval=TimeInterval)? 
+    
+//|   => ({WheneverImpliesStatement} 'whenever' cause=Expr 'occurs'
+//	    lhs=Expr 'implies') rhs=Expr (excl='exclusively')? ('during' interval=TimeInterval)? 	    
 ;
 
 RealTimeStatement:

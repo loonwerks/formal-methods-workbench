@@ -14,6 +14,7 @@ package com.rockwellcollins.atc.agree.agree;
  * <ul>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getTimes <em>Times</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getInterval <em>Interval</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getEffectCondition <em>Effect Condition</em>}</li>
  * </ul>
  *
  * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenOccursStatment()
@@ -73,5 +74,31 @@ public interface WhenOccursStatment extends WhenStatement
    * @generated
    */
   void setInterval(TimeInterval value);
+
+  /**
+   * Returns the value of the '<em><b>Effect Condition</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Effect Condition</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Effect Condition</em>' containment reference.
+   * @see #setEffectCondition(Expr)
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenOccursStatment_EffectCondition()
+   * @model containment="true"
+   * @generated
+   */
+  Expr getEffectCondition();
+
+  /**
+   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getEffectCondition <em>Effect Condition</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Effect Condition</em>' containment reference.
+   * @see #getEffectCondition()
+   * @generated
+   */
+  void setEffectCondition(Expr value);
 
 } // WhenOccursStatment

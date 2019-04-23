@@ -24,7 +24,7 @@ public abstract class AbstractAgreeSyntacticSequencer extends AbstractSyntacticS
 	protected AbstractElementAlias match_TermExpr_LeftParenthesisKeyword_18_0_a;
 	protected AbstractElementAlias match_TermExpr_LeftParenthesisKeyword_18_0_p;
 	protected AbstractElementAlias match_WheneverStatement_OccurKeyword_0_0_0_6_0_or_OccursKeyword_0_0_0_6_1;
-	protected AbstractElementAlias match_WheneverStatement_OccurKeyword_1_0_0_7_0_or_OccursKeyword_1_0_0_7_1;
+	protected AbstractElementAlias match_WheneverStatement_OccurKeyword_2_0_0_7_0_or_OccursKeyword_2_0_0_7_1;
 	
 	@Inject
 	protected void init(IGrammarAccess access) {
@@ -32,7 +32,7 @@ public abstract class AbstractAgreeSyntacticSequencer extends AbstractSyntacticS
 		match_TermExpr_LeftParenthesisKeyword_18_0_a = new TokenAlias(true, true, grammarAccess.getTermExprAccess().getLeftParenthesisKeyword_18_0());
 		match_TermExpr_LeftParenthesisKeyword_18_0_p = new TokenAlias(true, false, grammarAccess.getTermExprAccess().getLeftParenthesisKeyword_18_0());
 		match_WheneverStatement_OccurKeyword_0_0_0_6_0_or_OccursKeyword_0_0_0_6_1 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getWheneverStatementAccess().getOccurKeyword_0_0_0_6_0()), new TokenAlias(false, false, grammarAccess.getWheneverStatementAccess().getOccursKeyword_0_0_0_6_1()));
-		match_WheneverStatement_OccurKeyword_1_0_0_7_0_or_OccursKeyword_1_0_0_7_1 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getWheneverStatementAccess().getOccurKeyword_1_0_0_7_0()), new TokenAlias(false, false, grammarAccess.getWheneverStatementAccess().getOccursKeyword_1_0_0_7_1()));
+		match_WheneverStatement_OccurKeyword_2_0_0_7_0_or_OccursKeyword_2_0_0_7_1 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getWheneverStatementAccess().getOccurKeyword_2_0_0_7_0()), new TokenAlias(false, false, grammarAccess.getWheneverStatementAccess().getOccursKeyword_2_0_0_7_1()));
 	}
 	
 	@Override
@@ -91,8 +91,8 @@ public abstract class AbstractAgreeSyntacticSequencer extends AbstractSyntacticS
 				emit_TermExpr_LeftParenthesisKeyword_18_0_p(semanticObject, getLastNavigableState(), syntaxNodes);
 			else if (match_WheneverStatement_OccurKeyword_0_0_0_6_0_or_OccursKeyword_0_0_0_6_1.equals(syntax))
 				emit_WheneverStatement_OccurKeyword_0_0_0_6_0_or_OccursKeyword_0_0_0_6_1(semanticObject, getLastNavigableState(), syntaxNodes);
-			else if (match_WheneverStatement_OccurKeyword_1_0_0_7_0_or_OccursKeyword_1_0_0_7_1.equals(syntax))
-				emit_WheneverStatement_OccurKeyword_1_0_0_7_0_or_OccursKeyword_1_0_0_7_1(semanticObject, getLastNavigableState(), syntaxNodes);
+			else if (match_WheneverStatement_OccurKeyword_2_0_0_7_0_or_OccursKeyword_2_0_0_7_1.equals(syntax))
+				emit_WheneverStatement_OccurKeyword_2_0_0_7_0_or_OccursKeyword_2_0_0_7_1(semanticObject, getLastNavigableState(), syntaxNodes);
 			else acceptNodes(getLastNavigableState(), syntaxNodes);
 		}
 	}
@@ -172,8 +172,8 @@ public abstract class AbstractAgreeSyntacticSequencer extends AbstractSyntacticS
 	 *     'occur' | 'occurs'
 	 *
 	 * This ambiguous syntax occurs at:
-	 *     effect=Expr (ambiguity) 'during' interval=TimeInterval
-	 *     effect=Expr (ambiguity) (rule end)
+	 *     effectEvent=Expr (ambiguity) 'during' interval=TimeInterval
+	 *     effectEvent=Expr (ambiguity) (rule end)
 	 *     excl='exclusively' (ambiguity) 'during' interval=TimeInterval
 	 *     excl='exclusively' (ambiguity) (rule end)
 	 */
@@ -191,7 +191,7 @@ public abstract class AbstractAgreeSyntacticSequencer extends AbstractSyntacticS
 	 *     excl='exclusively' (ambiguity) 'during' interval=TimeInterval
 	 *     excl='exclusively' (ambiguity) (rule end)
 	 */
-	protected void emit_WheneverStatement_OccurKeyword_1_0_0_7_0_or_OccursKeyword_1_0_0_7_1(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
+	protected void emit_WheneverStatement_OccurKeyword_2_0_0_7_0_or_OccursKeyword_2_0_0_7_1(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
 		acceptNodes(transition, nodes);
 	}
 	

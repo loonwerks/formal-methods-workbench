@@ -12,8 +12,7 @@ package com.rockwellcollins.atc.agree.agree;
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCondition <em>Condition</em>}</li>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getEvent <em>Event</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCauseCondition <em>Cause Condition</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getExcl <em>Excl</em>}</li>
  * </ul>
  *
@@ -24,56 +23,30 @@ package com.rockwellcollins.atc.agree.agree;
 public interface WhenStatement extends PatternStatement
 {
   /**
-   * Returns the value of the '<em><b>Condition</b></em>' containment reference.
+   * Returns the value of the '<em><b>Cause Condition</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <p>
-   * If the meaning of the '<em>Condition</em>' containment reference isn't clear,
+   * If the meaning of the '<em>Cause Condition</em>' containment reference isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Condition</em>' containment reference.
-   * @see #setCondition(Expr)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenStatement_Condition()
+   * @return the value of the '<em>Cause Condition</em>' containment reference.
+   * @see #setCauseCondition(Expr)
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenStatement_CauseCondition()
    * @model containment="true"
    * @generated
    */
-  Expr getCondition();
+  Expr getCauseCondition();
 
   /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCondition <em>Condition</em>}' containment reference.
+   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCauseCondition <em>Cause Condition</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Condition</em>' containment reference.
-   * @see #getCondition()
+   * @param value the new value of the '<em>Cause Condition</em>' containment reference.
+   * @see #getCauseCondition()
    * @generated
    */
-  void setCondition(Expr value);
-
-  /**
-   * Returns the value of the '<em><b>Event</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Event</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @return the value of the '<em>Event</em>' containment reference.
-   * @see #setEvent(Expr)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenStatement_Event()
-   * @model containment="true"
-   * @generated
-   */
-  Expr getEvent();
-
-  /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getEvent <em>Event</em>}' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Event</em>' containment reference.
-   * @see #getEvent()
-   * @generated
-   */
-  void setEvent(Expr value);
+  void setCauseCondition(Expr value);
 
   /**
    * Returns the value of the '<em><b>Excl</b></em>' attribute.

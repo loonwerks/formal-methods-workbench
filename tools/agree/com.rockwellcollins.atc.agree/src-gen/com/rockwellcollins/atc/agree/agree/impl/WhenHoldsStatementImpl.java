@@ -3,6 +3,7 @@
 package com.rockwellcollins.atc.agree.agree.impl;
 
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
+import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.TimeInterval;
 import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
 
@@ -23,6 +24,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * </p>
  * <ul>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getConditionInterval <em>Condition Interval</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getEffectEvent <em>Effect Event</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getEventInterval <em>Event Interval</em>}</li>
  * </ul>
  *
@@ -39,6 +41,16 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * @ordered
    */
   protected TimeInterval conditionInterval;
+
+  /**
+   * The cached value of the '{@link #getEffectEvent() <em>Effect Event</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getEffectEvent()
+   * @generated
+   * @ordered
+   */
+  protected Expr effectEvent;
 
   /**
    * The cached value of the '{@link #getEventInterval() <em>Event Interval</em>}' containment reference.
@@ -127,6 +139,56 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * @generated
    */
   @Override
+  public Expr getEffectEvent()
+  {
+    return effectEvent;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetEffectEvent(Expr newEffectEvent, NotificationChain msgs)
+  {
+    Expr oldEffectEvent = effectEvent;
+    effectEvent = newEffectEvent;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT, oldEffectEvent, newEffectEvent);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setEffectEvent(Expr newEffectEvent)
+  {
+    if (newEffectEvent != effectEvent)
+    {
+      NotificationChain msgs = null;
+      if (effectEvent != null)
+        msgs = ((InternalEObject)effectEvent).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT, null, msgs);
+      if (newEffectEvent != null)
+        msgs = ((InternalEObject)newEffectEvent).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT, null, msgs);
+      msgs = basicSetEffectEvent(newEffectEvent, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT, newEffectEvent, newEffectEvent));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public TimeInterval getEventInterval()
   {
     return eventInterval;
@@ -183,6 +245,8 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
     {
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         return basicSetConditionInterval(null, msgs);
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
+        return basicSetEffectEvent(null, msgs);
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         return basicSetEventInterval(null, msgs);
     }
@@ -201,6 +265,8 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
     {
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         return getConditionInterval();
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
+        return getEffectEvent();
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         return getEventInterval();
     }
@@ -219,6 +285,9 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
     {
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         setConditionInterval((TimeInterval)newValue);
+        return;
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
+        setEffectEvent((Expr)newValue);
         return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         setEventInterval((TimeInterval)newValue);
@@ -240,6 +309,9 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         setConditionInterval((TimeInterval)null);
         return;
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
+        setEffectEvent((Expr)null);
+        return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         setEventInterval((TimeInterval)null);
         return;
@@ -259,6 +331,8 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
     {
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         return conditionInterval != null;
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
+        return effectEvent != null;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         return eventInterval != null;
     }

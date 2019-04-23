@@ -22,8 +22,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenStatementImpl#getCondition <em>Condition</em>}</li>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenStatementImpl#getEvent <em>Event</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenStatementImpl#getCauseCondition <em>Cause Condition</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenStatementImpl#getExcl <em>Excl</em>}</li>
  * </ul>
  *
@@ -32,24 +31,14 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class WhenStatementImpl extends PatternStatementImpl implements WhenStatement
 {
   /**
-   * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
+   * The cached value of the '{@link #getCauseCondition() <em>Cause Condition</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getCondition()
+   * @see #getCauseCondition()
    * @generated
    * @ordered
    */
-  protected Expr condition;
-
-  /**
-   * The cached value of the '{@link #getEvent() <em>Event</em>}' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #getEvent()
-   * @generated
-   * @ordered
-   */
-  protected Expr event;
+  protected Expr causeCondition;
 
   /**
    * The default value of the '{@link #getExcl() <em>Excl</em>}' attribute.
@@ -98,9 +87,9 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
    * @generated
    */
   @Override
-  public Expr getCondition()
+  public Expr getCauseCondition()
   {
-    return condition;
+    return causeCondition;
   }
 
   /**
@@ -108,13 +97,13 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
    * <!-- end-user-doc -->
    * @generated
    */
-  public NotificationChain basicSetCondition(Expr newCondition, NotificationChain msgs)
+  public NotificationChain basicSetCauseCondition(Expr newCauseCondition, NotificationChain msgs)
   {
-    Expr oldCondition = condition;
-    condition = newCondition;
+    Expr oldCauseCondition = causeCondition;
+    causeCondition = newCauseCondition;
     if (eNotificationRequired())
     {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_STATEMENT__CONDITION, oldCondition, newCondition);
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION, oldCauseCondition, newCauseCondition);
       if (msgs == null) msgs = notification; else msgs.add(notification);
     }
     return msgs;
@@ -126,70 +115,20 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
    * @generated
    */
   @Override
-  public void setCondition(Expr newCondition)
+  public void setCauseCondition(Expr newCauseCondition)
   {
-    if (newCondition != condition)
+    if (newCauseCondition != causeCondition)
     {
       NotificationChain msgs = null;
-      if (condition != null)
-        msgs = ((InternalEObject)condition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_STATEMENT__CONDITION, null, msgs);
-      if (newCondition != null)
-        msgs = ((InternalEObject)newCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_STATEMENT__CONDITION, null, msgs);
-      msgs = basicSetCondition(newCondition, msgs);
+      if (causeCondition != null)
+        msgs = ((InternalEObject)causeCondition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION, null, msgs);
+      if (newCauseCondition != null)
+        msgs = ((InternalEObject)newCauseCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION, null, msgs);
+      msgs = basicSetCauseCondition(newCauseCondition, msgs);
       if (msgs != null) msgs.dispatch();
     }
     else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_STATEMENT__CONDITION, newCondition, newCondition));
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public Expr getEvent()
-  {
-    return event;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public NotificationChain basicSetEvent(Expr newEvent, NotificationChain msgs)
-  {
-    Expr oldEvent = event;
-    event = newEvent;
-    if (eNotificationRequired())
-    {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_STATEMENT__EVENT, oldEvent, newEvent);
-      if (msgs == null) msgs = notification; else msgs.add(notification);
-    }
-    return msgs;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public void setEvent(Expr newEvent)
-  {
-    if (newEvent != event)
-    {
-      NotificationChain msgs = null;
-      if (event != null)
-        msgs = ((InternalEObject)event).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_STATEMENT__EVENT, null, msgs);
-      if (newEvent != null)
-        msgs = ((InternalEObject)newEvent).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_STATEMENT__EVENT, null, msgs);
-      msgs = basicSetEvent(newEvent, msgs);
-      if (msgs != null) msgs.dispatch();
-    }
-    else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_STATEMENT__EVENT, newEvent, newEvent));
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION, newCauseCondition, newCauseCondition));
   }
 
   /**
@@ -227,10 +166,8 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
   {
     switch (featureID)
     {
-      case AgreePackage.WHEN_STATEMENT__CONDITION:
-        return basicSetCondition(null, msgs);
-      case AgreePackage.WHEN_STATEMENT__EVENT:
-        return basicSetEvent(null, msgs);
+      case AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION:
+        return basicSetCauseCondition(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -245,10 +182,8 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
   {
     switch (featureID)
     {
-      case AgreePackage.WHEN_STATEMENT__CONDITION:
-        return getCondition();
-      case AgreePackage.WHEN_STATEMENT__EVENT:
-        return getEvent();
+      case AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION:
+        return getCauseCondition();
       case AgreePackage.WHEN_STATEMENT__EXCL:
         return getExcl();
     }
@@ -265,11 +200,8 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
   {
     switch (featureID)
     {
-      case AgreePackage.WHEN_STATEMENT__CONDITION:
-        setCondition((Expr)newValue);
-        return;
-      case AgreePackage.WHEN_STATEMENT__EVENT:
-        setEvent((Expr)newValue);
+      case AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION:
+        setCauseCondition((Expr)newValue);
         return;
       case AgreePackage.WHEN_STATEMENT__EXCL:
         setExcl((String)newValue);
@@ -288,11 +220,8 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
   {
     switch (featureID)
     {
-      case AgreePackage.WHEN_STATEMENT__CONDITION:
-        setCondition((Expr)null);
-        return;
-      case AgreePackage.WHEN_STATEMENT__EVENT:
-        setEvent((Expr)null);
+      case AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION:
+        setCauseCondition((Expr)null);
         return;
       case AgreePackage.WHEN_STATEMENT__EXCL:
         setExcl(EXCL_EDEFAULT);
@@ -311,10 +240,8 @@ public class WhenStatementImpl extends PatternStatementImpl implements WhenState
   {
     switch (featureID)
     {
-      case AgreePackage.WHEN_STATEMENT__CONDITION:
-        return condition != null;
-      case AgreePackage.WHEN_STATEMENT__EVENT:
-        return event != null;
+      case AgreePackage.WHEN_STATEMENT__CAUSE_CONDITION:
+        return causeCondition != null;
       case AgreePackage.WHEN_STATEMENT__EXCL:
         return EXCL_EDEFAULT == null ? excl != null : !EXCL_EDEFAULT.equals(excl);
     }

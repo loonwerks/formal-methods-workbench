@@ -16,7 +16,6 @@ import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
 import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
 import com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
-import com.rockwellcollins.atc.agree.agree.WheneverImpliesStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 import com.rockwellcollins.atc.agree.agree.util.AgreeSwitch;
 import com.rockwellcollins.atc.agree.analysis.AgreeException;
@@ -75,8 +74,8 @@ public class AgreePatternBuilder extends AgreeSwitch<AgreeStatement> {
 
 	@Override
 	public AgreeStatement caseWheneverHoldsStatement(WheneverHoldsStatement object) {
-		IdExpr cause = (IdExpr) builder.doSwitch(object.getCause());
-		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffect());
+		IdExpr cause = (IdExpr) builder.doSwitch(object.getCauseEvent());
+		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffectCondition());
 		boolean exclusive = object.getExcl() != null;
 
 		AgreePatternInterval interval = getIntervalType(object.getInterval());
@@ -85,30 +84,61 @@ public class AgreePatternBuilder extends AgreeSwitch<AgreeStatement> {
 				TriggerType.CONDITION);
 	}
 
-	@Override
-	public AgreeStatement caseWheneverImpliesStatement(WheneverImpliesStatement object) {
-		throw new AgreeException("We do not support this pattern currently");
-		// IdExpr cause = (IdExpr) builder.doSwitch(object.getCause());
-		// IdExpr lhs = (IdExpr) builder.doSwitch(object.getLhs());
-		// IdExpr rhs = (IdExpr) builder.doSwitch(object.getRhs());
-		// boolean exclusive = object.getExcl() != null;
-		// AgreePatternInterval effectInterval = getIntervalType(object.getInterval());
 
-		// Expr effect = new BinaryExpr(lhs, BinaryOp.IMPLIES, rhs);
-		// return new AgreeCauseEffectPattern(str, ref, exclusive, cause, effect, null, effectInterval, TriggerType.EVENT,
-		// TriggerType.CONDITION);
-	}
 
 	@Override
 	public AgreeStatement caseWheneverOccursStatement(WheneverOccursStatement object) {
-		IdExpr cause = (IdExpr) builder.doSwitch(object.getCause());
-		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffect());
+		IdExpr cause = (IdExpr) builder.doSwitch(object.getCauseEvent());
+		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffectEvent());
 		boolean exclusive = object.getExcl() != null;
 		AgreePatternInterval effectInterval = getIntervalType(object.getInterval());
 
 		return new AgreeCauseEffectPattern(str, ref, exclusive, cause, effect, null, effectInterval, TriggerType.EVENT,
 				TriggerType.EVENT);
 	}
+
+
+	@Override
+	public AgreeStatement caseWhenHoldsStatement(WhenHoldsStatement object) {
+		IdExpr condition = (IdExpr) builder.doSwitch(object.getCauseCondition());
+		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffectEvent());
+		boolean exclusive = object.getExcl() != null;
+		AgreePatternInterval conditionInterval = getIntervalType(object.getConditionInterval());
+		AgreePatternInterval effectInterval = getIntervalType(object.getEventInterval());
+
+		return new AgreeCauseEffectPattern(str, ref, exclusive, condition, effect, conditionInterval, effectInterval,
+				TriggerType.CONDITION, TriggerType.EVENT);
+	}
+
+	@Override
+	public AgreeStatement caseWhenOccursStatment(WhenOccursStatment object) {
+		IdExpr condition = (IdExpr) builder.doSwitch(object.getCauseCondition());
+		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffectCondition());
+		Expr timesExpr = builder.doSwitch(object.getTimes());
+		boolean exclusive = object.getExcl() != null;
+		if (!(timesExpr instanceof IntExpr)) {
+			throw new AgreeException("Expected an integer literal in 'When Occurs' pattern");
+		}
+		BigInteger times = ((IntExpr) timesExpr).value;
+		AgreePatternInterval interval = getIntervalType(object.getInterval());
+
+		return new AgreeTimesPattern(str, ref, exclusive, condition, effect, interval, null, TriggerType.CONDITION,
+				TriggerType.CONDITION, times, null);
+	}
+
+//	@Override
+//	public AgreeStatement caseWheneverImpliesStatement(WheneverImpliesStatement object) {
+//		throw new AgreeException("We do not support this pattern currently");
+//		// IdExpr cause = (IdExpr) builder.doSwitch(object.getCause());
+//		// IdExpr lhs = (IdExpr) builder.doSwitch(object.getLhs());
+//		// IdExpr rhs = (IdExpr) builder.doSwitch(object.getRhs());
+//		// boolean exclusive = object.getExcl() != null;
+//		// AgreePatternInterval effectInterval = getIntervalType(object.getInterval());
+//
+//		// Expr effect = new BinaryExpr(lhs, BinaryOp.IMPLIES, rhs);
+//		// return new AgreeCauseEffectPattern(str, ref, exclusive, cause, effect, null, effectInterval, TriggerType.EVENT,
+//		// TriggerType.CONDITION);
+//	}
 
 	@Override
 	public AgreeStatement caseWheneverBecomesTrueStatement(WheneverBecomesTrueStatement object) {
@@ -124,34 +154,6 @@ public class AgreePatternBuilder extends AgreeSwitch<AgreeStatement> {
 //        effect = new BinaryExpr(effect, BinaryOp.ARROW, edgeEffect);
 		return new AgreeCauseEffectPattern(str, ref, exclusive, cause, effect, null, effectInterval, TriggerType.EVENT,
 				TriggerType.EVENT);
-	}
-
-	@Override
-	public AgreeStatement caseWhenHoldsStatement(WhenHoldsStatement object) {
-		IdExpr condition = (IdExpr) builder.doSwitch(object.getCondition());
-		IdExpr effect = (IdExpr) builder.doSwitch(object.getEvent());
-		boolean exclusive = object.getExcl() != null;
-		AgreePatternInterval conditionInterval = getIntervalType(object.getConditionInterval());
-		AgreePatternInterval effectInterval = getIntervalType(object.getEventInterval());
-
-		return new AgreeCauseEffectPattern(str, ref, exclusive, condition, effect, conditionInterval, effectInterval,
-				TriggerType.CONDITION, TriggerType.EVENT);
-	}
-
-	@Override
-	public AgreeStatement caseWhenOccursStatment(WhenOccursStatment object) {
-		IdExpr condition = (IdExpr) builder.doSwitch(object.getCondition());
-		IdExpr effect = (IdExpr) builder.doSwitch(object.getEvent());
-		Expr timesExpr = builder.doSwitch(object.getTimes());
-		boolean exclusive = object.getExcl() != null;
-		if (!(timesExpr instanceof IntExpr)) {
-			throw new AgreeException("Expected an integer literal in 'When Occurs' pattern");
-		}
-		BigInteger times = ((IntExpr) timesExpr).value;
-		AgreePatternInterval interval = getIntervalType(object.getInterval());
-
-		return new AgreeTimesPattern(str, ref, exclusive, condition, effect, interval, null, TriggerType.CONDITION,
-				TriggerType.CONDITION, times, null);
 	}
 
 	private AgreePatternInterval getIntervalType(TimeInterval interval) {

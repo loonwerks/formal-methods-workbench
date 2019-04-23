@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <ul>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl#getTimes <em>Times</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl#getInterval <em>Interval</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl#getEffectCondition <em>Effect Condition</em>}</li>
  * </ul>
  *
  * @generated
@@ -50,6 +51,16 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
    * @ordered
    */
   protected TimeInterval interval;
+
+  /**
+   * The cached value of the '{@link #getEffectCondition() <em>Effect Condition</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getEffectCondition()
+   * @generated
+   * @ordered
+   */
+  protected Expr effectCondition;
 
   /**
    * <!-- begin-user-doc -->
@@ -178,6 +189,56 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
    * @generated
    */
   @Override
+  public Expr getEffectCondition()
+  {
+    return effectCondition;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetEffectCondition(Expr newEffectCondition, NotificationChain msgs)
+  {
+    Expr oldEffectCondition = effectCondition;
+    effectCondition = newEffectCondition;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION, oldEffectCondition, newEffectCondition);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setEffectCondition(Expr newEffectCondition)
+  {
+    if (newEffectCondition != effectCondition)
+    {
+      NotificationChain msgs = null;
+      if (effectCondition != null)
+        msgs = ((InternalEObject)effectCondition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION, null, msgs);
+      if (newEffectCondition != null)
+        msgs = ((InternalEObject)newEffectCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION, null, msgs);
+      msgs = basicSetEffectCondition(newEffectCondition, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION, newEffectCondition, newEffectCondition));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
     switch (featureID)
@@ -186,6 +247,8 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
         return basicSetTimes(null, msgs);
       case AgreePackage.WHEN_OCCURS_STATMENT__INTERVAL:
         return basicSetInterval(null, msgs);
+      case AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION:
+        return basicSetEffectCondition(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -204,6 +267,8 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
         return getTimes();
       case AgreePackage.WHEN_OCCURS_STATMENT__INTERVAL:
         return getInterval();
+      case AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION:
+        return getEffectCondition();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -223,6 +288,9 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
         return;
       case AgreePackage.WHEN_OCCURS_STATMENT__INTERVAL:
         setInterval((TimeInterval)newValue);
+        return;
+      case AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION:
+        setEffectCondition((Expr)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -244,6 +312,9 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
       case AgreePackage.WHEN_OCCURS_STATMENT__INTERVAL:
         setInterval((TimeInterval)null);
         return;
+      case AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION:
+        setEffectCondition((Expr)null);
+        return;
     }
     super.eUnset(featureID);
   }
@@ -262,6 +333,8 @@ public class WhenOccursStatmentImpl extends WhenStatementImpl implements WhenOcc
         return times != null;
       case AgreePackage.WHEN_OCCURS_STATMENT__INTERVAL:
         return interval != null;
+      case AgreePackage.WHEN_OCCURS_STATMENT__EFFECT_CONDITION:
+        return effectCondition != null;
     }
     return super.eIsSet(featureID);
   }
