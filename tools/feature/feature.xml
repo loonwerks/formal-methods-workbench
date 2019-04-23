@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.collins.fmw.feature"
+      label="Feature"
+      version="1.0.0.qualifier"
+      provider-name="Collins Aerospace">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="com.rockwellcollins.atc.agree.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="edu.uah.rsesc.aadlsimulator.agree.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="edu.uah.rsesc.aadlsimulator.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.rockwellcollins.atc.resolute.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.rockwellcollins.atc.tcg.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.collins.fmw.cyres.feature"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.rockwellcollins.atc.aadl2sexp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
