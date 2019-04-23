@@ -425,6 +425,8 @@ public class Nenola {
 
 	public static interface Pattern {
 		public jkind.lustre.Expr toLustreExpr();
+
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap();
 	}
 
 
@@ -442,6 +444,12 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -484,6 +492,12 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class WhenOccursPattern implements Pattern {
@@ -503,6 +517,12 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -527,6 +547,12 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class WheneverBecomesTruePattern implements Pattern {
@@ -547,6 +573,12 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class WheneverHoldsPattern implements Pattern {
@@ -564,6 +596,12 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -589,6 +627,12 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class PeriodicPattern implements Pattern {
@@ -604,6 +648,12 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -623,6 +673,12 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternMap() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1051,18 +1107,14 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		private Optional<Node> lustreMainNodeCache = Optional.empty();
-		private Optional<Node> lustreSubNodeCache = Optional.empty();
+		private Optional<Node> lustreNodeCache = Optional.empty();
 
-		public Node toLustreNode(boolean isMain) {
+		public Node toLustreNode() {
 
-			if (isMain && this.lustreMainNodeCache.isPresent()) {
-				return lustreMainNodeCache.get();
+			if (this.lustreNodeCache.isPresent()) {
+				return lustreNodeCache.get();
 			}
 
-			if (!isMain && this.lustreSubNodeCache.isPresent()) {
-				return lustreSubNodeCache.get();
-			}
 
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
@@ -1108,7 +1160,7 @@ public class Nenola {
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternMap(isMain).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternMap().entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -1156,11 +1208,8 @@ public class Nenola {
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
 
-			if (isMain) {
-				lustreMainNodeCache = Optional.of(node);
-			} else {
-				lustreSubNodeCache = Optional.of(node);
-			}
+			lustreNodeCache = Optional.of(node);
+
 			return node;
 		}
 
@@ -1198,7 +1247,7 @@ public class Nenola {
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustrePatternMap(false).keySet()) {
+				for (String propKey : nc.toLustrePatternMap().keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
@@ -1253,7 +1302,8 @@ public class Nenola {
 
 		private Optional<Map<String, jkind.lustre.Expr>> lustreMainPatternMapCache = Optional.empty();
 		private Optional<Map<String, jkind.lustre.Expr>> lustreSubPatternMapCache = Optional.empty();
-		private Map<String, jkind.lustre.Expr> toLustrePatternMap(boolean isMain) {
+
+		private Map<String, jkind.lustre.Expr> toLustrePatternMap() {
 			if (isMain && lustreMainPatternMapCache.isPresent()) {
 				return lustreMainPatternMapCache.get();
 			}
@@ -1265,10 +1315,10 @@ public class Nenola {
 			Map<String, jkind.lustre.Expr> props = new HashMap<>();
 			for (Spec spec : this.specList) {
 				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					// TODO - implement the patterns
-					// cases on isMain
-					// props.put("PATTERN", );
+					Map<String, jkind.lustre.Expr> localMap = pattern.toLustrePatternMap();
+					props.putAll(localMap);
 				}
 			}
 
@@ -1276,7 +1326,7 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternMap(false).entrySet()) {
+				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternMap().entrySet()) {
 					String key = prefix + "__" + nestedEntry.getKey();
 					jkind.lustre.Expr expr = nestedEntry.getValue();
 					props.put(key, expr);
@@ -1395,12 +1445,12 @@ public class Nenola {
 			return exprMap;
 		}
 
-		public List<Node> toLustreNodesFromNesting(boolean isMain) {
+		public List<Node> toLustreNodesFromNesting() {
 
 			List<Node> nodes = new ArrayList<>();
-			nodes.add(this.toLustreNode(isMain));
+			nodes.add(this.toLustreNode());
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.toLustreNodesFromNesting(false));
+				nodes.addAll(subNodeContract.toLustreNodesFromNesting());
 			}
 
 			return nodes;
@@ -1509,7 +1559,7 @@ public class Nenola {
 		}
 
 		private List<Node> lustreNodesFromMain() {
-			return this.main.toLustreNodesFromNesting(true);
+			return this.main.toLustreNodesFromNesting();
 		}
 
 
