@@ -23,6 +23,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.impl.RootNode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DefaultAnnexSubclause;
@@ -55,7 +58,7 @@ import com.rockwellcollins.atc.resolute.validation.BaseType;
 
 public class LinterHandler extends AadlHandler {
 
-	protected final String MARKER_TYPE = "com.rockwellcollins.atc.resolute.linter.marker";
+	private static final String MARKER_TYPE = "com.rockwellcollins.atc.resolute.linter.marker";
 
 	@Override
 	protected String getJobName() {
@@ -168,6 +171,13 @@ public class LinterHandler extends AadlHandler {
 					} else if (severity == IMarker.SEVERITY_WARNING) {
 						warnings++;
 					}
+					INode node = NodeModelUtils.getNode(result.getLocation());
+					int lineNum = 0;
+					while (!(node instanceof RootNode)) {
+						lineNum += node.getTotalStartLine();
+						node = node.getParent();
+					}
+					marker.setAttribute(IMarker.LINE_NUMBER, lineNum);
 				} catch (CoreException exception) {
 					exception.printStackTrace();
 				}
@@ -175,7 +185,7 @@ public class LinterHandler extends AadlHandler {
 		}
 
 		if ((errors + warnings) == 0) {
-			Dialog.showInfo("AADL Linter", "No problems found");
+			Dialog.showInfo("Resolint", "No problems found");
 		} else {
 			String message = "";
 			if (errors > 0) {
@@ -187,7 +197,7 @@ public class LinterHandler extends AadlHandler {
 				}
 				message += warnings + " warning" + (warnings > 1 ? "s" : "") + " found.";
 			}
-			Dialog.showInfo("AADL Linter", message);
+			Dialog.showInfo("Resolint", message);
 		}
 
 	}
