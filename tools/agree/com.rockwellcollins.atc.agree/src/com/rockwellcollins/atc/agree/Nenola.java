@@ -682,6 +682,12 @@ public class Nenola {
 		}
 	}
 
+
+	public static String getCauseConditionString(String causeId) {
+		return "__CAUSE_CONDITION_HELD__" + causeId;
+	}
+
+
 	public static class WhenHoldsPattern implements Pattern {
 
 		public final Expr causeCondition;
@@ -707,19 +713,7 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-
-			jkind.lustre.IdExpr condition = this.causeCondition.toLustreExpr();
-			jkind.lustre.IdExpr effect = this.effectEvent.toLustreExpr();
-//			boolean exclusive = this.exclusive;
-//			AgreePatternInterval conditionInterval = this.conditionInterval
-//			AgreePatternInterval effectInterval = this.eventInterval
-//
-//			return new AgreeCauseEffectPattern(str, ref, exclusive, condition, effect, conditionInterval, effectInterval,
-//					TriggerType.CONDITION, TriggerType.EVENT);
-//
-
-			// TODO Auto-generated method stub
-			return null;
+			return new HashMap<>();
 		}
 
 		@Override
@@ -1447,6 +1441,7 @@ public class Nenola {
 
 			// gather the remaining inputs
 
+
 			for (VarDecl v : this.toLustreChanInList()) {
 				inputs.add(v);
 			}
@@ -1460,6 +1455,9 @@ public class Nenola {
 					locals.add(chan.toLustreVar());
 				}
 			}
+
+			// TODO : get lustre inputs, locals, equations from real time and other translations.
+			// see what is added to the builder through various calls.
 
 			for (Connection conn : this.connections) {
 				equations.add(conn.toLustreEquation());

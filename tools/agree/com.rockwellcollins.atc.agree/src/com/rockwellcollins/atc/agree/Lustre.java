@@ -4,6 +4,7 @@ import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.BoolExpr;
 import jkind.lustre.Expr;
+import jkind.lustre.VarDecl;
 
 public class Lustre {
 	public static Expr makeANDExpr(Expr left, Expr right) {
@@ -41,5 +42,16 @@ public class Lustre {
 
 		return new BinaryExpr(left, BinaryOp.OR, right);
 	}
+
+	public static VarDecl getTimeRiseVar(String causeId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static VarDecl getTimeFallVar(String causeId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
