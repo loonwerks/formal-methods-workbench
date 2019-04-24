@@ -81,8 +81,6 @@ import com.rockwellcollins.atc.agree.agree.TimeOfExpr;
 import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
-import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
-import com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 import com.rockwellcollins.atc.agree.services.AgreeGrammarAccess;
@@ -454,12 +452,6 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 				return; 
 			case AgreePackage.WHEN_HOLDS_STATEMENT:
 				sequence_WhenStatement(context, (WhenHoldsStatement) semanticObject); 
-				return; 
-			case AgreePackage.WHEN_OCCURS_STATMENT:
-				sequence_WhenStatement(context, (WhenOccursStatment) semanticObject); 
-				return; 
-			case AgreePackage.WHENEVER_BECOMES_TRUE_STATEMENT:
-				sequence_WheneverStatement(context, (WheneverBecomesTrueStatement) semanticObject); 
 				return; 
 			case AgreePackage.WHENEVER_HOLDS_STATEMENT:
 				sequence_WheneverStatement(context, (WheneverHoldsStatement) semanticObject); 
@@ -3112,32 +3104,6 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 	 *     (causeCondition=Expr conditionInterval=TimeInterval effectEvent=Expr excl='exclusively'? eventInterval=TimeInterval?)
 	 */
 	protected void sequence_WhenStatement(ISerializationContext context, WhenHoldsStatement semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
-	}
-	
-	
-	/**
-	 * Contexts:
-	 *     PatternStatement returns WhenOccursStatment
-	 *     WhenStatement returns WhenOccursStatment
-	 *
-	 * Constraint:
-	 *     (causeCondition=Expr times=Expr interval=TimeInterval excl='exclusively'? effectCondition=Expr)
-	 */
-	protected void sequence_WhenStatement(ISerializationContext context, WhenOccursStatment semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
-	}
-	
-	
-	/**
-	 * Contexts:
-	 *     PatternStatement returns WheneverBecomesTrueStatement
-	 *     WheneverStatement returns WheneverBecomesTrueStatement
-	 *
-	 * Constraint:
-	 *     (cause=Expr effect=Expr excl='exclusively'? interval=TimeInterval?)
-	 */
-	protected void sequence_WheneverStatement(ISerializationContext context, WheneverBecomesTrueStatement semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	

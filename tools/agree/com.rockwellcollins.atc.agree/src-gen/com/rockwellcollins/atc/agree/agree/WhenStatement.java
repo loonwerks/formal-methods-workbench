@@ -8,13 +8,6 @@ package com.rockwellcollins.atc.agree.agree;
  * A representation of the model object '<em><b>When Statement</b></em>'.
  * <!-- end-user-doc -->
  *
- * <p>
- * The following features are supported:
- * </p>
- * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCauseCondition <em>Cause Condition</em>}</li>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getExcl <em>Excl</em>}</li>
- * </ul>
  *
  * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenStatement()
  * @model
@@ -22,56 +15,4 @@ package com.rockwellcollins.atc.agree.agree;
  */
 public interface WhenStatement extends PatternStatement
 {
-  /**
-   * Returns the value of the '<em><b>Cause Condition</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Cause Condition</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @return the value of the '<em>Cause Condition</em>' containment reference.
-   * @see #setCauseCondition(Expr)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenStatement_CauseCondition()
-   * @model containment="true"
-   * @generated
-   */
-  Expr getCauseCondition();
-
-  /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCauseCondition <em>Cause Condition</em>}' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Cause Condition</em>' containment reference.
-   * @see #getCauseCondition()
-   * @generated
-   */
-  void setCauseCondition(Expr value);
-
-  /**
-   * Returns the value of the '<em><b>Excl</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Excl</em>' attribute isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @return the value of the '<em>Excl</em>' attribute.
-   * @see #setExcl(String)
-   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWhenStatement_Excl()
-   * @model
-   * @generated
-   */
-  String getExcl();
-
-  /**
-   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getExcl <em>Excl</em>}' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Excl</em>' attribute.
-   * @see #getExcl()
-   * @generated
-   */
-  void setExcl(String value);
-
 } // WhenStatement

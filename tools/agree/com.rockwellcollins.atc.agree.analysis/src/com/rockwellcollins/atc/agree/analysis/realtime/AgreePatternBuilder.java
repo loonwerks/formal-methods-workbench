@@ -1,7 +1,5 @@
 package com.rockwellcollins.atc.agree.analysis.realtime;
 
-import java.math.BigInteger;
-
 import org.eclipse.emf.ecore.EObject;
 
 import com.rockwellcollins.atc.agree.agree.AlwaysStatement;
@@ -13,8 +11,6 @@ import com.rockwellcollins.atc.agree.agree.PeriodicStatement;
 import com.rockwellcollins.atc.agree.agree.SporadicStatement;
 import com.rockwellcollins.atc.agree.agree.TimeInterval;
 import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
-import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
-import com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 import com.rockwellcollins.atc.agree.agree.util.AgreeSwitch;
@@ -26,7 +22,6 @@ import com.rockwellcollins.atc.agree.analysis.realtime.AgreePatternInterval.Inte
 
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
-import jkind.lustre.IntExpr;
 
 public class AgreePatternBuilder extends AgreeSwitch<AgreeStatement> {
 
@@ -110,21 +105,21 @@ public class AgreePatternBuilder extends AgreeSwitch<AgreeStatement> {
 				TriggerType.CONDITION, TriggerType.EVENT);
 	}
 
-	@Override
-	public AgreeStatement caseWhenOccursStatment(WhenOccursStatment object) {
-		IdExpr condition = (IdExpr) builder.doSwitch(object.getCauseCondition());
-		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffectCondition());
-		Expr timesExpr = builder.doSwitch(object.getTimes());
-		boolean exclusive = object.getExcl() != null;
-		if (!(timesExpr instanceof IntExpr)) {
-			throw new AgreeException("Expected an integer literal in 'When Occurs' pattern");
-		}
-		BigInteger times = ((IntExpr) timesExpr).value;
-		AgreePatternInterval interval = getIntervalType(object.getInterval());
-
-		return new AgreeTimesPattern(str, ref, exclusive, condition, effect, interval, null, TriggerType.CONDITION,
-				TriggerType.CONDITION, times, null);
-	}
+//	@Override
+//	public AgreeStatement caseWhenOccursStatment(WhenOccursStatment object) {
+//		IdExpr condition = (IdExpr) builder.doSwitch(object.getCauseCondition());
+//		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffectCondition());
+//		Expr timesExpr = builder.doSwitch(object.getTimes());
+//		boolean exclusive = object.getExcl() != null;
+//		if (!(timesExpr instanceof IntExpr)) {
+//			throw new AgreeException("Expected an integer literal in 'When Occurs' pattern");
+//		}
+//		BigInteger times = ((IntExpr) timesExpr).value;
+//		AgreePatternInterval interval = getIntervalType(object.getInterval());
+//
+//		return new AgreeTimesPattern(str, ref, exclusive, condition, effect, interval, null, TriggerType.CONDITION,
+//				TriggerType.CONDITION, times, null);
+//	}
 
 //	@Override
 //	public AgreeStatement caseWheneverImpliesStatement(WheneverImpliesStatement object) {
@@ -140,21 +135,21 @@ public class AgreePatternBuilder extends AgreeSwitch<AgreeStatement> {
 //		// TriggerType.CONDITION);
 //	}
 
-	@Override
-	public AgreeStatement caseWheneverBecomesTrueStatement(WheneverBecomesTrueStatement object) {
-		IdExpr cause = (IdExpr) builder.doSwitch(object.getCause());
-		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffect());
-		boolean exclusive = object.getExcl() != null;
-		AgreePatternInterval effectInterval = getIntervalType(object.getInterval());
-
-		// make the effect rising edge sensitive
-//        Expr preEffect = new UnaryExpr(UnaryOp.PRE, effect);
-//        Expr notPreEffect = new UnaryExpr(UnaryOp.NOT, preEffect);
-//        Expr edgeEffect = new BinaryExpr(notPreEffect, BinaryOp.AND, effect);
-//        effect = new BinaryExpr(effect, BinaryOp.ARROW, edgeEffect);
-		return new AgreeCauseEffectPattern(str, ref, exclusive, cause, effect, null, effectInterval, TriggerType.EVENT,
-				TriggerType.EVENT);
-	}
+//	@Override
+//	public AgreeStatement caseWheneverBecomesTrueStatement(WheneverBecomesTrueStatement object) {
+//		IdExpr cause = (IdExpr) builder.doSwitch(object.getCause());
+//		IdExpr effect = (IdExpr) builder.doSwitch(object.getEffect());
+//		boolean exclusive = object.getExcl() != null;
+//		AgreePatternInterval effectInterval = getIntervalType(object.getInterval());
+//
+//		// make the effect rising edge sensitive
+////        Expr preEffect = new UnaryExpr(UnaryOp.PRE, effect);
+////        Expr notPreEffect = new UnaryExpr(UnaryOp.NOT, preEffect);
+////        Expr edgeEffect = new BinaryExpr(notPreEffect, BinaryOp.AND, effect);
+////        effect = new BinaryExpr(effect, BinaryOp.ARROW, edgeEffect);
+//		return new AgreeCauseEffectPattern(str, ref, exclusive, cause, effect, null, effectInterval, TriggerType.EVENT,
+//				TriggerType.EVENT);
+//	}
 
 	private AgreePatternInterval getIntervalType(TimeInterval interval) {
 		if (interval == null) {

@@ -3,6 +3,7 @@
 package com.rockwellcollins.atc.agree.agree.impl;
 
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
+import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.TimeInterval;
 import com.rockwellcollins.atc.agree.agree.WheneverStatement;
 
@@ -22,6 +23,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * </p>
  * <ul>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WheneverStatementImpl#getCauseEvent <em>Cause Event</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WheneverStatementImpl#getExcl <em>Excl</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WheneverStatementImpl#getInterval <em>Interval</em>}</li>
  * </ul>
@@ -30,6 +32,16 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class WheneverStatementImpl extends PatternStatementImpl implements WheneverStatement
 {
+  /**
+   * The cached value of the '{@link #getCauseEvent() <em>Cause Event</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getCauseEvent()
+   * @generated
+   * @ordered
+   */
+  protected Expr causeEvent;
+
   /**
    * The default value of the '{@link #getExcl() <em>Excl</em>}' attribute.
    * <!-- begin-user-doc -->
@@ -79,6 +91,56 @@ public class WheneverStatementImpl extends PatternStatementImpl implements Whene
   protected EClass eStaticClass()
   {
     return AgreePackage.Literals.WHENEVER_STATEMENT;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Expr getCauseEvent()
+  {
+    return causeEvent;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetCauseEvent(Expr newCauseEvent, NotificationChain msgs)
+  {
+    Expr oldCauseEvent = causeEvent;
+    causeEvent = newCauseEvent;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT, oldCauseEvent, newCauseEvent);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setCauseEvent(Expr newCauseEvent)
+  {
+    if (newCauseEvent != causeEvent)
+    {
+      NotificationChain msgs = null;
+      if (causeEvent != null)
+        msgs = ((InternalEObject)causeEvent).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT, null, msgs);
+      if (newCauseEvent != null)
+        msgs = ((InternalEObject)newCauseEvent).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT, null, msgs);
+      msgs = basicSetCauseEvent(newCauseEvent, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT, newCauseEvent, newCauseEvent));
   }
 
   /**
@@ -166,6 +228,8 @@ public class WheneverStatementImpl extends PatternStatementImpl implements Whene
   {
     switch (featureID)
     {
+      case AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT:
+        return basicSetCauseEvent(null, msgs);
       case AgreePackage.WHENEVER_STATEMENT__INTERVAL:
         return basicSetInterval(null, msgs);
     }
@@ -182,6 +246,8 @@ public class WheneverStatementImpl extends PatternStatementImpl implements Whene
   {
     switch (featureID)
     {
+      case AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT:
+        return getCauseEvent();
       case AgreePackage.WHENEVER_STATEMENT__EXCL:
         return getExcl();
       case AgreePackage.WHENEVER_STATEMENT__INTERVAL:
@@ -200,6 +266,9 @@ public class WheneverStatementImpl extends PatternStatementImpl implements Whene
   {
     switch (featureID)
     {
+      case AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT:
+        setCauseEvent((Expr)newValue);
+        return;
       case AgreePackage.WHENEVER_STATEMENT__EXCL:
         setExcl((String)newValue);
         return;
@@ -220,6 +289,9 @@ public class WheneverStatementImpl extends PatternStatementImpl implements Whene
   {
     switch (featureID)
     {
+      case AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT:
+        setCauseEvent((Expr)null);
+        return;
       case AgreePackage.WHENEVER_STATEMENT__EXCL:
         setExcl(EXCL_EDEFAULT);
         return;
@@ -240,6 +312,8 @@ public class WheneverStatementImpl extends PatternStatementImpl implements Whene
   {
     switch (featureID)
     {
+      case AgreePackage.WHENEVER_STATEMENT__CAUSE_EVENT:
+        return causeEvent != null;
       case AgreePackage.WHENEVER_STATEMENT__EXCL:
         return EXCL_EDEFAULT == null ? excl != null : !EXCL_EDEFAULT.equals(excl);
       case AgreePackage.WHENEVER_STATEMENT__INTERVAL:

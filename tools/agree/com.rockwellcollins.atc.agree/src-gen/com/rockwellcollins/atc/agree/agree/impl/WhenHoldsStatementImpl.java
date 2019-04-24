@@ -23,8 +23,10 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * </p>
  * <ul>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getCauseCondition <em>Cause Condition</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getConditionInterval <em>Condition Interval</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getEffectEvent <em>Effect Event</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getExcl <em>Excl</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.WhenHoldsStatementImpl#getEventInterval <em>Event Interval</em>}</li>
  * </ul>
  *
@@ -32,6 +34,16 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHoldsStatement
 {
+  /**
+   * The cached value of the '{@link #getCauseCondition() <em>Cause Condition</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getCauseCondition()
+   * @generated
+   * @ordered
+   */
+  protected Expr causeCondition;
+
   /**
    * The cached value of the '{@link #getConditionInterval() <em>Condition Interval</em>}' containment reference.
    * <!-- begin-user-doc -->
@@ -51,6 +63,26 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * @ordered
    */
   protected Expr effectEvent;
+
+  /**
+   * The default value of the '{@link #getExcl() <em>Excl</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getExcl()
+   * @generated
+   * @ordered
+   */
+  protected static final String EXCL_EDEFAULT = null;
+
+  /**
+   * The cached value of the '{@link #getExcl() <em>Excl</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getExcl()
+   * @generated
+   * @ordered
+   */
+  protected String excl = EXCL_EDEFAULT;
 
   /**
    * The cached value of the '{@link #getEventInterval() <em>Event Interval</em>}' containment reference.
@@ -81,6 +113,56 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
   protected EClass eStaticClass()
   {
     return AgreePackage.Literals.WHEN_HOLDS_STATEMENT;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Expr getCauseCondition()
+  {
+    return causeCondition;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetCauseCondition(Expr newCauseCondition, NotificationChain msgs)
+  {
+    Expr oldCauseCondition = causeCondition;
+    causeCondition = newCauseCondition;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION, oldCauseCondition, newCauseCondition);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setCauseCondition(Expr newCauseCondition)
+  {
+    if (newCauseCondition != causeCondition)
+    {
+      NotificationChain msgs = null;
+      if (causeCondition != null)
+        msgs = ((InternalEObject)causeCondition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION, null, msgs);
+      if (newCauseCondition != null)
+        msgs = ((InternalEObject)newCauseCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION, null, msgs);
+      msgs = basicSetCauseCondition(newCauseCondition, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION, newCauseCondition, newCauseCondition));
   }
 
   /**
@@ -189,6 +271,31 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
    * @generated
    */
   @Override
+  public String getExcl()
+  {
+    return excl;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setExcl(String newExcl)
+  {
+    String oldExcl = excl;
+    excl = newExcl;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.WHEN_HOLDS_STATEMENT__EXCL, oldExcl, excl));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public TimeInterval getEventInterval()
   {
     return eventInterval;
@@ -243,6 +350,8 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
   {
     switch (featureID)
     {
+      case AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION:
+        return basicSetCauseCondition(null, msgs);
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         return basicSetConditionInterval(null, msgs);
       case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
@@ -263,10 +372,14 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
   {
     switch (featureID)
     {
+      case AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION:
+        return getCauseCondition();
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         return getConditionInterval();
       case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
         return getEffectEvent();
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EXCL:
+        return getExcl();
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         return getEventInterval();
     }
@@ -283,11 +396,17 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
   {
     switch (featureID)
     {
+      case AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION:
+        setCauseCondition((Expr)newValue);
+        return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         setConditionInterval((TimeInterval)newValue);
         return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
         setEffectEvent((Expr)newValue);
+        return;
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EXCL:
+        setExcl((String)newValue);
         return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         setEventInterval((TimeInterval)newValue);
@@ -306,11 +425,17 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
   {
     switch (featureID)
     {
+      case AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION:
+        setCauseCondition((Expr)null);
+        return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         setConditionInterval((TimeInterval)null);
         return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
         setEffectEvent((Expr)null);
+        return;
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EXCL:
+        setExcl(EXCL_EDEFAULT);
         return;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         setEventInterval((TimeInterval)null);
@@ -329,14 +454,35 @@ public class WhenHoldsStatementImpl extends WhenStatementImpl implements WhenHol
   {
     switch (featureID)
     {
+      case AgreePackage.WHEN_HOLDS_STATEMENT__CAUSE_CONDITION:
+        return causeCondition != null;
       case AgreePackage.WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL:
         return conditionInterval != null;
       case AgreePackage.WHEN_HOLDS_STATEMENT__EFFECT_EVENT:
         return effectEvent != null;
+      case AgreePackage.WHEN_HOLDS_STATEMENT__EXCL:
+        return EXCL_EDEFAULT == null ? excl != null : !EXCL_EDEFAULT.equals(excl);
       case AgreePackage.WHEN_HOLDS_STATEMENT__EVENT_INTERVAL:
         return eventInterval != null;
     }
     return super.eIsSet(featureID);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public String toString()
+  {
+    if (eIsProxy()) return super.toString();
+
+    StringBuilder result = new StringBuilder(super.toString());
+    result.append(" (excl: ");
+    result.append(excl);
+    result.append(')');
+    return result.toString();
   }
 
 } //WhenHoldsStatementImpl

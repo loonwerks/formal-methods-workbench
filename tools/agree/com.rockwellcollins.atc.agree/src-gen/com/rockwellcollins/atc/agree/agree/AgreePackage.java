@@ -390,31 +390,13 @@ public interface AgreePackage extends EPackage
   int WHEN_STATEMENT = 6;
 
   /**
-   * The feature id for the '<em><b>Cause Condition</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_STATEMENT__CAUSE_CONDITION = PATTERN_STATEMENT_FEATURE_COUNT + 0;
-
-  /**
-   * The feature id for the '<em><b>Excl</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_STATEMENT__EXCL = PATTERN_STATEMENT_FEATURE_COUNT + 1;
-
-  /**
    * The number of structural features of the '<em>When Statement</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WHEN_STATEMENT_FEATURE_COUNT = PATTERN_STATEMENT_FEATURE_COUNT + 2;
+  int WHEN_STATEMENT_FEATURE_COUNT = PATTERN_STATEMENT_FEATURE_COUNT + 0;
 
   /**
    * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverStatementImpl <em>Whenever Statement</em>}' class.
@@ -427,13 +409,22 @@ public interface AgreePackage extends EPackage
   int WHENEVER_STATEMENT = 7;
 
   /**
+   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int WHENEVER_STATEMENT__CAUSE_EVENT = PATTERN_STATEMENT_FEATURE_COUNT + 0;
+
+  /**
    * The feature id for the '<em><b>Excl</b></em>' attribute.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WHENEVER_STATEMENT__EXCL = PATTERN_STATEMENT_FEATURE_COUNT + 0;
+  int WHENEVER_STATEMENT__EXCL = PATTERN_STATEMENT_FEATURE_COUNT + 1;
 
   /**
    * The feature id for the '<em><b>Interval</b></em>' containment reference.
@@ -442,7 +433,7 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int WHENEVER_STATEMENT__INTERVAL = PATTERN_STATEMENT_FEATURE_COUNT + 1;
+  int WHENEVER_STATEMENT__INTERVAL = PATTERN_STATEMENT_FEATURE_COUNT + 2;
 
   /**
    * The number of structural features of the '<em>Whenever Statement</em>' class.
@@ -451,7 +442,7 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int WHENEVER_STATEMENT_FEATURE_COUNT = PATTERN_STATEMENT_FEATURE_COUNT + 2;
+  int WHENEVER_STATEMENT_FEATURE_COUNT = PATTERN_STATEMENT_FEATURE_COUNT + 3;
 
   /**
    * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.RealTimeStatementImpl <em>Real Time Statement</em>}' class.
@@ -2711,16 +2702,7 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int WHEN_HOLDS_STATEMENT__CAUSE_CONDITION = WHEN_STATEMENT__CAUSE_CONDITION;
-
-  /**
-   * The feature id for the '<em><b>Excl</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_HOLDS_STATEMENT__EXCL = WHEN_STATEMENT__EXCL;
+  int WHEN_HOLDS_STATEMENT__CAUSE_CONDITION = WHEN_STATEMENT_FEATURE_COUNT + 0;
 
   /**
    * The feature id for the '<em><b>Condition Interval</b></em>' containment reference.
@@ -2729,7 +2711,7 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL = WHEN_STATEMENT_FEATURE_COUNT + 0;
+  int WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL = WHEN_STATEMENT_FEATURE_COUNT + 1;
 
   /**
    * The feature id for the '<em><b>Effect Event</b></em>' containment reference.
@@ -2738,44 +2720,7 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int WHEN_HOLDS_STATEMENT__EFFECT_EVENT = WHEN_STATEMENT_FEATURE_COUNT + 1;
-
-  /**
-   * The feature id for the '<em><b>Event Interval</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_HOLDS_STATEMENT__EVENT_INTERVAL = WHEN_STATEMENT_FEATURE_COUNT + 2;
-
-  /**
-   * The number of structural features of the '<em>When Holds Statement</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_HOLDS_STATEMENT_FEATURE_COUNT = WHEN_STATEMENT_FEATURE_COUNT + 3;
-
-  /**
-   * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl <em>When Occurs Statment</em>}' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl
-   * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getWhenOccursStatment()
-   * @generated
-   */
-  int WHEN_OCCURS_STATMENT = 45;
-
-  /**
-   * The feature id for the '<em><b>Cause Condition</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_OCCURS_STATMENT__CAUSE_CONDITION = WHEN_STATEMENT__CAUSE_CONDITION;
+  int WHEN_HOLDS_STATEMENT__EFFECT_EVENT = WHEN_STATEMENT_FEATURE_COUNT + 2;
 
   /**
    * The feature id for the '<em><b>Excl</b></em>' attribute.
@@ -2784,43 +2729,25 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int WHEN_OCCURS_STATMENT__EXCL = WHEN_STATEMENT__EXCL;
+  int WHEN_HOLDS_STATEMENT__EXCL = WHEN_STATEMENT_FEATURE_COUNT + 3;
 
   /**
-   * The feature id for the '<em><b>Times</b></em>' containment reference.
+   * The feature id for the '<em><b>Event Interval</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WHEN_OCCURS_STATMENT__TIMES = WHEN_STATEMENT_FEATURE_COUNT + 0;
+  int WHEN_HOLDS_STATEMENT__EVENT_INTERVAL = WHEN_STATEMENT_FEATURE_COUNT + 4;
 
   /**
-   * The feature id for the '<em><b>Interval</b></em>' containment reference.
+   * The number of structural features of the '<em>When Holds Statement</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WHEN_OCCURS_STATMENT__INTERVAL = WHEN_STATEMENT_FEATURE_COUNT + 1;
-
-  /**
-   * The feature id for the '<em><b>Effect Condition</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_OCCURS_STATMENT__EFFECT_CONDITION = WHEN_STATEMENT_FEATURE_COUNT + 2;
-
-  /**
-   * The number of structural features of the '<em>When Occurs Statment</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHEN_OCCURS_STATMENT_FEATURE_COUNT = WHEN_STATEMENT_FEATURE_COUNT + 3;
+  int WHEN_HOLDS_STATEMENT_FEATURE_COUNT = WHEN_STATEMENT_FEATURE_COUNT + 5;
 
   /**
    * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverOccursStatementImpl <em>Whenever Occurs Statement</em>}' class.
@@ -2830,7 +2757,16 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getWheneverOccursStatement()
    * @generated
    */
-  int WHENEVER_OCCURS_STATEMENT = 46;
+  int WHENEVER_OCCURS_STATEMENT = 45;
+
+  /**
+   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT__CAUSE_EVENT;
 
   /**
    * The feature id for the '<em><b>Excl</b></em>' attribute.
@@ -2851,22 +2787,22 @@ public interface AgreePackage extends EPackage
   int WHENEVER_OCCURS_STATEMENT__INTERVAL = WHENEVER_STATEMENT__INTERVAL;
 
   /**
-   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT_FEATURE_COUNT + 0;
-
-  /**
    * The feature id for the '<em><b>Effect Event</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT = WHENEVER_STATEMENT_FEATURE_COUNT + 1;
+  int WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT = WHENEVER_STATEMENT_FEATURE_COUNT + 0;
+
+  /**
+   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT_FEATURE_COUNT + 1;
 
   /**
    * The number of structural features of the '<em>Whenever Occurs Statement</em>' class.
@@ -2885,7 +2821,16 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getWheneverHoldsStatement()
    * @generated
    */
-  int WHENEVER_HOLDS_STATEMENT = 47;
+  int WHENEVER_HOLDS_STATEMENT = 46;
+
+  /**
+   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT__CAUSE_EVENT;
 
   /**
    * The feature id for the '<em><b>Excl</b></em>' attribute.
@@ -2906,22 +2851,22 @@ public interface AgreePackage extends EPackage
   int WHENEVER_HOLDS_STATEMENT__INTERVAL = WHENEVER_STATEMENT__INTERVAL;
 
   /**
-   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT_FEATURE_COUNT + 0;
-
-  /**
    * The feature id for the '<em><b>Effect Condition</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WHENEVER_HOLDS_STATEMENT__EFFECT_CONDITION = WHENEVER_STATEMENT_FEATURE_COUNT + 1;
+  int WHENEVER_HOLDS_STATEMENT__EFFECT_CONDITION = WHENEVER_STATEMENT_FEATURE_COUNT + 0;
+
+  /**
+   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT_FEATURE_COUNT + 1;
 
   /**
    * The number of structural features of the '<em>Whenever Holds Statement</em>' class.
@@ -2933,61 +2878,6 @@ public interface AgreePackage extends EPackage
   int WHENEVER_HOLDS_STATEMENT_FEATURE_COUNT = WHENEVER_STATEMENT_FEATURE_COUNT + 2;
 
   /**
-   * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverBecomesTrueStatementImpl <em>Whenever Becomes True Statement</em>}' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see com.rockwellcollins.atc.agree.agree.impl.WheneverBecomesTrueStatementImpl
-   * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getWheneverBecomesTrueStatement()
-   * @generated
-   */
-  int WHENEVER_BECOMES_TRUE_STATEMENT = 48;
-
-  /**
-   * The feature id for the '<em><b>Excl</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_BECOMES_TRUE_STATEMENT__EXCL = WHENEVER_STATEMENT__EXCL;
-
-  /**
-   * The feature id for the '<em><b>Interval</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_BECOMES_TRUE_STATEMENT__INTERVAL = WHENEVER_STATEMENT__INTERVAL;
-
-  /**
-   * The feature id for the '<em><b>Cause</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_BECOMES_TRUE_STATEMENT__CAUSE = WHENEVER_STATEMENT_FEATURE_COUNT + 0;
-
-  /**
-   * The feature id for the '<em><b>Effect</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_BECOMES_TRUE_STATEMENT__EFFECT = WHENEVER_STATEMENT_FEATURE_COUNT + 1;
-
-  /**
-   * The number of structural features of the '<em>Whenever Becomes True Statement</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_BECOMES_TRUE_STATEMENT_FEATURE_COUNT = WHENEVER_STATEMENT_FEATURE_COUNT + 2;
-
-  /**
    * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.PeriodicStatementImpl <em>Periodic Statement</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -2995,7 +2885,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getPeriodicStatement()
    * @generated
    */
-  int PERIODIC_STATEMENT = 49;
+  int PERIODIC_STATEMENT = 47;
 
   /**
    * The feature id for the '<em><b>Event</b></em>' containment reference.
@@ -3041,7 +2931,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getSporadicStatement()
    * @generated
    */
-  int SPORADIC_STATEMENT = 50;
+  int SPORADIC_STATEMENT = 48;
 
   /**
    * The feature id for the '<em><b>Event</b></em>' containment reference.
@@ -3087,7 +2977,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getClosedTimeInterval()
    * @generated
    */
-  int CLOSED_TIME_INTERVAL = 51;
+  int CLOSED_TIME_INTERVAL = 49;
 
   /**
    * The feature id for the '<em><b>Low</b></em>' containment reference.
@@ -3124,7 +3014,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getOpenLeftTimeInterval()
    * @generated
    */
-  int OPEN_LEFT_TIME_INTERVAL = 52;
+  int OPEN_LEFT_TIME_INTERVAL = 50;
 
   /**
    * The feature id for the '<em><b>Low</b></em>' containment reference.
@@ -3161,7 +3051,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getOpenRightTimeInterval()
    * @generated
    */
-  int OPEN_RIGHT_TIME_INTERVAL = 53;
+  int OPEN_RIGHT_TIME_INTERVAL = 51;
 
   /**
    * The feature id for the '<em><b>Low</b></em>' containment reference.
@@ -3198,7 +3088,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getOpenTimeInterval()
    * @generated
    */
-  int OPEN_TIME_INTERVAL = 54;
+  int OPEN_TIME_INTERVAL = 52;
 
   /**
    * The feature id for the '<em><b>Low</b></em>' containment reference.
@@ -3235,7 +3125,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getMNSynchStatement()
    * @generated
    */
-  int MN_SYNCH_STATEMENT = 55;
+  int MN_SYNCH_STATEMENT = 53;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3335,7 +3225,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getAsynchStatement()
    * @generated
    */
-  int ASYNCH_STATEMENT = 56;
+  int ASYNCH_STATEMENT = 54;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3399,7 +3289,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getLatchedStatement()
    * @generated
    */
-  int LATCHED_STATEMENT = 57;
+  int LATCHED_STATEMENT = 55;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3463,7 +3353,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getNodeEq()
    * @generated
    */
-  int NODE_EQ = 58;
+  int NODE_EQ = 56;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3518,7 +3408,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getNodeLemma()
    * @generated
    */
-  int NODE_LEMMA = 59;
+  int NODE_LEMMA = 57;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3573,7 +3463,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getArrayType()
    * @generated
    */
-  int ARRAY_TYPE = 60;
+  int ARRAY_TYPE = 58;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3628,7 +3518,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getPrimType()
    * @generated
    */
-  int PRIM_TYPE = 61;
+  int PRIM_TYPE = 59;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3710,7 +3600,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getForallExpr()
    * @generated
    */
-  int FORALL_EXPR = 62;
+  int FORALL_EXPR = 60;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3774,7 +3664,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getExistsExpr()
    * @generated
    */
-  int EXISTS_EXPR = 63;
+  int EXISTS_EXPR = 61;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3838,7 +3728,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getFlatmapExpr()
    * @generated
    */
-  int FLATMAP_EXPR = 64;
+  int FLATMAP_EXPR = 62;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3902,7 +3792,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getFoldLeftExpr()
    * @generated
    */
-  int FOLD_LEFT_EXPR = 65;
+  int FOLD_LEFT_EXPR = 63;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -3984,7 +3874,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getFoldRightExpr()
    * @generated
    */
-  int FOLD_RIGHT_EXPR = 66;
+  int FOLD_RIGHT_EXPR = 64;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4066,7 +3956,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getBinaryExpr()
    * @generated
    */
-  int BINARY_EXPR = 67;
+  int BINARY_EXPR = 65;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4130,7 +4020,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getUnaryExpr()
    * @generated
    */
-  int UNARY_EXPR = 68;
+  int UNARY_EXPR = 66;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4185,7 +4075,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getIfThenElseExpr()
    * @generated
    */
-  int IF_THEN_ELSE_EXPR = 69;
+  int IF_THEN_ELSE_EXPR = 67;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4249,7 +4139,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getThisRef()
    * @generated
    */
-  int THIS_REF = 70;
+  int THIS_REF = 68;
 
   /**
    * The number of structural features of the '<em>This Ref</em>' class.
@@ -4268,7 +4158,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getPrevExpr()
    * @generated
    */
-  int PREV_EXPR = 71;
+  int PREV_EXPR = 69;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4323,7 +4213,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getGetPropertyExpr()
    * @generated
    */
-  int GET_PROPERTY_EXPR = 72;
+  int GET_PROPERTY_EXPR = 70;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4378,7 +4268,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getArrayUpdateExpr()
    * @generated
    */
-  int ARRAY_UPDATE_EXPR = 73;
+  int ARRAY_UPDATE_EXPR = 71;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4442,7 +4332,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getRecordUpdateExpr()
    * @generated
    */
-  int RECORD_UPDATE_EXPR = 74;
+  int RECORD_UPDATE_EXPR = 72;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4506,7 +4396,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getArraySubExpr()
    * @generated
    */
-  int ARRAY_SUB_EXPR = 75;
+  int ARRAY_SUB_EXPR = 73;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4561,7 +4451,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getTagExpr()
    * @generated
    */
-  int TAG_EXPR = 76;
+  int TAG_EXPR = 74;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4616,7 +4506,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getSelectionExpr()
    * @generated
    */
-  int SELECTION_EXPR = 77;
+  int SELECTION_EXPR = 75;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4671,7 +4561,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getNamedElmExpr()
    * @generated
    */
-  int NAMED_ELM_EXPR = 78;
+  int NAMED_ELM_EXPR = 76;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4717,7 +4607,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getTimeExpr()
    * @generated
    */
-  int TIME_EXPR = 79;
+  int TIME_EXPR = 77;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4754,7 +4644,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getIndicesExpr()
    * @generated
    */
-  int INDICES_EXPR = 80;
+  int INDICES_EXPR = 78;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4800,7 +4690,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getCallExpr()
    * @generated
    */
-  int CALL_EXPR = 81;
+  int CALL_EXPR = 79;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4855,7 +4745,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getRecordLitExpr()
    * @generated
    */
-  int RECORD_LIT_EXPR = 82;
+  int RECORD_LIT_EXPR = 80;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4919,7 +4809,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getEnumLitExpr()
    * @generated
    */
-  int ENUM_LIT_EXPR = 83;
+  int ENUM_LIT_EXPR = 81;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -4974,7 +4864,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getIntLitExpr()
    * @generated
    */
-  int INT_LIT_EXPR = 84;
+  int INT_LIT_EXPR = 82;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5020,7 +4910,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getPreExpr()
    * @generated
    */
-  int PRE_EXPR = 85;
+  int PRE_EXPR = 83;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5066,7 +4956,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getEventExpr()
    * @generated
    */
-  int EVENT_EXPR = 86;
+  int EVENT_EXPR = 84;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5112,7 +5002,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getLatchedExpr()
    * @generated
    */
-  int LATCHED_EXPR = 87;
+  int LATCHED_EXPR = 85;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5158,7 +5048,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getTimeOfExpr()
    * @generated
    */
-  int TIME_OF_EXPR = 88;
+  int TIME_OF_EXPR = 86;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5204,7 +5094,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getTimeRiseExpr()
    * @generated
    */
-  int TIME_RISE_EXPR = 89;
+  int TIME_RISE_EXPR = 87;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5250,7 +5140,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getTimeFallExpr()
    * @generated
    */
-  int TIME_FALL_EXPR = 90;
+  int TIME_FALL_EXPR = 88;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5296,7 +5186,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getRealLitExpr()
    * @generated
    */
-  int REAL_LIT_EXPR = 91;
+  int REAL_LIT_EXPR = 89;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5342,7 +5232,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getBoolLitExpr()
    * @generated
    */
-  int BOOL_LIT_EXPR = 92;
+  int BOOL_LIT_EXPR = 90;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5388,7 +5278,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getFloorCast()
    * @generated
    */
-  int FLOOR_CAST = 93;
+  int FLOOR_CAST = 91;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5434,7 +5324,7 @@ public interface AgreePackage extends EPackage
    * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getRealCast()
    * @generated
    */
-  int REAL_CAST = 94;
+  int REAL_CAST = 92;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -5577,28 +5467,6 @@ public interface AgreePackage extends EPackage
   EClass getWhenStatement();
 
   /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getCauseCondition <em>Cause Condition</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Cause Condition</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WhenStatement#getCauseCondition()
-   * @see #getWhenStatement()
-   * @generated
-   */
-  EReference getWhenStatement_CauseCondition();
-
-  /**
-   * Returns the meta object for the attribute '{@link com.rockwellcollins.atc.agree.agree.WhenStatement#getExcl <em>Excl</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Excl</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WhenStatement#getExcl()
-   * @see #getWhenStatement()
-   * @generated
-   */
-  EAttribute getWhenStatement_Excl();
-
-  /**
    * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.WheneverStatement <em>Whenever Statement</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -5607,6 +5475,17 @@ public interface AgreePackage extends EPackage
    * @generated
    */
   EClass getWheneverStatement();
+
+  /**
+   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverStatement#getCauseEvent <em>Cause Event</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the containment reference '<em>Cause Event</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.WheneverStatement#getCauseEvent()
+   * @see #getWheneverStatement()
+   * @generated
+   */
+  EReference getWheneverStatement_CauseEvent();
 
   /**
    * Returns the meta object for the attribute '{@link com.rockwellcollins.atc.agree.agree.WheneverStatement#getExcl <em>Excl</em>}'.
@@ -6496,6 +6375,17 @@ public interface AgreePackage extends EPackage
   EClass getWhenHoldsStatement();
 
   /**
+   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenHoldsStatement#getCauseCondition <em>Cause Condition</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the containment reference '<em>Cause Condition</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.WhenHoldsStatement#getCauseCondition()
+   * @see #getWhenHoldsStatement()
+   * @generated
+   */
+  EReference getWhenHoldsStatement_CauseCondition();
+
+  /**
    * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenHoldsStatement#getConditionInterval <em>Condition Interval</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -6518,6 +6408,17 @@ public interface AgreePackage extends EPackage
   EReference getWhenHoldsStatement_EffectEvent();
 
   /**
+   * Returns the meta object for the attribute '{@link com.rockwellcollins.atc.agree.agree.WhenHoldsStatement#getExcl <em>Excl</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Excl</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.WhenHoldsStatement#getExcl()
+   * @see #getWhenHoldsStatement()
+   * @generated
+   */
+  EAttribute getWhenHoldsStatement_Excl();
+
+  /**
    * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenHoldsStatement#getEventInterval <em>Event Interval</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -6529,49 +6430,6 @@ public interface AgreePackage extends EPackage
   EReference getWhenHoldsStatement_EventInterval();
 
   /**
-   * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment <em>When Occurs Statment</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for class '<em>When Occurs Statment</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WhenOccursStatment
-   * @generated
-   */
-  EClass getWhenOccursStatment();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getTimes <em>Times</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Times</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getTimes()
-   * @see #getWhenOccursStatment()
-   * @generated
-   */
-  EReference getWhenOccursStatment_Times();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getInterval <em>Interval</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Interval</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getInterval()
-   * @see #getWhenOccursStatment()
-   * @generated
-   */
-  EReference getWhenOccursStatment_Interval();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getEffectCondition <em>Effect Condition</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Effect Condition</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WhenOccursStatment#getEffectCondition()
-   * @see #getWhenOccursStatment()
-   * @generated
-   */
-  EReference getWhenOccursStatment_EffectCondition();
-
-  /**
    * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.WheneverOccursStatement <em>Whenever Occurs Statement</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -6580,17 +6438,6 @@ public interface AgreePackage extends EPackage
    * @generated
    */
   EClass getWheneverOccursStatement();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverOccursStatement#getCauseEvent <em>Cause Event</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Cause Event</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WheneverOccursStatement#getCauseEvent()
-   * @see #getWheneverOccursStatement()
-   * @generated
-   */
-  EReference getWheneverOccursStatement_CauseEvent();
 
   /**
    * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverOccursStatement#getEffectEvent <em>Effect Event</em>}'.
@@ -6604,6 +6451,17 @@ public interface AgreePackage extends EPackage
   EReference getWheneverOccursStatement_EffectEvent();
 
   /**
+   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverOccursStatement#getCauseEvent <em>Cause Event</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the containment reference '<em>Cause Event</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.WheneverOccursStatement#getCauseEvent()
+   * @see #getWheneverOccursStatement()
+   * @generated
+   */
+  EReference getWheneverOccursStatement_CauseEvent();
+
+  /**
    * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement <em>Whenever Holds Statement</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -6612,17 +6470,6 @@ public interface AgreePackage extends EPackage
    * @generated
    */
   EClass getWheneverHoldsStatement();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement#getCauseEvent <em>Cause Event</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Cause Event</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement#getCauseEvent()
-   * @see #getWheneverHoldsStatement()
-   * @generated
-   */
-  EReference getWheneverHoldsStatement_CauseEvent();
 
   /**
    * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement#getEffectCondition <em>Effect Condition</em>}'.
@@ -6636,36 +6483,15 @@ public interface AgreePackage extends EPackage
   EReference getWheneverHoldsStatement_EffectCondition();
 
   /**
-   * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement <em>Whenever Becomes True Statement</em>}'.
+   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement#getCauseEvent <em>Cause Event</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Whenever Becomes True Statement</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement
+   * @return the meta object for the containment reference '<em>Cause Event</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement#getCauseEvent()
+   * @see #getWheneverHoldsStatement()
    * @generated
    */
-  EClass getWheneverBecomesTrueStatement();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement#getCause <em>Cause</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Cause</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement#getCause()
-   * @see #getWheneverBecomesTrueStatement()
-   * @generated
-   */
-  EReference getWheneverBecomesTrueStatement_Cause();
-
-  /**
-   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement#getEffect <em>Effect</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Effect</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement#getEffect()
-   * @see #getWheneverBecomesTrueStatement()
-   * @generated
-   */
-  EReference getWheneverBecomesTrueStatement_Effect();
+  EReference getWheneverHoldsStatement_CauseEvent();
 
   /**
    * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.PeriodicStatement <em>Periodic Statement</em>}'.
@@ -8103,22 +7929,6 @@ public interface AgreePackage extends EPackage
     EClass WHEN_STATEMENT = eINSTANCE.getWhenStatement();
 
     /**
-     * The meta object literal for the '<em><b>Cause Condition</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHEN_STATEMENT__CAUSE_CONDITION = eINSTANCE.getWhenStatement_CauseCondition();
-
-    /**
-     * The meta object literal for the '<em><b>Excl</b></em>' attribute feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EAttribute WHEN_STATEMENT__EXCL = eINSTANCE.getWhenStatement_Excl();
-
-    /**
      * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverStatementImpl <em>Whenever Statement</em>}' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -8127,6 +7937,14 @@ public interface AgreePackage extends EPackage
      * @generated
      */
     EClass WHENEVER_STATEMENT = eINSTANCE.getWheneverStatement();
+
+    /**
+     * The meta object literal for the '<em><b>Cause Event</b></em>' containment reference feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference WHENEVER_STATEMENT__CAUSE_EVENT = eINSTANCE.getWheneverStatement_CauseEvent();
 
     /**
      * The meta object literal for the '<em><b>Excl</b></em>' attribute feature.
@@ -8875,6 +8693,14 @@ public interface AgreePackage extends EPackage
     EClass WHEN_HOLDS_STATEMENT = eINSTANCE.getWhenHoldsStatement();
 
     /**
+     * The meta object literal for the '<em><b>Cause Condition</b></em>' containment reference feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference WHEN_HOLDS_STATEMENT__CAUSE_CONDITION = eINSTANCE.getWhenHoldsStatement_CauseCondition();
+
+    /**
      * The meta object literal for the '<em><b>Condition Interval</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -8891,46 +8717,20 @@ public interface AgreePackage extends EPackage
     EReference WHEN_HOLDS_STATEMENT__EFFECT_EVENT = eINSTANCE.getWhenHoldsStatement_EffectEvent();
 
     /**
+     * The meta object literal for the '<em><b>Excl</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute WHEN_HOLDS_STATEMENT__EXCL = eINSTANCE.getWhenHoldsStatement_Excl();
+
+    /**
      * The meta object literal for the '<em><b>Event Interval</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
     EReference WHEN_HOLDS_STATEMENT__EVENT_INTERVAL = eINSTANCE.getWhenHoldsStatement_EventInterval();
-
-    /**
-     * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl <em>When Occurs Statment</em>}' class.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see com.rockwellcollins.atc.agree.agree.impl.WhenOccursStatmentImpl
-     * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getWhenOccursStatment()
-     * @generated
-     */
-    EClass WHEN_OCCURS_STATMENT = eINSTANCE.getWhenOccursStatment();
-
-    /**
-     * The meta object literal for the '<em><b>Times</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHEN_OCCURS_STATMENT__TIMES = eINSTANCE.getWhenOccursStatment_Times();
-
-    /**
-     * The meta object literal for the '<em><b>Interval</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHEN_OCCURS_STATMENT__INTERVAL = eINSTANCE.getWhenOccursStatment_Interval();
-
-    /**
-     * The meta object literal for the '<em><b>Effect Condition</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHEN_OCCURS_STATMENT__EFFECT_CONDITION = eINSTANCE.getWhenOccursStatment_EffectCondition();
 
     /**
      * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverOccursStatementImpl <em>Whenever Occurs Statement</em>}' class.
@@ -8943,20 +8743,20 @@ public interface AgreePackage extends EPackage
     EClass WHENEVER_OCCURS_STATEMENT = eINSTANCE.getWheneverOccursStatement();
 
     /**
-     * The meta object literal for the '<em><b>Cause Event</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT = eINSTANCE.getWheneverOccursStatement_CauseEvent();
-
-    /**
      * The meta object literal for the '<em><b>Effect Event</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
     EReference WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT = eINSTANCE.getWheneverOccursStatement_EffectEvent();
+
+    /**
+     * The meta object literal for the '<em><b>Cause Event</b></em>' containment reference feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT = eINSTANCE.getWheneverOccursStatement_CauseEvent();
 
     /**
      * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverHoldsStatementImpl <em>Whenever Holds Statement</em>}' class.
@@ -8969,14 +8769,6 @@ public interface AgreePackage extends EPackage
     EClass WHENEVER_HOLDS_STATEMENT = eINSTANCE.getWheneverHoldsStatement();
 
     /**
-     * The meta object literal for the '<em><b>Cause Event</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT = eINSTANCE.getWheneverHoldsStatement_CauseEvent();
-
-    /**
      * The meta object literal for the '<em><b>Effect Condition</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -8985,30 +8777,12 @@ public interface AgreePackage extends EPackage
     EReference WHENEVER_HOLDS_STATEMENT__EFFECT_CONDITION = eINSTANCE.getWheneverHoldsStatement_EffectCondition();
 
     /**
-     * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.WheneverBecomesTrueStatementImpl <em>Whenever Becomes True Statement</em>}' class.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see com.rockwellcollins.atc.agree.agree.impl.WheneverBecomesTrueStatementImpl
-     * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getWheneverBecomesTrueStatement()
-     * @generated
-     */
-    EClass WHENEVER_BECOMES_TRUE_STATEMENT = eINSTANCE.getWheneverBecomesTrueStatement();
-
-    /**
-     * The meta object literal for the '<em><b>Cause</b></em>' containment reference feature.
+     * The meta object literal for the '<em><b>Cause Event</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EReference WHENEVER_BECOMES_TRUE_STATEMENT__CAUSE = eINSTANCE.getWheneverBecomesTrueStatement_Cause();
-
-    /**
-     * The meta object literal for the '<em><b>Effect</b></em>' containment reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference WHENEVER_BECOMES_TRUE_STATEMENT__EFFECT = eINSTANCE.getWheneverBecomesTrueStatement_Effect();
+    EReference WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT = eINSTANCE.getWheneverHoldsStatement_CauseEvent();
 
     /**
      * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.PeriodicStatementImpl <em>Periodic Statement</em>}' class.

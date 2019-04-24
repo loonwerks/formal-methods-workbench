@@ -428,15 +428,6 @@ public interface AgreeFactory extends EFactory
   WhenHoldsStatement createWhenHoldsStatement();
 
   /**
-   * Returns a new object of class '<em>When Occurs Statment</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>When Occurs Statment</em>'.
-   * @generated
-   */
-  WhenOccursStatment createWhenOccursStatment();
-
-  /**
    * Returns a new object of class '<em>Whenever Occurs Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -453,15 +444,6 @@ public interface AgreeFactory extends EFactory
    * @generated
    */
   WheneverHoldsStatement createWheneverHoldsStatement();
-
-  /**
-   * Returns a new object of class '<em>Whenever Becomes True Statement</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Whenever Becomes True Statement</em>'.
-   * @generated
-   */
-  WheneverBecomesTrueStatement createWheneverBecomesTrueStatement();
 
   /**
    * Returns a new object of class '<em>Periodic Statement</em>'.

@@ -144,8 +144,6 @@ import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
-import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
-import com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 
@@ -318,22 +316,23 @@ public class AgreeXtext {
 					new Nenola.WhenHoldsPattern(causeCondition, conditionInterval, effectEvent, exclusive,
 							effectInterval));
 
-		} else if (pattern instanceof WhenOccursStatment) {
-			Nenola.Expr causeCondition = toExprFromExpr(((WhenOccursStatment) pattern).getCauseCondition());
-			Nenola.Expr frequency = toExprFromExpr(((WhenOccursStatment) pattern).getTimes());
-			boolean exclusive = ((WhenOccursStatment) pattern).getExcl() != null;
-			Nenola.Interval interval = toInterval(((WhenOccursStatment) pattern).getInterval());
-			Nenola.Expr effectCondition = toExprFromExpr(((WhenOccursStatment) pattern).getEffectCondition());
 
-			return new Nenola.PatternProp(
-					new Nenola.WhenOccursPattern(causeCondition, frequency, interval, exclusive, effectCondition));
+//		} else if (pattern instanceof WheneverBecomesTrueStatement) {
+//			Nenola.Expr cause = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getCause());
+//			Nenola.Expr effect = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getEffect());
+//			boolean exclusive = ((WheneverBecomesTrueStatement) pattern).getExcl() != null;
+//			Nenola.Interval interval = toInterval(((WheneverBecomesTrueStatement) pattern).getInterval());
+//			return new Nenola.PatternProp(new Nenola.WheneverBecomesTruePattern(cause, effect, exclusive, interval));
 
-		} else if (pattern instanceof WheneverBecomesTrueStatement) {
-			Nenola.Expr cause = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getCause());
-			Nenola.Expr effect = toExprFromExpr(((WheneverBecomesTrueStatement) pattern).getEffect());
-			boolean exclusive = ((WheneverBecomesTrueStatement) pattern).getExcl() != null;
-			Nenola.Interval interval = toInterval(((WheneverBecomesTrueStatement) pattern).getInterval());
-			return new Nenola.PatternProp(new Nenola.WheneverBecomesTruePattern(cause, effect, exclusive, interval));
+//		} else if (pattern instanceof WhenOccursStatment) {
+//			Nenola.Expr causeCondition = toExprFromExpr(((WhenOccursStatment) pattern).getCauseCondition());
+//			Nenola.Expr frequency = toExprFromExpr(((WhenOccursStatment) pattern).getTimes());
+//			boolean exclusive = ((WhenOccursStatment) pattern).getExcl() != null;
+//			Nenola.Interval interval = toInterval(((WhenOccursStatment) pattern).getInterval());
+//			Nenola.Expr effectCondition = toExprFromExpr(((WhenOccursStatment) pattern).getEffectCondition());
+//
+//			return new Nenola.PatternProp(
+//					new Nenola.WhenOccursPattern(causeCondition, frequency, interval, exclusive, effectCondition));
 
 //			} else if (pattern instanceof WheneverImpliesStatement) {
 //			throw new RuntimeException("We do not support this pattern currently");

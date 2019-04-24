@@ -127,7 +127,6 @@ import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
-import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
 import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 import com.rockwellcollins.atc.agree.visitors.ExprCycleVisitor;
@@ -951,33 +950,6 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	@Check(CheckType.FAST)
-	public void checkWhenOccursStatment(WhenOccursStatment when) {
-		Expr causeCondition = when.getCauseCondition();
-		Expr effectCondition = when.getEffectCondition();
-		Expr times = when.getTimes();
-
-		checkExprIsIdentifier(causeCondition);
-		checkExprIsIdentifier(effectCondition);
-
-		Contract type = AgreeXtext.inferContract(causeCondition);
-		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
-			error(causeCondition,
-					"The condition of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
-		}
-		type = AgreeXtext.inferContract(effectCondition);
-		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
-			error(effectCondition,
-					"The effect of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
-		}
-		type = AgreeXtext.inferContract(times);
-		if (!Nenola.staticEqual(Nenola.Prim.IntContract, type)) {
-			error(effectCondition,
-					"The 'times' of the 'when' statement is of type '" + type + "'" + " but must be of type 'int'");
-		}
-
-	}
-
-	@Check(CheckType.FAST)
 	public void checkWheneverOccursStatement(WheneverOccursStatement whenever) {
 		Expr cause = whenever.getCauseEvent();
 		Expr effect = whenever.getEffectEvent();
@@ -996,6 +968,53 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
 		}
 	}
+
+	@Check(CheckType.FAST)
+	public void checkWheneverHoldsStatement(WheneverHoldsStatement whenever) {
+		Expr cause = whenever.getCauseEvent();
+		Expr effect = whenever.getEffectCondition();
+
+		checkExprIsIdentifier(cause);
+		checkExprIsIdentifier(effect);
+
+		Contract type = AgreeXtext.inferContract(cause);
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
+			error(cause,
+					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
+		}
+		type = AgreeXtext.inferContract(effect);
+		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
+			error(effect,
+					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
+		}
+	}
+
+//	@Check(CheckType.FAST)
+//	public void checkWhenOccursStatment(WhenOccursStatment when) {
+//		Expr causeCondition = when.getCauseCondition();
+//		Expr effectCondition = when.getEffectCondition();
+//		Expr times = when.getTimes();
+//
+//		checkExprIsIdentifier(causeCondition);
+//		checkExprIsIdentifier(effectCondition);
+//
+//		Contract type = AgreeXtext.inferContract(causeCondition);
+//		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
+//			error(causeCondition,
+//					"The condition of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
+//		}
+//		type = AgreeXtext.inferContract(effectCondition);
+//		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
+//			error(effectCondition,
+//					"The effect of the 'when' statement is of type '" + type + "'" + " but must be of type 'bool'");
+//		}
+//		type = AgreeXtext.inferContract(times);
+//		if (!Nenola.staticEqual(Nenola.Prim.IntContract, type)) {
+//			error(effectCondition,
+//					"The 'times' of the 'when' statement is of type '" + type + "'" + " but must be of type 'int'");
+//		}
+//
+//	}
 
 //	@Check(CheckType.FAST)
 //	public void checkWheneverBecomesTrueStatement(WheneverBecomesTrueStatement whenever) {
@@ -1017,25 +1036,6 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 //		}
 //	}
 
-	@Check(CheckType.FAST)
-	public void checkWheneverHoldsStatement(WheneverHoldsStatement whenever) {
-		Expr cause = whenever.getCauseEvent();
-		Expr effect = whenever.getEffectCondition();
-
-		checkExprIsIdentifier(cause);
-		checkExprIsIdentifier(effect);
-
-		Contract type = AgreeXtext.inferContract(cause);
-		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
-			error(cause,
-					"The cause of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
-		}
-		type = AgreeXtext.inferContract(effect);
-		if (!Nenola.staticEqual(Nenola.Prim.BoolContract, type)) {
-			error(effect,
-					"The effect of the 'whenever' statement is of type '" + type + "' " + "but must be of type 'bool'");
-		}
-	}
 //
 //	@Check(CheckType.FAST)
 //	public void checkWheneverImpliesStatement(WheneverImpliesStatement whenever) {

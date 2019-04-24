@@ -24,9 +24,9 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenStatement/event"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//WheneverStatement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverStatement/causeEvent"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Agree.ecore#//WheneverStatement/excl"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverStatement/interval"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverStatement/causeEvent"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverStatement/cause"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//RealTimeStatement">
@@ -138,28 +138,21 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//AlwaysStatement/expr"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//WhenHoldsStatement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenHoldsStatement/causeCondition"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenHoldsStatement/conditionInterval"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenHoldsStatement/effectEvent"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Agree.ecore#//WhenHoldsStatement/excl"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenHoldsStatement/eventInterval"/>
     </genClasses>
-    <genClasses ecoreClass="Agree.ecore#//WhenOccursStatment">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenOccursStatment/times"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenOccursStatment/interval"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenOccursStatment/effectCondition"/>
-    </genClasses>
     <genClasses ecoreClass="Agree.ecore#//WheneverOccursStatement">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverOccursStatement/causeEvent"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverOccursStatement/effectEvent"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverStatement/causeEvent"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverOccursStatement/effect"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//WheneverHoldsStatement">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverHoldsStatement/causeEvent"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverHoldsStatement/effectCondition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverStatement/causeEvent"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverHoldsStatement/effect"/>
-    </genClasses>
-    <genClasses ecoreClass="Agree.ecore#//WheneverBecomesTrueStatement">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverBecomesTrueStatement/cause"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverBecomesTrueStatement/effect"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//PeriodicStatement">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//PeriodicStatement/period"/>
@@ -322,6 +315,15 @@
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//RealCast">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//RealCast/expr"/>
+    </genClasses>
+    <genClasses ecoreClass="Agree.ecore#//WheneverBecomesTrueStatement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverBecomesTrueStatement/cause"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverBecomesTrueStatement/effect"/>
+    </genClasses>
+    <genClasses ecoreClass="Agree.ecore#//WhenOccursStatment">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenOccursStatment/times"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenOccursStatment/interval"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WhenOccursStatment/effectCondition"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//WheneverImpliesStatement">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//WheneverImpliesStatement/lhs"/>

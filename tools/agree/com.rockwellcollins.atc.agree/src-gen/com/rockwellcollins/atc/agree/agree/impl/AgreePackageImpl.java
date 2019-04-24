@@ -93,9 +93,7 @@ import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.WhenHoldsStatement;
-import com.rockwellcollins.atc.agree.agree.WhenOccursStatment;
 import com.rockwellcollins.atc.agree.agree.WhenStatement;
-import com.rockwellcollins.atc.agree.agree.WheneverBecomesTrueStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverHoldsStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverOccursStatement;
 import com.rockwellcollins.atc.agree.agree.WheneverStatement;
@@ -438,13 +436,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass whenOccursStatmentEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
   private EClass wheneverOccursStatementEClass = null;
 
   /**
@@ -453,13 +444,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   private EClass wheneverHoldsStatementEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass wheneverBecomesTrueStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -966,28 +950,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWhenStatement_CauseCondition()
-  {
-    return (EReference)whenStatementEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EAttribute getWhenStatement_Excl()
-  {
-    return (EAttribute)whenStatementEClass.getEStructuralFeatures().get(1);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
   public EClass getWheneverStatement()
   {
     return wheneverStatementEClass;
@@ -999,9 +961,20 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
+  public EReference getWheneverStatement_CauseEvent()
+  {
+    return (EReference)wheneverStatementEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public EAttribute getWheneverStatement_Excl()
   {
-    return (EAttribute)wheneverStatementEClass.getEStructuralFeatures().get(0);
+    return (EAttribute)wheneverStatementEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -1012,7 +985,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
   @Override
   public EReference getWheneverStatement_Interval()
   {
-    return (EReference)wheneverStatementEClass.getEStructuralFeatures().get(1);
+    return (EReference)wheneverStatementEClass.getEStructuralFeatures().get(2);
   }
 
   /**
@@ -1923,7 +1896,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWhenHoldsStatement_ConditionInterval()
+  public EReference getWhenHoldsStatement_CauseCondition()
   {
     return (EReference)whenHoldsStatementEClass.getEStructuralFeatures().get(0);
   }
@@ -1934,7 +1907,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWhenHoldsStatement_EffectEvent()
+  public EReference getWhenHoldsStatement_ConditionInterval()
   {
     return (EReference)whenHoldsStatementEClass.getEStructuralFeatures().get(1);
   }
@@ -1945,7 +1918,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWhenHoldsStatement_EventInterval()
+  public EReference getWhenHoldsStatement_EffectEvent()
   {
     return (EReference)whenHoldsStatementEClass.getEStructuralFeatures().get(2);
   }
@@ -1956,9 +1929,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EClass getWhenOccursStatment()
+  public EAttribute getWhenHoldsStatement_Excl()
   {
-    return whenOccursStatmentEClass;
+    return (EAttribute)whenHoldsStatementEClass.getEStructuralFeatures().get(3);
   }
 
   /**
@@ -1967,31 +1940,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWhenOccursStatment_Times()
+  public EReference getWhenHoldsStatement_EventInterval()
   {
-    return (EReference)whenOccursStatmentEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getWhenOccursStatment_Interval()
-  {
-    return (EReference)whenOccursStatmentEClass.getEStructuralFeatures().get(1);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getWhenOccursStatment_EffectCondition()
-  {
-    return (EReference)whenOccursStatmentEClass.getEStructuralFeatures().get(2);
+    return (EReference)whenHoldsStatementEClass.getEStructuralFeatures().get(4);
   }
 
   /**
@@ -2011,7 +1962,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWheneverOccursStatement_CauseEvent()
+  public EReference getWheneverOccursStatement_EffectEvent()
   {
     return (EReference)wheneverOccursStatementEClass.getEStructuralFeatures().get(0);
   }
@@ -2022,9 +1973,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWheneverOccursStatement_EffectEvent()
+  public EReference getWheneverOccursStatement_CauseEvent()
   {
-    return (EReference)wheneverOccursStatementEClass.getEStructuralFeatures().get(1);
+    return (EReference)wheneverOccursStatementEClass.getEStructuralFeatures().get(-1);
   }
 
   /**
@@ -2044,7 +1995,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWheneverHoldsStatement_CauseEvent()
+  public EReference getWheneverHoldsStatement_EffectCondition()
   {
     return (EReference)wheneverHoldsStatementEClass.getEStructuralFeatures().get(0);
   }
@@ -2055,42 +2006,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getWheneverHoldsStatement_EffectCondition()
+  public EReference getWheneverHoldsStatement_CauseEvent()
   {
-    return (EReference)wheneverHoldsStatementEClass.getEStructuralFeatures().get(1);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EClass getWheneverBecomesTrueStatement()
-  {
-    return wheneverBecomesTrueStatementEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getWheneverBecomesTrueStatement_Cause()
-  {
-    return (EReference)wheneverBecomesTrueStatementEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EReference getWheneverBecomesTrueStatement_Effect()
-  {
-    return (EReference)wheneverBecomesTrueStatementEClass.getEStructuralFeatures().get(1);
+    return (EReference)wheneverHoldsStatementEClass.getEStructuralFeatures().get(-1);
   }
 
   /**
@@ -3504,10 +3422,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     patternStatementEClass = createEClass(PATTERN_STATEMENT);
 
     whenStatementEClass = createEClass(WHEN_STATEMENT);
-    createEReference(whenStatementEClass, WHEN_STATEMENT__CAUSE_CONDITION);
-    createEAttribute(whenStatementEClass, WHEN_STATEMENT__EXCL);
 
     wheneverStatementEClass = createEClass(WHENEVER_STATEMENT);
+    createEReference(wheneverStatementEClass, WHENEVER_STATEMENT__CAUSE_EVENT);
     createEAttribute(wheneverStatementEClass, WHENEVER_STATEMENT__EXCL);
     createEReference(wheneverStatementEClass, WHENEVER_STATEMENT__INTERVAL);
 
@@ -3629,26 +3546,19 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     createEReference(alwaysStatementEClass, ALWAYS_STATEMENT__EXPR);
 
     whenHoldsStatementEClass = createEClass(WHEN_HOLDS_STATEMENT);
+    createEReference(whenHoldsStatementEClass, WHEN_HOLDS_STATEMENT__CAUSE_CONDITION);
     createEReference(whenHoldsStatementEClass, WHEN_HOLDS_STATEMENT__CONDITION_INTERVAL);
     createEReference(whenHoldsStatementEClass, WHEN_HOLDS_STATEMENT__EFFECT_EVENT);
+    createEAttribute(whenHoldsStatementEClass, WHEN_HOLDS_STATEMENT__EXCL);
     createEReference(whenHoldsStatementEClass, WHEN_HOLDS_STATEMENT__EVENT_INTERVAL);
 
-    whenOccursStatmentEClass = createEClass(WHEN_OCCURS_STATMENT);
-    createEReference(whenOccursStatmentEClass, WHEN_OCCURS_STATMENT__TIMES);
-    createEReference(whenOccursStatmentEClass, WHEN_OCCURS_STATMENT__INTERVAL);
-    createEReference(whenOccursStatmentEClass, WHEN_OCCURS_STATMENT__EFFECT_CONDITION);
-
     wheneverOccursStatementEClass = createEClass(WHENEVER_OCCURS_STATEMENT);
-    createEReference(wheneverOccursStatementEClass, WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT);
     createEReference(wheneverOccursStatementEClass, WHENEVER_OCCURS_STATEMENT__EFFECT_EVENT);
+    createEReference(wheneverOccursStatementEClass, WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT);
 
     wheneverHoldsStatementEClass = createEClass(WHENEVER_HOLDS_STATEMENT);
-    createEReference(wheneverHoldsStatementEClass, WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT);
     createEReference(wheneverHoldsStatementEClass, WHENEVER_HOLDS_STATEMENT__EFFECT_CONDITION);
-
-    wheneverBecomesTrueStatementEClass = createEClass(WHENEVER_BECOMES_TRUE_STATEMENT);
-    createEReference(wheneverBecomesTrueStatementEClass, WHENEVER_BECOMES_TRUE_STATEMENT__CAUSE);
-    createEReference(wheneverBecomesTrueStatementEClass, WHENEVER_BECOMES_TRUE_STATEMENT__EFFECT);
+    createEReference(wheneverHoldsStatementEClass, WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT);
 
     periodicStatementEClass = createEClass(PERIODIC_STATEMENT);
     createEReference(periodicStatementEClass, PERIODIC_STATEMENT__PERIOD);
@@ -3912,10 +3822,8 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     lemmaStatementEClass.getESuperTypes().add(this.getNamedSpecStatement());
     alwaysStatementEClass.getESuperTypes().add(this.getPatternStatement());
     whenHoldsStatementEClass.getESuperTypes().add(this.getWhenStatement());
-    whenOccursStatmentEClass.getESuperTypes().add(this.getWhenStatement());
     wheneverOccursStatementEClass.getESuperTypes().add(this.getWheneverStatement());
     wheneverHoldsStatementEClass.getESuperTypes().add(this.getWheneverStatement());
-    wheneverBecomesTrueStatementEClass.getESuperTypes().add(this.getWheneverStatement());
     periodicStatementEClass.getESuperTypes().add(this.getRealTimeStatement());
     sporadicStatementEClass.getESuperTypes().add(this.getRealTimeStatement());
     closedTimeIntervalEClass.getESuperTypes().add(this.getTimeInterval());
@@ -3980,10 +3888,9 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     initEClass(patternStatementEClass, PatternStatement.class, "PatternStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
     initEClass(whenStatementEClass, WhenStatement.class, "WhenStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getWhenStatement_CauseCondition(), this.getExpr(), null, "causeCondition", null, 0, 1, WhenStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEAttribute(getWhenStatement_Excl(), theEcorePackage.getEString(), "excl", null, 0, 1, WhenStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(wheneverStatementEClass, WheneverStatement.class, "WheneverStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getWheneverStatement_CauseEvent(), this.getExpr(), null, "causeEvent", null, 0, 1, WheneverStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getWheneverStatement_Excl(), theEcorePackage.getEString(), "excl", null, 0, 1, WheneverStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getWheneverStatement_Interval(), this.getTimeInterval(), null, "interval", null, 0, 1, WheneverStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -4105,26 +4012,19 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     initEReference(getAlwaysStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, AlwaysStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(whenHoldsStatementEClass, WhenHoldsStatement.class, "WhenHoldsStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEReference(getWhenHoldsStatement_CauseCondition(), this.getExpr(), null, "causeCondition", null, 0, 1, WhenHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getWhenHoldsStatement_ConditionInterval(), this.getTimeInterval(), null, "conditionInterval", null, 0, 1, WhenHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getWhenHoldsStatement_EffectEvent(), this.getExpr(), null, "effectEvent", null, 0, 1, WhenHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getWhenHoldsStatement_Excl(), theEcorePackage.getEString(), "excl", null, 0, 1, WhenHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getWhenHoldsStatement_EventInterval(), this.getTimeInterval(), null, "eventInterval", null, 0, 1, WhenHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(whenOccursStatmentEClass, WhenOccursStatment.class, "WhenOccursStatment", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getWhenOccursStatment_Times(), this.getExpr(), null, "times", null, 0, 1, WhenOccursStatment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getWhenOccursStatment_Interval(), this.getTimeInterval(), null, "interval", null, 0, 1, WhenOccursStatment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getWhenOccursStatment_EffectCondition(), this.getExpr(), null, "effectCondition", null, 0, 1, WhenOccursStatment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
     initEClass(wheneverOccursStatementEClass, WheneverOccursStatement.class, "WheneverOccursStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getWheneverOccursStatement_CauseEvent(), this.getExpr(), null, "causeEvent", null, 0, 1, WheneverOccursStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getWheneverOccursStatement_EffectEvent(), this.getExpr(), null, "effectEvent", null, 0, 1, WheneverOccursStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getWheneverOccursStatement_CauseEvent(), this.getExpr(), null, "causeEvent", null, 0, 1, WheneverOccursStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(wheneverHoldsStatementEClass, WheneverHoldsStatement.class, "WheneverHoldsStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getWheneverHoldsStatement_CauseEvent(), this.getExpr(), null, "causeEvent", null, 0, 1, WheneverHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getWheneverHoldsStatement_EffectCondition(), this.getExpr(), null, "effectCondition", null, 0, 1, WheneverHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-    initEClass(wheneverBecomesTrueStatementEClass, WheneverBecomesTrueStatement.class, "WheneverBecomesTrueStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getWheneverBecomesTrueStatement_Cause(), this.getExpr(), null, "cause", null, 0, 1, WheneverBecomesTrueStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getWheneverBecomesTrueStatement_Effect(), this.getExpr(), null, "effect", null, 0, 1, WheneverBecomesTrueStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getWheneverHoldsStatement_CauseEvent(), this.getExpr(), null, "causeEvent", null, 0, 1, WheneverHoldsStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(periodicStatementEClass, PeriodicStatement.class, "PeriodicStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getPeriodicStatement_Period(), this.getExpr(), null, "period", null, 0, 1, PeriodicStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

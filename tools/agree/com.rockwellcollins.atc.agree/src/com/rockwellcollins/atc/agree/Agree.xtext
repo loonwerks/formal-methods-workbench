@@ -82,8 +82,8 @@ PatternStatement returns PatternStatement:
 WhenStatement:
 	=> ({WhenHoldsStatement} 'when' causeCondition=Expr 'holds') 'during' 
         conditionInterval=TimeInterval effectEvent=Expr (excl='exclusively')? 'occurs' ('during' eventInterval=TimeInterval)? 
-|   => ({WhenOccursStatment} 'when' causeCondition=Expr 'occurs')
-        times=Expr 'times' 'during' interval=TimeInterval (excl='exclusively')? 'raises' effectCondition=Expr 
+//|   => ({WhenOccursStatment} 'when' causeCondition=Expr 'occurs')
+//        times=Expr 'times' 'during' interval=TimeInterval (excl='exclusively')? 'raises' effectCondition=Expr 
 ;
 
 WheneverStatement:
@@ -93,9 +93,8 @@ WheneverStatement:
 |	=> ({WheneverHoldsStatement} 'whenever' causeEvent=Expr 'occurs'
 	    effectCondition=Expr (excl='exclusively')? ('holds')) ('during' interval=TimeInterval)? 
 	    
-|   => ({WheneverBecomesTrueStatement} 'whenever' cause=Expr 'becomes' 'true'
-    effect=Expr (excl='exclusively')? ('occur' | 'occurs')) ('during' interval=TimeInterval)? 
-    
+//|   => ({WheneverBecomesTrueStatement} 'whenever' cause=Expr 'becomes' 'true'
+//    effect=Expr (excl='exclusively')? ('occur' | 'occurs')) ('during' interval=TimeInterval)? 
 //|   => ({WheneverImpliesStatement} 'whenever' cause=Expr 'occurs'
 //	    lhs=Expr 'implies') rhs=Expr (excl='exclusively')? ('during' interval=TimeInterval)? 	    
 ;

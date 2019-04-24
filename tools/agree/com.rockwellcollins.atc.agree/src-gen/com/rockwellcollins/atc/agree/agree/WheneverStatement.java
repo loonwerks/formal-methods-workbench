@@ -12,6 +12,7 @@ package com.rockwellcollins.atc.agree.agree;
  * The following features are supported:
  * </p>
  * <ul>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.WheneverStatement#getCauseEvent <em>Cause Event</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.WheneverStatement#getExcl <em>Excl</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.agree.agree.WheneverStatement#getInterval <em>Interval</em>}</li>
  * </ul>
@@ -22,6 +23,32 @@ package com.rockwellcollins.atc.agree.agree;
  */
 public interface WheneverStatement extends PatternStatement
 {
+  /**
+   * Returns the value of the '<em><b>Cause Event</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Cause Event</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Cause Event</em>' containment reference.
+   * @see #setCauseEvent(Expr)
+   * @see com.rockwellcollins.atc.agree.agree.AgreePackage#getWheneverStatement_CauseEvent()
+   * @model containment="true"
+   * @generated
+   */
+  Expr getCauseEvent();
+
+  /**
+   * Sets the value of the '{@link com.rockwellcollins.atc.agree.agree.WheneverStatement#getCauseEvent <em>Cause Event</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Cause Event</em>' containment reference.
+   * @see #getCauseEvent()
+   * @generated
+   */
+  void setCauseEvent(Expr value);
+
   /**
    * Returns the value of the '<em><b>Excl</b></em>' attribute.
    * <!-- begin-user-doc -->
