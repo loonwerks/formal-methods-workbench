@@ -32,7 +32,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 
 	List<CyberRequirement> importedRequirements = new ArrayList<>();
 	List<CyberRequirement> omittedRequirements = new ArrayList<>();
-//	List<JsonRequirement> newRequirements = null;
 	List<CyberRequirement> newRequirements = null;
 
 	public ImportRequirementsDialog(Shell parentShell) {
@@ -100,14 +99,12 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 
 		// Add requirements
 		for (CyberRequirement req : newRequirements) {
-//		for (JsonRequirement req : newRequirements) {
 			addRequirement(req, container);
 		}
 
 	}
 
 	private void addRequirement(CyberRequirement req, Composite container) {
-//	private void addRequirement(JsonRequirement req, Composite container) {
 
 		Button btnReq = new Button(container, SWT.CHECK);
 		btnReq.setText(req.getType());
@@ -194,10 +191,7 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 					btnReqs.get(i).setSelection(false);
 					return false;
 				}
-//				else {
-//					// Create a unique requirement ID by concatenating the requirement type with the user-specified ID
-//					txtIDs.get(i).setText(btnReqs.get(i).getText() + "_" + txtIDs.get(i).getText());
-//				}
+
 				importedRequirements.add(new CyberRequirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
 						lblReqTexts.get(i), contextClassifier, btnAgreeProps.get(i).getSelection(), ""));
 			} else {
@@ -230,7 +224,6 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 
 
 	public void setRequirements(List<CyberRequirement> requirements) {
-//	public void setRequirements(List<JsonRequirement> requirements) {
 		this.newRequirements = requirements;
 	}
 

@@ -10,11 +10,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.ThreadImplementation;
-import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.ComponentImplementationImpl;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
@@ -39,8 +35,9 @@ public class VerifyLegacyImplementationHandler extends AadlHandler {
 
 		// Make sure selection is either a component or component implementation
 		EObject eObj = getEObject(uri);
-		if (!((eObj instanceof ProcessType) || (eObj instanceof ThreadType) || (eObj instanceof ProcessImplementation)
-				|| (eObj instanceof ThreadImplementation))) {
+//		if (!((eObj instanceof ProcessType) || (eObj instanceof ThreadType) || (eObj instanceof ProcessImplementation)
+//				|| (eObj instanceof ThreadImplementation))) {
+		if (!((eObj instanceof ComponentType) || (eObj instanceof ComponentImplementation))) {
 			Dialog.showError("No component is selected",
 					"A component type or component implementation must be selected for verification.");
 			return;

@@ -42,7 +42,6 @@ public class CyberRequirement {
 	private String id = "";
 	private String text = "";
 	private String context = ""; // this is the qualified name of the component
-	private Classifier contextClassifier = null;
 	private boolean agree = false;
 	private String rationale = "";
 
@@ -56,7 +55,6 @@ public class CyberRequirement {
 		this.id = id;
 		this.text = text;
 		this.context = context;
-		this.contextClassifier = getClassifier(context);
 		this.agree = agree;
 		this.rationale = rationale;
 	}
@@ -67,7 +65,6 @@ public class CyberRequirement {
 		this.id = id;
 		this.text = text;
 		this.context = contextClassifier.getQualifiedName();
-		this.contextClassifier = contextClassifier;
 		this.agree = agree;
 		this.rationale = rationale;
 	}
