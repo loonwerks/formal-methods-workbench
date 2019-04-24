@@ -723,41 +723,6 @@ public class Nenola {
 		}
 	}
 
-	public static class WhenOccursPattern implements Pattern {
-		public final Expr causeCondition;
-		public final Expr frequency;
-		public final Interval interval;
-		public final boolean exclusive;
-		public final Expr effectCondition;
-
-		public WhenOccursPattern(Expr causeCondition, Expr frequency, Interval interval, boolean exclusive,
-				Expr event) {
-			this.causeCondition = causeCondition;
-			this.frequency = frequency;
-			this.interval = interval;
-			this.exclusive = exclusive;
-			this.effectCondition = event;
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
-
 
 	public static class WheneverOccursPattern implements Pattern {
 		public final Expr causeEvent;
@@ -791,37 +756,7 @@ public class Nenola {
 		}
 	}
 
-	public static class WheneverBecomesTruePattern implements Pattern {
-		public final Expr cause;
-		public final Expr effect;
-		public final boolean exclusive;
-		public final Interval interval;
 
-		public WheneverBecomesTruePattern(Expr cause, Expr effect, boolean exclusive, Interval interval) {
-			this.cause = cause;
-			this.effect = effect;
-			this.exclusive = exclusive;
-			this.interval = interval;
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
 
 	public static class WheneverHoldsPattern implements Pattern {
 		public final Expr causeEvent;
@@ -855,39 +790,6 @@ public class Nenola {
 		}
 	}
 
-	public static class WheneverImpliesPattern implements Pattern {
-		public final Expr cause;
-		public final Expr lhs;
-		public final Expr rhs;
-		public final boolean exclusive;
-		public final Interval interval;
-
-		public WheneverImpliesPattern(Expr cause, Expr lhs, Expr rhs, boolean exclusive, Interval interval) {
-			this.cause = cause;
-			this.lhs = lhs;
-			this.rhs = rhs;
-			this.exclusive = exclusive;
-			this.interval = interval;
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
 
 	public static class PeriodicPattern implements Pattern {
 		public final Expr event;
@@ -918,7 +820,6 @@ public class Nenola {
 			return null;
 		}
 	}
-
 
 	public static class SporadicPattern implements Pattern {
 		public final Expr event;
