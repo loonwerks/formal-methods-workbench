@@ -26,7 +26,7 @@ import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AadlString;
 import org.osate.aadl2.BooleanLiteral;
-import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EnumerationType;
 import org.osate.aadl2.IntegerLiteral;
@@ -239,15 +239,18 @@ public abstract class AadlHandler extends AbstractHandler {
 	 * @param casePropSet - PropertySet that defines the property
 	 * @return A boolean indicating success
 	 */
-	protected boolean addPropertyAssociation(String propName, String propVal, ComponentType componentType,
+	protected boolean addPropertyAssociation(String propName, String propVal, Classifier classifier,
 			PropertySet propSet) {
+//	protected boolean addPropertyAssociation(String propName, String propVal, ComponentType componentType,
+//			PropertySet propSet) {
 
 		PropertyAssociation propAssocImpl = null;
 		Property prop = null;
 
 		// Check if the property is already present in the component.
 		// If so, we don't need to create a new property association, just overwrite the existing one
-		for (PropertyAssociation propAssoc : componentType.getOwnedPropertyAssociations()) {
+//		for (PropertyAssociation propAssoc : componentType.getOwnedPropertyAssociations()) {
+		for (PropertyAssociation propAssoc : classifier.getOwnedPropertyAssociations()) {
 			if (propAssoc.getProperty().getName().equalsIgnoreCase(propName)) {
 				propAssocImpl = propAssoc;
 				break;
@@ -257,7 +260,8 @@ public abstract class AadlHandler extends AbstractHandler {
 		if (propAssocImpl == null) {
 
 			// Property is not already present in the component. Need to create a new property association
-			propAssocImpl = componentType.createOwnedPropertyAssociation();
+//			propAssocImpl = componentType.createOwnedPropertyAssociation();
+			propAssocImpl = classifier.createOwnedPropertyAssociation();
 
 			// Find the property in the specified property set
 			for (Property p : propSet.getOwnedProperties()) {

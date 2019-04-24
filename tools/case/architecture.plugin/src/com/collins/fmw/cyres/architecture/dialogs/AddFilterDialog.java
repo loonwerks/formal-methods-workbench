@@ -67,61 +67,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 		return area;
 	}
 
-//	/**
-//	 * Creates the input drop-down field for specifying the filter component type
-//	 * @param container
-//	 */
-//	private void createFilterComponentTypeField(Composite container) {
-//		Label lblFilterComponentType = new Label(container, SWT.NONE);
-//		lblFilterComponentType.setText("Filter Component Type");
-//
-//		GridData dataInfoField = new GridData();
-//		dataInfoField.grabExcessHorizontalSpace = true;
-//		dataInfoField.horizontalAlignment = GridData.FILL;
-//		cboFilterComponentType = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-//		cboFilterComponentType.setLayoutData(dataInfoField);
-//
-//		if (strParentType.isEmpty()) {
-//			cboFilterComponentType.add("abstract");
-//			cboFilterComponentType.setText("abstract");
-//		}
-//		else {
-//
-//			switch (strParentType) {
-//			case "system":
-//				cboFilterComponentType.add("system");
-//				cboFilterComponentType.add("process");
-//				cboFilterComponentType.add("device");
-//				cboFilterComponentType.add("abstract");
-//				break;
-//			case "process":
-//				cboFilterComponentType.add("thread");
-//				cboFilterComponentType.add("abstract");
-//				break;
-//			case "thread":
-//				cboFilterComponentType.add("abstract");
-//				break;
-//			case "device":
-//				cboFilterComponentType.add("abstract");
-//				break;
-//			case "abstract":
-//				cboFilterComponentType.add("system");
-//				cboFilterComponentType.add("process");
-//				cboFilterComponentType.add("thread");
-//				cboFilterComponentType.add("device");
-//				cboFilterComponentType.add("abstract");
-//			}
-//
-//			// Set default value
-//			if (!strRecommendedType.isEmpty()) {
-//				cboFilterComponentType.setText(strRecommendedType);
-//			}
-//
-//		}
-//
-//	}
-
-
 	/**
 	 * Creates the input text field for specifying the filter implementation name
 	 * @param container
@@ -269,15 +214,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 		saveInput();
 		super.okPressed();
 	}
-
-//	public void setFilterComponentTypeInfo(String recommendedType, String parentType) {
-//		strRecommendedType = recommendedType;
-//		strParentType = parentType;
-//	}
-
-//	public String getFilterComponentType() {
-//		return strFilterComponentType;
-//	}
 
 	public String getFilterImplementationName() {
 		return strFilterImplementationName;
