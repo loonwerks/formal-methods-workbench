@@ -845,64 +845,62 @@ public class AgreeXtext {
 
 		} else if (c instanceof ComponentClassifier) {
 
-
-			Map<String, Nenola.Channel> channels = new HashMap<>();
-			Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
-			List<Nenola.Connection> connections = new ArrayList<>();
-			List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
-
-			Optional<Nenola.TimingMode> timingMode = extractTimingMode((ComponentClassifier) c);
-
-			List<Nenola.Spec> localSpecs = extractSpecList((ComponentClassifier) c);
-			specs.addAll(localSpecs);
-
-			ComponentType ct = null;
-			if (c instanceof ComponentImplementation) {
-
-				EList<Subcomponent> subcomps = ((ComponentImplementation) c).getAllSubcomponents();
-				for (Subcomponent sub : subcomps) {
-					String fieldName = sub.getName();
-					if (sub.getClassifier() != null) {
-
-						if (sub.getArrayDimensions().size() == 0) {
-							Nenola.Contract typeDef = toContractFromClassifier(sub.getClassifier());
-							if (typeDef instanceof Nenola.NodeContract) {
-								subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
-							}
-
-						} else if (sub.getArrayDimensions().size() == 1) {
-							throw new RuntimeException("Arrays may not be used in node subcomponent");
-						}
-					}
-				}
-
-
-				connections.addAll(extractConnections((ComponentImplementation) c));
-
-
-				ct = ((ComponentImplementation) c).getType();
-			} else if (c instanceof ComponentType) {
-				ct = (ComponentType) c;
-			}
-
-			if (ct != null) {
-
-				channels.putAll(extractChannels("", ct));
-
-
-			}
-
-
-
-			String name = c.getQualifiedName();
-
-
-			return new Nenola.NodeContract(name, channels, subNodes, connections, specs, timingMode, c);
+			return toNodeContractFromClassifier((ComponentClassifier) c, false);
 
 		}
 
 		return Nenola.Prim.ErrorContract;
 
+	}
+
+	public static Nenola.NodeContract toNodeContractFromClassifier(ComponentClassifier c, boolean isMain) {
+
+		Map<String, Nenola.Channel> channels = new HashMap<>();
+		Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
+		List<Nenola.Connection> connections = new ArrayList<>();
+		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
+
+		Optional<Nenola.TimingMode> timingMode = extractTimingMode(c);
+
+		List<Nenola.Spec> localSpecs = extractSpecList(c);
+		specs.addAll(localSpecs);
+
+		ComponentType ct = null;
+		if (c instanceof ComponentImplementation) {
+
+			EList<Subcomponent> subcomps = ((ComponentImplementation) c).getAllSubcomponents();
+			for (Subcomponent sub : subcomps) {
+				String fieldName = sub.getName();
+				if (sub.getClassifier() != null) {
+
+					if (sub.getArrayDimensions().size() == 0) {
+						Nenola.Contract typeDef = toContractFromClassifier(sub.getClassifier());
+						if (typeDef instanceof Nenola.NodeContract) {
+							subNodes.putIfAbsent(fieldName, (Nenola.NodeContract) typeDef);
+						}
+
+					} else if (sub.getArrayDimensions().size() == 1) {
+						throw new RuntimeException("Arrays may not be used in node subcomponent");
+					}
+				}
+			}
+
+			connections.addAll(extractConnections((ComponentImplementation) c));
+
+			ct = ((ComponentImplementation) c).getType();
+		} else if (c instanceof ComponentType) {
+			ct = (ComponentType) c;
+		}
+
+		if (ct != null) {
+
+			channels.putAll(extractChannels("", ct));
+
+		}
+
+		String name = c.getQualifiedName();
+
+		return new Nenola.NodeContract(name, channels, subNodes, connections, specs, timingMode, isMain, c);
 	}
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
@@ -1940,7 +1938,7 @@ public class AgreeXtext {
 	}
 
 	public static Nenola.Program toProgram(ComponentImplementation ci) {
-		Nenola.Contract main = toContractFromClassifier(ci);
+		Nenola.Contract main = toNodeContractFromClassifier(ci, true);
 		Map<String, Nenola.Contract> specMap = extractContractMap(ci);
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(ci);
 

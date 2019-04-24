@@ -1326,12 +1326,15 @@ public class Nenola {
 		public final List<Connection> connections;
 		public final List<Spec> specList;
 		public final Optional<TimingMode> timingMode;
+		public final boolean isMain;
+
+		// TODO : add isMain field
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
-				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode,
+				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode, boolean isMain,
 				NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
@@ -1342,6 +1345,7 @@ public class Nenola {
 			this.connections.addAll(connections);
 			this.specList = specList;
 			this.timingMode = timingMode;
+			this.isMain = isMain;
 
 			this.namedElement = namedElement;
 
@@ -1573,6 +1577,7 @@ public class Nenola {
 		private Optional<Map<String, jkind.lustre.Expr>> lustrePatternMapCache = Optional.empty();
 
 		private Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+
 			if (lustrePatternMapCache.isPresent()) {
 				return lustrePatternMapCache.get();
 			}
@@ -1583,7 +1588,11 @@ public class Nenola {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
-					boolean isProperty = spec.specTag == SpecTag.Lemma || spec.specTag == SpecTag.Assume;
+
+					// TODO : implement toLustrePatternPropertyMap
+					boolean isProperty = (spec.specTag == SpecTag.Assume && !this.isMain)
+							|| (spec.specTag == SpecTag.Lemma && this.isMain)
+							|| (spec.specTag == SpecTag.Guarantee && this.isMain);
 					Map<String, jkind.lustre.Expr> localMap = isProperty ? pattern.toLustrePatternPropertyMap()
 							: pattern.toLustrePatternConstraintMap();
 					props.putAll(localMap);
