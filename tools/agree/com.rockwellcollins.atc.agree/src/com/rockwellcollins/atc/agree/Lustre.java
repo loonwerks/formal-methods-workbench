@@ -4,6 +4,7 @@ import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.BoolExpr;
 import jkind.lustre.Expr;
+import jkind.lustre.NamedType;
 import jkind.lustre.VarDecl;
 
 public class Lustre {
@@ -43,14 +44,25 @@ public class Lustre {
 		return new BinaryExpr(left, BinaryOp.OR, right);
 	}
 
-	public static VarDecl getTimeRiseVar(String causeId) {
-		// TODO Auto-generated method stub
-		return null;
+	public static VarDecl getTimeRiseVar(String id) {
+		return new VarDecl(id + "__RISE__", NamedType.REAL);
 	}
 
-	public static VarDecl getTimeFallVar(String causeId) {
-		// TODO Auto-generated method stub
-		return null;
+	public static VarDecl getTimeFallVar(String id) {
+		return new VarDecl(id + "__FALL__", NamedType.REAL);
+	}
+
+	public static VarDecl getTimeOfVar(String id) {
+		return new VarDecl(id + "__TIME__", NamedType.REAL);
+	}
+
+	public static VarDecl getTimerVar(String patternIndex) {
+		return new VarDecl("__TIMER__" + patternIndex, NamedType.REAL);
+	}
+
+	public static VarDecl getRunningVar(String patternIndex) {
+		return new VarDecl("__RUNNING__" + patternIndex, NamedType.BOOL);
+
 	}
 
 

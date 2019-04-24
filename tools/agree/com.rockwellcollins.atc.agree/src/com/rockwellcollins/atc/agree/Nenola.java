@@ -1,5 +1,6 @@
 package com.rockwellcollins.atc.agree;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import jkind.lustre.Node;
 import jkind.lustre.TypeDef;
 import jkind.lustre.VarDecl;
 import jkind.lustre.builders.NodeBuilder;
+import jkind.lustre.parsing.LustreParseUtil;
 
 //Nenola = Nested Node Language
 public class Nenola {
@@ -656,8 +658,7 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			// TODO Auto-generated method stub
-			return null;
+			return new HashMap<>();
 		}
 
 		@Override
@@ -681,12 +682,6 @@ public class Nenola {
 			this.highOpen = highOpen;
 		}
 	}
-
-
-	public static String getCauseConditionString(String causeId) {
-		return "__CAUSE_CONDITION_HELD__" + causeId;
-	}
-
 
 	public static class WhenHoldsPattern implements Pattern {
 
@@ -724,40 +719,6 @@ public class Nenola {
 	}
 
 
-	public static class WheneverOccursPattern implements Pattern {
-		public final Expr causeEvent;
-		public final Expr effectEvent;
-		public final boolean exclusive;
-		public final Interval interval;
-
-		public WheneverOccursPattern(Expr causeEvent, Expr effectEvent, boolean exclusive, Interval interval) {
-			this.causeEvent = causeEvent;
-			this.effectEvent = effectEvent;
-			this.exclusive = exclusive;
-			this.interval = interval;
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
-
-
-
 	public static class WheneverHoldsPattern implements Pattern {
 		public final Expr causeEvent;
 		public final Expr effectCondition;
@@ -779,8 +740,66 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+			return new HashMap<>();
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
 			// TODO Auto-generated method stub
 			return null;
+		}
+
+	}
+
+
+	public static class WheneverOccursPattern implements Pattern {
+		public final Expr causeEvent;
+		public final Expr effectEvent;
+		public final boolean exclusive;
+		public final Interval interval;
+
+		public WheneverOccursPattern(Expr causeEvent, Expr effectEvent, boolean exclusive, Interval interval) {
+			this.causeEvent = causeEvent;
+			this.effectEvent = effectEvent;
+			this.exclusive = exclusive;
+			this.interval = interval;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+			String patternIndex = Integer.toString(this.hashCode());
+
+			String patternKey = "Timer Lemma for Pattern " + patternIndex;
+
+			jkind.lustre.IdExpr lustreCause = causeEvent.toLustreExpr();
+			jkind.lustre.IdExpr lustreEffect = effectEvent.toLustreExpr();
+
+			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
+			VarDecl runVar = Lustre.getRunningVar(patternIndex);
+
+			VarDecl timeOfCause = Lustre.getTimeOfVar(lustreCause.id);
+			VarDecl timeOfEffect = Lustre.getTimeOfVar(lustreEffect.id);
+
+			jkind.lustre.Expr patternExpr = LustreParseUtil.expr("(timer > 0.0 => timeOfCause >= 0.0) and "
+					+ "(timer <= time) and"
+					+ "(timeOfEffect >= timeOfCause and timer <= high and timeOfEffect >= time - timer + low => not run) and"
+					+ "(true -> (pre(timeOfEffect >= timeOfCause + low and timeOfEffect <= timeOfCause + high and timer <= high) => timer = 0.0)) and"
+					+ "(timer = 0.0 or timer >= time - timeOfCause)", LustreParseUtil.to("timer", timerVar),
+					LustreParseUtil.to("timeOfCause", timeOfCause), LustreParseUtil.to("timeOfEffect", timeOfEffect),
+					LustreParseUtil.to("time", new jkind.lustre.IdExpr("time")),
+					LustreParseUtil.to("low", this.interval.low.toLustreExpr()),
+					LustreParseUtil.to("high", this.interval.high.toLustreExpr()), LustreParseUtil.to("run", runVar));
+
+			HashMap<String, jkind.lustre.Expr> result = new HashMap<>();
+			result.put(patternKey, patternExpr);
+			return result;
+
 		}
 
 		@Override
@@ -789,6 +808,7 @@ public class Nenola {
 			return null;
 		}
 	}
+
 
 
 	public static class PeriodicPattern implements Pattern {
@@ -1331,21 +1351,35 @@ public class Nenola {
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternMap().entrySet()) {
-				String inputName = entry.getKey();
-				jkind.lustre.Expr expr = entry.getValue();
-				inputs.add(new VarDecl(inputName, NamedType.BOOL));
-				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap().entrySet()) {
+				String patternVarName = "__PATTERN__" + this.hashCode();
+				inputs.add(new VarDecl(patternVarName, NamedType.BOOL));
+				assertions.add(new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(patternVarName), BinaryOp.EQUAL,
+						entry.getValue()));
 			}
+
+			for (jkind.lustre.VarDecl patternInput : this.toLustrePatternInputList()) {
+				inputs.add(patternInput);
+			}
+
+			for (jkind.lustre.VarDecl patternLocal : this.toLustrePatternLocalList()) {
+				locals.add(patternLocal);
+			}
+
+			for (jkind.lustre.Expr patternAssert : this.toLustrePatternAssertList()) {
+				assertions.add(patternAssert);
+
+			}
+
+			for (jkind.lustre.Equation patternEquation : this.toLustrePatternEquationList()) {
+				equations.add(patternEquation);
+			}
+
 
 			jkind.lustre.Expr assertExpr = new BoolExpr(true);
 			for (jkind.lustre.Expr expr : assertions) {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
-
-
-			// gather the remaining inputs
-
 
 			for (VarDecl v : this.toLustreChanInList()) {
 				inputs.add(v);
@@ -1388,6 +1422,26 @@ public class Nenola {
 			return node;
 		}
 
+		private List<jkind.lustre.Equation> toLustrePatternEquationList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private List<jkind.lustre.Expr> toLustrePatternAssertList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private List<jkind.lustre.VarDecl> toLustrePatternLocalList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private List<jkind.lustre.VarDecl> toLustrePatternInputList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 		private Optional<List<VarDecl>> chanOutListCache = Optional.empty();
 		private List<VarDecl> toLustreChanOutList() {
 
@@ -1422,7 +1476,7 @@ public class Nenola {
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustrePatternMap().keySet()) {
+				for (String propKey : nc.toLustrePatternPropMap().keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
@@ -1477,7 +1531,7 @@ public class Nenola {
 
 		private Optional<Map<String, jkind.lustre.Expr>> lustrePatternMapCache = Optional.empty();
 
-		private Map<String, jkind.lustre.Expr> toLustrePatternMap() {
+		private Map<String, jkind.lustre.Expr> toLustrePatternPropMap() {
 
 			if (lustrePatternMapCache.isPresent()) {
 				return lustrePatternMapCache.get();
@@ -1504,7 +1558,7 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternMap().entrySet()) {
+				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternPropMap().entrySet()) {
 					String key = prefix + "__" + nestedEntry.getKey();
 					jkind.lustre.Expr expr = nestedEntry.getValue();
 					props.put(key, expr);

@@ -477,6 +477,7 @@ public class AgreePatternTranslator {
 
 	}
 
+
 	private Expr translatePatternEventProperty(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
 			IdExpr causeId, IdExpr effectId) {
 		EObject varReference = pattern.reference;
