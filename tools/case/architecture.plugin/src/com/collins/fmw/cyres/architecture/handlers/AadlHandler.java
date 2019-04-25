@@ -13,7 +13,12 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.ui.editor.XtextEditor;
@@ -51,6 +56,7 @@ public abstract class AadlHandler extends AbstractHandler {
 
 	abstract protected void runCommand(URI uri);
 
+	static final String OUTLINE_VIEW_PART_ID = "org.eclipse.ui.views.ContentOutline";
 	static final String CASE_PROPSET_NAME = "CASE_Properties";
 	static final String CASE_PROPSET_FILE = "CASE_Properties.aadl";
 	static final String CASE_MODEL_TRANSFORMATIONS_NAME = "CASE_Model_Transformations";
@@ -63,8 +69,19 @@ public abstract class AadlHandler extends AbstractHandler {
 		this.executionEvent = event;
 
 		// Get the current selection
+		ISelection selection = null;
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IViewPart viewPart = page.findView(OUTLINE_VIEW_PART_ID);
+		if (viewPart == null) {
+			selection = HandlerUtil.getCurrentSelection(event);
+		} else {
+			IViewSite viewSite = viewPart.getViewSite();
+			ISelectionProvider selectionProvider = viewSite.getSelectionProvider();
+			selection = selectionProvider.getSelection();
+		}
+
 		// TODO: Handle same functionality in the Graphical Editor?
-		URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
+		URI uri = getSelectionURI(selection);
 		if (uri == null) {
 			return null;
 		}

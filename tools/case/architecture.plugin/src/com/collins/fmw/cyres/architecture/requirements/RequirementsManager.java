@@ -141,6 +141,7 @@ public class RequirementsManager {
 												if (reqText.matches("^\\[.+\\]\\s.+")) {
 													// Extract the Requirement type from the text
 													reqType = reqText.substring(1, reqText.indexOf("]"));
+													reqText = reqText.substring(reqText.indexOf("]") + 1).trim();
 												}
 												// See if there is an agree statement with this requirement id
 												boolean agree = false;
@@ -220,8 +221,7 @@ public class RequirementsManager {
 
 				// Add AGREE, if necessary
 				if (req.hasAgree()) {
-					req.insertClaim(new AgreePropCheckedClaim(req.getId()), resource);
-					req.insertAgree(resource);
+					formalizeRequirement(req, resource);
 				}
 
 				return null;
@@ -244,6 +244,22 @@ public class RequirementsManager {
 				break;
 			}
 		}
+	}
+
+	public boolean formalizeRequirement(String reqId, Resource resource) {
+		for (CyberRequirement req : importedRequirements) {
+			if (req.getId().equalsIgnoreCase(reqId)) {
+				req.setAgree();
+				formalizeRequirement(req, resource);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void formalizeRequirement(CyberRequirement req, Resource resource) {
+		req.insertClaim(new AgreePropCheckedClaim(req.getId()), resource);
+		req.insertAgree(resource);
 	}
 
 	public void addOmittedRequirements(List<CyberRequirement> omittedReqs, String implementation) {
