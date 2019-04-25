@@ -293,6 +293,10 @@ public class AgreePatternTranslator {
 		return prop;
 	}
 
+
+
+
+
 	private Expr translatePatternCondition(AgreePeriodicPattern pattern, AgreeNodeBuilder builder,
 			EObject varReference) {
 		AgreeVar jitterVar = new AgreeVar(JITTER_PREFIX + patternIndex, NamedType.REAL, varReference);
