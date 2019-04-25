@@ -65,5 +65,13 @@ public class Lustre {
 
 	}
 
+	public static VarDecl getAssumeHistVar() {
+		return new VarDecl("__ASSUME__HIST", NamedType.BOOL);
+	}
+
+	public static VarDecl getPatternVar(String index) {
+		return new VarDecl("__PATTERN__" + index, NamedType.BOOL);
+	}
+
 
 }

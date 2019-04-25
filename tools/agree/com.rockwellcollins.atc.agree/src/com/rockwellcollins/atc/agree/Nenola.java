@@ -13,7 +13,6 @@ import org.osate.aadl2.NamedElement;
 
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
-import jkind.lustre.BoolExpr;
 import jkind.lustre.EnumType;
 import jkind.lustre.Equation;
 import jkind.lustre.Location;
@@ -1349,57 +1348,32 @@ public class Nenola {
 
 			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("__ASSUME__HIST");
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
-			assertions.add(new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr));
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap().entrySet()) {
-				String patternVarName = "__PATTERN__" + this.hashCode();
+				String patternVarName = entry.getKey(); // "__PATTERN__"
 				inputs.add(new VarDecl(patternVarName, NamedType.BOOL));
 				assertions.add(new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(patternVarName), BinaryOp.EQUAL,
 						entry.getValue()));
 			}
 
-			for (jkind.lustre.VarDecl patternInput : this.toLustrePatternInputList()) {
-				inputs.add(patternInput);
-			}
 
-			for (jkind.lustre.VarDecl patternLocal : this.toLustrePatternLocalList()) {
-				locals.add(patternLocal);
-			}
-
-			for (jkind.lustre.Expr patternAssert : this.toLustrePatternAssertList()) {
-				assertions.add(patternAssert);
-
-			}
-
-			for (jkind.lustre.Equation patternEquation : this.toLustrePatternEquationList()) {
-				equations.add(patternEquation);
-			}
-
-
-			jkind.lustre.Expr assertExpr = new BoolExpr(true);
+			jkind.lustre.Expr assertExpr = new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr);
 			for (jkind.lustre.Expr expr : assertions) {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
-			for (VarDecl v : this.toLustreChanInList()) {
-				inputs.add(v);
-			}
+			inputs.addAll(this.toLustreChanInList());
 
 			for (VarDecl v : this.toLustreChanOutList()) {
 				inputs.add(v);
 			}
 
-			for (Channel chan : this.channels.values()) {
-				if (chan.direction instanceof Bi) {
-					locals.add(chan.toLustreVar());
-				}
+			for (VarDecl v : this.toLustreChanBiList()) {
+				locals.add(v);
 			}
 
-			// TODO : get lustre inputs, locals, equations from real time and other translations.
-			// see what is added to the builder through various calls.
-
-			for (Connection conn : this.connections) {
-				equations.add(conn.toLustreEquation());
+			for (Equation e : this.toLustreEquationList()) {
+				equations.add(e);
 			}
 
 			String outputName = "__ASSERT";
@@ -1422,23 +1396,28 @@ public class Nenola {
 			return node;
 		}
 
-		private List<jkind.lustre.Equation> toLustrePatternEquationList() {
-			// TODO Auto-generated method stub
-			return null;
+		private List<Equation> toLustreEquationList() {
+			List<Equation> equations = new ArrayList<>();
+
+			for (Connection conn : this.connections) {
+				equations.add(conn.toLustreEquation());
+			}
+
+			// TODO add real time pattern connections
+			return equations;
 		}
 
-		private List<jkind.lustre.Expr> toLustrePatternAssertList() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		private List<VarDecl> toLustreChanBiList() {
 
-		private List<jkind.lustre.VarDecl> toLustrePatternLocalList() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+			List<VarDecl> vars = new ArrayList<>();
 
-		private List<jkind.lustre.VarDecl> toLustrePatternInputList() {
-			// TODO Auto-generated method stub
+			for (Channel chan : this.channels.values()) {
+				if (chan.direction instanceof Bi) {
+					vars.add(chan.toLustreVar());
+				}
+			}
+
+			// TODO add real time pattern locals
 			return null;
 		}
 
@@ -1518,6 +1497,7 @@ public class Nenola {
 
 			}
 
+			// TODO : add real time pattern inputs
 
 			chanInListCache = Optional.of(vars);
 
@@ -1589,6 +1569,7 @@ public class Nenola {
 
 			}
 
+			// TODO : gather assert from real time patterns
 			// TODO : gather asserts from subnodes
 			lustreAssertListCache = Optional.of(exprs);
 			return null;
