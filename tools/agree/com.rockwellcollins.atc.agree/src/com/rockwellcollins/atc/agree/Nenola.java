@@ -637,11 +637,24 @@ public class Nenola {
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap();
 
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap();
+
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList();
+
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternChanInPropertyList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternChanInConstraintList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternChanOutPropertyList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternChanOutConstraintList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternChanBiPropertyList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternChanBiConstraintList();
+
 	}
-
-
-
-
 
 
 	public static class AlwaysPattern implements Pattern {
@@ -665,6 +678,54 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiConstraintList() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -717,6 +778,54 @@ public class Nenola {
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
 			return new HashMap<>();
 		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 
@@ -747,6 +856,54 @@ public class Nenola {
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
 			return new HashMap<>();
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -803,6 +960,54 @@ public class Nenola {
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
 			return new HashMap<>();
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -863,6 +1068,54 @@ public class Nenola {
 
 			return localMap;
 		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class SporadicPattern implements Pattern {
@@ -890,6 +1143,54 @@ public class Nenola {
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
 			return new HashMap<>();
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanInConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1430,7 +1731,19 @@ public class Nenola {
 				}
 			}
 
-			// TODO add real time pattern locals
+			for (Spec spec : this.specList) {
+
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+
+					List<jkind.lustre.VarDecl> localList = this.isProperty(spec.specTag)
+							? pattern.toLustrePatternChanBiPropertyList()
+							: pattern.toLustrePatternChanBiConstraintList();
+					vars.addAll(localList);
+				}
+
+			}
+
 			return null;
 		}
 
@@ -1446,6 +1759,19 @@ public class Nenola {
 				if (chan.direction instanceof Out) {
 					vars.add(chan.toLustreVar());
 				}
+			}
+
+			for (Spec spec : this.specList) {
+
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+
+					List<jkind.lustre.VarDecl> localList = this.isProperty(spec.specTag)
+							? pattern.toLustrePatternChanOutPropertyList()
+							: pattern.toLustrePatternChanOutConstraintList();
+					vars.addAll(localList);
+				}
+
 			}
 
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
@@ -1496,6 +1822,19 @@ public class Nenola {
 				}
 			}
 
+			for (Spec spec : this.specList) {
+
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+
+					List<jkind.lustre.VarDecl> localList = this.isProperty(spec.specTag)
+							? pattern.toLustrePatternChanInPropertyList()
+							: pattern.toLustrePatternChanInConstraintList();
+					vars.addAll(localList);
+				}
+
+			}
+
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
@@ -1510,8 +1849,6 @@ public class Nenola {
 
 			}
 
-			// TODO : add real time pattern inputs
-
 			chanInListCache = Optional.of(vars);
 
 			return vars;
@@ -1523,6 +1860,12 @@ public class Nenola {
 		}
 
 		private Optional<Map<String, jkind.lustre.Expr>> lustrePatternMapCache = Optional.empty();
+
+		private boolean isProperty(SpecTag specTag) {
+			return (specTag == SpecTag.Assume && !this.isMain) || (specTag == SpecTag.Lemma && this.isMain)
+					|| (specTag == SpecTag.Guarantee && this.isMain);
+
+		}
 
 		private Map<String, jkind.lustre.Expr> toLustrePatternPropMap() {
 
@@ -1537,11 +1880,8 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					// TODO : implement toLustrePatternPropertyMap
-					boolean isProperty = (spec.specTag == SpecTag.Assume && !this.isMain)
-							|| (spec.specTag == SpecTag.Lemma && this.isMain)
-							|| (spec.specTag == SpecTag.Guarantee && this.isMain);
-					Map<String, jkind.lustre.Expr> localMap = isProperty ? pattern.toLustrePatternPropertyMap()
+					Map<String, jkind.lustre.Expr> localMap = this.isProperty(spec.specTag)
+							? pattern.toLustrePatternPropertyMap()
 							: pattern.toLustrePatternConstraintMap();
 					props.putAll(localMap);
 				}
@@ -1580,10 +1920,25 @@ public class Nenola {
 					exprs.add(expr);
 				}
 
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+
+					List<jkind.lustre.Expr> localList = this.isProperty(spec.specTag)
+							? pattern.toLustrePatternAssertPropertyList()
+							: pattern.toLustrePatternAssertConstraintList();
+					exprs.addAll(localList);
+				}
+
 			}
 
-			// TODO : gather assert from real time patterns
-			// TODO : gather asserts from subnodes
+			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
+				NodeContract nc = entry.getValue();
+
+				for (jkind.lustre.Expr subAssert : nc.toLustreAssertList()) {
+					exprs.add(subAssert);
+				}
+			}
+
 			lustreAssertListCache = Optional.of(exprs);
 			return null;
 		}
