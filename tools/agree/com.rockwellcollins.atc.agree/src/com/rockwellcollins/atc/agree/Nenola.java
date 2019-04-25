@@ -1305,16 +1305,11 @@ public class Nenola {
 				return lustreNodeCache.get();
 			}
 
-
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
-			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+			List<jkind.lustre.Expr> assertions = this.toLustreAssertList();
 			List<String> ivcs = new ArrayList<>();
-
-			for (jkind.lustre.Expr expr : this.toLustreAssertList()) {
-				assertions.add(expr);
-			}
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap().entrySet()) {
 				String inputName = entry.getKey();
@@ -1349,32 +1344,27 @@ public class Nenola {
 			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("__ASSUME__HIST");
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap().entrySet()) {
-				String patternVarName = entry.getKey(); // "__PATTERN__"
-				inputs.add(new VarDecl(patternVarName, NamedType.BOOL));
-				assertions.add(new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(patternVarName), BinaryOp.EQUAL,
-						entry.getValue()));
-			}
-
 
 			jkind.lustre.Expr assertExpr = new BinaryExpr(assumHist, BinaryOp.IMPLIES, guarConjExpr);
 			for (jkind.lustre.Expr expr : assertions) {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap().entrySet()) {
+				String patternVarName = entry.getKey(); // "__PATTERN__"
+				inputs.add(new VarDecl(patternVarName, NamedType.BOOL));
+				jkind.lustre.Expr expr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(patternVarName),
+						BinaryOp.EQUAL, entry.getValue());
+				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
+			}
+
 			inputs.addAll(this.toLustreChanInList());
 
-			for (VarDecl v : this.toLustreChanOutList()) {
-				inputs.add(v);
-			}
+			inputs.addAll(this.toLustreChanOutList());
 
-			for (VarDecl v : this.toLustreChanBiList()) {
-				locals.add(v);
-			}
+			inputs.addAll(this.toLustreChanBiList());
 
-			for (Equation e : this.toLustreEquationList()) {
-				equations.add(e);
-			}
+			equations.addAll(this.toLustreEquationList());
 
 			String outputName = "__ASSERT";
 			List<VarDecl> outputs = new ArrayList<>();
@@ -1394,6 +1384,7 @@ public class Nenola {
 			lustreNodeCache = Optional.of(node);
 
 			return node;
+
 		}
 
 		private List<Equation> toLustreEquationList() {
