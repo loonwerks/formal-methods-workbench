@@ -715,8 +715,7 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
+			return new HashMap<>();
 		}
 	}
 
@@ -747,8 +746,7 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
+			return new HashMap<>();
 		}
 
 	}
@@ -1273,8 +1271,6 @@ public class Nenola {
 		public final List<Spec> specList;
 		public final Optional<TimingMode> timingMode;
 		public final boolean isMain;
-
-		// TODO : add isMain field
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
