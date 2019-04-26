@@ -293,10 +293,6 @@ public class AgreePatternTranslator {
 		return prop;
 	}
 
-
-
-
-
 	private Expr translatePatternCondition(AgreePeriodicPattern pattern, AgreeNodeBuilder builder,
 			EObject varReference) {
 		AgreeVar jitterVar = new AgreeVar(JITTER_PREFIX + patternIndex, NamedType.REAL, varReference);
@@ -422,10 +418,6 @@ public class AgreePatternTranslator {
 		return timeCause;
 	}
 
-
-
-
-
 	private AgreeVar getTimeRise(String varName, AgreeNodeBuilder builder, EObject reference) {
 		Map<String, AgreeVar> timeRiseMap = builder.build().timeRiseMap;
 		if (timeRiseMap.containsKey(varName)) {
@@ -484,9 +476,6 @@ public class AgreePatternTranslator {
 		}
 
 	}
-
-
-
 
 	private Expr translatePatternEventProperty(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
 			IdExpr causeId, IdExpr effectId) {
@@ -696,7 +685,6 @@ public class AgreePatternTranslator {
 		return expr;
 	}
 
-
 	private Expr translatePatternEffectEventConstraint(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
 			IdExpr causeId, IdExpr effectId) {
 		AgreeVar effectTimeRangeVar = new AgreeVar(EFFECT_TIME_RANGE_PREFIX + patternIndex, NamedType.REAL, pattern);
@@ -751,9 +739,6 @@ public class AgreePatternTranslator {
 		Expr impliesEffect = new BinaryExpr(timeEqualsEffectTime, effectOp, effectId);
 		return impliesEffect;
 	}
-
-
-
 
 	// this method registers a timeout and creates an event that is true iff the
 	// condition

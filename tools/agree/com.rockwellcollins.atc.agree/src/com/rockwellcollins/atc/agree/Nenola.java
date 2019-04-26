@@ -763,7 +763,6 @@ public class Nenola {
 		public final boolean exclusive;
 		public final Interval effectInterval;
 
-		private String patternIndex = this.hashCode() + "";
 		private final WheneverOccursPattern pattern;
 
 		public WhenHoldsPattern(Expr causeCondition, Interval causeInterval, Expr effectEvent, boolean exclusive,
@@ -952,7 +951,7 @@ public class Nenola {
 			this.effectInterval = interval;
 		}
 
-		private String patternIndex = this.hashCode() + "";
+		public String patternIndex = this.hashCode() + "";
 
 		private jkind.lustre.Expr toTimeRangeConstraint() {
 			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
