@@ -73,5 +73,20 @@ public class Lustre {
 		return new VarDecl("__PATTERN__" + index, NamedType.BOOL);
 	}
 
+	public static VarDecl getCauseHeldVar(String causeId) {
+		return new VarDecl("__CAUSE_CONDITION_HELD__" + causeId, NamedType.BOOL);
+	}
+
+	public static VarDecl getRecordVar(String patternIndex) {
+		return new VarDecl("__RECORD__" + patternIndex, NamedType.BOOL);
+	}
+
+	public static VarDecl getEffectTimeRangeVar(String patternIndex) {
+		return new VarDecl("__EFFECT_TIME_RANGE__" + patternIndex, NamedType.REAL);
+	}
+
+	public static VarDecl getTimeWillVar(String patternIndex) {
+		return new VarDecl("__TIME_WILL__" + patternIndex, NamedType.REAL);
+	}
 
 }

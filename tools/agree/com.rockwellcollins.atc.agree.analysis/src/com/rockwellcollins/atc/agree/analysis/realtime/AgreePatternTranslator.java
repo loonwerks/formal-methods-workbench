@@ -422,6 +422,10 @@ public class AgreePatternTranslator {
 		return timeCause;
 	}
 
+
+
+
+
 	private AgreeVar getTimeRise(String varName, AgreeNodeBuilder builder, EObject reference) {
 		Map<String, AgreeVar> timeRiseMap = builder.build().timeRiseMap;
 		if (timeRiseMap.containsKey(varName)) {
@@ -480,6 +484,8 @@ public class AgreePatternTranslator {
 		}
 
 	}
+
+
 
 
 	private Expr translatePatternEventProperty(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
@@ -689,6 +695,10 @@ public class AgreePatternTranslator {
 
 		return expr;
 	}
+
+
+
+
 
 	private Expr translatePatternEffectEventConstraint(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
 			IdExpr causeId, IdExpr effectId) {

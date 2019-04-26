@@ -4,6 +4,7 @@ package com.rockwellcollins.atc.agree;
 import static jkind.lustre.parsing.LustreParseUtil.expr;
 import static jkind.lustre.parsing.LustreParseUtil.to;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +22,9 @@ import jkind.lustre.Equation;
 import jkind.lustre.Location;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
+import jkind.lustre.RealExpr;
 import jkind.lustre.TypeDef;
+import jkind.lustre.UnaryOp;
 import jkind.lustre.VarDecl;
 import jkind.lustre.builders.NodeBuilder;
 import jkind.lustre.parsing.LustreParseUtil;
@@ -671,8 +674,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
+			return expr.toLustreExpr();
 		}
 
 		@Override
@@ -687,62 +689,52 @@ public class Nenola {
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 	}
@@ -778,6 +770,40 @@ public class Nenola {
 			this.eventInterval = eventInterval;
 		}
 
+		private String patternIndex = this.hashCode() + "";
+
+		private jkind.lustre.Expr toTimeRangeConstraint() {
+			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
+			jkind.lustre.IdExpr timeRangeId = new jkind.lustre.IdExpr(effectTimeRangeVar.id);
+
+			jkind.lustre.Expr occurs = new BinaryExpr(timeRangeId, BinaryOp.MINUS, new jkind.lustre.IdExpr("time"));
+			jkind.lustre.BinaryOp left = this.eventInterval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
+			jkind.lustre.BinaryOp right = this.eventInterval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
+
+			jkind.lustre.Expr lower = new BinaryExpr(this.eventInterval.low.toLustreExpr(), left, occurs);
+			jkind.lustre.Expr higher = new BinaryExpr(occurs, right, this.eventInterval.high.toLustreExpr());
+			return new BinaryExpr(lower, BinaryOp.AND, higher);
+		}
+
+		private List<jkind.lustre.Expr> toTimeOfAssertions(String id) {
+
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+
+			VarDecl timeCause = Lustre.getTimeOfVar(id);
+
+			jkind.lustre.Expr timeVarExpr = expr("timeCause = (if cause then time else (-1.0 -> pre timeCause))",
+					to("timeCause", timeCause), to("cause", id), to("time", new jkind.lustre.IdExpr("time")));
+			assertions.add(timeVarExpr);
+
+			jkind.lustre.Expr lemmaExpr = expr("timeCause <= time and timeCause >= -1.0", to("timeCause", timeCause),
+					to("time", new jkind.lustre.IdExpr("time")));
+
+			// add this assertion to help with proofs (it should always be true)
+			assertions.add(lemmaExpr);
+
+			return assertions;
+		}
+
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
@@ -796,14 +822,96 @@ public class Nenola {
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+
+			jkind.lustre.IdExpr causeConditionExpr = (this.causeCondition.toLustreExpr());
+			jkind.lustre.VarDecl causeEventVar = Lustre.getCauseHeldVar(causeConditionExpr.id);
+
+			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
+			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
+
+			jkind.lustre.IdExpr timerId = new jkind.lustre.IdExpr(timerVar.id);
+			jkind.lustre.IdExpr recordId = new jkind.lustre.IdExpr(recordVar.id);
+
+			{
+				jkind.lustre.Expr expr = new jkind.lustre.BinaryExpr(timerId, BinaryOp.GREATEREQUAL,
+						new RealExpr(BigDecimal.ZERO));
+				assertions.add(expr);
+			}
+
+			{
+				jkind.lustre.Expr causeExpr;
+
+				if (this.eventInterval.lowOpen) {
+					causeExpr = new jkind.lustre.IdExpr(causeEventVar.id);
+				} else {
+					jkind.lustre.Expr eAndLZero = new jkind.lustre.BinaryExpr(this.eventInterval.low.toLustreExpr(),
+							BinaryOp.EQUAL, new jkind.lustre.RealExpr(BigDecimal.ZERO));
+					eAndLZero = new BinaryExpr(this.effectEvent.toLustreExpr(), BinaryOp.AND, eAndLZero);
+					jkind.lustre.Expr notEAndLZero = new jkind.lustre.UnaryExpr(UnaryOp.NOT, eAndLZero);
+					causeExpr = new BinaryExpr(new jkind.lustre.IdExpr(causeEventVar.id), BinaryOp.AND, notEAndLZero);
+				}
+				jkind.lustre.Expr recordExpr = new BinaryExpr(recordId, BinaryOp.IMPLIES, causeExpr);
+				assertions.add(recordExpr);
+			}
+
+			return assertions;
 		}
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+
+			jkind.lustre.IdExpr causeConditionExpr = (this.causeCondition.toLustreExpr());
+			jkind.lustre.VarDecl causeEventVar = Lustre.getCauseHeldVar(causeConditionExpr.id);
+
+
+			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
+			jkind.lustre.IdExpr effectTimeRangeId = new jkind.lustre.IdExpr(effectTimeRangeVar.id);
+			//
+			VarDecl timeEffectVar = Lustre.getTimeWillVar(patternIndex);
+
+			jkind.lustre.IdExpr timeEffectId = new jkind.lustre.IdExpr(timeEffectVar.id);
+
+			jkind.lustre.Expr effectTimeRangeConstraint = this.toTimeRangeConstraint();
+			assertions.add(effectTimeRangeConstraint);
+			// make a constraint that triggers when the event WILL happen
+
+			jkind.lustre.Expr expr = expr(
+					"timeEffect = if causeId then effectTimeRangeId else (-1.0 -> pre timeEffect)",
+					to("timeEffect", timeEffectId), to("causeId", causeEventVar),
+					to("effectTimeRangeId", effectTimeRangeId));
+
+			assertions.add(expr);
+
+			// a lemma that may be helpful
+
+			jkind.lustre.Expr lemma1 = expr("timeEffect <= time + intHigh", to("timeEffect", timeEffectVar),
+					to("time", new jkind.lustre.IdExpr("time")), to("intHigh", this.eventInterval.high.toLustreExpr()));
+
+			assertions.add(lemma1);
+
+			jkind.lustre.Expr lemma2 = expr(
+					"timeWill <= causeTime + high and (causeTime >= 0.0 => causeTime + low <= timeWill)",
+					to("timeWill", timeEffectVar), to("causeTime", Lustre.getTimeOfVar(causeEventVar.id)),
+					to("high", this.eventInterval.high.toLustreExpr()),
+					to("low", this.eventInterval.low.toLustreExpr()));
+
+			assertions.add(lemma2);
+			assertions.addAll(this.toTimeOfAssertions(causeEventVar.id));
+
+			jkind.lustre.IdExpr lustreEffect = this.effectEvent.toLustreExpr();
+
+			jkind.lustre.Expr lemma3 = expr("timeWill <= time => timeWill <= timeEffect", to("timeWill", timeEffectVar),
+					to("timeEffect", Lustre.getTimeOfVar(lustreEffect.id)));
+
+			assertions.add(lemma3);
+			assertions.addAll(this.toTimeOfAssertions(lustreEffect.id));
+
+			return assertions;
+
 		}
 
 		@Override
