@@ -1,5 +1,11 @@
 package com.rockwellcollins.atc.agree;
 
+import static jkind.lustre.parsing.LustreParseUtil.expr;
+import static jkind.lustre.parsing.LustreParseUtil.to;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.BoolExpr;
@@ -87,6 +93,25 @@ public class Lustre {
 
 	public static VarDecl getTimeWillVar(String patternIndex) {
 		return new VarDecl("__TIME_WILL__" + patternIndex, NamedType.REAL);
+	}
+
+	public static List<jkind.lustre.Expr> getTimeOfExprs(String id) {
+
+		List<jkind.lustre.Expr> exprs = new ArrayList<>();
+
+		VarDecl timeCause = Lustre.getTimeOfVar(id);
+
+		jkind.lustre.Expr timeVarExpr = expr("timeCause = (if cause then time else (-1.0 -> pre timeCause))",
+				to("timeCause", timeCause), to("cause", id), to("time", new jkind.lustre.IdExpr("time")));
+		exprs.add(timeVarExpr);
+
+		jkind.lustre.Expr lemmaExpr = expr("timeCause <= time and timeCause >= -1.0", to("timeCause", timeCause),
+				to("time", new jkind.lustre.IdExpr("time")));
+
+		// add this assertion to help with proofs (it should always be true)
+		exprs.add(lemmaExpr);
+
+		return exprs;
 	}
 
 }

@@ -785,24 +785,6 @@ public class Nenola {
 			return new BinaryExpr(lower, BinaryOp.AND, higher);
 		}
 
-		private List<jkind.lustre.Expr> toTimeOfAssertions(String id) {
-
-			List<jkind.lustre.Expr> assertions = new ArrayList<>();
-
-			VarDecl timeCause = Lustre.getTimeOfVar(id);
-
-			jkind.lustre.Expr timeVarExpr = expr("timeCause = (if cause then time else (-1.0 -> pre timeCause))",
-					to("timeCause", timeCause), to("cause", id), to("time", new jkind.lustre.IdExpr("time")));
-			assertions.add(timeVarExpr);
-
-			jkind.lustre.Expr lemmaExpr = expr("timeCause <= time and timeCause >= -1.0", to("timeCause", timeCause),
-					to("time", new jkind.lustre.IdExpr("time")));
-
-			// add this assertion to help with proofs (it should always be true)
-			assertions.add(lemmaExpr);
-
-			return assertions;
-		}
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
@@ -900,7 +882,7 @@ public class Nenola {
 					to("low", this.eventInterval.low.toLustreExpr()));
 
 			assertions.add(lemma2);
-			assertions.addAll(this.toTimeOfAssertions(causeEventVar.id));
+			assertions.addAll(Lustre.getTimeOfExprs(causeEventVar.id));
 
 			jkind.lustre.IdExpr lustreEffect = this.effectEvent.toLustreExpr();
 
@@ -908,7 +890,7 @@ public class Nenola {
 					to("timeEffect", Lustre.getTimeOfVar(lustreEffect.id)));
 
 			assertions.add(lemma3);
-			assertions.addAll(this.toTimeOfAssertions(lustreEffect.id));
+			assertions.addAll(Lustre.getTimeOfExprs(lustreEffect.id));
 
 			return assertions;
 
