@@ -1,6 +1,7 @@
 package com.rockwellcollins.atc.agree;
 
 
+import static jkind.lustre.parsing.LustreParseUtil.equation;
 import static jkind.lustre.parsing.LustreParseUtil.expr;
 import static jkind.lustre.parsing.LustreParseUtil.to;
 
@@ -998,6 +999,8 @@ public class Nenola {
 			this.interval = interval;
 		}
 
+		private String patternIndex = this.hashCode() + "";
+
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
@@ -1016,8 +1019,15 @@ public class Nenola {
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
+			asserts.addAll(Lustre.getTimeOfAsserts(recordVar.id));
+
+			jkind.lustre.Expr expr = expr("record => cause", to("record", recordVar),
+					to("cause", this.causeEvent.toLustreExpr().id));
+			asserts.add(expr);
+
+			return asserts;
 		}
 
 		@Override
@@ -1028,8 +1038,9 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+			vars.add(Lustre.getRecordVar(patternIndex));
+			return vars;
 		}
 
 		@Override
@@ -1040,8 +1051,11 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
+			VarDecl timeCause = Lustre.getTimeOfVar(recordVar.id);
+			vars.add(timeCause);
+			return vars;
 		}
 
 		@Override
@@ -1052,8 +1066,10 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl windowVar = Lustre.getWindowVar(patternIndex);
+			vars.add(windowVar);
+			return vars;
 		}
 
 		@Override
@@ -1064,8 +1080,23 @@ public class Nenola {
 
 		@Override
 		public List<Equation> toLustrePatternEquationPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<Equation> equations = new ArrayList<>();
+
+			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
+			VarDecl windowVar = Lustre.getWindowVar(patternIndex);
+			VarDecl tRecord = Lustre.getTimeOfVar(recordVar.id);
+
+			jkind.lustre.BinaryOp left = this.interval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
+			jkind.lustre.BinaryOp right = this.interval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
+
+			Equation eq = equation(
+					"in_window = (trecord <> -1.0) and " + "(l + trecord " + left + " time) and (time " + right
+							+ " h + trecord);",
+					to("in_window", windowVar), to("trecord", tRecord), to("time", new jkind.lustre.IdExpr("time")),
+					to("l", this.interval.low.toLustreExpr()), to("h", this.interval.high.toLustreExpr()));
+
+			equations.add(eq);
+			return equations;
 		}
 
 		@Override
@@ -1226,7 +1257,7 @@ public class Nenola {
 					to("low", this.effectInterval.low.toLustreExpr()));
 
 			assertions.add(lemma2);
-			assertions.addAll(Lustre.getTimeOfExprs(causeEventExpr.id));
+			assertions.addAll(Lustre.getTimeOfAsserts(causeEventExpr.id));
 
 			jkind.lustre.IdExpr lustreEffect = this.effectEvent.toLustreExpr();
 
@@ -1234,7 +1265,7 @@ public class Nenola {
 					to("timeEffect", Lustre.getTimeOfVar(lustreEffect.id)));
 
 			assertions.add(lemma3);
-			assertions.addAll(Lustre.getTimeOfExprs(lustreEffect.id));
+			assertions.addAll(Lustre.getTimeOfAsserts(lustreEffect.id));
 
 			return assertions;
 

@@ -95,27 +95,31 @@ public class Lustre {
 		return new VarDecl("__TIME_WILL__" + patternIndex, NamedType.REAL);
 	}
 
-	public static List<jkind.lustre.Expr> getTimeOfExprs(String id) {
+	public static List<jkind.lustre.Expr> getTimeOfAsserts(String id) {
 
-		List<jkind.lustre.Expr> exprs = new ArrayList<>();
+		List<jkind.lustre.Expr> asserts = new ArrayList<>();
 
 		VarDecl timeCause = Lustre.getTimeOfVar(id);
 
 		jkind.lustre.Expr timeVarExpr = expr("timeCause = (if cause then time else (-1.0 -> pre timeCause))",
 				to("timeCause", timeCause), to("cause", id), to("time", new jkind.lustre.IdExpr("time")));
-		exprs.add(timeVarExpr);
+		asserts.add(timeVarExpr);
 
 		jkind.lustre.Expr lemmaExpr = expr("timeCause <= time and timeCause >= -1.0", to("timeCause", timeCause),
 				to("time", new jkind.lustre.IdExpr("time")));
 
 		// add this assertion to help with proofs (it should always be true)
-		exprs.add(lemmaExpr);
+		asserts.add(lemmaExpr);
 
-		return exprs;
+		return asserts;
 	}
 
 	public static VarDecl getCauseConditionTimeOutVar(String id) {
 		return new VarDecl("__CAUSE_CONDITION_TIMEOUT__" + id, NamedType.BOOL);
+	}
+
+	public static VarDecl getWindowVar(String patternIndex) {
+		return new VarDecl("__WINDOW__" + patternIndex, NamedType.BOOL);
 	}
 
 }

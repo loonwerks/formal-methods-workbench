@@ -578,6 +578,36 @@ public class AgreePatternTranslator {
 		return new BinaryExpr(timerId, right, pattern.effectInterval.high);
 	}
 
+
+
+
+	private void asdf(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
+			IdExpr causeId, IdExpr effectId) {
+		EObject varReference = pattern.reference;
+		AgreeVar recordVar = new AgreeVar(RECORD_PREFIX + patternIndex, NamedType.BOOL, varReference);
+		AgreeVar windowVar = new AgreeVar(WINDOW_PREFIX + patternIndex, NamedType.BOOL, varReference);
+//
+//		builder.addInput(recordVar);
+//		builder.addLocal(windowVar);
+		AgreeVar tRecord = getTimeOf(recordVar.id, builder, pattern);
+//
+//		Expr expr = expr("record => cause", to("record", recordVar), to("cause", causeId));
+//		builder.addAssertion(new AgreeStatement(null, expr, varReference));
+//
+		BinaryOp left = getIntervalLeftOp(pattern.effectInterval);
+		BinaryOp right = getIntervalRightOp(pattern.effectInterval);
+
+		Equation eq = equation(
+				"in_window = (trecord <> -1.0) and " + "(l + trecord " + left + " time) and (time " + right
+						+ " h + trecord);",
+				to("in_window", windowVar), to("trecord", tRecord), to("time", timeExpr),
+				to("l", pattern.effectInterval.low), to("h", pattern.effectInterval.high));
+		builder.addLocalEquation(new AgreeEquation(eq, varReference));
+
+	}
+
+
+
 	private Expr translatePatternConditionProperty(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
 			IdExpr causeId, IdExpr effectId) {
 		EObject varReference = pattern.reference;
