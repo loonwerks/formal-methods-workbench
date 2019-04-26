@@ -24,6 +24,7 @@ import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.Location;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
+import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.TypeDef;
 import jkind.lustre.UnaryOp;
@@ -763,7 +764,7 @@ public class Nenola {
 		public final boolean exclusive;
 		public final Interval effectInterval;
 
-		private final WheneverOccursPattern pattern;
+		private final WheneverOccursPattern refinementPattern;
 
 		public WhenHoldsPattern(Expr causeCondition, Interval causeInterval, Expr effectEvent, boolean exclusive,
 				Interval effectInterval) {
@@ -773,10 +774,12 @@ public class Nenola {
 			this.exclusive = exclusive;
 			this.effectInterval = effectInterval;
 
-			Expr causeEvent = new IdExpr("__CAUSE_CONDITION_HELD__" + causeCondition);
-			this.pattern = new WheneverOccursPattern(causeEvent, effectEvent, exclusive, effectInterval);
+			{
+				String causeConditionString = causeCondition.toLustreExpr().id;
+				Expr causeEvent = new IdExpr(Lustre.getCauseHeldVar(causeConditionString).id);
+				this.refinementPattern = new WheneverOccursPattern(causeEvent, effectEvent, exclusive, effectInterval);
+			}
 		}
-		// TODO - make sure all build pattern from causeHeld Event construction are added.
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr() {
@@ -786,62 +789,198 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			return pattern.toLustrePatternPropertyMap();
+			return refinementPattern.toLustrePatternPropertyMap();
 		}
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			return pattern.toLustrePatternConstraintMap();
+			return refinementPattern.toLustrePatternConstraintMap();
+		}
+
+		private List<jkind.lustre.Expr> toLustreCauseAssertList() {
+
+			List<jkind.lustre.Expr> assertList = new ArrayList<>();
+
+			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+
+			VarDecl causeRiseTimeVar = Lustre.getTimeRiseVar(lustreCauseCondition.id);
+			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(lustreCauseCondition.id);
+			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
+
+			jkind.lustre.IdExpr causeFallTimeId = new jkind.lustre.IdExpr(causeFallTimeVar.id);
+			jkind.lustre.IdExpr causeRiseTimeId = new jkind.lustre.IdExpr(causeRiseTimeVar.id);
+			jkind.lustre.IdExpr causeHeldTimeoutId = new jkind.lustre.IdExpr(causeHeldTimeoutVar.id);
+
+			jkind.lustre.Expr posRise = new jkind.lustre.BinaryExpr(causeRiseTimeId, BinaryOp.GREATER,
+					new RealExpr(BigDecimal.valueOf(-1)));
+			jkind.lustre.Expr gtFall = new jkind.lustre.BinaryExpr(causeRiseTimeId, BinaryOp.GREATER, causeFallTimeId);
+			jkind.lustre.Expr cond = new jkind.lustre.BinaryExpr(posRise, BinaryOp.AND, gtFall);
+
+			jkind.lustre.Expr heldTime = new BinaryExpr(causeRiseTimeId, BinaryOp.PLUS,
+					this.causeInterval.high.toLustreExpr());
+			jkind.lustre.Expr ifExpr = new IfThenElseExpr(cond, heldTime, new RealExpr(BigDecimal.valueOf(-1)));
+			assertList.add(new BinaryExpr(causeHeldTimeoutId, BinaryOp.EQUAL, ifExpr));
+
+			{
+
+				jkind.lustre.Expr rise = new NodeCallExpr("__Rise", new jkind.lustre.IdExpr(lustreCauseCondition.id));
+				jkind.lustre.Expr timeVarExpr = expr("timeRise = (if rise then time else (-1.0 -> pre timeRise))",
+						to("timeRise", causeRiseTimeVar.id), to("rise", rise),
+						to("time", new jkind.lustre.IdExpr("time")));
+				assertList.add(timeVarExpr);
+
+				jkind.lustre.Expr lemmaExpr = expr("timeRise <= time and timeRise >= -1.0",
+						to("timeRise", new jkind.lustre.IdExpr("time")), to("time", new jkind.lustre.IdExpr("time")));
+
+				assertList.add(lemmaExpr);
+
+			}
+
+			{
+
+				jkind.lustre.Expr Fall = new NodeCallExpr("__Fall", new jkind.lustre.IdExpr(lustreCauseCondition.id));
+				jkind.lustre.Expr timeVarExpr = expr("timeFall = (if Fall then time else (-1.0 -> pre timeFall))",
+						to("timeFall", causeFallTimeVar.id), to("Fall", Fall),
+						to("time", new jkind.lustre.IdExpr("time")));
+				assertList.add(timeVarExpr);
+
+				jkind.lustre.Expr lemmaExpr = expr("timeFall <= time and timeFall >= -1.0",
+						to("timeFall", causeFallTimeVar.id), to("time", new jkind.lustre.IdExpr("time")));
+
+				// add this assertion to help with proofs (it should always be true)
+				assertList.add(lemmaExpr);
+			}
+			return assertList;
+
 		}
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
-			return pattern.toLustrePatternAssertPropertyList();
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+			asserts.addAll(toLustreCauseAssertList());
+			asserts.addAll(refinementPattern.toLustrePatternAssertPropertyList());
+			return asserts;
 		}
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
-			return pattern.toLustrePatternAssertConstraintList();
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+			asserts.addAll(toLustreCauseAssertList());
+			asserts.addAll(refinementPattern.toLustrePatternAssertConstraintList());
+			return asserts;
+		}
+
+		private List<VarDecl> toLustreCauseChanInList() {
+			List<VarDecl> vars = new ArrayList<>();
+			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
+			vars.add(causeHeldTimeoutVar);
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInPropertyList() {
-			return pattern.toLustrePatternChanInPropertyList();
+			List<VarDecl> vars = new ArrayList<>();
+			vars.addAll(this.toLustreCauseChanInList());
+			vars.addAll(refinementPattern.toLustrePatternChanInPropertyList());
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInConstraintList() {
-			return pattern.toLustrePatternChanInConstraintList();
+			List<VarDecl> vars = new ArrayList<>();
+			vars.addAll(this.toLustreCauseChanInList());
+			vars.addAll(refinementPattern.toLustrePatternChanInConstraintList());
+			return vars;
+		}
+
+		private List<VarDecl> toLustreCauseChanOutList() {
+			List<VarDecl> vars = new ArrayList<>();
+
+			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			{
+				VarDecl causeRiseTimeVar = Lustre.getTimeRiseVar(lustreCauseCondition.id);
+				vars.add(causeRiseTimeVar);
+			}
+			{
+				VarDecl causeRiseFallVar = Lustre.getTimeFallVar(lustreCauseCondition.id);
+				vars.add(causeRiseFallVar);
+			}
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList() {
-			return pattern.toLustrePatternChanOutPropertyList();
+			List<VarDecl> vars = new ArrayList<>();
+
+			vars.addAll(this.toLustreCauseChanOutList());
+			vars.addAll(refinementPattern.toLustrePatternChanOutPropertyList());
+
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutConstraintList() {
-			return pattern.toLustrePatternChanOutConstraintList();
+			List<VarDecl> vars = new ArrayList<>();
+			vars.addAll(this.toLustreCauseChanOutList());
+			vars.addAll(refinementPattern.toLustrePatternChanOutConstraintList());
+			return vars;
+		}
+
+		private List<VarDecl> toLustreCauseChanBiList() {
+			List<VarDecl> vars = new ArrayList<>();
+			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			vars.add(Lustre.getCauseHeldVar(lustreCauseCondition.id));
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiPropertyList() {
-			return pattern.toLustrePatternChanBiPropertyList();
+			List<VarDecl> vars = new ArrayList<>();
+			vars.addAll(this.toLustreCauseChanBiList());
+			vars.addAll(refinementPattern.toLustrePatternChanBiPropertyList());
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
-			return pattern.toLustrePatternChanBiConstraintList();
+			List<VarDecl> vars = new ArrayList<>();
+			vars.addAll(this.toLustreCauseChanBiList());
+			vars.addAll(refinementPattern.toLustrePatternChanBiConstraintList());
+			return vars;
+		}
+
+		private List<jkind.lustre.Equation> toLustreCauseEquationList() {
+			List<jkind.lustre.Equation> equations = new ArrayList<>();
+			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+
+			VarDecl causeHeldVar = Lustre.getCauseHeldVar(lustreCauseCondition.id);
+			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
+			jkind.lustre.IdExpr causeHeldId = new jkind.lustre.IdExpr(causeHeldVar.id);
+			jkind.lustre.IdExpr causeHeldTimeoutId = new jkind.lustre.IdExpr(causeHeldTimeoutVar.id);
+
+			jkind.lustre.Expr causeHeldExpr = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL,
+					causeHeldTimeoutId);
+			jkind.lustre.Equation equation = new jkind.lustre.Equation(causeHeldId, causeHeldExpr);
+			equations.add(equation);
+
+			return equations;
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationPropertyList() {
-			return pattern.toLustrePatternEquationPropertyList();
+			List<Equation> equations = new ArrayList<>();
+			equations.addAll(this.toLustreCauseEquationList());
+			equations.addAll(refinementPattern.toLustrePatternEquationPropertyList());
+			return equations;
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationConstraintList() {
-			return pattern.toLustrePatternEquationConstraintList();
+			List<Equation> equations = new ArrayList<>();
+			equations.addAll(this.toLustreCauseEquationList());
+			equations.addAll(refinementPattern.toLustrePatternEquationConstraintList());
+			return equations;
 		}
 	}
 

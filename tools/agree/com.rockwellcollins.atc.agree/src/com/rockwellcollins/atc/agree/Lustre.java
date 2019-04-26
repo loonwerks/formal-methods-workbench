@@ -114,4 +114,8 @@ public class Lustre {
 		return exprs;
 	}
 
+	public static VarDecl getCauseConditionTimeOutVar(String id) {
+		return new VarDecl("__CAUSE_CONDITION_TIMEOUT__" + id, NamedType.BOOL);
+	}
+
 }
