@@ -485,51 +485,8 @@ public class AgreePatternTranslator {
 
 	}
 
-	private void asdf(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder, IdExpr causeId, IdExpr effectId) {
-		EObject varReference = pattern.reference;
-		AgreeVar timerVar = new AgreeVar(TIMER_PREFIX + patternIndex, NamedType.REAL, varReference);
-		AgreeVar runVar = new AgreeVar(RUNNING_PREFIX + patternIndex, NamedType.BOOL, varReference);
-		AgreeVar recordVar = new AgreeVar(RECORD_PREFIX + patternIndex, NamedType.BOOL, varReference);
-		IdExpr timerId = new IdExpr(timerVar.id);
-		IdExpr runId = new IdExpr(runVar.id);
-		IdExpr recordId = new IdExpr(recordVar.id);
 
-		// run = record -> if pre(run) and e and l <= timer <= h then
-		// false
-		// else
-		// if record then
-		// true
-		// else
-		// pre(run)
 
-		Expr preRun = new UnaryExpr(UnaryOp.PRE, runId);
-
-		{
-			Expr if2 = new IfThenElseExpr(recordId, new BoolExpr(true), preRun);
-			BinaryOp left = getIntervalLeftOp(pattern.effectInterval);
-			BinaryOp right = getIntervalRightOp(pattern.effectInterval);
-			Expr timerLow = new BinaryExpr(pattern.effectInterval.low, left, timerId);
-			Expr timerHigh = new BinaryExpr(timerId, right, pattern.effectInterval.high);
-			Expr cond1 = new BinaryExpr(preRun, BinaryOp.AND, effectId);
-			cond1 = new BinaryExpr(cond1, BinaryOp.AND, timerLow);
-			cond1 = new BinaryExpr(cond1, BinaryOp.AND, timerHigh);
-			Expr if1 = new IfThenElseExpr(cond1, new BoolExpr(false), if2);
-			Expr runExpr = new BinaryExpr(recordId, BinaryOp.ARROW, if1);
-			builder.addLocalEquation(new AgreeEquation(runId, runExpr, varReference));
-		}
-
-		// timer = (0 -> if pre(run) then pre(timer) + (t - pre(t)) else 0)
-		{
-			Expr preTimer = new UnaryExpr(UnaryOp.PRE, timerId);
-			Expr preT = new UnaryExpr(UnaryOp.PRE, timeExpr);
-			Expr elapsed = new BinaryExpr(timeExpr, BinaryOp.MINUS, preT);
-			Expr total = new BinaryExpr(preTimer, BinaryOp.PLUS, elapsed);
-			Expr timerExpr = new IfThenElseExpr(preRun, total, new RealExpr(BigDecimal.ZERO));
-			timerExpr = new BinaryExpr(new RealExpr(BigDecimal.ZERO), BinaryOp.ARROW, timerExpr);
-			builder.addLocalEquation(new AgreeEquation(timerId, timerExpr, varReference));
-		}
-
-	}
 
 	private Expr translatePatternEventProperty(AgreeCauseEffectPattern pattern, AgreeNodeBuilder builder,
 			IdExpr causeId, IdExpr effectId) {
@@ -794,6 +751,9 @@ public class AgreePatternTranslator {
 		Expr impliesEffect = new BinaryExpr(timeEqualsEffectTime, effectOp, effectId);
 		return impliesEffect;
 	}
+
+
+
 
 	// this method registers a timeout and creates an event that is true iff the
 	// condition
