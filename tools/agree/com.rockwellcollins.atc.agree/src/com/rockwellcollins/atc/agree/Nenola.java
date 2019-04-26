@@ -654,6 +654,10 @@ public class Nenola {
 
 		public List<jkind.lustre.VarDecl> toLustrePatternChanBiConstraintList();
 
+		public List<jkind.lustre.Equation> toLustrePatternEquationPropertyList();
+
+		public List<jkind.lustre.Equation> toLustrePatternEquationConstraintList();
+
 	}
 
 
@@ -678,8 +682,7 @@ public class Nenola {
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			// TODO Auto-generated method stub
-			return null;
+			return new HashMap<>();
 		}
 
 		@Override
@@ -726,6 +729,18 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationConstraintList() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -826,6 +841,18 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 
@@ -902,6 +929,18 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationConstraintList() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1006,6 +1045,18 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationConstraintList() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1116,6 +1167,18 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class SporadicPattern implements Pattern {
@@ -1189,6 +1252,18 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Equation> toLustrePatternEquationConstraintList() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1717,7 +1792,18 @@ public class Nenola {
 				equations.add(conn.toLustreEquation());
 			}
 
-			// TODO add real time pattern connections
+			for (Spec spec : this.specList) {
+
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+
+					List<jkind.lustre.Equation> localList = this.isProperty(spec.specTag)
+							? pattern.toLustrePatternEquationPropertyList()
+							: pattern.toLustrePatternEquationConstraintList();
+					equations.addAll(localList);
+				}
+
+			}
 			return equations;
 		}
 
@@ -1744,7 +1830,7 @@ public class Nenola {
 
 			}
 
-			return null;
+			return vars;
 		}
 
 		private Optional<List<VarDecl>> chanOutListCache = Optional.empty();

@@ -6,7 +6,6 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-
 import org.osate.aadl2.Aadl2Package;
 
 /**
@@ -2759,14 +2758,6 @@ public interface AgreePackage extends EPackage
    */
   int WHENEVER_OCCURS_STATEMENT = 45;
 
-  /**
-   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_OCCURS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT__CAUSE_EVENT;
 
   /**
    * The feature id for the '<em><b>Excl</b></em>' attribute.
@@ -2822,15 +2813,6 @@ public interface AgreePackage extends EPackage
    * @generated
    */
   int WHENEVER_HOLDS_STATEMENT = 46;
-
-  /**
-   * The feature id for the '<em><b>Cause Event</b></em>' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int WHENEVER_HOLDS_STATEMENT__CAUSE_EVENT = WHENEVER_STATEMENT__CAUSE_EVENT;
 
   /**
    * The feature id for the '<em><b>Excl</b></em>' attribute.
