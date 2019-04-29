@@ -210,11 +210,11 @@ public abstract class VerifyHandler extends AadlHandler {
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isMonolithic()) {
-				Map<String, Program> lustrePrograms = nenolaProgram.toMonolithicLustrePrograms();
+				Map<String, Program> lustrePrograms = nenolaProgram.toMonolithicLustrePrograms(AgreeUtils.usingKind2());
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isSingle()) {
-				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms(AgreeUtils.usingKind2());
+				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms();
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			}

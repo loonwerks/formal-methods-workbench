@@ -8,7 +8,7 @@ import com.rockwellcollins.atc.agree.analysis.preferences.PreferenceConstants;
 public class VerifyRealizabilityHandler extends VerifyHandler {
 
 	public VerifyRealizabilityHandler() {
-		this.programType = ProgramType.Monolithic;
+		this.programType = ProgramType.Realizability;
 		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 		String solver = prefs.getString(PreferenceConstants.PREF_SOLVER);
 		if (solver != PreferenceConstants.SOLVER_Z3) {

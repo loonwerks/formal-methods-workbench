@@ -2739,23 +2739,22 @@ public class Nenola {
 			return null;
 		}
 
-		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(boolean usingKind2) {
-			// TODO Auto-generated method stub
-
+		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(boolean usingKind2) {
 			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
 
 			if (usingKind2) {
 				programMap.putAll(this.toContractPrograms());
 			} else {
-				programMap.putAll(this.toAssumeGuaranteePrograms());
+				programMap.putAll(this.toAssumeGuaranteePrograms(true));
 			}
 
-			return null;
+			return programMap;
+		}
+
+		public Map<String, jkind.lustre.Program> toSingleLustrePrograms() {
+			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
+			programMap.putAll(this.toAssumeGuaranteePrograms(false));
+			return programMap;
 		}
 
 		private Map<String, jkind.lustre.Program> toContractPrograms() {
@@ -2764,7 +2763,7 @@ public class Nenola {
 			return null;
 		}
 
-		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms() {
+		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(boolean isMonolithic) {
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
