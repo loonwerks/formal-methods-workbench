@@ -602,8 +602,6 @@ public class Nenola {
 
 	public static interface Prop {
 
-		jkind.lustre.Expr toLustreExpr();
-
 	}
 
 	public static class ExprProp implements Prop {
@@ -613,11 +611,6 @@ public class Nenola {
 			this.expr = expr;
 		}
 
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 
@@ -629,17 +622,13 @@ public class Nenola {
 		public PatternProp(Pattern pattern) {
 			this.pattern = pattern;
 		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 
 	public static interface Pattern {
-		public jkind.lustre.Expr toLustreExpr();
+		public jkind.lustre.Expr toLustreExprProperty();
+
+		public jkind.lustre.Expr toLustreExprConstraint();
 
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap();
 
@@ -676,10 +665,6 @@ public class Nenola {
 			this.expr = expr;
 		}
 
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			return expr.toLustreExpr();
-		}
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
@@ -741,6 +726,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public jkind.lustre.Expr toLustreExprProperty() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprConstraint() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class Interval {
@@ -780,12 +777,6 @@ public class Nenola {
 				Expr causeEvent = new IdExpr(Lustre.getCauseHeldVar(causeConditionString).id);
 				this.refinementPattern = new WheneverOccursPattern(causeEvent, effectEvent, exclusive, effectInterval);
 			}
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
 		}
 
 		@Override
@@ -983,6 +974,18 @@ public class Nenola {
 			equations.addAll(refinementPattern.toLustrePatternEquationConstraintList());
 			return equations;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprProperty() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprConstraint() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 
@@ -1000,12 +1003,6 @@ public class Nenola {
 		}
 
 		private String patternIndex = this.hashCode() + "";
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
@@ -1116,6 +1113,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public jkind.lustre.Expr toLustreExprProperty() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprConstraint() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 
@@ -1147,11 +1156,6 @@ public class Nenola {
 			return new BinaryExpr(lower, BinaryOp.AND, higher);
 		}
 
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
@@ -1390,6 +1394,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public jkind.lustre.Expr toLustreExprProperty() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprConstraint() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 
@@ -1403,12 +1419,6 @@ public class Nenola {
 			this.event = event;
 			this.period = period;
 			this.jitterOp = jitterOp;
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
 		}
 
 		public String patternIndex = this.hashCode() + "";
@@ -1565,6 +1575,18 @@ public class Nenola {
 		public List<Equation> toLustrePatternEquationConstraintList() {
 			return new ArrayList<>();
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprProperty() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprConstraint() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class SporadicPattern implements Pattern {
@@ -1578,12 +1600,6 @@ public class Nenola {
 			this.event = event;
 			this.iat = iat;
 			this.jitterOp = jitterOp;
-		}
-
-		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
 		}
 
 		@Override
@@ -1700,6 +1716,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustrePatternEquationConstraintList() {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprProperty() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExprConstraint() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -2436,8 +2464,18 @@ public class Nenola {
 
 			for (Spec spec : this.specList) {
 				if (spec.specTag == SpecTag.Assert) {
-					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
-					exprs.add(expr);
+
+					if (spec.prop instanceof PatternProp) {
+
+						Pattern pattern = ((PatternProp) spec.prop).pattern;
+
+						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+								: pattern.toLustreExprConstraint();
+						exprs.add(expr);
+					} else if (spec.prop instanceof ExprProp) {
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						exprs.add(expr);
+					}
 				}
 
 				if (spec.prop instanceof PatternProp) {
@@ -2476,8 +2514,17 @@ public class Nenola {
 
 				if (spec.specTag == SpecTag.Guarantee) {
 					String key = SpecTag.Guarantee.name() + "__" + suffix;
-					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
-					exprMap.put(key, expr);
+					if (spec.prop instanceof PatternProp) {
+						Pattern pattern = ((PatternProp) spec.prop).pattern;
+						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+								: pattern.toLustreExprConstraint();
+						exprMap.put(key, expr);
+
+					} else if (spec.prop instanceof ExprProp) {
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						exprMap.put(key, expr);
+
+					}
 
 					suffix = suffix + 1;
 				}
@@ -2501,8 +2548,18 @@ public class Nenola {
 
 				if (spec.specTag == SpecTag.Lemma) {
 					String key = SpecTag.Lemma.name() + "__" + suffix;
-					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
-					exprMap.put(key, expr);
+
+					if (spec.prop instanceof PatternProp) {
+						Pattern pattern = ((PatternProp) spec.prop).pattern;
+						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+								: pattern.toLustreExprConstraint();
+						exprMap.put(key, expr);
+
+					} else if (spec.prop instanceof ExprProp) {
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						exprMap.put(key, expr);
+
+					}
 
 					suffix = suffix + 1;
 				}
@@ -2527,8 +2584,17 @@ public class Nenola {
 
 				if (spec.specTag == SpecTag.Assume) {
 					String key = SpecTag.Assume.name() + "__" + suffix;
-					jkind.lustre.Expr expr = spec.prop.toLustreExpr();
-					exprMap.put(key, expr);
+					if (spec.prop instanceof PatternProp) {
+						Pattern pattern = ((PatternProp) spec.prop).pattern;
+						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+								: pattern.toLustreExprConstraint();
+						exprMap.put(key, expr);
+
+					} else if (spec.prop instanceof ExprProp) {
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						exprMap.put(key, expr);
+
+					}
 
 					suffix = suffix + 1;
 				}
