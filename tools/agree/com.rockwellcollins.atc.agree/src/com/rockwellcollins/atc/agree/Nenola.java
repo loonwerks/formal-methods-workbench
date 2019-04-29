@@ -2214,28 +2214,28 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-		private Optional<Node> lustreNodeCache = Optional.empty();
+		private Map<Boolean, Node> lustreNodeCache = new HashMap<>();
 
-		public Node toLustreNode() {
+		public Node toLustreNode(boolean isMonolithic) {
 
-			if (this.lustreNodeCache.isPresent()) {
-				return lustreNodeCache.get();
+			if (this.lustreNodeCache.containsKey(isMonolithic)) {
+				return lustreNodeCache.get(isMonolithic);
 			}
 
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
-			List<jkind.lustre.Expr> assertions = this.toLustreAssertList();
+			List<jkind.lustre.Expr> assertions = this.toLustreAssertList(isMonolithic);
 			List<String> ivcs = new ArrayList<>();
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
 				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -2243,7 +2243,7 @@ public class Nenola {
 			}
 
 			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				locals.add(new VarDecl(inputName, NamedType.BOOL));
@@ -2253,7 +2253,7 @@ public class Nenola {
 				guarConjExpr = Lustre.makeANDExpr(guarId, guarConjExpr);
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(isMonolithic).entrySet()) {
 				jkind.lustre.Expr expr = entry.getValue();
 				guarConjExpr = Lustre.makeANDExpr(expr, guarConjExpr);
 			}
@@ -2267,7 +2267,7 @@ public class Nenola {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap().entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap(isMonolithic).entrySet()) {
 				String patternVarName = entry.getKey();
 				inputs.add(new VarDecl(patternVarName, NamedType.BOOL));
 				jkind.lustre.Expr expr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(patternVarName),
@@ -2275,13 +2275,13 @@ public class Nenola {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
-			inputs.addAll(this.toLustreChanInList());
+			inputs.addAll(this.toLustreChanInList(isMonolithic));
 
-			inputs.addAll(this.toLustreChanOutList());
+			inputs.addAll(this.toLustreChanOutList(isMonolithic));
 
-			inputs.addAll(this.toLustreChanBiList());
+			inputs.addAll(this.toLustreChanBiList(isMonolithic));
 
-			equations.addAll(this.toLustreEquationList());
+			equations.addAll(this.toLustreEquationList(isMonolithic));
 
 			String outputName = "__ASSERT";
 			List<VarDecl> outputs = new ArrayList<>();
@@ -2298,13 +2298,14 @@ public class Nenola {
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
 
-			lustreNodeCache = Optional.of(node);
+			lustreNodeCache.put(isMonolithic, node);
 
 			return node;
 
 		}
 
-		private List<Equation> toLustreEquationList() {
+
+		private List<Equation> toLustreEquationList(boolean isMonolithic) {
 			List<Equation> equations = new ArrayList<>();
 
 			for (Connection conn : this.connections) {
@@ -2316,7 +2317,7 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					List<jkind.lustre.Equation> localList = this.isProperty(spec.specTag)
+					List<jkind.lustre.Equation> localList = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternEquationPropertyList()
 							: pattern.toLustrePatternEquationConstraintList();
 					equations.addAll(localList);
@@ -2326,7 +2327,7 @@ public class Nenola {
 			return equations;
 		}
 
-		private List<VarDecl> toLustreChanBiList() {
+		private List<VarDecl> toLustreChanBiList(boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 
@@ -2341,7 +2342,7 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					List<jkind.lustre.VarDecl> localList = this.isProperty(spec.specTag)
+					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternChanBiPropertyList()
 							: pattern.toLustrePatternChanBiConstraintList();
 					vars.addAll(localList);
@@ -2352,12 +2353,8 @@ public class Nenola {
 			return vars;
 		}
 
-		private Optional<List<VarDecl>> chanOutListCache = Optional.empty();
-		private List<VarDecl> toLustreChanOutList() {
 
-			if (chanOutListCache.isPresent()) {
-				return chanOutListCache.get();
-			}
+		private List<VarDecl> toLustreChanOutList(boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
@@ -2371,7 +2368,7 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					List<jkind.lustre.VarDecl> localList = this.isProperty(spec.specTag)
+					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternChanOutPropertyList()
 							: pattern.toLustrePatternChanOutConstraintList();
 					vars.addAll(localList);
@@ -2383,23 +2380,23 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (VarDecl nestedVar : nc.toLustreChanOutList()) {
+				for (VarDecl nestedVar : nc.toLustreChanOutList(isMonolithic)) {
 					String id = prefix + "__" + nestedVar.id;
 					jkind.lustre.Type type = nestedVar.type;
 					vars.add(new VarDecl(id, type));
 				}
 
-				for (String assumeKey : nc.toLustreAssumeMap().keySet()) {
+				for (String assumeKey : nc.toLustreAssumeMap(isMonolithic).keySet()) {
 					String id = prefix + "__" + assumeKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustreLemmaMap().keySet()) {
+				for (String propKey : nc.toLustreLemmaMap(isMonolithic).keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustrePatternPropMap().keySet()) {
+				for (String propKey : nc.toLustrePatternPropMap(isMonolithic).keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
@@ -2408,17 +2405,10 @@ public class Nenola {
 
 			}
 
-			chanOutListCache = Optional.of(vars);
-
 			return vars;
 		}
 
-		private Optional<List<VarDecl>> chanInListCache = Optional.empty();
-		private List<VarDecl> toLustreChanInList() {
-
-			if (chanInListCache.isPresent()) {
-				return chanInListCache.get();
-			}
+		private List<VarDecl> toLustreChanInList(boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
@@ -2432,7 +2422,7 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					List<jkind.lustre.VarDecl> localList = this.isProperty(spec.specTag)
+					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternChanInPropertyList()
 							: pattern.toLustrePatternChanInConstraintList();
 					vars.addAll(localList);
@@ -2443,7 +2433,7 @@ public class Nenola {
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
-				for (VarDecl nestedVar : nc.toLustreChanInList()) {
+				for (VarDecl nestedVar : nc.toLustreChanInList(isMonolithic)) {
 					String id = prefix + "__" + nestedVar.id;
 					jkind.lustre.Type type = nestedVar.type;
 					vars.add(new VarDecl(id, type));
@@ -2454,8 +2444,6 @@ public class Nenola {
 
 			}
 
-			chanInListCache = Optional.of(vars);
-
 			return vars;
 		}
 
@@ -2464,20 +2452,16 @@ public class Nenola {
 			return new jkind.lustre.VarDecl(this.getName() + "__CLOCK_", jkind.lustre.NamedType.BOOL);
 		}
 
-		private Optional<Map<String, jkind.lustre.Expr>> lustrePatternMapCache = Optional.empty();
 
-		private boolean isProperty(SpecTag specTag) {
-			return (specTag == SpecTag.Assume && !this.isMain) || (specTag == SpecTag.Lemma && this.isMain)
-					|| (specTag == SpecTag.Guarantee && this.isMain);
+		private boolean isProperty(boolean isMonolithic, SpecTag specTag) {
+			return (specTag == SpecTag.Assume && !this.isMain && !isMonolithic)
+					|| (specTag == SpecTag.Lemma && (this.isMain || isMonolithic))
+					|| (specTag == SpecTag.Guarantee && (this.isMain || isMonolithic));
 
 		}
 
-		private Map<String, jkind.lustre.Expr> toLustrePatternPropMap() {
 
-			if (lustrePatternMapCache.isPresent()) {
-				return lustrePatternMapCache.get();
-			}
-
+		private Map<String, jkind.lustre.Expr> toLustrePatternPropMap(boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> props = new HashMap<>();
 			for (Spec spec : this.specList) {
@@ -2485,7 +2469,7 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					Map<String, jkind.lustre.Expr> localMap = this.isProperty(spec.specTag)
+					Map<String, jkind.lustre.Expr> localMap = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternPropertyMap()
 							: pattern.toLustrePatternConstraintMap();
 					props.putAll(localMap);
@@ -2496,7 +2480,8 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternPropMap().entrySet()) {
+				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternPropMap(isMonolithic)
+						.entrySet()) {
 					String key = prefix + "__" + nestedEntry.getKey();
 					jkind.lustre.Expr expr = nestedEntry.getValue();
 					props.put(key, expr);
@@ -2504,18 +2489,10 @@ public class Nenola {
 
 			}
 
-			lustrePatternMapCache = Optional.of(props);
-
 			return props;
 		}
 
-		private Optional<List<jkind.lustre.Expr>> lustreAssertListCache = Optional.empty();
-
-		private List<jkind.lustre.Expr> toLustreAssertList() {
-
-			if (lustreAssertListCache.isPresent()) {
-				return lustreAssertListCache.get();
-			}
+		private List<jkind.lustre.Expr> toLustreAssertList(boolean isMonolithic) {
 
 			List<jkind.lustre.Expr> exprs = new ArrayList<>();
 
@@ -2526,7 +2503,8 @@ public class Nenola {
 
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
+								? pattern.toLustreExprProperty()
 								: pattern.toLustreExprConstraint();
 						exprs.add(expr);
 					} else if (spec.prop instanceof ExprProp) {
@@ -2538,7 +2516,7 @@ public class Nenola {
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
-					List<jkind.lustre.Expr> localList = this.isProperty(spec.specTag)
+					List<jkind.lustre.Expr> localList = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternAssertPropertyList()
 							: pattern.toLustrePatternAssertConstraintList();
 					exprs.addAll(localList);
@@ -2549,21 +2527,16 @@ public class Nenola {
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
 				NodeContract nc = entry.getValue();
 
-				for (jkind.lustre.Expr subAssert : nc.toLustreAssertList()) {
+				for (jkind.lustre.Expr subAssert : nc.toLustreAssertList(isMonolithic)) {
 					exprs.add(subAssert);
 				}
 			}
 
-			lustreAssertListCache = Optional.of(exprs);
-			return null;
+			return exprs;
 		}
 
 
-		private Optional<Map<String, jkind.lustre.Expr>> lustreGuaranteeMapCache = Optional.empty();
-		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap() {
-			if (lustreGuaranteeMapCache.isPresent()) {
-				return lustreGuaranteeMapCache.get();
-			}
+		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
 			int suffix = 0;
@@ -2573,7 +2546,8 @@ public class Nenola {
 					String key = SpecTag.Guarantee.name() + "__" + suffix;
 					if (spec.prop instanceof PatternProp) {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
-						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
+								? pattern.toLustreExprProperty()
 								: pattern.toLustreExprConstraint();
 						exprMap.put(key, expr);
 
@@ -2588,16 +2562,11 @@ public class Nenola {
 
 			}
 
-			lustreGuaranteeMapCache = Optional.of(exprMap);
-
 			return exprMap;
 		}
 
-		private Optional<Map<String, jkind.lustre.Expr>> lustreLemmaMapCache = Optional.empty();
-		private Map<String, jkind.lustre.Expr> toLustreLemmaMap() {
-			if (lustreLemmaMapCache.isPresent()) {
-				return lustreLemmaMapCache.get();
-			}
+
+		private Map<String, jkind.lustre.Expr> toLustreLemmaMap(boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
 			int suffix = 0;
@@ -2608,7 +2577,8 @@ public class Nenola {
 
 					if (spec.prop instanceof PatternProp) {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
-						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
+								? pattern.toLustreExprProperty()
 								: pattern.toLustreExprConstraint();
 						exprMap.put(key, expr);
 
@@ -2623,17 +2593,11 @@ public class Nenola {
 
 			}
 
-			lustreLemmaMapCache = Optional.of(exprMap);
-
 			return exprMap;
 		}
 
-		private Optional<Map<String, jkind.lustre.Expr>> lustreAssumeMapCache = Optional.empty();
-		private Map<String, jkind.lustre.Expr> toLustreAssumeMap() {
 
-			if (lustreAssumeMapCache.isPresent()) {
-				return lustreAssumeMapCache.get();
-			}
+		private Map<String, jkind.lustre.Expr> toLustreAssumeMap(boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
 			int suffix = 0;
@@ -2643,7 +2607,8 @@ public class Nenola {
 					String key = SpecTag.Assume.name() + "__" + suffix;
 					if (spec.prop instanceof PatternProp) {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
-						jkind.lustre.Expr expr = this.isProperty(spec.specTag) ? pattern.toLustreExprProperty()
+						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
+								? pattern.toLustreExprProperty()
 								: pattern.toLustreExprConstraint();
 						exprMap.put(key, expr);
 
@@ -2658,17 +2623,15 @@ public class Nenola {
 
 			}
 
-			lustreAssumeMapCache = Optional.of(exprMap);
-
 			return exprMap;
 		}
 
-		public List<Node> toLustreNodesFromNesting() {
+		public List<Node> toLustreNodesFromNesting(boolean isMonolithic) {
 
 			List<Node> nodes = new ArrayList<>();
-			nodes.add(this.toLustreNode());
+			nodes.add(this.toLustreNode(isMonolithic));
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.toLustreNodesFromNesting());
+				nodes.addAll(subNodeContract.toLustreNodesFromNesting(isMonolithic));
 			}
 
 			return nodes;
@@ -2767,7 +2730,7 @@ public class Nenola {
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
-			lustreNodes.addAll(this.lustreNodesFromMain());
+			lustreNodes.addAll(this.lustreNodesFromMain(isMonolithic));
 			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
 					this.main.getName());
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
@@ -2775,8 +2738,8 @@ public class Nenola {
 			return programs;
 		}
 
-		private List<Node> lustreNodesFromMain() {
-			return this.main.toLustreNodesFromNesting();
+		private List<Node> lustreNodesFromMain(boolean isMonolithic) {
+			return this.main.toLustreNodesFromNesting(isMonolithic);
 		}
 
 
