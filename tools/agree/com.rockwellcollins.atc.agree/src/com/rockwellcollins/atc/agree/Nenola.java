@@ -1032,8 +1032,20 @@ public class Nenola {
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+
+			VarDecl timeCauseVar = Lustre.getTimeOfVar(this.causeEvent.toLustreExpr().id);
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+
+			jkind.lustre.Expr timeoutExpr = expr("timeout = if timeCause >= 0.0 then (timeCause + l) else -1.0",
+					to("timeout", timeoutVar), to("timeCause", timeCauseVar),
+					to("l", this.interval.low.toLustreExpr()));
+
+			asserts.add(timeoutExpr);
+
+			return asserts;
+
 		}
 
 		@Override
@@ -1045,8 +1057,7 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
@@ -1060,8 +1071,10 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			vars.add(timeoutVar);
+			return vars;
 		}
 
 		@Override
@@ -1074,8 +1087,7 @@ public class Nenola {
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
@@ -1101,8 +1113,7 @@ public class Nenola {
 
 		@Override
 		public List<Equation> toLustrePatternEquationConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 	}
@@ -1400,6 +1411,8 @@ public class Nenola {
 			return null;
 		}
 
+		public String patternIndex = this.hashCode() + "";
+
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
 			return new HashMap<>();
@@ -1441,62 +1454,116 @@ public class Nenola {
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+
+			VarDecl jitterVar = Lustre.getJitterVar(patternIndex);
+			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+
+			jkind.lustre.IdExpr jitterId = new jkind.lustre.IdExpr(jitterVar.id);
+			jkind.lustre.IdExpr periodId = new jkind.lustre.IdExpr(periodVar.id);
+			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
+			//
+
+//			// -j <= jitter <= j
+			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+			jkind.lustre.Expr jitterLow = new jkind.lustre.BinaryExpr(
+					new jkind.lustre.UnaryExpr(UnaryOp.NEGATIVE, lustreJitter), BinaryOp.LESSEQUAL,
+					jitterId);
+			jkind.lustre.Expr jitterHigh = new jkind.lustre.BinaryExpr(jitterId, BinaryOp.LESSEQUAL, lustreJitter);
+			asserts.add(new BinaryExpr(jitterLow, BinaryOp.AND, jitterHigh));
+
+			jkind.lustre.Expr expr = expr(
+					"(0.0 <= period) and (period < p) -> " + "(period = (pre period) + (if pre(e) then p else 0.0))",
+					to("period", periodVar), to("p", this.period.toLustreExpr()), to("e", this.event.toLustreExpr()));
+
+			asserts.add(expr);
+
+			// helper assertion (should be true)
+			jkind.lustre.Expr lemma = expr("period - time < p - j and period >= time", to("period", periodVar),
+					to("p", this.period.toLustreExpr()), to("time", new jkind.lustre.IdExpr("time")),
+					to("j", lustreJitter));
+
+			asserts.add(lemma);
+			asserts.addAll(Lustre.getTimeOfAsserts(this.event.toLustreExpr().id));
+
+			// timeout = pnext + jitter
+			jkind.lustre.Expr timeoutExpr = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
+			timeoutExpr = new BinaryExpr(timeoutId, BinaryOp.EQUAL, timeoutExpr);
+			asserts.add(timeoutExpr);
+
+			return asserts;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+
+			VarDecl jitterVar = Lustre.getJitterVar(patternIndex);
+			vars.add(jitterVar);
+			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
+			vars.add(periodVar);
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			vars.add(timeoutVar);
+
+			VarDecl var = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+			vars.add(var);
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+			vars.add(Lustre.getPeriodVar(patternIndex));
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+
+			List<Equation> eqs = new ArrayList<>();
+
+			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
+
+			jkind.lustre.Equation eq = equation(
+					"period = if event then (if time <= P then time  else (0.0 -> pre period)) + P else (P -> pre period);",
+					to("event", this.event.toLustreExpr()), to("period", periodVar),
+					to("P", this.period.toLustreExpr()));
+
+			eqs.add(eq);
+
+			return eqs;
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 	}
 
@@ -1504,6 +1571,8 @@ public class Nenola {
 		public final Expr event;
 		public final Expr iat;
 		public final Optional<Expr> jitterOp;
+
+		public final String patternIndex = this.hashCode() + "";
 
 		public SporadicPattern(Expr event, Expr iat, Optional<Expr> jitterOp) {
 			this.event = event;
@@ -1529,62 +1598,108 @@ public class Nenola {
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+			asserts.addAll(Lustre.getTimeOfAsserts(this.event.toLustreExpr().id));
+			return asserts;
 		}
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+
+			List<jkind.lustre.Expr> asserts = new ArrayList<>();
+
+			VarDecl jitterVar = Lustre.getJitterVar(patternIndex);
+			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+
+			jkind.lustre.IdExpr jitterId = new jkind.lustre.IdExpr(jitterVar.id);
+			jkind.lustre.IdExpr periodId = new jkind.lustre.IdExpr(periodVar.id);
+			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
+
+			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+
+			// -j <= jitter <= j
+			jkind.lustre.Expr jitterLow = new jkind.lustre.BinaryExpr(
+					new jkind.lustre.UnaryExpr(UnaryOp.NEGATIVE, lustreJitter), BinaryOp.LESSEQUAL, jitterId);
+			jkind.lustre.Expr jitterHigh = new BinaryExpr(jitterId, BinaryOp.LESSEQUAL, lustreJitter);
+			asserts.add(new BinaryExpr(jitterLow, BinaryOp.AND, jitterHigh));
+
+			// pnext >= 0 -> if pre ((pnext + jitter) = t) then pnext >= p +
+			// pre(pnext) else pre(pnext)
+
+			jkind.lustre.Expr prePNext = new jkind.lustre.UnaryExpr(UnaryOp.PRE, periodId);
+			jkind.lustre.Expr pNextInit = new BinaryExpr(periodId, BinaryOp.GREATEREQUAL,
+					new RealExpr(BigDecimal.ZERO));
+			jkind.lustre.Expr pNextCond = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
+			pNextCond = new BinaryExpr(pNextCond, BinaryOp.EQUAL, new jkind.lustre.IdExpr("time"));
+			pNextCond = new jkind.lustre.UnaryExpr(UnaryOp.PRE, pNextCond);
+			jkind.lustre.Expr pNextThen = new BinaryExpr(this.iat.toLustreExpr(), BinaryOp.PLUS, prePNext);
+			pNextThen = new BinaryExpr(periodId, BinaryOp.GREATEREQUAL, pNextThen);
+			jkind.lustre.Expr pNextHold = new BinaryExpr(periodId, BinaryOp.EQUAL, prePNext);
+			jkind.lustre.Expr pNextIf = new IfThenElseExpr(pNextCond, pNextThen, pNextHold);
+			jkind.lustre.Expr pNext = new BinaryExpr(pNextInit, BinaryOp.ARROW, pNextIf);
+
+			asserts.add(pNext);
+
+			// timeout = pnext + jitter
+			jkind.lustre.Expr timeoutExpr = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
+			timeoutExpr = new BinaryExpr(timeoutId, BinaryOp.EQUAL, timeoutExpr);
+			asserts.add(timeoutExpr);
+
+			return asserts;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanInConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+			vars.add(Lustre.getTimeOfVar(this.event.toLustreExpr().id));
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanOutConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			List<VarDecl> vars = new ArrayList<>();
+
+			VarDecl jitterVar = Lustre.getJitterVar(patternIndex);
+			vars.add(jitterVar);
+			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
+			vars.add(periodVar);
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			vars.add(timeoutVar);
+
+			VarDecl var = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+			vars.add(var);
+			return vars;
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<VarDecl> toLustrePatternChanBiConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationPropertyList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<Equation> toLustrePatternEquationConstraintList() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 	}

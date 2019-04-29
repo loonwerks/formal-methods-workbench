@@ -271,7 +271,7 @@ public class AgreePatternTranslator {
 		if (isProperty) {
 			return translatePatternProperty(pattern, builder, varReference);
 		} else {
-			return translatePatternCondition(pattern, builder, varReference);
+			return translatePatternConstraint(pattern, builder, varReference);
 		}
 	}
 
@@ -292,8 +292,9 @@ public class AgreePatternTranslator {
 
 		return prop;
 	}
-
-	private Expr translatePatternCondition(AgreePeriodicPattern pattern, AgreeNodeBuilder builder,
+	
+	
+	private Expr translatePatternConstraint(AgreePeriodicPattern pattern, AgreeNodeBuilder builder,
 			EObject varReference) {
 		AgreeVar jitterVar = new AgreeVar(JITTER_PREFIX + patternIndex, NamedType.REAL, varReference);
 		AgreeVar periodVar = new AgreeVar(PERIOD_PREFIX + patternIndex, NamedType.REAL, varReference);

@@ -122,4 +122,16 @@ public class Lustre {
 		return new VarDecl("__WINDOW__" + patternIndex, NamedType.BOOL);
 	}
 
+	public static VarDecl getTimeoutVar(String patternIndex) {
+		return new VarDecl("__TIMEOUT__" + patternIndex, NamedType.BOOL);
+	}
+
+	public static VarDecl getPeriodVar(String patternIndex) {
+		return new VarDecl("__PERIOD__" + patternIndex, NamedType.BOOL);
+	}
+
+	public static VarDecl getJitterVar(String patternIndex) {
+		return new VarDecl("__JITTER__" + patternIndex, NamedType.BOOL);
+	}
+
 }
