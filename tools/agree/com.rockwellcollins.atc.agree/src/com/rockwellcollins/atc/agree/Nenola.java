@@ -2304,6 +2304,24 @@ public class Nenola {
 
 		}
 
+		private List<jkind.lustre.VarDecl> toEventTimeVarList() {
+
+			List<jkind.lustre.VarDecl> vars = new ArrayList<>();
+
+			// TODO - add base event times from AgreePatternTranslator
+
+			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
+
+				String prefix = entry.getKey() + "__";
+				NodeContract nc = entry.getValue();
+				for (VarDecl subTimeVar : nc.toEventTimeVarList()) {
+					vars.add(new VarDecl(prefix + subTimeVar.id, subTimeVar.type));
+				}
+			}
+
+			return vars;
+		}
+
 
 		private List<Equation> toLustreEquationList(boolean isMonolithic) {
 			List<Equation> equations = new ArrayList<>();
@@ -2525,11 +2543,20 @@ public class Nenola {
 			}
 
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
+
 				NodeContract nc = entry.getValue();
 
 				for (jkind.lustre.Expr subAssert : nc.toLustreAssertList(isMonolithic)) {
 					exprs.add(subAssert);
 				}
+
+				String prefix = entry.getKey() + "__";
+				jkind.lustre.IdExpr timeId = new jkind.lustre.IdExpr("time");
+
+				exprs.add(new jkind.lustre.BinaryExpr(timeId, BinaryOp.EQUAL,
+						new jkind.lustre.IdExpr(prefix + timeId.id)));
+
+
 			}
 
 			return exprs;
