@@ -1610,14 +1610,28 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExprProperty() {
-			// TODO Auto-generated method stub
-			return null;
+			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
+
+			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+
+			jkind.lustre.Expr prop = expr(
+					"true -> (time >= P + j => event => (pre period) - j <= time and time <= (pre period) + j)",
+					to("time", new jkind.lustre.IdExpr("time")), to("period", periodVar),
+					to("P", this.period.toLustreExpr()), to("j", lustreJitter), to("event", this.event.toLustreExpr()));
+			return prop;
 		}
 
 		@Override
 		public jkind.lustre.Expr toLustreExprConstraint() {
-			// TODO Auto-generated method stub
-			return null;
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+
+			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
+
+			// event = (t = timeout)
+			jkind.lustre.Expr eventExpr = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL, timeoutId);
+			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
+
+			return eventExpr;
 		}
 	}
 
@@ -1752,14 +1766,25 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExprProperty() {
-			// TODO Auto-generated method stub
-			return null;
+			VarDecl timeofEvent = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+
+			jkind.lustre.Expr propExpr = expr(
+					"(true -> (not ((pre laste) = -1.0) => event => time - (pre laste) >= period))",
+					to("laste", timeofEvent), to("event", this.event.toLustreExpr()),
+					to("time", new jkind.lustre.IdExpr("time")), to("period", this.iat.toLustreExpr()));
+
+			return propExpr;
 		}
 
 		@Override
 		public jkind.lustre.Expr toLustreExprConstraint() {
-			// TODO Auto-generated method stub
-			return null;
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
+			// event = (t = timeout)
+			jkind.lustre.Expr eventExpr = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL, timeoutId);
+			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
+
+			return eventExpr;
 		}
 
 	}
