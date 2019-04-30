@@ -40,7 +40,7 @@
      <command
            categoryId="com.rockwellcollins.atc.resolute.analysis.commands"
            id="com.rockwellcollins.atc.resolute.analysis.commands.linter"
-           name="Linter">
+           name="Resolint">
      </command>
 	 <command categoryId="com.rockwellcollins.atc.resolute.analysis.commands"
 	           id="com.rockwellcollins.atc.resolute.analysis.commands.resolutePredefined" 
@@ -211,7 +211,7 @@
    </extension>
    <extension
          id="com.rockwellcollins.atc.resolute.linter.marker"
-         name="Linter Marker"
+         name="Resolint"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.osate.aadl2.modelsupport.AadlObjectMarker">

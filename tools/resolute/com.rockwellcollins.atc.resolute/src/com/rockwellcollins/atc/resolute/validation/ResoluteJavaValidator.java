@@ -1651,4 +1651,5 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 			throw new IllegalArgumentException();
 		}
 	}
+
 }
