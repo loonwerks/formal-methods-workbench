@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Build splat executable (for Linux) from sources" basedir=".">
+
+	<property name="polyml.version" value="5.8" />
+	<property name="polyml.zipfile" value="polyml-${polyml.version}.zip" />
+	<property name="polyml.url" value="https://github.com/polyml/polyml/archive" />
+	<property name="polyml.dir" value="./polyml-${polyml.version}" />
+	<property name="polyml.binary.dir" location="${polyml.dir}-bin" />
+
+	<property name="hol4.repository" value="git://github.com/HOL-Theorem-Prover/HOL.git" />
+	<property name="hol4.dir" value="HOL" />
+	<property name="hol4.release.tag" value="kananaskis-12" />
+
+	<target name="acquire-polyml">
+		<download-polyml />
+		<unzip-polyml />
+		<configure-polyml />
+		<compile-polyml />
+		<install-polyml />
+	</target>
+
+	<macrodef name="download-polyml" description="Download polyml zipfile">
+		<sequential>
+			<get-file file="v${polyml.version}.zip" url="${polyml.url}" dest="${polyml.zipfile}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="unzip-polyml" description="Unzip polyml zipfile">
+		<sequential>
+			<unzip src="${polyml.zipfile}" dest="." />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="configure-polyml" description="Configure polyml for build">
+		<sequential>
+			<exec dir="${polyml.dir}" spawn="false" executable="bash" newenvironment="false">
+				<arg line="./configure --prefix=${polyml.binary.dir}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="compile-polyml" description="Compile polyml using make">
+		<sequential>
+			<exec dir="${polyml.dir}" spawn="false" executable="make" newenvironment="false" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="install-polyml" description="Install polyml">
+		<sequential>
+			<exec dir="${polyml.dir}" spawn="false" executable="make" newenvironment="false">
+				<arg value="install" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<target name="acquire-hol" depends="acquire-polyml">
+	  <clone-hol />
+	  <configure-hol />
+	  <build-hol />
+	</target>
+
+	<macrodef name="clone-hol" description="Clone HOL-4 repository">
+		<sequential>
+		  <exec dir="." spawn="false" executable="git">
+		    <arg value="clone" />
+		    <arg value="${hol4.repository}" />
+		    <arg value="${hol4.dir}" />
+		  </exec>
+		  <exec dir="${hol4.dir}" spawn="false" executable="git">
+		    <arg value="checkout" />
+		    <arg value="${hol4.release.tag}" />
+		  </exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="configure-hol" description="Configure HOL-4 for build">
+		<sequential>
+		  <exec dir="${hol4.dir}" spawn="false" executable="${polyml.binary.dir}/bin/poly" input="${hol4.dir}/tools/smart-configure.sml" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="build-hol" description="Build HOL-4">
+		<sequential>
+		  <exec dir="${hol4.dir}" spawn="false" executable="bin/build" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="get-file" description="Use Ant Get task the file">
+		<attribute name="file" />
+		<attribute name="url" />
+		<attribute name="dest" />
+		<sequential>
+			<echo message="Getting @{file} from @{url} into @{dest}..." />
+			<get dest="@{dest}" ignoreerrors="false">
+				<url url="@{url}/@{file}" />
+			</get>
+		</sequential>
+	</macrodef>
+
+	<target name="build-splat" depends="acquire-hol">
+	  <exec dir="." spawn="false" executable="${hol4.dir}/bin/Holmake" />
+	</target>
+
+</project>
