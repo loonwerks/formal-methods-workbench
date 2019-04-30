@@ -2977,6 +2977,9 @@ public class Nenola {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
 			lustreNodes.addAll(this.lustreNodesFromMain(isMonolithic));
+
+			lustreNodes.add(Lustre.getHistNode());
+			lustreNodes.addAll(Lustre.getRealTimeNodes());
 			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
 					this.main.getName());
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
