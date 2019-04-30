@@ -654,6 +654,10 @@ public class Nenola {
 
 		public List<jkind.lustre.Equation> toLustrePatternEquationConstraintList();
 
+		public List<jkind.lustre.VarDecl> toLustrePatternTimeEventPropertyList();
+
+		public List<jkind.lustre.VarDecl> toLustrePatternTimeEventConstraintList();
+
 	}
 
 
@@ -734,6 +738,16 @@ public class Nenola {
 		@Override
 		public jkind.lustre.Expr toLustreExprConstraint() {
 			return this.expr.toLustreExpr();
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+			return new ArrayList<>();
 		}
 
 	}
@@ -982,6 +996,24 @@ public class Nenola {
 		public jkind.lustre.Expr toLustreExprConstraint() {
 			return refinementPattern.toLustreExprConstraint();
 		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(this.causeCondition.toLustreExpr().id);
+			vars.add(causeFallTimeVar);
+			vars.addAll(refinementPattern.toLustrePatternTimeEventPropertyList());
+			return vars;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(this.causeCondition.toLustreExpr().id);
+			vars.addAll(refinementPattern.toLustrePatternTimeEventConstraintList());
+			vars.add(causeFallTimeVar);
+			return vars;
+		}
 	}
 
 
@@ -1144,6 +1176,19 @@ public class Nenola {
 					to("effectTrue", this.effectCondition.toLustreExpr()));
 
 			return expr;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			vars.add(timeoutVar);
+			return vars;
 		}
 
 	}
@@ -1438,6 +1483,19 @@ public class Nenola {
 			return impliesEffect;
 		}
 
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+			List<VarDecl> vars = new ArrayList<>();
+			vars.add(Lustre.getTimeWillVar(patternIndex));
+			return vars;
+		}
+
 	}
 
 
@@ -1633,6 +1691,19 @@ public class Nenola {
 
 			return eventExpr;
 		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			vars.add(timeoutVar);
+			return vars;
+		}
 	}
 
 	public static class SporadicPattern implements Pattern {
@@ -1785,6 +1856,19 @@ public class Nenola {
 			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
 
 			return eventExpr;
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+			List<VarDecl> vars = new ArrayList<>();
+			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
+			vars.add(timeoutVar);
+			return vars;
 		}
 
 	}
@@ -2304,17 +2388,26 @@ public class Nenola {
 
 		}
 
-		private List<jkind.lustre.VarDecl> toEventTimeVarList() {
+		private List<jkind.lustre.VarDecl> toEventTimeVarList(boolean isMonolithic) {
 
 			List<jkind.lustre.VarDecl> vars = new ArrayList<>();
 
-			// TODO - add base event times from AgreePatternTranslator
+			for (Spec spec : this.specList) {
+
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
+							? pattern.toLustrePatternTimeEventPropertyList()
+							: pattern.toLustrePatternTimeEventConstraintList();
+				}
+
+			}
 
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
 
 				String prefix = entry.getKey() + "__";
 				NodeContract nc = entry.getValue();
-				for (VarDecl subTimeVar : nc.toEventTimeVarList()) {
+				for (VarDecl subTimeVar : nc.toEventTimeVarList(isMonolithic)) {
 					vars.add(new VarDecl(prefix + subTimeVar.id, subTimeVar.type));
 				}
 			}
