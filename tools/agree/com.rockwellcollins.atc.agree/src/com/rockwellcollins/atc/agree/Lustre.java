@@ -16,6 +16,8 @@ import jkind.lustre.VarDecl;
 public class Lustre {
 	public static final jkind.lustre.IdExpr timeExpr = new jkind.lustre.IdExpr("time");
 
+	public static final VarDecl assumeHistVar = new VarDecl("__ASSUME__HIST", NamedType.BOOL);
+
 	public static Expr makeANDExpr(Expr left, Expr right) {
 		if (left instanceof BoolExpr) {
 			if (((BoolExpr) left).value == true) {
@@ -73,9 +75,6 @@ public class Lustre {
 
 	}
 
-	public static VarDecl getAssumeHistVar() {
-		return new VarDecl("__ASSUME__HIST", NamedType.BOOL);
-	}
 
 	public static VarDecl getPatternVar(String index) {
 		return new VarDecl("__PATTERN__" + index, NamedType.BOOL);
@@ -134,6 +133,11 @@ public class Lustre {
 
 	public static VarDecl getJitterVar(String patternIndex) {
 		return new VarDecl("__JITTER__" + patternIndex, NamedType.BOOL);
+	}
+
+	public static Expr getTimeConstraint(List<VarDecl> eventTimeVarList) {
+		// TODO Auto-generated method stub : See AgreeRealtimeCalendarBuilder.getTimeConstraint
+		return null;
 	}
 
 }

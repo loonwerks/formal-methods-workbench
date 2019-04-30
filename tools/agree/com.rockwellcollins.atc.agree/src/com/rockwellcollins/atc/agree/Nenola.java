@@ -2398,8 +2398,118 @@ public class Nenola {
 		}
 
 		private Node toLustreMainNode(boolean isMonolithic) {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+			List<VarDecl> locals = new ArrayList<>();
+			List<VarDecl> inputs = new ArrayList<>();
+			List<Equation> equations = new ArrayList<>();
+			List<String> properties = new ArrayList<>();
+			List<String> ivcs = new ArrayList<>();
+
+			int j = 0;
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
+
+				String inputName = entry.getKey();
+				jkind.lustre.Expr assumeExpr = entry.getValue();
+				locals.add(new VarDecl(inputName, NamedType.BOOL));
+				jkind.lustre.IdExpr idExpr = new jkind.lustre.IdExpr(inputName);
+				equations.add(new Equation(idExpr, assumeExpr));
+				assertions.add(idExpr);
+				ivcs.add(inputName);
+			}
+
+			for (jkind.lustre.Expr assertion : this.toLustreAssertList(isMonolithic)) {
+				assertions.add(assertion);
+			}
+
+			// add assumption and monolithic lemmas first (helps with proving)
+			for (VarDecl var : this.toLustreChanOutList(isMonolithic)) {
+				inputs.add(var);
+			}
+
+			for (String propStr : this.toLustreStringPropertyList(isMonolithic)) {
+				properties.add(propStr);
+			}
+
+			// add property that all assumption history is true
+			jkind.lustre.Expr assumeConj = new BoolExpr(true);
+			for (Entry<String,NodeContract> entry : this.subNodes.entrySet()) {
+
+				String id = entry.getKey() + Lustre.assumeHistVar;
+				NodeContract subNode = entry.getValue();
+
+				assumeConj = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(id), jkind.lustre.BinaryOp.AND,
+						assumeConj);
+			}
+
+			VarDecl assumeHistVar = Lustre.assumeHistVar;
+			locals.add(assumeHistVar);
+			equations.add(new Equation(new jkind.lustre.IdExpr(assumeHistVar.id), assumeConj));
+			properties.add(assumeHistVar.id);
+
+
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap(isMonolithic).entrySet()) {
+				String name = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				locals.add(new VarDecl(name, NamedType.BOOL));
+				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
+				properties.add(name);
+			}
+
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(isMonolithic).entrySet()) {
+				String name = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				locals.add(new VarDecl(name, NamedType.BOOL));
+				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
+				properties.add(name);
+			}
+
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(isMonolithic).entrySet()) {
+				String name = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				locals.add(new VarDecl(name, NamedType.BOOL));
+				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
+				properties.add(name);
+			}
+
+			for (VarDecl var : this.toLustreChanInList(isMonolithic)) {
+				inputs.add(var);
+			}
+			for (VarDecl var : this.toLustreChanBiList(isMonolithic)) {
+				locals.add(var);
+			}
+
+
+
+			equations.addAll(this.toLustreEquationList(isMonolithic));
+			assertions.add(Lustre.getTimeConstraint(this.toEventTimeVarList(isMonolithic)));
+
+			NodeBuilder builder = new NodeBuilder("main");
+			builder.addInputs(inputs);
+			builder.addLocals(locals);
+			builder.addEquations(equations);
+			builder.addProperties(properties);
+			builder.addAssertions(assertions);
+			builder.addIvcs(ivcs);
+
+			Node main = builder.build();
+			return main;
+		}
+
+		private List<String> toLustreStringPropertyList(boolean isMonolithic) {
+			List<String> strs = new ArrayList<>();
+
+			for (Spec spec : this.specList) {
+
+				if (spec.prop instanceof PatternProp) {
+					Pattern pattern = ((PatternProp) spec.prop).pattern;
+					for (VarDecl var : pattern.toLustrePatternTimeEventPropertyList()) {
+						strs.add(var.id);
+					}
+				}
+
+			}
+
+			return strs;
 		}
 
 		private List<jkind.lustre.VarDecl> toEventTimeVarList(boolean isMonolithic) {
