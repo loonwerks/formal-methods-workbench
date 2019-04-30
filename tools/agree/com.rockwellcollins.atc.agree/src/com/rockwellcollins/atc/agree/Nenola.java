@@ -830,11 +830,11 @@ public class Nenola {
 				jkind.lustre.Expr rise = new NodeCallExpr("__Rise", new jkind.lustre.IdExpr(lustreCauseCondition.id));
 				jkind.lustre.Expr timeVarExpr = expr("timeRise = (if rise then time else (-1.0 -> pre timeRise))",
 						to("timeRise", causeRiseTimeVar.id), to("rise", rise),
-						to("time", new jkind.lustre.IdExpr("time")));
+						to("time", Lustre.timeExpr));
 				assertList.add(timeVarExpr);
 
 				jkind.lustre.Expr lemmaExpr = expr("timeRise <= time and timeRise >= -1.0",
-						to("timeRise", new jkind.lustre.IdExpr("time")), to("time", new jkind.lustre.IdExpr("time")));
+						to("timeRise", Lustre.timeExpr), to("time", Lustre.timeExpr));
 
 				assertList.add(lemmaExpr);
 
@@ -845,11 +845,11 @@ public class Nenola {
 				jkind.lustre.Expr Fall = new NodeCallExpr("__Fall", new jkind.lustre.IdExpr(lustreCauseCondition.id));
 				jkind.lustre.Expr timeVarExpr = expr("timeFall = (if Fall then time else (-1.0 -> pre timeFall))",
 						to("timeFall", causeFallTimeVar.id), to("Fall", Fall),
-						to("time", new jkind.lustre.IdExpr("time")));
+						to("time", Lustre.timeExpr));
 				assertList.add(timeVarExpr);
 
 				jkind.lustre.Expr lemmaExpr = expr("timeFall <= time and timeFall >= -1.0",
-						to("timeFall", causeFallTimeVar.id), to("time", new jkind.lustre.IdExpr("time")));
+						to("timeFall", causeFallTimeVar.id), to("time", Lustre.timeExpr));
 
 				// add this assertion to help with proofs (it should always be true)
 				assertList.add(lemmaExpr);
@@ -963,7 +963,7 @@ public class Nenola {
 			jkind.lustre.IdExpr causeHeldId = new jkind.lustre.IdExpr(causeHeldVar.id);
 			jkind.lustre.IdExpr causeHeldTimeoutId = new jkind.lustre.IdExpr(causeHeldTimeoutVar.id);
 
-			jkind.lustre.Expr causeHeldExpr = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL,
+			jkind.lustre.Expr causeHeldExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL,
 					causeHeldTimeoutId);
 			jkind.lustre.Equation equation = new jkind.lustre.Equation(causeHeldId, causeHeldExpr);
 			equations.add(equation);
@@ -1129,7 +1129,7 @@ public class Nenola {
 			Equation eq = equation(
 					"in_window = (trecord <> -1.0) and " + "(l + trecord " + left + " time) and (time " + right
 							+ " h + trecord);",
-					to("in_window", windowVar), to("trecord", tRecord), to("time", new jkind.lustre.IdExpr("time")),
+					to("in_window", windowVar), to("trecord", tRecord), to("time", Lustre.timeExpr),
 					to("l", this.interval.low.toLustreExpr()), to("h", this.interval.high.toLustreExpr()));
 
 			equations.add(eq);
@@ -1160,8 +1160,8 @@ public class Nenola {
 			jkind.lustre.BinaryOp left = this.interval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 			jkind.lustre.BinaryOp right = this.interval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 
-			intervalLeft = new BinaryExpr(intervalLeft, left, new jkind.lustre.IdExpr("time"));
-			intervalRight = new BinaryExpr(new jkind.lustre.IdExpr("time"), right, intervalRight);
+			intervalLeft = new BinaryExpr(intervalLeft, left, Lustre.timeExpr);
+			intervalRight = new BinaryExpr(Lustre.timeExpr, right, intervalRight);
 
 			jkind.lustre.Expr inInterval = new BinaryExpr(intervalLeft, BinaryOp.AND, intervalRight);
 
@@ -1213,7 +1213,7 @@ public class Nenola {
 			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
 			jkind.lustre.IdExpr timeRangeId = new jkind.lustre.IdExpr(effectTimeRangeVar.id);
 
-			jkind.lustre.Expr occurs = new BinaryExpr(timeRangeId, BinaryOp.MINUS, new jkind.lustre.IdExpr("time"));
+			jkind.lustre.Expr occurs = new BinaryExpr(timeRangeId, BinaryOp.MINUS, Lustre.timeExpr);
 			jkind.lustre.BinaryOp left = this.effectInterval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 			jkind.lustre.BinaryOp right = this.effectInterval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 
@@ -1242,7 +1242,7 @@ public class Nenola {
 					+ "(true -> (pre(timeOfEffect >= timeOfCause + low and timeOfEffect <= timeOfCause + high and timer <= high) => timer = 0.0)) and"
 					+ "(timer = 0.0 or timer >= time - timeOfCause)", LustreParseUtil.to("timer", timerVar),
 					LustreParseUtil.to("timeOfCause", timeOfCause), LustreParseUtil.to("timeOfEffect", timeOfEffect),
-					LustreParseUtil.to("time", new jkind.lustre.IdExpr("time")),
+					LustreParseUtil.to("time", Lustre.timeExpr),
 					LustreParseUtil.to("low", this.effectInterval.low.toLustreExpr()),
 					LustreParseUtil.to("high", this.effectInterval.high.toLustreExpr()),
 					LustreParseUtil.to("run", runVar));
@@ -1326,7 +1326,7 @@ public class Nenola {
 			// a lemma that may be helpful
 
 			jkind.lustre.Expr lemma1 = expr("timeEffect <= time + intHigh", to("timeEffect", timeEffectVar),
-					to("time", new jkind.lustre.IdExpr("time")),
+					to("time", Lustre.timeExpr),
 					to("intHigh", this.effectInterval.high.toLustreExpr()));
 
 			assertions.add(lemma1);
@@ -1442,8 +1442,8 @@ public class Nenola {
 			// timer = (0 -> if pre(run) then pre(timer) + (t - pre(t)) else 0)
 			{
 				jkind.lustre.Expr preTimer = new jkind.lustre.UnaryExpr(UnaryOp.PRE, timerId);
-				jkind.lustre.Expr preT = new jkind.lustre.UnaryExpr(UnaryOp.PRE, new jkind.lustre.IdExpr("time"));
-				jkind.lustre.Expr elapsed = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.MINUS, preT);
+				jkind.lustre.Expr preT = new jkind.lustre.UnaryExpr(UnaryOp.PRE, Lustre.timeExpr);
+				jkind.lustre.Expr elapsed = new BinaryExpr(Lustre.timeExpr, BinaryOp.MINUS, preT);
 				jkind.lustre.Expr total = new BinaryExpr(preTimer, BinaryOp.PLUS, elapsed);
 				jkind.lustre.Expr timerExpr = new IfThenElseExpr(preRun, total, new RealExpr(BigDecimal.ZERO));
 				timerExpr = new BinaryExpr(new RealExpr(BigDecimal.ZERO), BinaryOp.ARROW, timerExpr);
@@ -1474,7 +1474,7 @@ public class Nenola {
 		public jkind.lustre.Expr toLustreExprConstraint() {
 			VarDecl timeEffectVar = Lustre.getTimeWillVar(patternIndex);
 			jkind.lustre.IdExpr timeEffectId = new jkind.lustre.IdExpr(timeEffectVar.id);
-			jkind.lustre.Expr timeEqualsEffectTime = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL,
+			jkind.lustre.Expr timeEqualsEffectTime = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL,
 					timeEffectId);
 			// if the event is exclusive it only occurs when scheduled
 			jkind.lustre.BinaryOp effectOp = this.exclusive ? BinaryOp.EQUAL : BinaryOp.IMPLIES;
@@ -1537,7 +1537,7 @@ public class Nenola {
 					"(timeOfEvent >= 0.0 and timeOfEvent <> time => timeout - timeOfEvent >= p - j) and "
 							+ "(true -> (period <> pre(period) => period - pre(period) <= p + j)) and "
 							+ "(timeOfEvent >= 0.0 => timeout - timeOfEvent <= p + j)",
-					to("timeOfEvent", timeofEvent), to("time", new jkind.lustre.IdExpr("time")),
+					to("timeOfEvent", timeofEvent), to("time", Lustre.timeExpr),
 					to("timeout", timeoutId), to("p", this.period.toLustreExpr()), to("j", jitter),
 					to("period", periodVar));
 
@@ -1587,7 +1587,7 @@ public class Nenola {
 
 			// helper assertion (should be true)
 			jkind.lustre.Expr lemma = expr("period - time < p - j and period >= time", to("period", periodVar),
-					to("p", this.period.toLustreExpr()), to("time", new jkind.lustre.IdExpr("time")),
+					to("p", this.period.toLustreExpr()), to("time", Lustre.timeExpr),
 					to("j", lustreJitter));
 
 			asserts.add(lemma);
@@ -1674,7 +1674,7 @@ public class Nenola {
 
 			jkind.lustre.Expr prop = expr(
 					"true -> (time >= P + j => event => (pre period) - j <= time and time <= (pre period) + j)",
-					to("time", new jkind.lustre.IdExpr("time")), to("period", periodVar),
+					to("time", Lustre.timeExpr), to("period", periodVar),
 					to("P", this.period.toLustreExpr()), to("j", lustreJitter), to("event", this.event.toLustreExpr()));
 			return prop;
 		}
@@ -1686,7 +1686,7 @@ public class Nenola {
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
 
 			// event = (t = timeout)
-			jkind.lustre.Expr eventExpr = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL, timeoutId);
+			jkind.lustre.Expr eventExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, timeoutId);
 			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
 
 			return eventExpr;
@@ -1764,7 +1764,7 @@ public class Nenola {
 			jkind.lustre.Expr pNextInit = new BinaryExpr(periodId, BinaryOp.GREATEREQUAL,
 					new RealExpr(BigDecimal.ZERO));
 			jkind.lustre.Expr pNextCond = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
-			pNextCond = new BinaryExpr(pNextCond, BinaryOp.EQUAL, new jkind.lustre.IdExpr("time"));
+			pNextCond = new BinaryExpr(pNextCond, BinaryOp.EQUAL, Lustre.timeExpr);
 			pNextCond = new jkind.lustre.UnaryExpr(UnaryOp.PRE, pNextCond);
 			jkind.lustre.Expr pNextThen = new BinaryExpr(this.iat.toLustreExpr(), BinaryOp.PLUS, prePNext);
 			pNextThen = new BinaryExpr(periodId, BinaryOp.GREATEREQUAL, pNextThen);
@@ -1842,7 +1842,7 @@ public class Nenola {
 			jkind.lustre.Expr propExpr = expr(
 					"(true -> (not ((pre laste) = -1.0) => event => time - (pre laste) >= period))",
 					to("laste", timeofEvent), to("event", this.event.toLustreExpr()),
-					to("time", new jkind.lustre.IdExpr("time")), to("period", this.iat.toLustreExpr()));
+					to("time", Lustre.timeExpr), to("period", this.iat.toLustreExpr()));
 
 			return propExpr;
 		}
@@ -1852,7 +1852,7 @@ public class Nenola {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
 			// event = (t = timeout)
-			jkind.lustre.Expr eventExpr = new BinaryExpr(new jkind.lustre.IdExpr("time"), BinaryOp.EQUAL, timeoutId);
+			jkind.lustre.Expr eventExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, timeoutId);
 			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
 
 			return eventExpr;
@@ -2300,12 +2300,7 @@ public class Nenola {
 
 		private Map<Boolean, Node> lustreNodeCache = new HashMap<>();
 
-		public Node toLustreNode(boolean isMonolithic) {
-
-			if (this.lustreNodeCache.containsKey(isMonolithic)) {
-				return lustreNodeCache.get(isMonolithic);
-			}
-
+		private jkind.lustre.Node toLustreSubNode(boolean isMonolithic) {
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
@@ -2381,11 +2376,30 @@ public class Nenola {
 			builder.addEquations(equations);
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
+			return node;
+		}
+
+		public Node toLustreNode(boolean isMonolithic) {
+
+			if (this.lustreNodeCache.containsKey(isMonolithic)) {
+				return lustreNodeCache.get(isMonolithic);
+			}
+
+			Node node = null;
+			if (this.isMain) {
+				node = this.toLustreMainNode(isMonolithic);
+			} else {
+				node = this.toLustreSubNode(isMonolithic);
+			}
 
 			lustreNodeCache.put(isMonolithic, node);
-
 			return node;
 
+		}
+
+		private Node toLustreMainNode(boolean isMonolithic) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 		private List<jkind.lustre.VarDecl> toEventTimeVarList(boolean isMonolithic) {
@@ -2399,6 +2413,8 @@ public class Nenola {
 					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
 							? pattern.toLustrePatternTimeEventPropertyList()
 							: pattern.toLustrePatternTimeEventConstraintList();
+
+					vars.addAll(localList);
 				}
 
 			}
@@ -2644,7 +2660,7 @@ public class Nenola {
 				}
 
 				String prefix = entry.getKey() + "__";
-				jkind.lustre.IdExpr timeId = new jkind.lustre.IdExpr("time");
+				jkind.lustre.IdExpr timeId = Lustre.timeExpr;
 
 				exprs.add(new jkind.lustre.BinaryExpr(timeId, BinaryOp.EQUAL,
 						new jkind.lustre.IdExpr(prefix + timeId.id)));

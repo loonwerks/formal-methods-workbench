@@ -14,6 +14,8 @@ import jkind.lustre.NamedType;
 import jkind.lustre.VarDecl;
 
 public class Lustre {
+	public static final jkind.lustre.IdExpr timeExpr = new jkind.lustre.IdExpr("time");
+
 	public static Expr makeANDExpr(Expr left, Expr right) {
 		if (left instanceof BoolExpr) {
 			if (((BoolExpr) left).value == true) {
