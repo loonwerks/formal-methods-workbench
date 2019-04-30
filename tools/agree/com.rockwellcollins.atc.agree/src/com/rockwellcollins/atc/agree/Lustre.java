@@ -103,11 +103,11 @@ public class Lustre {
 		VarDecl timeCause = Lustre.getTimeOfVar(id);
 
 		jkind.lustre.Expr timeVarExpr = expr("timeCause = (if cause then time else (-1.0 -> pre timeCause))",
-				to("timeCause", timeCause), to("cause", id), to("time", new jkind.lustre.IdExpr("time")));
+				to("timeCause", timeCause), to("cause", id), to("time", Lustre.timeExpr));
 		asserts.add(timeVarExpr);
 
 		jkind.lustre.Expr lemmaExpr = expr("timeCause <= time and timeCause >= -1.0", to("timeCause", timeCause),
-				to("time", new jkind.lustre.IdExpr("time")));
+				to("time", Lustre.timeExpr));
 
 		// add this assertion to help with proofs (it should always be true)
 		asserts.add(lemmaExpr);
