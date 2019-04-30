@@ -73,7 +73,7 @@ def package_plugin(plugin_version):
             sys.stderr.write(git_result[2])
             sys.exit(git_result[0])
         print('  Calling git commit...')
-        git_result = gitrepo.git.commit('-m', '[skip travis-ci] Package plugin updates', with_extended_output=True)
+        git_result = gitrepo.git.commit('-m', '[skip travis-ci] Package plugin %s' % (plugin_version), with_extended_output=True)
         print(git_result[1])
         if (git_result[0] != 0) :
             sys.stderr.write(git_result[2])
@@ -85,7 +85,7 @@ def package_plugin(plugin_version):
             sys.stderr.write(git_result[2])
             sys.exit(git_result[0])
         print('  Calling git merge %s...' % (plugin_version))
-        git_result = gitrepo.git.merge(plugin_version, '-m', '[skip travis-ci] Merge plugin updates', with_extended_output=True)
+        git_result = gitrepo.git.merge(plugin_version, '-m', '[skip travis-ci] Merge plugin %s' % (plugin_version), with_extended_output=True)
         print(git_result[1])
         if (git_result[0] != 0) :
             sys.stderr.write(git_result[2])
