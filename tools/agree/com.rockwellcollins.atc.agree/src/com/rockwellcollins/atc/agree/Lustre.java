@@ -247,5 +247,52 @@ public class Lustre {
 		return builder.build();
 	}
 
+	public final static String statVarPrefix = "_STATE";
+	public final static String clockVarName = "_CLK";
+	public final static String initVarName = "_INIT";
+	public final static String clockedNodePrefix = "_CLOCKED_";
+
+//
+//	public static Expr toClockedExpr(Expr expr) {
+//		if (expr instanceof UnaryExpr) {
+//			UnaryExpr e = (UnaryExpr) expr;
+//			if (e.op == UnaryOp.PRE) {
+//				IdExpr stateVarId = new IdExpr(Lustre.statVarPrefix + e.hashCode());
+//
+//				Expr stateVarExpr = new UnaryExpr(UnaryOp.PRE, Lustre.toClockedExpr(e.expr));
+//				stateVarExpr = expr("if clk then stateVarExpr else (pre stateVar)", to("stateVar", stateVarId),
+//						to("stateVarExpr", stateVarExpr), to("clk", Luster.clockVarName));
+//
+////				stateVars.add(new AgreeVar(stateVarId.id, e.accept(typeReconstructor), null, null, null));
+////				stateVarEqs.add(new Equation(stateVarId, stateVarExpr));
+//
+//				return stateVarId;
+//			} else {
+//				return new UnaryExpr(e.op, Lustre.toClockedExpr(e.expr));
+//			}
+//
+//		} else if (expr instanceof BinaryExpr) {
+//			BinaryExpr e = (BinaryExpr) expr;
+//			if (e.op == BinaryOp.ARROW) {
+//				return new IfThenElseExpr(new IdExpr(initVarName), Lustre.toClockedExpr(e.left),
+//						Lustre.toClockedExpr(e.right));
+//			} else {
+//				return new BinaryExpr(Lustre.toClockedExpr(e.left), e.op, Lustre.toClockedExpr(e.right));
+//			}
+//		}
+//
+//		return expr;
+//	}
+//
+//	public static List<VarDecl> toClockedLocals(Expr expr) {
+//		List<VarDecl> vars = new ArrayList<>();
+//		return vars;
+//	}
+//
+//	public static List<Equation> toClockedEquations(Expr expr) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 
 }

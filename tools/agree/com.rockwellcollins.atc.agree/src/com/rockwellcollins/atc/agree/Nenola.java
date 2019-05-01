@@ -7,6 +7,7 @@ import static jkind.lustre.parsing.LustreParseUtil.to;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,12 @@ public class Nenola {
 
 		jkind.lustre.IdExpr toLustreExpr();
 
+		jkind.lustre.Expr toLustreClockedExpr();
+
+		Collection<VarDecl> toLustreClockedLocals();
+
+		Collection<Equation> toLustreClockedEquations();
+
 	}
 
 	public static class TagExpr implements Expr {
@@ -66,6 +73,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class IdExpr implements Expr {
@@ -77,6 +102,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -94,6 +137,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -116,6 +177,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class DistinctionExpr implements Expr {
@@ -131,6 +210,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -150,6 +247,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class LocalProperty implements Expr {
@@ -161,6 +276,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -180,6 +313,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class IntLit implements Expr {
@@ -191,6 +342,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -208,6 +377,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class BoolLit implements Expr {
@@ -219,6 +406,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -236,6 +441,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class RealCast implements Expr {
@@ -247,6 +470,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -264,6 +505,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class Pre implements Expr {
@@ -275,6 +534,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -292,6 +569,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class TimeOf implements Expr {
@@ -303,6 +598,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -320,6 +633,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class TimeFall implements Expr {
@@ -334,6 +665,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class Time implements Expr {
@@ -344,6 +693,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -364,6 +731,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class ArrayLit implements Expr {
@@ -375,6 +760,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -394,6 +797,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class RecordLit implements Expr {
@@ -405,6 +826,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -426,6 +865,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class App implements Expr {
@@ -439,6 +896,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -458,6 +933,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class ArraySubExpr implements Expr {
@@ -474,6 +967,24 @@ public class Nenola {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class IndicesExpr implements Expr {
@@ -485,6 +996,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -509,6 +1038,24 @@ public class Nenola {
 			return null;
 		}
 
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class ExistsExpr implements Expr {
@@ -529,6 +1076,24 @@ public class Nenola {
 			return null;
 		}
 
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class FlatmapExpr implements Expr {
@@ -545,6 +1110,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -573,6 +1156,24 @@ public class Nenola {
 			return null;
 		}
 
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class FoldRightExpr implements Expr {
@@ -593,6 +1194,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.IdExpr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreClockedExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<VarDecl> toLustreClockedLocals() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Collection<Equation> toLustreClockedEquations() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -2925,6 +3544,45 @@ public class Nenola {
 			return null;
 		}
 
+
+		private Optional<Node> clockedNodeMap = Optional.empty();
+
+		public Node toLustreClockedNode() {
+			if (!clockedNodeMap.isPresent()) {
+
+				NodeBuilder builder = new NodeBuilder(this.toLustreNode());
+				builder.setId(Lustre.clockedNodePrefix + this.toLustreNode().id);
+				builder.clearEquations();
+				builder.clearInputs();
+				builder.addInput(new VarDecl(Lustre.clockVarName, NamedType.BOOL));
+				builder.addInput(new VarDecl(Lustre.initVarName, NamedType.BOOL));
+				builder.addInputs(this.toLustreNode().inputs);
+
+				for (DataFlow df : this.dataFlows) {
+//
+					jkind.lustre.Expr clockedExpr = df.src.toLustreClockedExpr();
+					List<jkind.lustre.IdExpr> idExprs = new ArrayList<>();
+					for (String id : df.tgts) {
+						idExprs.add(new jkind.lustre.IdExpr(id));
+					}
+					// this will make an unguarded pre expression, but any non initialized
+					// outputs should be masked by the init expression in the calling agree node
+					jkind.lustre.Expr lustreExpr = new jkind.lustre.IfThenElseExpr(
+							new jkind.lustre.IdExpr(Lustre.clockVarName), clockedExpr,
+							new jkind.lustre.UnaryExpr(UnaryOp.PRE, idExprs.get(0)));
+					builder.addEquation(new Equation(idExprs, lustreExpr));
+					builder.addLocals(df.src.toLustreClockedLocals());
+					builder.addEquations(df.src.toLustreClockedEquations());
+
+				}
+				return builder.build();
+			} else {
+				return clockedNodeMap.get();
+			}
+		}
+
+
+
 	}
 
 	public static class Program {
@@ -2976,6 +3634,7 @@ public class Nenola {
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
+			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGenList());
 			lustreNodes.addAll(this.lustreNodesFromMain(isMonolithic));
 
 			lustreNodes.add(Lustre.getHistNode());
@@ -2985,6 +3644,18 @@ public class Nenola {
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
 			programs.put("Contract Guarantees", program);
 			return programs;
+		}
+
+		private List<Node> toLustreClockedNodesFromNodeGenList() {
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			for (NodeGen nodeGen : this.nodeGenMap.values()) {
+
+				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode();
+				lustreNodes.add(lustreNode);
+
+			}
+
+			return lustreNodes;
 		}
 
 		private List<Node> lustreNodesFromMain(boolean isMonolithic) {
