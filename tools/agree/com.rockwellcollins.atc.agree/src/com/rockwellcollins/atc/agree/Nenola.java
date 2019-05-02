@@ -52,15 +52,15 @@ public class Nenola {
 
 	public static interface Expr {
 
-		jkind.lustre.IdExpr toLustreExpr();
+		DataContract inferDataContract(Map<String, Contract> contractMap);
+
+		jkind.lustre.Expr toLustreExpr();
 
 		jkind.lustre.Expr toLustreClockedExpr();
 
 		List<jkind.lustre.VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap);
 
 		List<jkind.lustre.Equation> toLustreClockedEquations();
-
-		DataContract inferDataContract(Map<String, Contract> contractMap);
 
 	}
 
@@ -75,7 +75,23 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public DataContract inferDataContract(Map<String, Contract> contractMap) {
+
+			switch (this.tag) {
+			case Clock:
+			case Insert:
+			case Remove:
+				return Nenola.Prim.BoolContract;
+			case Count:
+				return Nenola.Prim.IntContract;
+			}
+
+			throw new RuntimeException("Error: Tag.inferDataContract");
+
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -95,11 +111,6 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
-		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap) {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 	public static class IdExpr implements Expr {
@@ -110,7 +121,13 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public DataContract inferDataContract(Map<String, Contract> contractMap) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -130,11 +147,6 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
-		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap) {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 	public static class SelectionExpr implements Expr {
@@ -148,7 +160,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -188,7 +200,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -237,7 +249,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -274,7 +286,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -309,7 +321,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -346,7 +358,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -381,7 +393,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -416,7 +428,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -451,7 +463,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -486,7 +498,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -521,7 +533,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -556,7 +568,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -591,7 +603,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -626,7 +638,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -661,7 +673,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -696,7 +708,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -731,7 +743,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -765,7 +777,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -803,7 +815,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -838,7 +850,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -875,7 +887,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -910,7 +922,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -949,7 +961,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -986,7 +998,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1029,7 +1041,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1104,7 +1116,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1139,7 +1151,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1180,7 +1192,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1221,7 +1233,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1262,7 +1274,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1307,7 +1319,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1352,7 +1364,7 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.IdExpr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1566,7 +1578,7 @@ public class Nenola {
 			this.effectInterval = effectInterval;
 
 			{
-				String causeConditionString = causeCondition.toLustreExpr().id;
+				String causeConditionString = ((jkind.lustre.IdExpr) causeCondition.toLustreExpr()).id;
 				Expr causeEvent = new IdExpr(Lustre.getCauseHeldVar(causeConditionString).id);
 				this.refinementPattern = new WheneverOccursPattern(causeEvent, effectEvent, exclusive, effectInterval);
 			}
@@ -1586,7 +1598,7 @@ public class Nenola {
 
 			List<jkind.lustre.Expr> assertList = new ArrayList<>();
 
-			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
 
 			VarDecl causeRiseTimeVar = Lustre.getTimeRiseVar(lustreCauseCondition.id);
 			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(lustreCauseCondition.id);
@@ -1657,7 +1669,7 @@ public class Nenola {
 
 		private List<VarDecl> toLustreCauseChanInList() {
 			List<VarDecl> vars = new ArrayList<>();
-			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
 			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
 			vars.add(causeHeldTimeoutVar);
 			return vars;
@@ -1682,7 +1694,7 @@ public class Nenola {
 		private List<VarDecl> toLustreCauseChanOutList() {
 			List<VarDecl> vars = new ArrayList<>();
 
-			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
 			{
 				VarDecl causeRiseTimeVar = Lustre.getTimeRiseVar(lustreCauseCondition.id);
 				vars.add(causeRiseTimeVar);
@@ -1714,7 +1726,7 @@ public class Nenola {
 
 		private List<VarDecl> toLustreCauseChanBiList() {
 			List<VarDecl> vars = new ArrayList<>();
-			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
 			vars.add(Lustre.getCauseHeldVar(lustreCauseCondition.id));
 			return vars;
 		}
@@ -1737,7 +1749,7 @@ public class Nenola {
 
 		private List<jkind.lustre.Equation> toLustreCauseEquationList() {
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
-			jkind.lustre.IdExpr lustreCauseCondition = this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
 
 			VarDecl causeHeldVar = Lustre.getCauseHeldVar(lustreCauseCondition.id);
 			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
@@ -1781,7 +1793,8 @@ public class Nenola {
 		@Override
 		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
 			List<VarDecl> vars = new ArrayList<>();
-			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(this.causeCondition.toLustreExpr().id);
+			VarDecl causeFallTimeVar = Lustre
+					.getTimeFallVar(((jkind.lustre.IdExpr) this.causeCondition.toLustreExpr()).id);
 			vars.add(causeFallTimeVar);
 			vars.addAll(refinementPattern.toLustrePatternTimeEventPropertyList());
 			return vars;
@@ -1790,7 +1803,8 @@ public class Nenola {
 		@Override
 		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
 			List<VarDecl> vars = new ArrayList<>();
-			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(this.causeCondition.toLustreExpr().id);
+			VarDecl causeFallTimeVar = Lustre
+					.getTimeFallVar(((jkind.lustre.IdExpr) this.causeCondition.toLustreExpr()).id);
 			vars.addAll(refinementPattern.toLustrePatternTimeEventConstraintList());
 			vars.add(causeFallTimeVar);
 			return vars;
@@ -1830,7 +1844,7 @@ public class Nenola {
 			asserts.addAll(Lustre.getTimeOfAsserts(recordVar.id));
 
 			jkind.lustre.Expr expr = expr("record => cause", to("record", recordVar),
-					to("cause", this.causeEvent.toLustreExpr().id));
+					to("cause", ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr()).id));
 			asserts.add(expr);
 
 			return asserts;
@@ -1841,7 +1855,7 @@ public class Nenola {
 
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
 
-			VarDecl timeCauseVar = Lustre.getTimeOfVar(this.causeEvent.toLustreExpr().id);
+			VarDecl timeCauseVar = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr()).id);
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 
 			jkind.lustre.Expr timeoutExpr = expr("timeout = if timeCause >= 0.0 then (timeCause + l) else -1.0",
@@ -1931,7 +1945,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExprConstraint() {
-			VarDecl timeCauseVar = Lustre.getTimeOfVar(this.causeEvent.toLustreExpr().id);
+			VarDecl timeCauseVar = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr()).id);
 
 			jkind.lustre.Expr intervalLeft = expr("timeCause + l", to("timeCause", timeCauseVar),
 					to("l", this.interval.low.toLustreExpr()));
@@ -2008,8 +2022,8 @@ public class Nenola {
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
 			String patternIndex = Integer.toString(this.hashCode());
 
-			jkind.lustre.IdExpr lustreCause = causeEvent.toLustreExpr();
-			jkind.lustre.IdExpr lustreEffect = effectEvent.toLustreExpr();
+			jkind.lustre.IdExpr lustreCause = (jkind.lustre.IdExpr) causeEvent.toLustreExpr();
+			jkind.lustre.IdExpr lustreEffect = (jkind.lustre.IdExpr) effectEvent.toLustreExpr();
 
 			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
 			VarDecl runVar = Lustre.getRunningVar(patternIndex);
@@ -2046,7 +2060,7 @@ public class Nenola {
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 
-			jkind.lustre.IdExpr causeEventExpr = (this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
 
 			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
 			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
@@ -2084,7 +2098,7 @@ public class Nenola {
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 
-			jkind.lustre.IdExpr causeEventExpr = (this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
 
 			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
 			jkind.lustre.IdExpr effectTimeRangeId = new jkind.lustre.IdExpr(effectTimeRangeVar.id);
@@ -2121,7 +2135,7 @@ public class Nenola {
 			assertions.add(lemma2);
 			assertions.addAll(Lustre.getTimeOfAsserts(causeEventExpr.id));
 
-			jkind.lustre.IdExpr lustreEffect = this.effectEvent.toLustreExpr();
+			jkind.lustre.IdExpr lustreEffect = (jkind.lustre.IdExpr) this.effectEvent.toLustreExpr();
 
 			jkind.lustre.Expr lemma3 = expr("timeWill <= time => timeWill <= timeEffect", to("timeWill", timeEffectVar),
 					to("timeEffect", Lustre.getTimeOfVar(lustreEffect.id)));
@@ -2152,10 +2166,10 @@ public class Nenola {
 			List<VarDecl> vars = new ArrayList<>();
 
 
-			jkind.lustre.IdExpr causeEventExpr = (this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
 			vars.add(Lustre.getTimeOfVar(causeEventExpr.id));
 
-			jkind.lustre.IdExpr effectEventExpr = (this.effectEvent.toLustreExpr());
+			jkind.lustre.IdExpr effectEventExpr = ((jkind.lustre.IdExpr) this.effectEvent.toLustreExpr());
 			vars.add(Lustre.getTimeFallVar(effectEventExpr.id));
 
 			return vars;
@@ -2167,11 +2181,11 @@ public class Nenola {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getTimeWillVar(patternIndex));
 
-			jkind.lustre.IdExpr causeEventExpr = (this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
 
 			vars.add(Lustre.getTimeOfVar(causeEventExpr.id));
 
-			jkind.lustre.IdExpr effectEventExpr = (this.effectEvent.toLustreExpr());
+			jkind.lustre.IdExpr effectEventExpr = ((jkind.lustre.IdExpr) this.effectEvent.toLustreExpr());
 			vars.add(Lustre.getTimeFallVar(effectEventExpr.id));
 
 			return vars;
@@ -2309,7 +2323,8 @@ public class Nenola {
 			jkind.lustre.VarDecl timeoutVar = Lustre.getTimerVar(patternIndex);
 
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
-			jkind.lustre.VarDecl timeofEvent = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+			jkind.lustre.VarDecl timeofEvent = Lustre
+					.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
 
 			jkind.lustre.Expr jitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
 
@@ -2371,7 +2386,7 @@ public class Nenola {
 					to("j", lustreJitter));
 
 			asserts.add(lemma);
-			asserts.addAll(Lustre.getTimeOfAsserts(this.event.toLustreExpr().id));
+			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id));
 
 			// timeout = pnext + jitter
 			jkind.lustre.Expr timeoutExpr = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
@@ -2407,7 +2422,7 @@ public class Nenola {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
 
-			VarDecl var = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+			VarDecl var = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
 			vars.add(var);
 			return vars;
 		}
@@ -2512,7 +2527,7 @@ public class Nenola {
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
-			asserts.addAll(Lustre.getTimeOfAsserts(this.event.toLustreExpr().id));
+			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id));
 			return asserts;
 		}
 
@@ -2575,7 +2590,7 @@ public class Nenola {
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList() {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.add(Lustre.getTimeOfVar(this.event.toLustreExpr().id));
+			vars.add(Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id));
 			return vars;
 		}
 
@@ -2590,7 +2605,7 @@ public class Nenola {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
 
-			VarDecl var = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+			VarDecl var = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
 			vars.add(var);
 			return vars;
 		}
@@ -2617,7 +2632,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExprProperty() {
-			VarDecl timeofEvent = Lustre.getTimeOfVar(this.event.toLustreExpr().id);
+			VarDecl timeofEvent = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
 
 			jkind.lustre.Expr propExpr = expr(
 					"(true -> (not ((pre laste) = -1.0) => event => time - (pre laste) >= period))",
