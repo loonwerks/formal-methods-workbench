@@ -49,6 +49,49 @@ public class Nenola {
 	}
 
 
+	public static class State {
+
+		public final Map<String, NodeContract> nodeContractMap;
+		public final Map<String, DataContract> dataContractMap;
+		public final Map<String, NodeGen> nodeGenMap;
+		public final Map<String, Closure> environment;
+		public final Map<String, Expr> localProps;
+
+		public State(Map<String, NodeContract> nodeContractMap,
+				Map<String, DataContract> dataContractMap, Map<String, NodeGen> nodeGenMap,
+				Map<String, Closure> environment, Map<String, Expr> localProps) {
+			this.nodeContractMap = new HashMap<>();
+			this.nodeContractMap.putAll(nodeContractMap);
+
+			this.dataContractMap = new HashMap<>();
+			this.dataContractMap.putAll(dataContractMap);
+
+			this.nodeGenMap = new HashMap<>();
+			this.nodeGenMap.putAll(nodeGenMap);
+
+			this.environment = new HashMap<>();
+			this.environment.putAll(environment);
+
+			this.localProps = new HashMap<>();
+			this.localProps.putAll(localProps);
+
+		}
+
+		public State newNodeGenMap(Map<String, NodeGen> nodeGenMap) {
+			return new State(nodeContractMap, dataContractMap, nodeGenMap, environment, localProps);
+		}
+
+		public State newEnvironment(Map<String, Closure> environment) {
+			return new State(nodeContractMap, dataContractMap, nodeGenMap, environment, localProps);
+		}
+
+		public State newLocalProps(Map<String, Expr> localProps) {
+			return new State(nodeContractMap, dataContractMap, nodeGenMap, environment, localProps);
+		}
+
+	}
+
+
 	public static enum BinRator {
 		Equal, StreamCons, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod, Pow;
 
@@ -73,15 +116,13 @@ public class Nenola {
 
 	public static interface Expr {
 
-		DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps);
+		DataContract inferDataContract(State state);
 
 		jkind.lustre.Expr toLustreExpr();
 
 		jkind.lustre.Expr toLustreClockedExpr();
 
-		List<jkind.lustre.VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap,
-				Map<String, NodeGen> nodeGenMap, Map<String, Closure> environment, Map<String, Expr> localProps);
+		List<jkind.lustre.VarDecl> toLustreClockedLocals(State state);
 
 		List<jkind.lustre.Equation> toLustreClockedEquations();
 
@@ -98,8 +139,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 
 			switch (this.tag) {
 			case Clock:
@@ -126,8 +166,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -147,10 +186,9 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
-			Closure cl = environment.get(this.name);
-			return cl.expr.inferDataContract(contractMap, nodeGenMap, cl.environment, localProps);
+		public DataContract inferDataContract(State state) {
+			Closure cl = state.environment.get(this.name);
+			return cl.expr.inferDataContract(state.newEnvironment(cl.environment));
 		}
 
 		@Override
@@ -165,8 +203,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -188,10 +225,9 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 
-			Contract targetContract = this.target.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+			Contract targetContract = this.target.inferDataContract(state);
 			if (targetContract instanceof RecordContract) {
 				return ((RecordContract) targetContract).fields.get(this.selection);
 			}
@@ -211,8 +247,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -236,14 +271,13 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 
 			switch (this.rator) {
 			case Equal :
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case StreamCons:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case Implies:
 				return Nenola.Prim.BoolContract;
 			case Equiv:
@@ -263,17 +297,17 @@ public class Nenola {
 			case GreatEq:
 				return Nenola.Prim.BoolContract;
 			case Plus:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case Minus:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case Mult:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case Div:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case Mod:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			case Pow:
-				return this.e1.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				return this.e1.inferDataContract(state);
 			}
 
 			throw new RuntimeException();
@@ -296,11 +330,10 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.e1.toLustreClockedLocals(contractMap, nodeGenMap, environment, localProps));
-			vars.addAll(this.e2.toLustreClockedLocals(contractMap, nodeGenMap, environment, localProps));
+			vars.addAll(this.e1.toLustreClockedLocals(state));
+			vars.addAll(this.e2.toLustreClockedLocals(state));
 			return vars;
 		}
 
@@ -326,9 +359,8 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
-			return this.trueBody.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+		public DataContract inferDataContract(State state) {
+			return this.trueBody.inferDataContract(state);
 		}
 
 		@Override
@@ -343,8 +375,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -366,9 +397,8 @@ public class Nenola {
 
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
-			return this.init.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+		public DataContract inferDataContract(State state) {
+			return this.init.inferDataContract(state);
 		}
 
 		@Override
@@ -383,8 +413,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -404,8 +433,7 @@ public class Nenola {
 
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -422,8 +450,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -455,8 +482,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -466,8 +492,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -492,8 +517,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -503,8 +527,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -529,8 +552,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -540,8 +562,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -566,8 +587,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -577,8 +597,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -603,8 +622,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -614,8 +632,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -640,8 +657,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -651,8 +667,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -677,8 +692,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -688,8 +702,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -714,8 +727,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -725,8 +737,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -751,8 +762,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -762,8 +772,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -788,8 +797,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -799,8 +807,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -825,8 +832,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -836,8 +842,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -862,8 +867,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -873,8 +877,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -898,8 +901,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -909,8 +911,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -938,8 +939,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -949,8 +949,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -975,8 +974,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -986,8 +984,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1014,8 +1011,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1025,8 +1021,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1051,8 +1046,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1062,8 +1056,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1092,8 +1085,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1103,8 +1095,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1131,8 +1122,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1142,8 +1132,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1159,8 +1148,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1185,8 +1173,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 
 			if (this.rator == UniRator.Pre) {
 
@@ -1194,12 +1181,12 @@ public class Nenola {
 
 				String clockedId = Lustre.statVarPrefix + this.hashCode();
 				jkind.lustre.IdExpr stateVarId = new jkind.lustre.IdExpr(clockedId);
-				DataContract dc = this.inferDataContract(contractMap, nodeGenMap, environment, localProps);
+				DataContract dc = this.inferDataContract(state);
 				vars.add(new VarDecl(stateVarId.id, dc.toLustreType()));
 
 				return vars;
 			} else {
-				return this.rand.toLustreClockedLocals(contractMap, nodeGenMap, environment, localProps);
+				return this.rand.toLustreClockedLocals(state);
 
 			}
 
@@ -1253,8 +1240,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1264,8 +1250,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1290,8 +1275,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1301,8 +1285,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1333,8 +1316,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1344,8 +1326,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1376,8 +1357,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1387,8 +1367,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1419,8 +1398,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1430,8 +1408,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1466,8 +1443,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1477,8 +1453,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1513,8 +1488,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public List<VarDecl> toLustreClockedLocals(State state) {
 			return new ArrayList<>();
 		}
 
@@ -1524,8 +1498,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public DataContract inferDataContract(State state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -3181,6 +3154,7 @@ public class Nenola {
 		private final String name;
 		public final Map<String, Channel> channels;
 		public final Map<String, NodeContract> subNodes;
+		public final Map<String, NodeGen> nodeGenMap;
 		public final List<Connection> connections;
 		public final List<Spec> specList;
 		public final Optional<TimingMode> timingMode;
@@ -3190,6 +3164,7 @@ public class Nenola {
 		public final NamedElement namedElement;
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
+				Map<String, NodeGen> nodeGenMap,
 				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode, boolean isMain,
 				NamedElement namedElement) {
 			this.name = name;
@@ -3197,6 +3172,10 @@ public class Nenola {
 			this.channels.putAll(channels);
 			this.subNodes = new HashMap<>();
 			this.subNodes.putAll(subNodes);
+
+			this.nodeGenMap = new HashMap<>();
+			this.nodeGenMap.putAll(nodeGenMap);
+
 			this.connections = new ArrayList<>();
 			this.connections.addAll(connections);
 			this.specList = specList;
@@ -3863,8 +3842,7 @@ public class Nenola {
 
 		private Optional<Node> clockedNodeMap = Optional.empty();
 
-		public Node toLustreClockedNode(Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public Node toLustreClockedNode(State state) {
 			if (!clockedNodeMap.isPresent()) {
 
 				NodeBuilder builder = new NodeBuilder(this.toLustreNode());
@@ -3889,7 +3867,7 @@ public class Nenola {
 							new jkind.lustre.IdExpr(Lustre.clockVarName), clockedExpr,
 							new jkind.lustre.UnaryExpr(UnaryOp.PRE, idExprs.get(0)));
 					builder.addEquation(new Equation(idExprs, lustreExpr));
-					builder.addLocals(df.src.toLustreClockedLocals(contractMap, nodeGenMap, environment, localProps));
+					builder.addLocals(df.src.toLustreClockedLocals(state));
 					builder.addEquations(df.src.toLustreClockedEquations());
 
 				}
@@ -3899,18 +3877,20 @@ public class Nenola {
 			}
 		}
 
-
-
 	}
+
 
 	public static class Program {
 		public final NodeContract main;
-		public final Map<String, Contract> contractMap;
+		public final Map<String, NodeContract> nodeContractMap;
+		public final Map<String, DataContract> dataContractMap;
 		public final Map<String, NodeGen> nodeGenMap;
 
-		public Program(NodeContract main, Map<String, Contract> contractMap, Map<String, NodeGen> nodeGenMap) {
+		public Program(NodeContract main, Map<String, NodeContract> nodeContractMap,
+				Map<String, DataContract> dataContractMap, Map<String, NodeGen> nodeGenMap) {
 			this.main = main;
-			this.contractMap = contractMap;
+			this.nodeContractMap = nodeContractMap;
+			this.dataContractMap = dataContractMap;
 			this.nodeGenMap = nodeGenMap;
 		}
 
@@ -3963,18 +3943,21 @@ public class Nenola {
 			programs.put("Contract Guarantees", program);
 			return programs;
 		}
-			
+
 		private List<Node> toLustreClockedNodesFromNodeGenList() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 
 			Map<String, Closure> environment = new HashMap<>();
 			Map<String, Expr> localProps = new HashMap<>();
-			
+			State state = new State(this.nodeContractMap, this.dataContractMap, this.nodeGenMap, environment,
+					localProps);
+
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
-				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(this.contractMap, this.nodeGenMap,
-						environment, localProps);
+				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state);
 				lustreNodes.add(lustreNode);
+
+				// TODO: gather up all the nodegens in the sub node contracts
 
 			}
 
@@ -4000,16 +3983,15 @@ public class Nenola {
 
 		private List<TypeDef> lustreTypesFromDataContracts() {
 			List<jkind.lustre.TypeDef> lustreTypes = new ArrayList<>();
-			for (Entry<String, Contract> entry : this.contractMap.entrySet()) {
+			for (Entry<String, DataContract> entry : this.dataContractMap.entrySet()) {
 
 				String name = entry.getKey();
 				Contract contract = entry.getValue();
-				if (contract instanceof DataContract) {
-					jkind.lustre.Type lustreType = ((DataContract) contract).toLustreType();
-					jkind.lustre.TypeDef lustreTypeDef = new jkind.lustre.TypeDef(name, lustreType);
-					lustreTypes.add(lustreTypeDef);
+				jkind.lustre.Type lustreType = contract.toLustreType();
+				jkind.lustre.TypeDef lustreTypeDef = new jkind.lustre.TypeDef(name, lustreType);
+				lustreTypes.add(lustreTypeDef);
 
-				}
+
 			}
 
 			return lustreTypes;

@@ -856,6 +856,10 @@ public class AgreeXtext {
 
 		Map<String, Nenola.Channel> channels = new HashMap<>();
 		Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
+
+		Map<String, Nenola.NodeGen> nodeGenMap = new HashMap<>();
+		// TODO: get the local node generators
+
 		List<Nenola.Connection> connections = new ArrayList<>();
 		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
@@ -899,7 +903,7 @@ public class AgreeXtext {
 
 		String name = c.getQualifiedName();
 
-		return new Nenola.NodeContract(name, channels, subNodes, connections, specs, timingMode, isMain, c);
+		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, connections, specs, timingMode, isMain, c);
 	}
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
@@ -1355,22 +1359,22 @@ public class AgreeXtext {
 
 
 
-	private static Map<String, Contract> extractContractMapFromArgs(List<Arg> args) {
+	private static Map<String, DataContract> extractDataContractMapFromArgs(List<Arg> args) {
 
-		Map<String, Contract> result = new HashMap<>();
+		Map<String, DataContract> result = new HashMap<>();
 
 		for (Arg arg : args) {
 			Contract contract = toContractFromType(arg.getType());
-			result.put(contract.getName(), contract);
+			result.put(contract.getName(), (DataContract) contract);
 		}
 
 		return result;
 
 	}
 
-	private static Map<String, Contract> extractContractMapFromSpecStatement(SpecStatement spec) {
+	private static Map<String, DataContract> extractDataContractMapFromSpecStatement(SpecStatement spec) {
 
-		Map<String, Contract> result = new HashMap<>();
+		Map<String, DataContract> result = new HashMap<>();
 		if (spec instanceof NodeDef) {
 			EList<Arg> inputArgs = ((NodeDef) spec).getArgs();
 			EList<Arg> outputArgs = ((NodeDef) spec).getRets();
@@ -1381,70 +1385,78 @@ public class AgreeXtext {
 			argList.addAll(outputArgs);
 			argList.addAll(internalArgs);
 
-			result.putAll(extractContractMapFromArgs(argList));
+			result.putAll(extractDataContractMapFromArgs(argList));
 
 		} else if (spec instanceof FnDef) {
 			List<Arg> argList = new ArrayList<>();
 			argList.addAll(((FnDef) spec).getArgs());
-			result.putAll(extractContractMapFromArgs(argList));
+			result.putAll(extractDataContractMapFromArgs(argList));
 
 		} else if (spec instanceof LinearizationDef) {
 			List<Arg> argList = new ArrayList<>();
 			argList.addAll(((LinearizationDef) spec).getArgs());
-			result.putAll(extractContractMapFromArgs(argList));
+			result.putAll(extractDataContractMapFromArgs(argList));
 
 		} else if (spec instanceof OutputStatement) {
 			List<Arg> argList = new ArrayList<>();
 			argList.addAll(((OutputStatement) spec).getLhs());
-			result.putAll(extractContractMapFromArgs(argList));
+			result.putAll(extractDataContractMapFromArgs(argList));
 
 		} else if (spec instanceof InputStatement) {
 			List<Arg> argList = new ArrayList<>();
 			argList.addAll(((InputStatement) spec).getLhs());
-			result.putAll(extractContractMapFromArgs(argList));
+			result.putAll(extractDataContractMapFromArgs(argList));
 
 		}
 
 		return result;
 	}
 
-
-	public static Map<String, Nenola.Contract> extractContractMap(Classifier classifier) {
-		Map<String, Nenola.Contract> result = new HashMap<String, Nenola.Contract>();
+	public static Map<String, Nenola.DataContract> extractDataContractMap(Classifier classifier) {
+		Map<String, Nenola.DataContract> result = new HashMap<>();
 		AgreeContractSubclause annex = getAgreeAnnex(classifier);
 		if (annex != null) {
 			AgreeContract contract = (AgreeContract) annex.getContract();
 
 			for (SpecStatement spec : contract.getSpecs()) {
 
-				Map<String, Nenola.Contract> specResult = extractContractMapFromSpecStatement(spec);
+				Map<String, Nenola.DataContract> specResult = extractDataContractMapFromSpecStatement(spec);
 				result.putAll(specResult);
 
 			}
 
 		}
 
+		return result;
+	}
+
+	public static Map<String, Nenola.NodeContract> extractNodeContractMap(Classifier classifier) {
+		Map<String, Nenola.NodeContract> result = new HashMap<>();
+
 		if (classifier instanceof ComponentImplementation) {
-			Map<String, Nenola.Contract> ccResult = extractContractMap(
+			Map<String, Nenola.NodeContract> ccResult = extractNodeContractMap(
 					((ComponentImplementation) classifier).getType());
 			result.putAll(ccResult);
 
 			for (Subcomponent sub : ((ComponentImplementation) classifier).getAllSubcomponents()) {
 
-				Nenola.Contract contract = toContractFromClassifier(sub.getClassifier());
+				// TODO : check if CompImps are considered main/top
+				Nenola.NodeContract contract = toNodeContractFromClassifier(sub.getClassifier(), false);
 				result.put(contract.getName(), contract);
 
-				Map<String, Nenola.Contract> subResult = extractContractMap(sub.getClassifier());
+				Map<String, Nenola.NodeContract> subResult = extractNodeContractMap(sub.getClassifier());
 				result.putAll(subResult);
 			}
 		} else if (classifier instanceof ComponentClassifier) {
 			for (Feature feature : classifier.getAllFeatures()) {
-
-				Nenola.Contract contract = toContractFromClassifier(feature.getClassifier());
+				if (feature.getClassifier() instanceof ComponentClassifier) {
+					Nenola.NodeContract contract = toNodeContractFromClassifier(
+							(ComponentClassifier) feature.getClassifier(), false);
 				result.put(contract.getName(), contract);
 
-				Map<String, Nenola.Contract> subResult = extractContractMap(feature.getClassifier());
+				Map<String, Nenola.NodeContract> subResult = extractNodeContractMap(feature.getClassifier());
 				result.putAll(subResult);
+				}
 			}
 		}
 		return result;
@@ -1940,11 +1952,12 @@ public class AgreeXtext {
 
 	public static Nenola.Program toProgram(ComponentImplementation ci) {
 		Nenola.Contract main = toNodeContractFromClassifier(ci, true);
-		Map<String, Nenola.Contract> specMap = extractContractMap(ci);
+		Map<String, Nenola.NodeContract> nodeContractMap = extractNodeContractMap(ci);
+		Map<String, Nenola.DataContract> dataContractMap = extractDataContractMap(ci);
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(ci);
 
 		if (main instanceof Nenola.NodeContract) {
-			return new Nenola.Program((Nenola.NodeContract) main, specMap, nodeGenMap);
+			return new Nenola.Program((Nenola.NodeContract) main, nodeContractMap, dataContractMap, nodeGenMap);
 		}
 
 		throw new RuntimeException("Component Implementation cannot be converted to Node Contract");
