@@ -3158,14 +3158,14 @@ public class Nenola {
 		public final List<Connection> connections;
 		public final List<Spec> specList;
 		public final Optional<TimingMode> timingMode;
-		public final boolean isMain;
+		public final boolean isImpl;
 
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
 				Map<String, NodeGen> nodeGenMap,
-				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode, boolean isMain,
+				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode, boolean isImpl,
 				NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
@@ -3180,7 +3180,7 @@ public class Nenola {
 			this.connections.addAll(connections);
 			this.specList = specList;
 			this.timingMode = timingMode;
-			this.isMain = isMain;
+			this.isImpl = isImpl;
 
 			this.namedElement = namedElement;
 
@@ -3293,23 +3293,23 @@ public class Nenola {
 			return node;
 		}
 
-		public Node toLustreNode(boolean isMonolithic) {
-
-			if (this.lustreNodeCache.containsKey(isMonolithic)) {
-				return lustreNodeCache.get(isMonolithic);
-			}
-
-			Node node = null;
-			if (this.isMain) {
-				node = this.toLustreMainNode(isMonolithic);
-			} else {
-				node = this.toLustreSubNode(isMonolithic);
-			}
-
-			lustreNodeCache.put(isMonolithic, node);
-			return node;
-
-		}
+//		public Node toLustreNode(boolean isMain, boolean isMonolithic) {
+//
+//			if (this.lustreNodeCache.containsKey(isMonolithic)) {
+//				return lustreNodeCache.get(isMonolithic);
+//			}
+//
+//			Node node = null;
+//			if (isMain && this.isImpl) {
+//				node = this.toLustreMainNode(isMonolithic);
+//			} else {
+//				node = this.toLustreSubNode(isMonolithic);
+//			}
+//
+//			lustreNodeCache.put(isMonolithic, node);
+//			return node;
+//
+//		}
 
 		private Node toLustreMainNode(boolean isMonolithic) {
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -3605,9 +3605,9 @@ public class Nenola {
 
 
 		private boolean isProperty(boolean isMonolithic, SpecTag specTag) {
-			return (specTag == SpecTag.Assume && !this.isMain && !isMonolithic)
-					|| (specTag == SpecTag.Lemma && (this.isMain || isMonolithic))
-					|| (specTag == SpecTag.Guarantee && (this.isMain || isMonolithic));
+			return (specTag == SpecTag.Assume && !this.isImpl && !isMonolithic)
+					|| (specTag == SpecTag.Lemma && (this.isImpl || isMonolithic))
+					|| (specTag == SpecTag.Guarantee && (this.isImpl || isMonolithic));
 
 		}
 
@@ -3786,12 +3786,12 @@ public class Nenola {
 			return exprMap;
 		}
 
-		public List<Node> toLustreNodesFromNesting(boolean isMonolithic) {
+		public List<Node> toLustreSubNodes(boolean isMonolithic) {
 
 			List<Node> nodes = new ArrayList<>();
-			nodes.add(this.toLustreNode(isMonolithic));
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.addAll(subNodeContract.toLustreNodesFromNesting(isMonolithic));
+				nodes.add(this.toLustreSubNode(isMonolithic));
+				nodes.addAll(subNodeContract.toLustreSubNodes(isMonolithic));
 			}
 
 			return nodes;
@@ -3879,6 +3879,15 @@ public class Nenola {
 
 	}
 
+	private static List<Node> lustreNodesFromMain(NodeContract main, boolean isMonolithic) {
+		List<Node> nodes = new ArrayList<>();
+		Node mainNode = main.toLustreMainNode(isMonolithic);
+		nodes.add(mainNode);
+		List<Node> subs = main.toLustreSubNodes(isMonolithic);
+		nodes.addAll(subs);
+		return nodes;
+	}
+
 
 	public static class Program {
 		public final NodeContract main;
@@ -3929,16 +3938,17 @@ public class Nenola {
 		}
 
 		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(boolean isMonolithic) {
+
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
 			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGenList());
-			lustreNodes.addAll(this.lustreNodesFromMain(isMonolithic));
+			lustreNodes.addAll(Nenola.lustreNodesFromMain(main, isMonolithic));
 
 			lustreNodes.add(Lustre.getHistNode());
 			lustreNodes.addAll(Lustre.getRealTimeNodes());
 			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
-					this.main.getName());
+					main.getName());
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
 			programs.put("Contract Guarantees", program);
 			return programs;
@@ -3962,10 +3972,6 @@ public class Nenola {
 			}
 
 			return lustreNodes;
-		}
-
-		private List<Node> lustreNodesFromMain(boolean isMonolithic) {
-			return this.main.toLustreNodesFromNesting(isMonolithic);
 		}
 
 

@@ -852,7 +852,7 @@ public class AgreeXtext {
 
 	}
 
-	public static Nenola.NodeContract toNodeContractFromClassifier(ComponentClassifier c, boolean isMain) {
+	public static Nenola.NodeContract toNodeContractFromClassifier(ComponentClassifier c, boolean isImpl) {
 
 		Map<String, Nenola.Channel> channels = new HashMap<>();
 		Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
@@ -903,7 +903,7 @@ public class AgreeXtext {
 
 		String name = c.getQualifiedName();
 
-		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, connections, specs, timingMode, isMain, c);
+		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, connections, specs, timingMode, isImpl, c);
 	}
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
@@ -1434,29 +1434,26 @@ public class AgreeXtext {
 		Map<String, Nenola.NodeContract> result = new HashMap<>();
 
 		if (classifier instanceof ComponentImplementation) {
+
+			Nenola.NodeContract contract = toNodeContractFromClassifier((ComponentImplementation) classifier, true);
+			result.put(contract.getName(), contract);
+
 			Map<String, Nenola.NodeContract> ccResult = extractNodeContractMap(
 					((ComponentImplementation) classifier).getType());
 			result.putAll(ccResult);
 
 			for (Subcomponent sub : ((ComponentImplementation) classifier).getAllSubcomponents()) {
-
-				// TODO : check if CompImps are considered main/top
-				Nenola.NodeContract contract = toNodeContractFromClassifier(sub.getClassifier(), false);
-				result.put(contract.getName(), contract);
-
 				Map<String, Nenola.NodeContract> subResult = extractNodeContractMap(sub.getClassifier());
 				result.putAll(subResult);
 			}
 		} else if (classifier instanceof ComponentClassifier) {
-			for (Feature feature : classifier.getAllFeatures()) {
-				if (feature.getClassifier() instanceof ComponentClassifier) {
-					Nenola.NodeContract contract = toNodeContractFromClassifier(
-							(ComponentClassifier) feature.getClassifier(), false);
-				result.put(contract.getName(), contract);
 
+			Nenola.NodeContract contract = toNodeContractFromClassifier((ComponentClassifier) classifier, false);
+			result.put(contract.getName(), contract);
+
+			for (Feature feature : classifier.getAllFeatures()) {
 				Map<String, Nenola.NodeContract> subResult = extractNodeContractMap(feature.getClassifier());
 				result.putAll(subResult);
-				}
 			}
 		}
 		return result;
