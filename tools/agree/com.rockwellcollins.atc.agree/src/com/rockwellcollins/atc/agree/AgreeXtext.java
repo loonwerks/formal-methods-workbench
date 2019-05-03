@@ -371,7 +371,7 @@ public class AgreeXtext {
 
 			Nenola.Expr leftExpr = new Nenola.IdExpr(((AssertEqualStatement) spec).getId().getName());
 			Nenola.Expr rightExpr = toExprFromExpr(((AssertEqualStatement) spec).getExpr());
-			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.Rator.Equal, rightExpr);
+			Nenola.Expr expr = new Nenola.BinExpr(leftExpr, Nenola.BinRator.Equal, rightExpr);
 			Nenola.Prop prop = new Nenola.ExprProp(expr);
 			return new Nenola.Spec(Nenola.SpecTag.Assert, name, description, prop);
 
@@ -1623,47 +1623,47 @@ public class AgreeXtext {
 
 			Expr left = ((BinaryExpr) expr).getLeft();
 			Expr right = ((BinaryExpr) expr).getRight();
-			Nenola.Rator rator = null;
+			Nenola.BinRator rator = null;
 
 			switch (((BinaryExpr) expr).getOp()) {
 			case "->":
-				rator = Nenola.Rator.StreamCons;
+				rator = Nenola.BinRator.StreamCons;
 			case "=>":
-				rator = Nenola.Rator.Implies;
+				rator = Nenola.BinRator.Implies;
 			case "<=>":
-				rator = Nenola.Rator.Equiv;
+				rator = Nenola.BinRator.Equiv;
 			case "and":
-				rator = Nenola.Rator.Conj;
+				rator = Nenola.BinRator.Conj;
 			case "or":
-				rator = Nenola.Rator.Disj;
+				rator = Nenola.BinRator.Disj;
 			case "<>":
-				rator = Nenola.Rator.NotEqual;
+				rator = Nenola.BinRator.NotEqual;
 			case "!=":
-				rator = Nenola.Rator.NotEqual;
+				rator = Nenola.BinRator.NotEqual;
 			case "<":
-				rator = Nenola.Rator.LessThan;
+				rator = Nenola.BinRator.LessThan;
 			case "<=":
-				rator = Nenola.Rator.LessEq;
+				rator = Nenola.BinRator.LessEq;
 			case ">":
-				rator = Nenola.Rator.GreatThan;
+				rator = Nenola.BinRator.GreatThan;
 			case ">=":
-				rator = Nenola.Rator.GreatEq;
+				rator = Nenola.BinRator.GreatEq;
 			case "=":
-				rator = Nenola.Rator.Equal;
+				rator = Nenola.BinRator.Equal;
 			case "+":
-				rator = Nenola.Rator.Plus;
+				rator = Nenola.BinRator.Plus;
 			case "-":
-				rator = Nenola.Rator.Minus;
+				rator = Nenola.BinRator.Minus;
 			case "*":
-				rator = Nenola.Rator.Mult;
+				rator = Nenola.BinRator.Mult;
 			case "/":
-				rator = Nenola.Rator.Div;
+				rator = Nenola.BinRator.Div;
 			case "mod":
-				rator = Nenola.Rator.Mod;
+				rator = Nenola.BinRator.Mod;
 			case "div":
-				rator = Nenola.Rator.Div;
+				rator = Nenola.BinRator.Div;
 			case "^":
-				rator = Nenola.Rator.Pow;
+				rator = Nenola.BinRator.Pow;
 			}
 
 			return new Nenola.BinExpr(toExprFromExpr(left), rator, toExprFromExpr(right));
@@ -1671,13 +1671,15 @@ public class AgreeXtext {
 		} else if (expr instanceof UnaryExpr) {
 
 			Expr rand = ((UnaryExpr) expr).getExpr();
-			Nenola.Rator rator = null;
+			Nenola.UniRator rator = null;
 
 			switch (((BinaryExpr) expr).getOp()) {
 			case "-":
-				rator = Nenola.Rator.Neg;
+				rator = Nenola.UniRator.Neg;
 			case "not":
-				rator = Nenola.Rator.Not;
+				rator = Nenola.UniRator.Not;
+			case "pre":
+				rator = Nenola.UniRator.Pre;
 			}
 
 			return new Nenola.UnaryExpr(rator, toExprFromExpr(rand));
