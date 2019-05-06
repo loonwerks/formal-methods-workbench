@@ -41,11 +41,11 @@ public class Nenola {
 		public final Map<String, NodeContract> nodeContractMap;
 		public final Map<String, DataContract> dataContractMap;
 		public final Map<String, Map<String, DataContract>> propTypes;
-		public final String currentNodeContract;
+		public final Optional<String> currentOp;
 
 		public StaticState(Map<String, NodeContract> nodeContractMap,
 				Map<String, DataContract> dataContractMap, Map<String, Map<String, DataContract>> propTypes,
-				String currentNodeContract) {
+				Optional<String> currentOp) {
 			this.nodeContractMap = new HashMap<>();
 			this.nodeContractMap.putAll(nodeContractMap);
 
@@ -55,21 +55,21 @@ public class Nenola {
 			this.propTypes = new HashMap<>();
 			this.propTypes.putAll(propTypes);
 
-			this.currentNodeContract = currentNodeContract;
+			this.currentOp = currentOp;
 
 		}
 
 
 		public StaticState newDataContractMap(Map<String, DataContract> dataContractMap) {
-			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentNodeContract);
+			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentOp);
 		}
 
 		public StaticState newPropTypes(Map<String, Map<String, DataContract>> propTypes) {
-			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentNodeContract);
+			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentOp);
 		}
 
-		public StaticState newCurrentNodeContract(String currentNodeContract) {
-			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentNodeContract);
+		public StaticState newCurrentNodeContract(Optional<String> currentOp) {
+			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentOp);
 		}
 
 	}
@@ -416,7 +416,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.propTypes.get(state.currentNodeContract).get(propName);
+			return state.propTypes.get(state.currentOp).get(propName);
 		}
 
 		@Override
@@ -3938,10 +3938,9 @@ public class Nenola {
 		private List<Node> toLustreClockedNodesFromNodeGenList() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 
-			Map<String, Closure> environment = new HashMap<>();
-			Map<String, Expr> localProps = new HashMap<>();
-			StaticState state = new StaticState(this.nodeContractMap, this.dataContractMap, this.nodeGenMap, environment,
-					localProps);
+			Map<String, Map<String, DataContract>> propTypes = new HashMap<>();
+			StaticState state = new StaticState(this.nodeContractMap, this.dataContractMap, propTypes,
+					Optional.empty());
 
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
