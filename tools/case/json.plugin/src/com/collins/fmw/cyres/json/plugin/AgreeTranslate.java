@@ -245,8 +245,12 @@ public class AgreeTranslate {
 
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("AssertStatement"));
-		result.add("name", new JsonPrimitive(stmt.getName()));
-		result.add("label", new JsonPrimitive(stmt.getStr()));
+		if (stmt.getName() != null) {
+			result.add("name", new JsonPrimitive(stmt.getName()));
+		}
+		if (stmt.getStr() != null) {
+			result.add("label", new JsonPrimitive(stmt.getStr()));
+		}
 		result.add("expr", genExpr(stmt.getExpr()));
 		return result;
 	}
@@ -255,7 +259,9 @@ public class AgreeTranslate {
 
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("AssumeStatement"));
-		result.add("name", new JsonPrimitive(stmt.getName()));
+		if (stmt.getName() != null) {
+			result.add("name", new JsonPrimitive(stmt.getName()));
+		}
 		result.add("label", new JsonPrimitive(stmt.getStr()));
 		result.add("expr", genExpr(stmt.getExpr()));
 		return result;
@@ -278,7 +284,9 @@ public class AgreeTranslate {
 
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("GuaranteeStatement"));
-		result.add("name", new JsonPrimitive(stmt.getName()));
+		if (stmt.getName() != null) {
+			result.add("name", new JsonPrimitive(stmt.getName()));
+		}
 		result.add("label", new JsonPrimitive(stmt.getStr()));
 		result.add("expr", genExpr(stmt.getExpr()));
 		return result;
