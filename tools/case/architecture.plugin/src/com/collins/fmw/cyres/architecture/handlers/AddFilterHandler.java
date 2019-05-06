@@ -51,6 +51,7 @@ public class AddFilterHandler extends AadlHandler {
 	static final String FILTER_IMPL_NAME = "FLT";
 	static final String CONNECTION_IMPL_NAME = "c";
 
+	private ComponentCategory filterComponentType;
 	private String filterImplementationName;
 	private String filterImplementationLanguage;
 	private String filterResoluteClause;
@@ -64,7 +65,7 @@ public class AddFilterHandler extends AadlHandler {
 		// TODO: if user selects system implementation, allow the user to specify connection in the wizard
 		final EObject eObj = getEObject(uri);
 		if (!(eObj instanceof PortConnection)) {
-			Dialog.showError("No connection is selected",
+			Dialog.showError("Add Filter",
 					"A connection between two components must be selected to add a filter.");
 			return;
 		}
@@ -76,9 +77,10 @@ public class AddFilterHandler extends AadlHandler {
 		List<String> resoluteClauses = new ArrayList<>();
 		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
 		wizard.setResoluteClauses(resoluteClauses);
-
+		wizard.setAadlComponentTypes(getParentComponentCategory(eObj), getFilterComponentCategory(eObj));
 		wizard.create();
 		if (wizard.open() == Window.OK) {
+			filterComponentType = wizard.getAadlComponentType();
 			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
 			filterImplementationName = wizard.getFilterImplementationName();
 			if (filterImplementationName == "") {
@@ -148,20 +150,20 @@ public class AddFilterHandler extends AadlHandler {
 				}
 
 				// Figure out component type by looking at the component type of the destination component
-				ComponentCategory compCategory = ((Subcomponent) selectedConnection.getDestination().getContext())
-						.getCategory();
+//				ComponentCategory compCategory = ((Subcomponent) selectedConnection.getDestination().getContext())
+//						.getCategory();
 
 				// If the component type is a process, we will need to put a single thread inside.
 				// Per convention, we will attach all properties and contracts to the thread.
 				// For this model transformation, we will create the thread first, then wrap it in a process
 				// component, using the same mechanism we use for the seL4 transformation
-				boolean isProcess = (compCategory == ComponentCategory.PROCESS);
+				boolean isProcess = (filterComponentType == ComponentCategory.PROCESS);
 				if (isProcess) {
-					compCategory = ComponentCategory.THREAD;
+					filterComponentType = ComponentCategory.THREAD;
 				}
 
 				final ComponentType filterType = (ComponentType) pkgSection
-						.createOwnedClassifier(ComponentCreateHelper.getTypeClass(compCategory));
+						.createOwnedClassifier(ComponentCreateHelper.getTypeClass(filterComponentType));
 
 				// Give it a unique name
 				filterType.setName(getUniqueName(FILTER_COMP_TYPE_NAME, true, pkgSection.getOwnedClassifiers()));
@@ -241,7 +243,7 @@ public class AddFilterHandler extends AadlHandler {
 
 				// Create Filter implementation
 				final ComponentImplementation filterImpl = (ComponentImplementation) pkgSection
-						.createOwnedClassifier(ComponentCreateHelper.getImplClass(compCategory));
+						.createOwnedClassifier(ComponentCreateHelper.getImplClass(filterComponentType));
 				filterImpl.setName(filterType.getName() + ".Impl");
 				final Realization r = filterImpl.createOwnedRealization();
 				r.setImplemented(filterType);
@@ -255,7 +257,7 @@ public class AddFilterHandler extends AadlHandler {
 
 				// Insert filter feature in process component implementation
 				final Subcomponent filterSubcomp = ComponentCreateHelper.createOwnedSubcomponent(containingImpl,
-						compCategory);
+						filterComponentType);
 
 				// Give it a unique name
 				filterSubcomp
@@ -370,6 +372,15 @@ public class AddFilterHandler extends AadlHandler {
 			return guarantees;
 		});
 
+	}
+
+	private ComponentCategory getParentComponentCategory(EObject eObj) {
+		PortConnection selectedConnection = (PortConnection) eObj;
+		return selectedConnection.getContainingComponentImpl().getCategory();
+	}
+
+	private ComponentCategory getFilterComponentCategory(EObject eObj) {
+		return null;
 	}
 
 }

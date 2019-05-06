@@ -15,12 +15,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.aadl2.ComponentCategory;
 
 /**
  * This class creates the Add Filter wizard
  */
 public class AddFilterDialog extends TitleAreaDialog {
 
+	private Combo cboAadlComponentType;
 	private Text txtFilterImplementationName;
 	private Text txtFilterImplementationLanguage;
 	private Combo cboFilterResoluteClause;
@@ -34,6 +36,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> strSourceGuarantees = new ArrayList<>();
 	private List<String> strPropagateGuarantees = new ArrayList<>();
 	private List<String> strResoluteClauses = new ArrayList<>();
+	private ComponentCategory ccParent = null;
+	private ComponentCategory ccFilter = null;
 
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
@@ -58,6 +62,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 		container.setLayout(layout);
 
 		// Add filter information fields
+		createAadlComponentTypeField(container);
 		createFilterImplementationNameField(container);
 		createImplementationLanguageField(container);
 		createResoluteField(container);
@@ -65,6 +70,38 @@ public class AddFilterDialog extends TitleAreaDialog {
 		createAgreeField(container);
 
 		return area;
+	}
+
+	private void createAadlComponentTypeField(Composite container) {
+		Label lblAadlComponentType = new Label(container, SWT.NONE);
+		lblAadlComponentType.setText("AADL Component Type");
+
+		GridData dataInfoField = new GridData();
+		dataInfoField.grabExcessHorizontalSpace = true;
+		dataInfoField.horizontalAlignment = SWT.FILL;
+		cboAadlComponentType = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboAadlComponentType.setLayoutData(dataInfoField);
+		if (ccParent == ComponentCategory.SYSTEM) {
+			cboAadlComponentType.add("System");
+			cboAadlComponentType.add("Abstract");
+			cboAadlComponentType.add("Process");
+		} else if (ccParent == ComponentCategory.ABSTRACT) {
+			cboAadlComponentType.add("System");
+			cboAadlComponentType.add("Abstract");
+			cboAadlComponentType.add("Process");
+			cboAadlComponentType.add("Thread");
+		} else if (ccParent == ComponentCategory.PROCESS) {
+			cboAadlComponentType.add("Thread");
+		} else if (ccParent == ComponentCategory.THREAD_GROUP) {
+			cboAadlComponentType.add("Thread");
+		} else {
+			cboAadlComponentType.add("System");
+			cboAadlComponentType.add("Abstract");
+			cboAadlComponentType.add("Process");
+			cboAadlComponentType.add("Thread");
+		}
+		cboAadlComponentType.setText(ccFilter.getName());
+
 	}
 
 	/**
@@ -207,6 +244,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 				strPropagateGuarantees.add(guarantee);
 			}
 		}
+		ccFilter = ComponentCategory.get(cboAadlComponentType.getText());
 	}
 
 	@Override
@@ -244,4 +282,12 @@ public class AddFilterDialog extends TitleAreaDialog {
 		strResoluteClauses = clauses;
 	}
 
+	public void setAadlComponentTypes(ComponentCategory parentComp, ComponentCategory filterComp) {
+		ccParent = parentComp;
+		ccFilter = filterComp;
+	}
+
+	public ComponentCategory getAadlComponentType() {
+		return ccFilter;
+	}
 }

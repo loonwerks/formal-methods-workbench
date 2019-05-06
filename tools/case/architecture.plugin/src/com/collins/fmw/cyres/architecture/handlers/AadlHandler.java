@@ -70,14 +70,14 @@ public abstract class AadlHandler extends AbstractHandler {
 
 		// Get the current selection
 		ISelection selection = null;
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IViewPart viewPart = page.findView(OUTLINE_VIEW_PART_ID);
-		if (viewPart == null) {
-			selection = HandlerUtil.getCurrentSelection(event);
-		} else {
+		try {
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IViewPart viewPart = page.findView(OUTLINE_VIEW_PART_ID);
 			IViewSite viewSite = viewPart.getViewSite();
 			ISelectionProvider selectionProvider = viewSite.getSelectionProvider();
 			selection = selectionProvider.getSelection();
+		} catch (Exception e) {
+			selection = HandlerUtil.getCurrentSelection(event);
 		}
 
 		// TODO: Handle same functionality in the Graphical Editor?
