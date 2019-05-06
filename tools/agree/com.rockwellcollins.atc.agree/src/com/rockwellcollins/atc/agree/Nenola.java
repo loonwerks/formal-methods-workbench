@@ -36,57 +36,40 @@ import jkind.lustre.parsing.LustreParseUtil;
 //Nenola = Nested Node Language
 public class Nenola {
 
-	public static class Closure {
-
-		public final Expr expr;
-		public final Map<String, Closure> environment;
-
-		public Closure(Expr expr, Map<String, Closure> environment) {
-			this.expr = expr;
-			this.environment = environment;
-		}
-
-	}
-
-
-	public static class State {
+	public static class StaticState {
 
 		public final Map<String, NodeContract> nodeContractMap;
 		public final Map<String, DataContract> dataContractMap;
-		public final Map<String, NodeGen> nodeGenMap;
-		public final Map<String, Closure> environment;
-		public final Map<String, Expr> localProps;
+		public final Map<String, Map<String, DataContract>> propTypes;
+		public final String currentNodeContract;
 
-		public State(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> dataContractMap, Map<String, NodeGen> nodeGenMap,
-				Map<String, Closure> environment, Map<String, Expr> localProps) {
+		public StaticState(Map<String, NodeContract> nodeContractMap,
+				Map<String, DataContract> dataContractMap, Map<String, Map<String, DataContract>> propTypes,
+				String currentNodeContract) {
 			this.nodeContractMap = new HashMap<>();
 			this.nodeContractMap.putAll(nodeContractMap);
 
 			this.dataContractMap = new HashMap<>();
 			this.dataContractMap.putAll(dataContractMap);
 
-			this.nodeGenMap = new HashMap<>();
-			this.nodeGenMap.putAll(nodeGenMap);
+			this.propTypes = new HashMap<>();
+			this.propTypes.putAll(propTypes);
 
-			this.environment = new HashMap<>();
-			this.environment.putAll(environment);
-
-			this.localProps = new HashMap<>();
-			this.localProps.putAll(localProps);
+			this.currentNodeContract = currentNodeContract;
 
 		}
 
-		public State newNodeGenMap(Map<String, NodeGen> nodeGenMap) {
-			return new State(nodeContractMap, dataContractMap, nodeGenMap, environment, localProps);
+
+		public StaticState newDataContractMap(Map<String, DataContract> dataContractMap) {
+			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentNodeContract);
 		}
 
-		public State newEnvironment(Map<String, Closure> environment) {
-			return new State(nodeContractMap, dataContractMap, nodeGenMap, environment, localProps);
+		public StaticState newPropTypes(Map<String, Map<String, DataContract>> propTypes) {
+			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentNodeContract);
 		}
 
-		public State newLocalProps(Map<String, Expr> localProps) {
-			return new State(nodeContractMap, dataContractMap, nodeGenMap, environment, localProps);
+		public StaticState newCurrentNodeContract(String currentNodeContract) {
+			return new StaticState(nodeContractMap, dataContractMap, propTypes, currentNodeContract);
 		}
 
 	}
@@ -116,13 +99,13 @@ public class Nenola {
 
 	public static interface Expr {
 
-		DataContract inferDataContract(State state);
+		DataContract inferDataContract(StaticState state);
 
 		jkind.lustre.Expr toLustreExpr();
 
 		jkind.lustre.Expr toLustreClockedExpr();
 
-		List<jkind.lustre.VarDecl> toLustreClockedLocals(State state);
+		List<jkind.lustre.VarDecl> toLustreClockedLocals(StaticState state);
 
 		List<jkind.lustre.Equation> toLustreClockedEquations();
 
@@ -139,7 +122,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 
 			switch (this.tag) {
 			case Clock:
@@ -166,7 +149,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -186,9 +169,8 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
-			Closure cl = state.environment.get(this.name);
-			return cl.expr.inferDataContract(state.newEnvironment(cl.environment));
+		public DataContract inferDataContract(StaticState state) {
+			return state.dataContractMap.get(this.name);
 		}
 
 		@Override
@@ -203,7 +185,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -225,7 +207,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 
 			Contract targetContract = this.target.inferDataContract(state);
 			if (targetContract instanceof RecordContract) {
@@ -247,7 +229,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -271,7 +253,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 
 			switch (this.rator) {
 			case Equal :
@@ -330,7 +312,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.addAll(this.e1.toLustreClockedLocals(state));
 			vars.addAll(this.e2.toLustreClockedLocals(state));
@@ -359,7 +341,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			return this.trueBody.inferDataContract(state);
 		}
 
@@ -375,7 +357,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -397,7 +379,7 @@ public class Nenola {
 
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			return this.init.inferDataContract(state);
 		}
 
@@ -413,7 +395,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -433,9 +415,8 @@ public class Nenola {
 
 
 		@Override
-		public DataContract inferDataContract(State state) {
-			// TODO Auto-generated method stub
-			return null;
+		public DataContract inferDataContract(StaticState state) {
+			return state.propTypes.get(state.currentNodeContract).get(propName);
 		}
 
 		@Override
@@ -450,7 +431,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -482,7 +463,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -492,7 +473,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -517,7 +498,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -527,7 +508,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -552,7 +533,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -562,7 +543,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -587,7 +568,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -597,7 +578,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -622,7 +603,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -632,7 +613,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -657,7 +638,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -667,7 +648,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -692,7 +673,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -702,7 +683,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -727,7 +708,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -737,7 +718,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -762,7 +743,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -772,7 +753,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -797,7 +778,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -807,7 +788,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -832,7 +813,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -842,7 +823,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -867,7 +848,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -877,7 +858,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -901,7 +882,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -911,7 +892,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -939,7 +920,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -949,7 +930,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -974,7 +955,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -984,7 +965,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1011,7 +992,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1021,7 +1002,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1046,7 +1027,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1056,7 +1037,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1085,7 +1066,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1095,7 +1076,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1122,7 +1103,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1132,7 +1113,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1148,7 +1129,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1173,7 +1154,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 
 			if (this.rator == UniRator.Pre) {
 
@@ -1240,7 +1221,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1250,7 +1231,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1275,7 +1256,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1285,7 +1266,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1316,7 +1297,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1326,7 +1307,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1357,7 +1338,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1367,7 +1348,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1398,7 +1379,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1408,7 +1389,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1443,7 +1424,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1453,7 +1434,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1488,7 +1469,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals(State state) {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1498,7 +1479,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(State state) {
+		public DataContract inferDataContract(StaticState state) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -3842,7 +3823,7 @@ public class Nenola {
 
 		private Optional<Node> clockedNodeMap = Optional.empty();
 
-		public Node toLustreClockedNode(State state) {
+		public Node toLustreClockedNode(StaticState state) {
 			if (!clockedNodeMap.isPresent()) {
 
 				NodeBuilder builder = new NodeBuilder(this.toLustreNode());
@@ -3959,7 +3940,7 @@ public class Nenola {
 
 			Map<String, Closure> environment = new HashMap<>();
 			Map<String, Expr> localProps = new HashMap<>();
-			State state = new State(this.nodeContractMap, this.dataContractMap, this.nodeGenMap, environment,
+			StaticState state = new StaticState(this.nodeContractMap, this.dataContractMap, this.nodeGenMap, environment,
 					localProps);
 
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
