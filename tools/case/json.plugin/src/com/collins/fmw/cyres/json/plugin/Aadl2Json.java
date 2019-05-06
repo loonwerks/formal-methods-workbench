@@ -26,7 +26,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-public class AgreeJson {
+public class Aadl2Json {
 
 	static private URI makeJsonFile(XtextEditor state) throws CoreException, IOException {
 		XtextResource resource = state.getDocument().readOnly(r -> r);

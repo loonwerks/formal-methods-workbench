@@ -29,9 +29,9 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osgi.framework.Bundle;
 
-import com.collins.fmw.cyres.json.plugin.AgreeJson;
+import com.collins.fmw.cyres.json.plugin.Aadl2Json;
 
-public class VerifyHandler extends AbstractHandler {
+public class SplatHandler extends AbstractHandler {
 
 	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
 
@@ -65,7 +65,7 @@ public class VerifyHandler extends AbstractHandler {
 
 		try {
 
-			URI jsonURI = AgreeJson.createJson(event);
+			URI jsonURI = Aadl2Json.createJson(event);
 
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
 			String fullpath = file.getRawLocation().toOSString();
