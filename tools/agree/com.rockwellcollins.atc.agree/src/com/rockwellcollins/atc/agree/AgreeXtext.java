@@ -1796,7 +1796,7 @@ public class AgreeXtext {
 
 
 		} else if (expr instanceof RecordLitExpr) {
-
+			String typeName = ((RecordLitExpr) expr).getRecordType().getElm().getName();
 			Map<String, Nenola.Expr> fields = new HashMap<>();
 			for (int i = 0; i < ((RecordLitExpr) expr).getArgs().size(); i++) {
 				String key = ((RecordLitExpr) expr).getArgs().get(i).getName();
@@ -1806,7 +1806,7 @@ public class AgreeXtext {
 
 			}
 
-			return new Nenola.RecordLit(fields);
+			return new Nenola.RecordLit(typeName, fields);
 
 		} else if (expr instanceof RecordUpdateExpr) {
 			Nenola.Expr record = toExprFromExpr(((RecordUpdateExpr) expr).getRecord());
