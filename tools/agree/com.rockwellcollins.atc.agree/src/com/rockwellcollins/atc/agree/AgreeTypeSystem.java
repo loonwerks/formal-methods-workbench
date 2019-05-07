@@ -311,6 +311,7 @@ public class AgreeTypeSystem {
 				PropertyExpression v = choice.getOwnedValues().get(0).getOwnedValue();
 
 				String key = p.getQualifiedName();
+				key = key == null ? p.getName() : key;
 
 				if (key.equals("Data_Model::Data_Representation")) {
 					if (v instanceof NamedValue) {
