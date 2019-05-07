@@ -3,6 +3,7 @@ package com.rockwellcollins.atc.agree;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -536,7 +537,7 @@ public class AgreeXtext {
 	}
 
 	private static Map<String, Channel> extractChannels(String prefix, Classifier ct) {
-		Map<String, Channel> channels = new HashMap<>();
+		Map<String, Channel> channels = new LinkedHashMap<>();
 		EList<Feature> features = ct.getAllFeatures();
 		for (Feature feature : features) {
 
