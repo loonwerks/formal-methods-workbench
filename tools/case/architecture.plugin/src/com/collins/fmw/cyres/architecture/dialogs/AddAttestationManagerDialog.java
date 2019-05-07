@@ -31,7 +31,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private Text txtCacheTimeout;
 	private Combo cboCacheSize;
 	private Text txtLogSize;
-	private Combo cboResoluteClause;
+	private Combo cboRequirement;
 	private Button btnPropagateGuarantees;
 	private Text txtAgreeProperty;
 	private String commDriverComponent;
@@ -40,11 +40,11 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private String cacheTimeout;
 	private String cacheSize;
 	private String logSize;
-	private String resoluteClause;
+	private String requirement;
 	private boolean propagateGuarantees;
 	private String commDriver = "";
 	private List<String> components = new ArrayList<>();
-	private List<String> resoluteClauses = new ArrayList<>();
+	private List<String> requirements = new ArrayList<>();
 	private String agreeProperty;
 
 	public AddAttestationManagerDialog(Shell parentShell) {
@@ -68,10 +68,10 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return size;
 	}
 
-	public void create(String commDriver, List<String> components, List<String> resoluteClauses) {
+	public void create(String commDriver, List<String> components, List<String> requirements) {
 		this.commDriver = commDriver;
 		this.components = components;
-		this.resoluteClauses = resoluteClauses;
+		this.requirements = requirements;
 		if (commDriver == null || commDriver.isEmpty()) {
 			create();
 			return;
@@ -98,7 +98,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		createCacheTimeoutField(container);
 		createCacheSizeField(container);
 		createLogSizeField(container);
-		createResoluteClauseField(container);
+		createRequirementField(container);
 		createPropagateGuaranteesField(container);
 		createAgreePropertyField(container);
 
@@ -199,17 +199,17 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	 * the addition of this filter to the design
 	 * @param container
 	 */
-	private void createResoluteClauseField(Composite container) {
+	private void createRequirementField(Composite container) {
 		Label lblResoluteField = new Label(container, SWT.NONE);
 		lblResoluteField.setText("Resolute Clause");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboResoluteClause = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-		cboResoluteClause.setLayoutData(dataInfoField);
-		for (String clause : resoluteClauses) {
-			cboResoluteClause.add(clause);
+		cboRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboRequirement.setLayoutData(dataInfoField);
+		for (String clause : requirements) {
+			cboRequirement.add(clause);
 		}
 	}
 
@@ -268,7 +268,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		cacheTimeout = txtCacheTimeout.getText();
 		cacheSize = cboCacheSize.getText();
 		logSize = txtLogSize.getText();
-		resoluteClause = cboResoluteClause.getText();
+		requirement = cboRequirement.getText();
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees = btnPropagateGuarantees.getSelection();
 	}
@@ -301,8 +301,8 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return propagateGuarantees;
 	}
 
-	public String getResoluteClause() {
-		return resoluteClause;
+	public String getRequirement() {
+		return requirement;
 	}
 
 	public String getAgreeProperty() {

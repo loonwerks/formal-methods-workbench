@@ -23,17 +23,17 @@ public class AddFilterDialog extends TitleAreaDialog {
 
 	private Text txtFilterImplementationName;
 	private Text txtFilterImplementationLanguage;
-	private Combo cboFilterResoluteClause;
+	private Combo cboFilterRequirement;
 	private Text txtAgreeProperty;
 	private List<Button> btnPropagateGuarantees = new ArrayList<>();
 	private String strFilterImplementationLanguage = "";
 	private String strFilterImplementationName = "";
-	private String strFilterResoluteClause = "";
+	private String strFilterRequirement = "";
 	private String strAgreeProperty = "";
 	private String strSourceName = "";
 	private List<String> strSourceGuarantees = new ArrayList<>();
 	private List<String> strPropagateGuarantees = new ArrayList<>();
-	private List<String> strResoluteClauses = new ArrayList<>();
+	private List<String> strRequirements = new ArrayList<>();
 
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
@@ -60,7 +60,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 		// Add filter information fields
 		createFilterImplementationNameField(container);
 		createImplementationLanguageField(container);
-		createResoluteField(container);
+		createRequirementField(container);
 		createGuaranteeSelectionField(container);
 		createAgreeField(container);
 
@@ -104,17 +104,17 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 * the addition of this filter to the design
 	 * @param container
 	 */
-	private void createResoluteField(Composite container) {
+	private void createRequirementField(Composite container) {
 		Label lblResoluteField = new Label(container, SWT.NONE);
-		lblResoluteField.setText("Resolute Clause");
+		lblResoluteField.setText("Requirement");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboFilterResoluteClause = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-		cboFilterResoluteClause.setLayoutData(dataInfoField);
-		for (String clause : strResoluteClauses) {
-			cboFilterResoluteClause.add(clause);
+		cboFilterRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboFilterRequirement.setLayoutData(dataInfoField);
+		for (String clause : strRequirements) {
+			cboFilterRequirement.add(clause);
 		}
 	}
 
@@ -177,7 +177,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private void saveInput() {
 		strFilterImplementationLanguage = txtFilterImplementationLanguage.getText();
 		strFilterImplementationName = txtFilterImplementationName.getText();
-		strFilterResoluteClause = cboFilterResoluteClause.getText();
+		strFilterRequirement = cboFilterRequirement.getText();
 		strAgreeProperty = txtAgreeProperty.getText();
 		strPropagateGuarantees.clear();
 		for (int i = 0; i < btnPropagateGuarantees.size(); i++) {
@@ -232,7 +232,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	}
 
 	public String getResoluteClause() {
-		return strFilterResoluteClause;
+		return strFilterRequirement;
 	}
 
 	public void setGuaranteeList(String sourceName, List<String> guarantees) {
@@ -240,8 +240,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 		strSourceGuarantees = guarantees;
 	}
 
-	public void setResoluteClauses(List<String> clauses) {
-		strResoluteClauses = clauses;
+	public void setRequirements(List<String> requirements) {
+		strRequirements = requirements;
 	}
 
 }

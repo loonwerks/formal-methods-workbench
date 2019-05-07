@@ -64,18 +64,22 @@ public class AddFilterHandler extends AadlHandler {
 		// TODO: if user selects system implementation, allow the user to specify connection in the wizard
 		final EObject eObj = getEObject(uri);
 		if (!(eObj instanceof PortConnection)) {
-			Dialog.showError("No connection is selected",
+			Dialog.showError("Add Filter",
 					"A connection between two components must be selected to add a filter.");
 			return;
 		}
 
+		// TODO: Make sure the source and destination components are not filters.
+		// If one (or both) is, they will need to be combined, so alert the user
+
 		// Open wizard to enter filter info
 		final AddFilterDialog wizard = new AddFilterDialog(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+
 		wizard.setGuaranteeList(getSourceName(uri), getSourceGuarantees(uri));
-		List<String> resoluteClauses = new ArrayList<>();
-		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
-		wizard.setResoluteClauses(resoluteClauses);
+		List<String> requirements = new ArrayList<>();
+		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> requirements.add(r.getId()));
+		wizard.setRequirements(requirements);
 
 		wizard.create();
 		if (wizard.open() == Window.OK) {

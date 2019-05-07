@@ -77,7 +77,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		} else if (eObj instanceof ComponentImplementation) {
 			ci = (ComponentImplementation) eObj;
 		} else {
-			Dialog.showError("No component is selected",
+			Dialog.showError("Add Attestation Manager",
 					"A communication driver subcomponent (or its containing implementation) must be selected to add an attestation manager.");
 			return;
 		}
@@ -89,9 +89,9 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		for (Subcomponent comp : ci.getAllSubcomponents()) {
 			subcomponents.add(comp.getName());
 		}
-		List<String> resoluteClauses = new ArrayList<>();
-		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
-		wizard.create(selectedSubcomponent, subcomponents, resoluteClauses);
+		List<String> requirements = new ArrayList<>();
+		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> requirements.add(r.getId()));
+		wizard.create(selectedSubcomponent, subcomponents, requirements);
 		if (wizard.open() == Window.OK) {
 			commDriverComponent = wizard.getCommDriverComponent();
 			implementationName = wizard.getImplementationName();
@@ -108,7 +108,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			if (logSize.isEmpty()) {
 				logSize = "0";
 			}
-			attestationResoluteClause = wizard.getResoluteClause();
+			attestationResoluteClause = wizard.getRequirement();
 			propagateGuarantees = wizard.getPropagateGuarantees();
 			attestationAgreeProperty = wizard.getAgreeProperty();
 		} else {
