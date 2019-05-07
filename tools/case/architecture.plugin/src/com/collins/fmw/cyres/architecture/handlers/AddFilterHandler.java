@@ -205,25 +205,25 @@ public class AddFilterHandler extends AadlHandler {
 				if (!addPropertyAssociation("COMP_TYPE", "FILTER", filterType, casePropSet)) {
 //					return;
 				}
-				// CASE::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterType, casePropSet)) {
-//					return;
-				}
-				// CASE::COMP_SPEC property
-				// Parse the ID from the Filter AGREE property
-				String filterPropId = "";
-				try {
-					filterPropId = filterAgreeProperty
-							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-									filterAgreeProperty.indexOf("\""))
-							.trim();
-
-				} catch (IndexOutOfBoundsException e) {
-					// agree property is malformed, so leave blank
-				}
-				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
-//					return;
-				}
+//				// CASE::COMP_IMPL property
+//				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterType, casePropSet)) {
+////					return;
+//				}
+//				// CASE::COMP_SPEC property
+//				// Parse the ID from the Filter AGREE property
+//				String filterPropId = "";
+//				try {
+//					filterPropId = filterAgreeProperty
+//							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+//									filterAgreeProperty.indexOf("\""))
+//							.trim();
+//
+//				} catch (IndexOutOfBoundsException e) {
+//					// agree property is malformed, so leave blank
+//				}
+//				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
+////					return;
+//				}
 
 				// Move filter to proper location
 				// (just before component it connects to on communication pathway)
@@ -249,6 +249,26 @@ public class AddFilterHandler extends AadlHandler {
 				// Add it to proper place
 				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
+
+				// CASE::COMP_IMPL property
+				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl, casePropSet)) {
+//					return;
+				}
+				// CASE::COMP_SPEC property
+				// Parse the ID from the Filter AGREE property
+				String filterPropId = "";
+				try {
+					filterPropId = filterAgreeProperty
+							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+									filterAgreeProperty.indexOf("\""))
+							.trim();
+
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed, so leave blank
+				}
+				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterImpl, casePropSet)) {
+//					return;
+				}
 
 				final ComponentImplementation containingImpl = selectedConnection
 						.getContainingComponentImpl();

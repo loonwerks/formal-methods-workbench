@@ -25,6 +25,7 @@ import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
@@ -276,41 +277,42 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerType, casePropSet)) {
 //					return;
 				}
-				// CASE_Properties::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerType,
-						casePropSet)) {
-//					return;
-				}
 
-				// CASE_Properties::COMP_SPEC property
-				// Parse the ID from the Attestation Manager AGREE property
-				String attestationPropId = "";
-				try {
-					attestationPropId = attestationAgreeProperty.substring(
-							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-							attestationAgreeProperty.indexOf("\"")).trim();
-				} catch (IndexOutOfBoundsException e) {
-					// agree property is malformed, so leave blank
-				}
-				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType,
-						casePropSet)) {
-//					return;
-				}
-
-				// CASE_Properties::CACHE_TIMEOUT property
-				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerType, casePropSet)) {
-//					return;
-				}
-
-				// CASE_Properties::CACHE_SIZE property
-				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerType, casePropSet)) {
-//					return;
-				}
-
-				// CASE_Properties::LOG_SIZE property
-				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerType, casePropSet)) {
-//					return;
-				}
+//				// CASE_Properties::COMP_IMPL property
+//				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerType,
+//						casePropSet)) {
+////					return;
+//				}
+//
+//				// CASE_Properties::COMP_SPEC property
+//				// Parse the ID from the Attestation Manager AGREE property
+//				String attestationPropId = "";
+//				try {
+//					attestationPropId = attestationAgreeProperty.substring(
+//							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+//							attestationAgreeProperty.indexOf("\"")).trim();
+//				} catch (IndexOutOfBoundsException e) {
+//					// agree property is malformed, so leave blank
+//				}
+//				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType,
+//						casePropSet)) {
+////					return;
+//				}
+//
+//				// CASE_Properties::CACHE_TIMEOUT property
+//				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerType, casePropSet)) {
+////					return;
+//				}
+//
+//				// CASE_Properties::CACHE_SIZE property
+//				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerType, casePropSet)) {
+////					return;
+//				}
+//
+//				// CASE_Properties::LOG_SIZE property
+//				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerType, casePropSet)) {
+////					return;
+//				}
 
 				// Put Attestation Manager in proper location (just after the comm driver)
 				String destName = "";
@@ -336,7 +338,43 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 2,
 						pkgSection.getOwnedClassifiers().size() - 1);
 
-				// Make a copy of the process component implementation
+				// CASE_Properties::COMP_IMPL property
+				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerImpl,
+						casePropSet)) {
+//					return;
+				}
+
+				// CASE_Properties::COMP_SPEC property
+				// Parse the ID from the Attestation Manager AGREE property
+				String attestationPropId = "";
+				try {
+					attestationPropId = attestationAgreeProperty.substring(
+							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+							attestationAgreeProperty.indexOf("\"")).trim();
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed, so leave blank
+				}
+				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerImpl,
+						casePropSet)) {
+//					return;
+				}
+
+				// CASE_Properties::CACHE_TIMEOUT property
+				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
+//					return;
+				}
+
+				// CASE_Properties::CACHE_SIZE property
+				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerImpl, casePropSet)) {
+//					return;
+				}
+
+				// CASE_Properties::LOG_SIZE property
+				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerImpl, casePropSet)) {
+//					return;
+				}
+
+				// Get the parent component implementation
 				final ComponentImplementation containingImpl = commDriver.getContainingComponentImpl();
 
 				// Insert attestation manager in process component implementation
@@ -430,8 +468,17 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Add add_attestation claims to resolute prove statement, if applicable
 				if (!attestationResoluteClause.isEmpty()) {
 
+					NamedElement commDriverComp = null;
+					if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
+						// Get the component implementation
+						commDriverComp = commDriver.getComponentImplementation();
+					} else {
+						// Get the component type
+						commDriverComp = commDriverType;
+					}
+
 					RequirementsManager.getInstance().modifyRequirement(attestationResoluteClause, resource,
-							new AddAttestationManagerClaim(commDriverType, attestationManagerType));
+							new AddAttestationManagerClaim(commDriverComp, attestationManagerImpl));
 
 				}
 

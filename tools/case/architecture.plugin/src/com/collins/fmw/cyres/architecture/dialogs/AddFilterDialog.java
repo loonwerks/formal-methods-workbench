@@ -143,7 +143,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 		if (strSourceGuarantees.size() > 0) {
 
 			Label lblSelectionField = new Label(container, SWT.NONE);
-			lblSelectionField.setText("Propagate Guarantees from " + strSourceName);
+			lblSelectionField.setText("Preserve Guarantees from " + strSourceName);
 			lblSelectionField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 			GridData selectionFieldLayoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
