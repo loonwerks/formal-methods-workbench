@@ -857,8 +857,7 @@ public class AgreeXtext {
 		Map<String, Nenola.Channel> channels = new HashMap<>();
 		Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
 
-		Map<String, Nenola.NodeGen> nodeGenMap = new HashMap<>();
-		// TODO: get the local node generators
+		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(c);
 
 		List<Nenola.Connection> connections = new ArrayList<>();
 		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();

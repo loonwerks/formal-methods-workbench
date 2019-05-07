@@ -39,27 +39,28 @@ public class Nenola {
 	public static class StaticState {
 
 		public final Map<String, NodeContract> nodeContractMap;
-		public final Map<String, DataContract> types;
-		public final Map<String, DataContract> values;
-		public final Map<String, DataContract> funcs;
+		public final Map<String, DataContract> typeEnv;
+		public final Map<String, DataContract> valueEnv;
+		public final Map<String, List<DataContract>> nodeEnv;
 		public final Map<String, Map<String, DataContract>> props;
 		public final Optional<String> currentOp;
 
 		public StaticState(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> types, Map<String, DataContract> values, Map<String, DataContract> funcs,
+				Map<String, DataContract> types, Map<String, DataContract> values,
+				Map<String, List<DataContract>> funcs,
 				Map<String, Map<String, DataContract>> props,
 				Optional<String> currentOp) {
 			this.nodeContractMap = new HashMap<>();
 			this.nodeContractMap.putAll(nodeContractMap);
 
-			this.types = new HashMap<>();
-			this.types.putAll(types);
+			this.typeEnv = new HashMap<>();
+			this.typeEnv.putAll(types);
 
-			this.values = new HashMap<>();
-			this.values.putAll(values);
+			this.valueEnv = new HashMap<>();
+			this.valueEnv.putAll(values);
 
-			this.funcs = new HashMap<>();
-			this.funcs.putAll(funcs);
+			this.nodeEnv = new HashMap<>();
+			this.nodeEnv.putAll(funcs);
 
 			this.props = new HashMap<>();
 			this.props.putAll(props);
@@ -70,23 +71,23 @@ public class Nenola {
 
 
 		public StaticState newTypes(Map<String, DataContract> types) {
-			return new StaticState(nodeContractMap, types, values, funcs, props, currentOp);
+			return new StaticState(nodeContractMap, types, valueEnv, nodeEnv, props, currentOp);
 		}
 
 		public StaticState newValues(Map<String, DataContract> values) {
-			return new StaticState(nodeContractMap, types, values, funcs, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, values, nodeEnv, props, currentOp);
 		}
 
-		public StaticState newFuncs(Map<String, DataContract> funcs) {
-			return new StaticState(nodeContractMap, types, values, funcs, props, currentOp);
+		public StaticState newFuncs(Map<String, List<DataContract>> funcs) {
+			return new StaticState(nodeContractMap, typeEnv, valueEnv, funcs, props, currentOp);
 		}
 
 		public StaticState newProps(Map<String, Map<String, DataContract>> props) {
-			return new StaticState(nodeContractMap, types, values, funcs, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeEnv, props, currentOp);
 		}
 
 		public StaticState newCurrentOp(Optional<String> currentOp) {
-			return new StaticState(nodeContractMap, types, values, funcs, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeEnv, props, currentOp);
 		}
 
 	}
@@ -187,7 +188,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.values.get(this.name);
+			return state.valueEnv.get(this.name);
 		}
 
 		@Override
@@ -927,7 +928,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.types.get(contractName);
+			return state.typeEnv.get(contractName);
 		}
 
 		@Override
@@ -1036,7 +1037,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.types.get(contractName);
+			return state.typeEnv.get(contractName);
 		}
 
 		@Override
@@ -1112,7 +1113,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.funcs.get(fnName);
+			return state.nodeEnv.get(fnName).get(0);
 		}
 
 		@Override
@@ -1388,7 +1389,7 @@ public class Nenola {
 		@Override
 		public DataContract inferDataContract(StaticState state) {
 			Map<String, DataContract> newValues = new HashMap<>();
-			newValues.putAll(state.values);
+			newValues.putAll(state.valueEnv);
 			ArrayContract ac = (ArrayContract) this.array.inferDataContract(state);
 			DataContract stemType = ac.stemContract;
 			newValues.put(binding, stemType);
@@ -3957,7 +3958,7 @@ public class Nenola {
 		private List<Node> toLustreClockedNodesFromNodeGenList() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			Map<String, DataContract> values = new HashMap<>();
-			Map<String, DataContract> funcs = new HashMap<>();
+			Map<String, List<DataContract>> funcs = new HashMap<>();
 			Map<String, Map<String, DataContract>> props = new HashMap<>();
 			StaticState state = new StaticState(this.nodeContractMap, this.types, values, funcs, props,
 					Optional.empty());
@@ -3966,8 +3967,6 @@ public class Nenola {
 
 				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state);
 				lustreNodes.add(lustreNode);
-
-				// TODO: gather up all the nodegens in the sub node contracts
 
 			}
 
