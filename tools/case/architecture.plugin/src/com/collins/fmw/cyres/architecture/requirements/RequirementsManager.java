@@ -235,7 +235,6 @@ public class RequirementsManager {
 		importedRequirements.add(req);
 	}
 
-
 	public void modifyRequirement(String reqId, Resource resource, BuiltInClaim claim) {
 
 		for (CyberRequirement req : importedRequirements) {

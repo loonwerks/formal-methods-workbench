@@ -51,8 +51,7 @@ public class CyberRequirement {
 		this.type = type;
 	}
 
-	public CyberRequirement(String type, String id, String text, String context, boolean agree,
-			String rationale) {
+	public CyberRequirement(String type, String id, String text, String context, boolean agree, String rationale) {
 		this.type = type;
 		this.id = id;
 		this.text = text;
@@ -383,4 +382,3 @@ public class CyberRequirement {
 	}
 
 }
-
