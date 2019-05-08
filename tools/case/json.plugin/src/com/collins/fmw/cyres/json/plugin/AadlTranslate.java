@@ -180,6 +180,7 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	public JsonElement caseComponentType(ComponentType ct) {
 		JsonObject result = new JsonObject();
 		result.add("name", new JsonPrimitive(ct.getQualifiedName()));
+		result.add("localName", new JsonPrimitive(ct.getName()));
 		result.add("kind", new JsonPrimitive("ComponentType"));
 		result.add("category", new JsonPrimitive(ct.getCategory().getName()));
 		TypeExtension te = ct.getOwnedExtension();
@@ -218,8 +219,10 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	@Override
 	public JsonElement caseComponentImplementation(ComponentImplementation ci) {
 		JsonObject result = new JsonObject();
-//		result.add("name", ci.getName()));
+		AadlPackage pkg = (AadlPackage) Aadl2Json.getContainingModelUnit(ci);
+		result.add("packageName", new JsonPrimitive(pkg.getName()));
 		result.add("name", new JsonPrimitive(ci.getQualifiedName()));
+		result.add("localName", new JsonPrimitive(ci.getName()));
 		result.add("kind", new JsonPrimitive("ComponentImplementation"));
 		result.add("category", new JsonPrimitive(ci.getCategory().getName()));
 		ImplementationExtension ie = ci.getOwnedExtension();
