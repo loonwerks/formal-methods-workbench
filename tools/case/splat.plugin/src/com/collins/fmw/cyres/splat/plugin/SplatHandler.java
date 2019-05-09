@@ -76,6 +76,7 @@ public class SplatHandler extends AbstractHandler {
 
 			Bundle bundle = Platform.getBundle(bundleId);
 
+			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
 			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
 					.getFile();
 
@@ -83,8 +84,9 @@ public class SplatHandler extends AbstractHandler {
 			rt.exec("chmod a+x " + splatPath);
 
 			String[] commands = { splatPath, fullpath };
+			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
-			Process proc = rt.exec(commands);
+			Process proc = rt.exec(commands, environmentVars);
 
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
