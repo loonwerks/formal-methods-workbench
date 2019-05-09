@@ -5,8 +5,10 @@
 open HolKernel Parse boolLib bossLib BasicProvers;
 
 open arithmeticTheory listTheory stringTheory 
-     charsetTheory FormalLangTheory regexpTheory regexpLib 
-     ASCIInumbersTheory numposrepTheory ASCIInumbersLib;
+(*     charsetTheory FormalLangTheory regexpTheory regexpLib *)
+     ASCIInumbersTheory numposrepTheory ASCIInumbersLib integerTheory;
+
+val int_ss = intLib.int_ss;
 
 (*---------------------------------------------------------------------------*)
 (* Boilerplate prelude stuff                                                 *)
@@ -43,14 +45,6 @@ val layout_def =  (* LSB with padding to width *)
 
 val enc_def = Define `enc w n = MAP CHR (layout 256 n w)`;
 val dec_def = Define `dec s = l2n 256 (MAP ORD s)`;
-
-(*---------------------------------------------------------------------------*)
-(* Width needed to encode number n in base 256                               *)
-(*---------------------------------------------------------------------------*)
-
-val width_def = 
- Define 
-  `width n = if n = 0 then 1 else SUC (LOG 256 n)`;
 
 val n2l_256 = save_thm
 ("n2l_256",
@@ -393,26 +387,30 @@ val strlen_eq = save_thm
   fun l2n [] = 0
     | l2n (h::t) = h + 256 * l2n t;
 
-  fun i2n bits i = if 0 <= i then i else MiscLib.exp 2 bits + i;
+  fun i2n top i = if 0 <= i then i else top + i;
 
-  fun n2i bits n = 
-    if n < MiscLib.exp 2 (bits -1) then n 
-    else ~(MiscLib.exp 2 bits - n);
+  fun n2i top top_div_2 n = 
+    if n < top_div_2 then n 
+    else ~(top - n);
 
   fun ntest n = (n = l2n (n2l n));
   List.all (equal true) (map ntest (upto 0 65537));
 
-  fun itest bits i = (i = n2i bits (l2n (n2l (i2n bits i))));
+  fun itest bits = 
+    let open MiscLib 
+        val top = Arbint.toInt (twoE bits)
+        val n2i = n2i top (top div 2)
+        val i2n = i2n top
+   in 
+      fn i => (i = n2i (l2n (n2l (i2n i))))
+   end;
+
   List.all (equal true) (map (itest 16) (upto ~32768 32767));
-
 *)
-
-open integerTheory;
-val int_ss = intLib.int_ss;
 
 val i2n_def =
  Define
-  `i2n bits (i:int) =
+  `i2n bits i =
       if 0i <= i then Num(i) else (2 ** bits) - Num(ABS(i))`;
 
 val n2i_def =
@@ -458,14 +456,12 @@ val n2i_i2n = Q.store_thm
 
 
 val enci_def = Define `enci w i = enc w (i2n (8*w) i)`;
-
 val deci_def = Define `deci w s = n2i (8*w) (dec s)`;
-
 
 val deci_enci = Q.store_thm
 ("deci_enci",
  `!w i. 0 < w /\ -(&(2n ** ((8 * w) - 1))) <= i /\ i < &(2n ** ((8 * w) - 1))
-        ==> deci w (enci w i) = i`,
+        ==> (deci w (enci w i) = i)`,
  rw_tac int_ss [enci_def, deci_def,dec_enc,n2i_i2n]);
 
 val deci_encis = save_thm
@@ -531,6 +527,248 @@ val enci_byte_8 = Q.prove
 val enci_bytes = save_thm
  ("enci_bytes",
   LIST_CONJ [enci_byte_1,enci_byte_2,enci_byte_3,enci_byte_4,enci_byte_8]);
+
+val lower_enci = Q.store_thm
+("lower_enci",
+ `!w i. w <= LENGTH (enci w i)`,
+ rw_tac list_ss [enci_def,lower_enc]);
+
+
+(*---------------------------------------------------------------------------*)
+(* enci has a restricted domain. Revise to have unrestricted.                *)
+(*---------------------------------------------------------------------------*)
+
+(*---------------------------------------------------------------------------*)
+(* Width needed to encode number n in base 256                               *)
+(*---------------------------------------------------------------------------*)
+
+val bitwidthN_def = 
+ Define 
+  `bitwidthN n = if n = 0 then 1 else SUC (LOG 2 n)`;
+
+val bytewidthN_def = 
+ Define 
+  `bytewidthN n = if n = 0 then 1 else SUC (LOG 256 n)`;
+
+(*
+fun sbit_width i =
+ let open Arbint
+     fun W bits =
+       let val N = twoE (Int.-(bits,1))
+       in if Arbint.~(N) <= i andalso i < N then bits else W (Int.+(bits,1))
+       end
+ in W 0
+ end;
+
+val bits2bytes = 
+ let fun roundup (q,r) = q + (if r > 0 then 1 else 0)
+ in fn n => roundup(n div 8,n mod 8)
+ end
+
+fun sbyte_width i = bits2bytes(sbit_width i)
+*)
+
+val NWIDTH_def = Define `NWIDTH n = if n=0 then 1 else 1 + LOG 256 n`;
+
+val nwidth_pos = Q.prove
+(`!n. 0 < NWIDTH n`,
+ rw_tac arith_ss [NWIDTH_def]);
+
+open logrootTheory;
+
+val LOG_EXACT_RWT = Q.prove
+(`!b n. 1 < b /\ 0 < n ==> (LOG b (b ** n) = n)`,
+ rpt strip_tac
+  >> match_mp_tac LOG_UNIQUE
+  >> rw_tac arith_ss [EXP]);
+
+val LOG_LESS = Q.prove
+(`!n j. 0 < j /\ 0 < n /\ n < 256 ** j ==> LOG 256 n < j`,
+ rpt strip_tac
+ >> strip_assume_tac 
+     (qdecide `!a b:num. a < b \/ (a = b) \/ b < a`
+         |> qspec `LOG 256 n`
+         |> qspec `j:num`)
+  >- (mp_tac (LOG |> qspec_arith `256` |> qspec `n`)
+      >> rw_tac arith_ss [])
+  >- (mp_tac (LOG_LE_MONO |> qspec_arith `256` |> qspec `n` |> qspec `256 ** j`)
+      >> asm_simp_tac arith_ss [LOG_EXACT_RWT])
+);
+
+
+val NWIDTH_MINIMAL_BOUND = Q.prove
+(`!n. n < 256 ** NWIDTH n /\ !j. 0 < j /\ n < 256 ** j ==> NWIDTH n <= j`,
+ rw_tac arith_ss [NWIDTH_def]
+  >- rw_tac arith_ss [LOG |> qspec_arith `256` |> SIMP_RULE bool_ss [ADD1]]
+  >- (`LOG 256 n < j` by rw_tac arith_ss [LOG_LESS]
+       >> decide_tac)
+);
+
+val IWIDTH_def =
+ Define 
+  `IWIDTH i = 
+    let k = NWIDTH (Num (ABS i)) ;
+        N = 256 ** k ;
+        J = &(N DIV 2) ;
+    in
+     if -J <= i /\ i < J
+       then k
+     else k+1`;
+
+(*
+g `!i N. (N = (256 ** IWIDTH i)) ==> -(&(N DIV 2)) <= i /\ i < &(N DIV 2)`;
+rw_tac int_ss [IWIDTH_def]
+ >> rw_tac int_ss []
+ >> full_simp_tac int_ss []
+*)
+	     
+val encI_def = 
+ Define 
+  `encI w i =
+     let k = IWIDTH i;
+        bytes = MAX w k;
+     in if 0 <= i then 
+           enc bytes (Num i)
+        else 
+          let bound = 256 ** bytes;
+          in
+           enc bytes (bound - Num (ABS i))`
+;
+
+val decI_def =
+ Define 
+   `decI s = 
+       let n = dec s;
+           bound = 256 ** (STRLEN s);
+           half = bound DIV 2;
+       in 
+        if n < half then 
+           int_of_num n
+        else -(int_of_num (bound - n))`
+
+(*
+g `!i w. decI (encI w i) = i`;
+BasicProvers.NORM_TAC int_ss [decI_def, encI_def,MAX_DEF,LET_THM,IWIDTH_def, NWIDTH_def]
+ >> full_simp_tac list_ss [dec_enc]
+ >- intLib.ARITH_TAC
+ >- intLib.ARITH_TAC;
+
+ >- (`~(n < half)` by (UNABBREV_ALL_TAC >> metis_tac[])
+     >> 
+     >> full_simp_tac int_ss [MAX_DEF]
+     >> rw_tac int_ss []
+     >> rw_tac int_ss []
+     >> full_simp_tac int_ss [dec_enc]
+ >- (full_simp_tac bool_ss [qdecide `~(a < b) <=> (b <= a)`]
+     `w <= STRLEN (enc w (Num i))` by metis_tac [lower_enc]
+ >- (full_simp_tac int_ss [dec_enc]
+ >- (full_simp_tac int_ss [dec_enc]
+*)
+
+(*
+val defn = Hol_defn "width"
+  `WIDTH (i:int) (bits:num) = 
+    let N = 2 ** (bits - 1) in
+      if -(&N) <= i /\ i < &N 
+        then bits
+      else WIDTH i (bits+1)`;
+Defn.tgoal defn;
+*)
+
+
+(* Show that bitwidth i gives smallest k s.t. -(2**(k-1)) <= i < 2**(k-1) *)
+
+val interval_bitwidthN_def =
+ Define 
+  `interval_bitwidthN lo hi = 
+     bitwidthN
+       (if 0i <= lo /\ lo <= hi then
+           Num hi else 
+        if lo < 0i /\ 0i <= hi then
+          Num(ABS lo + hi) else
+        if lo < 0 /\ hi < 0 then
+            Num(ABS lo)
+        else ARB)`;
+
+EVAL ``interval_bitwidthN 0 17999``;
+EVAL ``interval_bitwidthN 0 127``;
+EVAL ``interval_bitwidthN (-128) 127``;
+
+val encI_def = 
+ Define 
+  `encI w i =
+     if Num(ABS i) < 256 ** w then
+        enc w (i2n (8*w) i)
+     else
+        enc w (i2n (bitwidthN (Num(ABS i))) i)`
+;
+
+val decI_def =
+ Define 
+   `decI s = n2i (8 * STRLEN s) (dec s)`
+;
+
+val test_def = Define`test w i = (i,decI (encI w i))`;
+
+(*
+EVAL ``test 1 0``;
+EVAL ``test 1 1``;
+EVAL ``test 1 127``;
+EVAL ``test 1 128``;
+
+
+val lemA = 
+ LOG_EXP 
+ |> qspec `n`
+ |> qspec `256`
+ |> qspec `1`
+ |> SIMP_RULE arith_ss [qdecide `1 < 256`, qdecide `0 < 1`,EVAL ``LOG 256 1``]
+;
+*)
+
+val lemA = 
+ LOG_EXP 
+ |> qspec `n`
+ |> qspec `b`
+ |> qspec `1`
+ |> SIMP_RULE arith_ss [qdecide `0 < 1`]
+;
+
+EXP_BASE_LT_MONO
+ |> qspec `256`
+ |> SIMP_RULE bool_ss [qdecide `1 < 256`]
+ |> qspec `LOG 256 (256 ** w)`
+ |> qspec `LOG 256 n`
+ |> SIMP_RULE bool_ss [lemA]
+;
+
+val log_lem = Q.prove
+(`!b n w. 1 < b /\ 0 < w /\ 0 < n /\ n < b ** w ==> LOG b n < w`,
+rw_tac arith_ss []
+ >> mp_tac (qspec `b` (GSYM EXP_BASE_LT_MONO))
+ >> ASM_REWRITE_TAC []
+ >> DISCH_THEN (fn th => SIMP_TAC std_ss [Once th])
+ >> `b ** (LOG b n) <= n` by metis_tac [LOG]
+ >> decide_tac);
+
+val len_enc = Q.prove
+(`!w n. 0 < w /\ n < 2 ** (8*w) ==> (LENGTH (enc w n) = w)`,
+rw_tac list_ss [enc_def,layout_def,PAD_RIGHT,EXP_EXP_MULT]
+ >> rw_tac arith_ss [numposrepTheory.LENGTH_n2l]
+ >> match_mp_tac (qdecide `a <= b ==> ((a:num) + (b - a) = b)`)
+ >> rw_tac arith_ss [qdecide `SUC x <= y <=> x < y`,log_lem]);
+
+val deci_enci = Q.store_thm
+("deci_enci",
+ `!w i. 0 < w /\ -(&(2n ** ((8 * w) - 1))) <= i /\ i < &(2n ** ((8 * w) - 1))
+        ==> (deci w (enci w i) = i)`,
+ rw_tac int_ss [enci_def, deci_def,dec_enc,n2i_i2n]);
+
+val deci_encis = save_thm
+("deci_encis",
+ LIST_CONJ
+     (map (C qspec_arith deci_enci) [`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`]));
+
 
 (*---------------------------------------------------------------------------*)
 (* Length directed string destructor                                         *)

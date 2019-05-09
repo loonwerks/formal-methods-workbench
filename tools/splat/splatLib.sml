@@ -12,6 +12,13 @@ open regexpSyntax pred_setSyntax Regexp_Type
      charsetTheory regexpTheory splatTheory
      pred_setLib numLib stringLib regexpLib;
 
+
+fun listrel R [] [] = true
+  | listrel R (a::t1) (b::t2) = R a b andalso listrel R t1 t2
+  | listrel _ _ _ = false;
+
+fun pairrel R1 R2 (x,y) (u,v) = R1 x u andalso R2 y v;
+
 val ERR = Feedback.mk_HOL_ERR "splatLib";
 
 type filter_info
@@ -356,9 +363,10 @@ fun define_enum_encoding ety =
 
 fun is_comparison tm =
  let val (opr,args) = strip_comb tm
-  in mem opr [numSyntax.less_tm,numSyntax.leq_tm,numSyntax.greater_tm,
-              numSyntax.geq_tm, intSyntax.less_tm,intSyntax.leq_tm,
-              intSyntax.great_tm,intSyntax.geq_tm]
+  in op_mem same_const opr 
+          [numSyntax.less_tm,numSyntax.leq_tm,numSyntax.greater_tm,
+           numSyntax.geq_tm, intSyntax.less_tm,intSyntax.leq_tm,
+           intSyntax.great_tm,intSyntax.geq_tm]
   end	
 
 fun mk_set_lr list =
@@ -407,7 +415,9 @@ fun all_paths recdvar =
        end
      fun genpaths paths =
        let val paths' = flatten (map grow paths)
-       in if paths' = paths then paths else genpaths paths'
+       in if listrel aconv paths' paths then 
+               paths 
+          else genpaths paths'
        end
  in
     genpaths [recdvar]
@@ -436,7 +446,7 @@ fun filter_correctness (fname,thm) =
      val recdty = type_of recdvar
      val {Thy,Tyop=rtyname,Args} = dest_thy_type recdty
      val constraints = strip_conj expansion
-     fun has_recd_var t = mem recdvar (free_vars t)
+     fun has_recd_var t = op_mem aconv recdvar (free_vars t)
      val allprojs = all_paths recdvar
      fun proj_of t =
        filter has_recd_var
@@ -448,7 +458,7 @@ fun filter_correctness (fname,thm) =
                  else raise ERR "proj_of" 
                    "expected a disjunction of equalities or an arithmetic inequality")
      val projs = mk_set_lr (flatten (map proj_of constraints))
-     val omitted_projs = set_diff allprojs projs
+     val omitted_projs = op_set_diff aconv allprojs projs
      fun in_group tmlist tm = (tm, filter (Lib.can (find_term (aconv tm))) tmlist)
      val allgroups = map (in_group constraints) allprojs 
      val groups = map (in_group constraints) projs 
@@ -475,13 +485,14 @@ fun filter_correctness (fname,thm) =
 
      (* Add implicit constraints to the wfpred *)
 
-     val implicit_constraints = List.mapPartial (C assoc1 groups') omitted_projs
+     val implicit_constraints = List.mapPartial (C (op_assoc1 aconv) groups') omitted_projs
      val (wfpred_app',iconstraints_opt) = 
 	 if null implicit_constraints
 	 then (wfpred_app,NONE)
 	 else 
          let val implicit_constraints_tm =
-                 list_mk_conj (map (list_mk_conj o snd) implicit_constraints)
+                 list_mk_conj (map list_mk_conj implicit_constraints)
+(*                 list_mk_conj (map (list_mk_conj o snd) implicit_constraints) *)
 	     val iconstr_name = wfpred_name^"_implicit_constraints"
 	     val iconstr_app = mk_comb(mk_var(iconstr_name,wfpred_ty),recdvar)
 	     val iconstr_def_tm = mk_eq(iconstr_app, implicit_constraints_tm)
@@ -501,13 +512,13 @@ fun filter_correctness (fname,thm) =
       let fun elim_gtr tm = (* elim > and >= *)
             case strip_comb tm
 	      of (rel,[a,b]) =>
-                  if rel = numSyntax.greater_tm
+                  if same_const rel numSyntax.greater_tm
 		    then (numSyntax.less_tm,b,a) else 
-                  if rel = numSyntax.geq_tm 
+                  if same_const rel numSyntax.geq_tm 
 		    then (numSyntax.leq_tm,b,a) else 
-                  if rel = intSyntax.great_tm
+                  if same_const rel intSyntax.great_tm
 		    then (intSyntax.less_tm,b,a) else 
-                  if rel = intSyntax.geq_tm 
+                  if same_const rel intSyntax.geq_tm 
 		    then (intSyntax.leq_tm,b,a) 
                   else if op_mem same_const rel
                           [intSyntax.leq_tm,numSyntax.leq_tm,
@@ -522,10 +533,10 @@ fun filter_correctness (fname,thm) =
                   val fvc = free_vars c
                   val fvd = free_vars d
               in 
-                 if mem recdvar fvb andalso mem recdvar fvc andalso aconv b c
+                 if op_mem aconv recdvar fvb andalso op_mem aconv recdvar fvc andalso aconv b c
                    then (c1,c2)
 	         else
-	         if mem recdvar fvd andalso mem recdvar fva andalso aconv a d
+	         if op_mem aconv recdvar fvd andalso op_mem aconv recdvar fva andalso aconv a d
                    then (c2,c1)
 	         else raise ERR "mk_interval(sort)" "unexpected format"
               end
@@ -640,7 +651,8 @@ fun filter_correctness (fname,thm) =
        | parts ((p as ([_],v))::t) = [p]::parts t
        | parts ((h as (segs1,_))::t) = 
 	 let fun P (segs2,_) = 
-                   if null segs1 orelse null segs2 then false else tl segs1 = tl segs2
+                if null segs1 orelse null segs2 then false 
+                else listrel aconv (tl segs1) (tl segs2)
              val (L1,L2) = Lib.partition P (h::t)
 	 in L1 :: parts L2
 	 end
@@ -676,6 +688,9 @@ fun filter_correctness (fname,thm) =
           end
        handle e => raise wrap_exn "splatLib" "maybe_shrink" e
 
+     (* path : (term list * term) list *)
+     val path_eq = listrel (pairrel (listrel aconv) aconv)
+			    
      fun mk_recd paths =
       if Lib.all (equal 1 o length o fst) paths
          then mk_recd_app recdty (map snd paths)
@@ -687,7 +702,7 @@ fun filter_correctness (fname,thm) =
           if length paths' < length paths
 	  then mk_recd paths'
 	  else 
-            if paths' = paths
+            if path_eq paths' paths (* paths' = paths *)
             then raise ERR "mk_recd" "irreducible path"
           else if length paths' = length paths
             then raise ERR "mk_recd" "length of paths not reduced"

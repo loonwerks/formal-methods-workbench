@@ -32,8 +32,6 @@ fun parse_args args =
 
 fun shortcut g = ACCEPT_TAC (mk_thm([],snd g)) g;
 
-fun filters_of (a,b,c,d) = d
-
 fun prove_filter_props {name,regexp,encode_def,decode_def,
                         inversion, correctness, implicit_constraints} =
  let in
@@ -54,6 +52,7 @@ fun main () =
      val _ = new_theory thyName
      val logic_defs = apply_with_chatter (pkgs2hol thyName) pkgs
 	   ("Converting AST to logic ...\n") "---> succeeded.\n"
+     fun filters_of (a,b,c,d) = d
      val filter_spec_thms = filters_of logic_defs
      val filter_defs_and_props = apply_with_chatter 
            (List.map splatLib.filter_correctness) filter_spec_thms
