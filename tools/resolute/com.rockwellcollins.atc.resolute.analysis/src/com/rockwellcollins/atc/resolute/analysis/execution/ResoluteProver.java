@@ -44,6 +44,7 @@ import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.LetBinding;
 import com.rockwellcollins.atc.resolute.resolute.LetExpr;
+import com.rockwellcollins.atc.resolute.resolute.LintStatement;
 import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
 import com.rockwellcollins.atc.resolute.resolute.QuantifiedExpr;
 import com.rockwellcollins.atc.resolute.resolute.StringExpr;
@@ -387,6 +388,27 @@ public class ResoluteProver extends ResoluteSwitch<ResoluteResult> {
 	public static String proveStatementToString(ProveStatement ps, ComponentInstance thisInst) {
 		FnCallExpr fnCall = (FnCallExpr) ps.getExpr();
 
+		StringBuilder text = new StringBuilder();
+		text.append(fnCall.getFn().getName());
+		text.append("(");
+		Iterator<Expr> iterator = fnCall.getArgs().iterator();
+		while (iterator.hasNext()) {
+			Expr arg = iterator.next();
+			if (arg instanceof ThisExpr) {
+				text.append(new NamedElementValue(thisInst));
+			} else {
+				text.append(exprToString(arg));
+			}
+			if (iterator.hasNext()) {
+				text.append(", ");
+			}
+		}
+		text.append(")");
+		return text.toString();
+	}
+
+	public static String lintStatementToString(LintStatement ls, ComponentInstance thisInst) {
+		FnCallExpr fnCall = (FnCallExpr) ls.getExpr();
 		StringBuilder text = new StringBuilder();
 		text.append(fnCall.getFn().getName());
 		text.append("(");

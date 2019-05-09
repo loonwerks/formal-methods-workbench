@@ -2,7 +2,6 @@ package com.collins.fmw.cyres.architecture.preferences;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
-import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IWorkbench;
@@ -13,10 +12,7 @@ import com.collins.fmw.cyres.architecture.Activator;
 public class CasePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	private FileFieldEditor splatOutputFileFieldEditor;
-	private StringFieldEditor baggageServerNameFieldEditor;
-	private StringFieldEditor baggageServerPortFieldEditor;
-	private FileFieldEditor baggageServerFileFieldEditor;
-	private FileFieldEditor suitCaseOutputFileFieldEditor;
+
 
 	public CasePreferencePage() {
 		super(GRID);

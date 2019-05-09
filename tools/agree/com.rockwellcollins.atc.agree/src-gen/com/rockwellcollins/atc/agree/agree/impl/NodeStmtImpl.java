@@ -67,7 +67,6 @@ public class NodeStmtImpl extends ElementImpl implements NodeStmt
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -95,7 +94,6 @@ public class NodeStmtImpl extends ElementImpl implements NodeStmt
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

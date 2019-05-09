@@ -24,7 +24,8 @@ NamedElement returns aadl2::NamedElement:
 
 Element returns aadl2::Element:
 	Expr
-|	ProveStatement
+//|	ProveStatement
+| 	AnalysisStatement
 |   ClaimText
 |   DefinitionBody
 ;
@@ -35,7 +36,10 @@ ResoluteLibrary:
 ;
 
 Definition:
-	ConstantDefinition | FunctionDefinition
+	ConstantDefinition 
+|	FunctionDefinition
+|	Ruleset
+//|	RuleDefinition
 ;
 
 Type:
@@ -179,6 +183,7 @@ AtomicExpr returns Expr:
 |	=> ({LibraryFnCallExpr} libName=ID '.' fnName=ID '(' (args+=(Expr) (',' args+=(Expr))*)? ')')
 |   {BuiltInFnCallExpr} fn=BuiltInFn '(' (args+=(Expr) (',' args+=(Expr))*)? ')'
 |	{FnCallExpr} fn=[FunctionDefinition] '(' (args+=(Expr) (',' args+=(Expr))*)? ')'
+|	{LintExpr} lintStmt=LintStatement
 |   '[' Expr ( ({ListFilterMapExpr.map=current} 'for' ('(' args+=Arg ')')+ ('|' filter=Expr)?)
              | ({ListExpr.exprs+=current} (',' exprs+=Expr)*)) ']'
 |   '{' Expr ( ({SetFilterMapExpr.map=current} 'for' ('(' args+=Arg ')')+ ('|' filter=Expr)?)
@@ -234,6 +239,7 @@ BuiltInFn:
 // Primary type: connection
 |	'source'
 |	'destination'
+|	'is_bidirectional'
 
 // Primary type: feature
 |	'direction'
@@ -242,6 +248,7 @@ BuiltInFn:
 |	'is_data_port'
 |	'is_port'
 |	'is_data_access'
+|	'is_bus_access'
 
 // Primary type: range
 |	'lower_bound'
@@ -303,13 +310,40 @@ UnsignedInt returns aadl2::Integer:
 
 ResoluteSubclause:
 	{ResoluteSubclause}
-	proves+=ProveStatement*
+	proves+=AnalysisStatement*
+//	proves+=ProveStatement*
+
 ;
 
 NestedDotID:
 	base=[aadl2::NamedElement | ID] ('.' sub=NestedDotID)?
 ;
 
-ProveStatement:
-	'prove' expr=Expr
+LintStatement:
+	{WarningStatement} 'warning' expr=Expr
+|	{ErrorStatement} 'error' expr=Expr
+|	{InfoStatement} 'info' expr=Expr
 ;
+
+//RuleDefinition:
+//	'rule' name=ID '(' (args+=Arg (',' args+=Arg)*)? ')' body=DefinitionBody
+//;
+
+Ruleset:
+	'ruleset' name=ID '{' body=RulesetBody '}'
+;
+
+RulesetBody:
+	{RulesetBody}
+	lintStatements+=LintStatement*
+;
+
+//ProveStatement:
+//	'prove' expr=Expr
+//;
+
+AnalysisStatement:
+	{ProveStatement} 'prove' expr=Expr
+|	{CheckStatement} 'check' expr=Expr	
+;
+

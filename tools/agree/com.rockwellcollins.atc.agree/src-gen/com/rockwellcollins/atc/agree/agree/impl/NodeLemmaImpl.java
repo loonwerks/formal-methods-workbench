@@ -72,7 +72,6 @@ public class NodeLemmaImpl extends NodeStmtImpl implements NodeLemma
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public String getStr()
   {
     return str;
@@ -83,7 +82,6 @@ public class NodeLemmaImpl extends NodeStmtImpl implements NodeLemma
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setStr(String newStr)
   {
     String oldStr = str;
@@ -168,7 +166,7 @@ public class NodeLemmaImpl extends NodeStmtImpl implements NodeLemma
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuilder result = new StringBuilder(super.toString());
+    StringBuffer result = new StringBuffer(super.toString());
     result.append(" (str: ");
     result.append(str);
     result.append(')');

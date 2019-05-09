@@ -13,7 +13,12 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.ui.editor.XtextEditor;
@@ -26,7 +31,7 @@ import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AadlString;
 import org.osate.aadl2.BooleanLiteral;
-import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EnumerationType;
 import org.osate.aadl2.IntegerLiteral;
@@ -51,6 +56,7 @@ public abstract class AadlHandler extends AbstractHandler {
 
 	abstract protected void runCommand(URI uri);
 
+	static final String OUTLINE_VIEW_PART_ID = "org.eclipse.ui.views.ContentOutline";
 	static final String CASE_PROPSET_NAME = "CASE_Properties";
 	static final String CASE_PROPSET_FILE = "CASE_Properties.aadl";
 	static final String CASE_MODEL_TRANSFORMATIONS_NAME = "CASE_Model_Transformations";
@@ -63,8 +69,19 @@ public abstract class AadlHandler extends AbstractHandler {
 		this.executionEvent = event;
 
 		// Get the current selection
+		ISelection selection = null;
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IViewPart viewPart = page.findView(OUTLINE_VIEW_PART_ID);
+		if (viewPart == null) {
+			selection = HandlerUtil.getCurrentSelection(event);
+		} else {
+			IViewSite viewSite = viewPart.getViewSite();
+			ISelectionProvider selectionProvider = viewSite.getSelectionProvider();
+			selection = selectionProvider.getSelection();
+		}
+
 		// TODO: Handle same functionality in the Graphical Editor?
-		URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
+		URI uri = getSelectionURI(selection);
 		if (uri == null) {
 			return null;
 		}
@@ -239,15 +256,18 @@ public abstract class AadlHandler extends AbstractHandler {
 	 * @param casePropSet - PropertySet that defines the property
 	 * @return A boolean indicating success
 	 */
-	protected boolean addPropertyAssociation(String propName, String propVal, ComponentType componentType,
+	protected boolean addPropertyAssociation(String propName, String propVal, Classifier classifier,
 			PropertySet propSet) {
+//	protected boolean addPropertyAssociation(String propName, String propVal, ComponentType componentType,
+//			PropertySet propSet) {
 
 		PropertyAssociation propAssocImpl = null;
 		Property prop = null;
 
 		// Check if the property is already present in the component.
 		// If so, we don't need to create a new property association, just overwrite the existing one
-		for (PropertyAssociation propAssoc : componentType.getOwnedPropertyAssociations()) {
+//		for (PropertyAssociation propAssoc : componentType.getOwnedPropertyAssociations()) {
+		for (PropertyAssociation propAssoc : classifier.getOwnedPropertyAssociations()) {
 			if (propAssoc.getProperty().getName().equalsIgnoreCase(propName)) {
 				propAssocImpl = propAssoc;
 				break;
@@ -257,7 +277,8 @@ public abstract class AadlHandler extends AbstractHandler {
 		if (propAssocImpl == null) {
 
 			// Property is not already present in the component. Need to create a new property association
-			propAssocImpl = componentType.createOwnedPropertyAssociation();
+//			propAssocImpl = componentType.createOwnedPropertyAssociation();
+			propAssocImpl = classifier.createOwnedPropertyAssociation();
 
 			// Find the property in the specified property set
 			for (Property p : propSet.getOwnedProperties()) {
@@ -498,7 +519,6 @@ public abstract class AadlHandler extends AbstractHandler {
 		} else if (num == 0 && !startWithBase) {
 			num = 1;
 		}
-//		int num = (startWithBase ? 0 : 1);
 
 		do {
 			if (names.contains(newIdentifier)) {

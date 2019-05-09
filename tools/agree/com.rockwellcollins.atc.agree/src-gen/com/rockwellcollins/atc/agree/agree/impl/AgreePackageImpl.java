@@ -844,7 +844,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
 
   /**
    * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-   *
+   * 
    * <p>This method is used to initialize {@link AgreePackage#eINSTANCE} when that field is accessed.
    * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
    * <!-- begin-user-doc -->
@@ -859,8 +859,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     if (isInited) return (AgreePackage)EPackage.Registry.INSTANCE.getEPackage(AgreePackage.eNS_URI);
 
     // Obtain or create and register package
-    Object registeredAgreePackage = EPackage.Registry.INSTANCE.get(eNS_URI);
-    AgreePackageImpl theAgreePackage = registeredAgreePackage instanceof AgreePackageImpl ? (AgreePackageImpl)registeredAgreePackage : new AgreePackageImpl();
+    AgreePackageImpl theAgreePackage = (AgreePackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof AgreePackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new AgreePackageImpl());
 
     isInited = true;
 
@@ -877,6 +876,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     // Mark meta-data to indicate it can't be changed
     theAgreePackage.freeze();
 
+  
     // Update the registry and return the package
     EPackage.Registry.INSTANCE.put(AgreePackage.eNS_URI, theAgreePackage);
     return theAgreePackage;
@@ -887,7 +887,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAgreeLibrary()
   {
     return agreeLibraryEClass;
@@ -898,7 +897,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAgreeSubclause()
   {
     return agreeSubclauseEClass;
@@ -909,7 +907,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getContract()
   {
     return contractEClass;
@@ -920,7 +917,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getSpecStatement()
   {
     return specStatementEClass;
@@ -931,7 +927,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNamedSpecStatement()
   {
     return namedSpecStatementEClass;
@@ -942,7 +937,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getNamedSpecStatement_Str()
   {
     return (EAttribute)namedSpecStatementEClass.getEStructuralFeatures().get(0);
@@ -953,7 +947,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNamedSpecStatement_Expr()
   {
     return (EReference)namedSpecStatementEClass.getEStructuralFeatures().get(1);
@@ -964,7 +957,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNamedSpecStatement_Pattern()
   {
     return (EReference)namedSpecStatementEClass.getEStructuralFeatures().get(2);
@@ -975,7 +967,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getPatternStatement()
   {
     return patternStatementEClass;
@@ -986,7 +977,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWhenStatement()
   {
     return whenStatementEClass;
@@ -997,7 +987,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWhenStatement_Condition()
   {
     return (EReference)whenStatementEClass.getEStructuralFeatures().get(0);
@@ -1008,7 +997,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWhenStatement_Event()
   {
     return (EReference)whenStatementEClass.getEStructuralFeatures().get(1);
@@ -1019,7 +1007,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getWhenStatement_Excl()
   {
     return (EAttribute)whenStatementEClass.getEStructuralFeatures().get(2);
@@ -1030,7 +1017,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWheneverStatement()
   {
     return wheneverStatementEClass;
@@ -1041,7 +1027,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverStatement_Cause()
   {
     return (EReference)wheneverStatementEClass.getEStructuralFeatures().get(0);
@@ -1052,7 +1037,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getWheneverStatement_Excl()
   {
     return (EAttribute)wheneverStatementEClass.getEStructuralFeatures().get(1);
@@ -1063,7 +1047,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverStatement_Interval()
   {
     return (EReference)wheneverStatementEClass.getEStructuralFeatures().get(2);
@@ -1074,7 +1057,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getRealTimeStatement()
   {
     return realTimeStatementEClass;
@@ -1085,7 +1067,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRealTimeStatement_Event()
   {
     return (EReference)realTimeStatementEClass.getEStructuralFeatures().get(0);
@@ -1096,7 +1077,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRealTimeStatement_Jitter()
   {
     return (EReference)realTimeStatementEClass.getEStructuralFeatures().get(1);
@@ -1107,7 +1087,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getTimeInterval()
   {
     return timeIntervalEClass;
@@ -1118,7 +1097,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getTimeInterval_Low()
   {
     return (EReference)timeIntervalEClass.getEStructuralFeatures().get(0);
@@ -1129,7 +1107,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getTimeInterval_High()
   {
     return (EReference)timeIntervalEClass.getEStructuralFeatures().get(1);
@@ -1140,7 +1117,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getSynchStatement()
   {
     return synchStatementEClass;
@@ -1151,7 +1127,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getSynchStatement_Val()
   {
     return (EAttribute)synchStatementEClass.getEStructuralFeatures().get(0);
@@ -1162,7 +1137,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getSynchStatement_Val2()
   {
     return (EAttribute)synchStatementEClass.getEStructuralFeatures().get(1);
@@ -1173,7 +1147,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getSynchStatement_Sim()
   {
     return (EAttribute)synchStatementEClass.getEStructuralFeatures().get(2);
@@ -1184,7 +1157,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getOrderStatement()
   {
     return orderStatementEClass;
@@ -1195,7 +1167,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getOrderStatement_Comps()
   {
     return (EReference)orderStatementEClass.getEStructuralFeatures().get(0);
@@ -1206,7 +1177,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAbstraction()
   {
     return abstractionEClass;
@@ -1217,7 +1187,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getPropertyStatement()
   {
     return propertyStatementEClass;
@@ -1228,7 +1197,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getPropertyStatement_Expr()
   {
     return (EReference)propertyStatementEClass.getEStructuralFeatures().get(0);
@@ -1239,7 +1207,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getConstStatement()
   {
     return constStatementEClass;
@@ -1250,7 +1217,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getConstStatement_Type()
   {
     return (EReference)constStatementEClass.getEStructuralFeatures().get(0);
@@ -1261,7 +1227,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getConstStatement_Expr()
   {
     return (EReference)constStatementEClass.getEStructuralFeatures().get(1);
@@ -1272,7 +1237,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getEqStatement()
   {
     return eqStatementEClass;
@@ -1283,7 +1247,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getEqStatement_Lhs()
   {
     return (EReference)eqStatementEClass.getEStructuralFeatures().get(0);
@@ -1294,7 +1257,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getEqStatement_Expr()
   {
     return (EReference)eqStatementEClass.getEStructuralFeatures().get(1);
@@ -1305,7 +1267,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getInputStatement()
   {
     return inputStatementEClass;
@@ -1316,7 +1277,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getInputStatement_Lhs()
   {
     return (EReference)inputStatementEClass.getEStructuralFeatures().get(0);
@@ -1327,7 +1287,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAssignStatement()
   {
     return assignStatementEClass;
@@ -1338,7 +1297,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getAssignStatement_Id()
   {
     return (EReference)assignStatementEClass.getEStructuralFeatures().get(0);
@@ -1349,7 +1307,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getAssignStatement_Expr()
   {
     return (EReference)assignStatementEClass.getEStructuralFeatures().get(1);
@@ -1360,7 +1317,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getFnDef()
   {
     return fnDefEClass;
@@ -1371,7 +1327,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFnDef_Args()
   {
     return (EReference)fnDefEClass.getEStructuralFeatures().get(0);
@@ -1382,7 +1337,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFnDef_Type()
   {
     return (EReference)fnDefEClass.getEStructuralFeatures().get(1);
@@ -1393,7 +1347,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFnDef_Expr()
   {
     return (EReference)fnDefEClass.getEStructuralFeatures().get(2);
@@ -1404,7 +1357,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLibraryFnDef()
   {
     return libraryFnDefEClass;
@@ -1415,7 +1367,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLibraryFnDef_Args()
   {
     return (EReference)libraryFnDefEClass.getEStructuralFeatures().get(0);
@@ -1426,7 +1377,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLibraryFnDef_Type()
   {
     return (EReference)libraryFnDefEClass.getEStructuralFeatures().get(1);
@@ -1437,7 +1387,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLinearizationDef()
   {
     return linearizationDefEClass;
@@ -1448,7 +1397,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLinearizationDef_Args()
   {
     return (EReference)linearizationDefEClass.getEStructuralFeatures().get(0);
@@ -1459,7 +1407,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLinearizationDef_Intervals()
   {
     return (EReference)linearizationDefEClass.getEStructuralFeatures().get(1);
@@ -1470,7 +1417,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLinearizationDef_Precision()
   {
     return (EReference)linearizationDefEClass.getEStructuralFeatures().get(2);
@@ -1481,7 +1427,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLinearizationDef_ExprBody()
   {
     return (EReference)linearizationDefEClass.getEStructuralFeatures().get(3);
@@ -1492,7 +1437,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLinearizationInterval()
   {
     return linearizationIntervalEClass;
@@ -1503,7 +1447,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLinearizationInterval_Start()
   {
     return (EReference)linearizationIntervalEClass.getEStructuralFeatures().get(0);
@@ -1514,7 +1457,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLinearizationInterval_End()
   {
     return (EReference)linearizationIntervalEClass.getEStructuralFeatures().get(1);
@@ -1525,7 +1467,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNodeDef()
   {
     return nodeDefEClass;
@@ -1536,7 +1477,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeDef_Args()
   {
     return (EReference)nodeDefEClass.getEStructuralFeatures().get(0);
@@ -1547,7 +1487,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeDef_Rets()
   {
     return (EReference)nodeDefEClass.getEStructuralFeatures().get(1);
@@ -1558,7 +1497,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeDef_NodeBody()
   {
     return (EReference)nodeDefEClass.getEStructuralFeatures().get(2);
@@ -1569,7 +1507,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNodeBodyExpr()
   {
     return nodeBodyExprEClass;
@@ -1580,7 +1517,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeBodyExpr_Locs()
   {
     return (EReference)nodeBodyExprEClass.getEStructuralFeatures().get(0);
@@ -1591,7 +1527,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeBodyExpr_Stmts()
   {
     return (EReference)nodeBodyExprEClass.getEStructuralFeatures().get(1);
@@ -1602,7 +1537,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNodeStmt()
   {
     return nodeStmtEClass;
@@ -1613,7 +1547,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeStmt_Expr()
   {
     return (EReference)nodeStmtEClass.getEStructuralFeatures().get(0);
@@ -1624,7 +1557,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getArg()
   {
     return argEClass;
@@ -1635,7 +1567,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArg_Type()
   {
     return (EReference)argEClass.getEStructuralFeatures().get(0);
@@ -1646,7 +1577,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getType()
   {
     return typeEClass;
@@ -1657,7 +1587,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getRecordDef()
   {
     return recordDefEClass;
@@ -1668,7 +1597,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordDef_Args()
   {
     return (EReference)recordDefEClass.getEStructuralFeatures().get(0);
@@ -1679,7 +1607,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getEnumStatement()
   {
     return enumStatementEClass;
@@ -1690,7 +1617,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getEnumStatement_Enums()
   {
     return (EReference)enumStatementEClass.getEStructuralFeatures().get(0);
@@ -1701,7 +1627,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getExpr()
   {
     return exprEClass;
@@ -1712,7 +1637,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getComponentRef()
   {
     return componentRefEClass;
@@ -1723,7 +1647,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getArrayLiteralExpr()
   {
     return arrayLiteralExprEClass;
@@ -1734,7 +1657,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArrayLiteralExpr_Elems()
   {
     return (EReference)arrayLiteralExprEClass.getEStructuralFeatures().get(0);
@@ -1745,7 +1667,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getDoubleDotRef()
   {
     return doubleDotRefEClass;
@@ -1756,7 +1677,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getDoubleDotRef_Elm()
   {
     return (EReference)doubleDotRefEClass.getEStructuralFeatures().get(0);
@@ -1767,7 +1687,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNamedID()
   {
     return namedIDEClass;
@@ -1778,7 +1697,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAgreeContractLibrary()
   {
     return agreeContractLibraryEClass;
@@ -1789,7 +1707,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getAgreeContractLibrary_Contract()
   {
     return (EReference)agreeContractLibraryEClass.getEStructuralFeatures().get(0);
@@ -1800,7 +1717,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAgreeContractSubclause()
   {
     return agreeContractSubclauseEClass;
@@ -1811,7 +1727,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getAgreeContractSubclause_Contract()
   {
     return (EReference)agreeContractSubclauseEClass.getEStructuralFeatures().get(0);
@@ -1822,7 +1737,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAgreeContract()
   {
     return agreeContractEClass;
@@ -1833,7 +1747,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getAgreeContract_Specs()
   {
     return (EReference)agreeContractEClass.getEStructuralFeatures().get(0);
@@ -1844,7 +1757,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getInitialStatement()
   {
     return initialStatementEClass;
@@ -1855,7 +1767,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getInitialStatement_Expr()
   {
     return (EReference)initialStatementEClass.getEStructuralFeatures().get(0);
@@ -1866,7 +1777,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getParamStatement()
   {
     return paramStatementEClass;
@@ -1877,7 +1787,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getParamStatement_Expr()
   {
     return (EReference)paramStatementEClass.getEStructuralFeatures().get(0);
@@ -1888,7 +1797,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getParamStatement_Type()
   {
     return (EReference)paramStatementEClass.getEStructuralFeatures().get(1);
@@ -1899,7 +1807,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLiftStatement()
   {
     return liftStatementEClass;
@@ -1910,7 +1817,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLiftStatement_Subcomp()
   {
     return (EReference)liftStatementEClass.getEStructuralFeatures().get(0);
@@ -1921,7 +1827,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getConnectionStatement()
   {
     return connectionStatementEClass;
@@ -1932,7 +1837,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getConnectionStatement_Conn()
   {
     return (EReference)connectionStatementEClass.getEStructuralFeatures().get(0);
@@ -1943,7 +1847,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getConnectionStatement_Expr()
   {
     return (EReference)connectionStatementEClass.getEStructuralFeatures().get(1);
@@ -1954,7 +1857,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAssumeStatement()
   {
     return assumeStatementEClass;
@@ -1965,7 +1867,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getGuaranteeStatement()
   {
     return guaranteeStatementEClass;
@@ -1976,7 +1877,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAssertStatement()
   {
     return assertStatementEClass;
@@ -1987,7 +1887,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLemmaStatement()
   {
     return lemmaStatementEClass;
@@ -1998,7 +1897,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAlwaysStatement()
   {
     return alwaysStatementEClass;
@@ -2009,7 +1907,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getAlwaysStatement_Expr()
   {
     return (EReference)alwaysStatementEClass.getEStructuralFeatures().get(0);
@@ -2020,7 +1917,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWhenHoldsStatement()
   {
     return whenHoldsStatementEClass;
@@ -2031,7 +1927,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWhenHoldsStatement_ConditionInterval()
   {
     return (EReference)whenHoldsStatementEClass.getEStructuralFeatures().get(0);
@@ -2042,7 +1937,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWhenHoldsStatement_EventInterval()
   {
     return (EReference)whenHoldsStatementEClass.getEStructuralFeatures().get(1);
@@ -2053,7 +1947,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWhenOccursStatment()
   {
     return whenOccursStatmentEClass;
@@ -2064,7 +1957,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWhenOccursStatment_Times()
   {
     return (EReference)whenOccursStatmentEClass.getEStructuralFeatures().get(0);
@@ -2075,7 +1967,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWhenOccursStatment_Interval()
   {
     return (EReference)whenOccursStatmentEClass.getEStructuralFeatures().get(1);
@@ -2086,7 +1977,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWheneverOccursStatement()
   {
     return wheneverOccursStatementEClass;
@@ -2097,7 +1987,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverOccursStatement_Effect()
   {
     return (EReference)wheneverOccursStatementEClass.getEStructuralFeatures().get(0);
@@ -2108,7 +1997,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWheneverBecomesTrueStatement()
   {
     return wheneverBecomesTrueStatementEClass;
@@ -2119,7 +2007,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverBecomesTrueStatement_Effect()
   {
     return (EReference)wheneverBecomesTrueStatementEClass.getEStructuralFeatures().get(0);
@@ -2130,7 +2017,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWheneverHoldsStatement()
   {
     return wheneverHoldsStatementEClass;
@@ -2141,7 +2027,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverHoldsStatement_Effect()
   {
     return (EReference)wheneverHoldsStatementEClass.getEStructuralFeatures().get(0);
@@ -2152,7 +2037,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getWheneverImpliesStatement()
   {
     return wheneverImpliesStatementEClass;
@@ -2163,7 +2047,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverImpliesStatement_Lhs()
   {
     return (EReference)wheneverImpliesStatementEClass.getEStructuralFeatures().get(0);
@@ -2174,7 +2057,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getWheneverImpliesStatement_Rhs()
   {
     return (EReference)wheneverImpliesStatementEClass.getEStructuralFeatures().get(1);
@@ -2185,7 +2067,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getPeriodicStatement()
   {
     return periodicStatementEClass;
@@ -2196,7 +2077,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getPeriodicStatement_Period()
   {
     return (EReference)periodicStatementEClass.getEStructuralFeatures().get(0);
@@ -2207,7 +2087,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getSporadicStatement()
   {
     return sporadicStatementEClass;
@@ -2218,7 +2097,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getSporadicStatement_Iat()
   {
     return (EReference)sporadicStatementEClass.getEStructuralFeatures().get(0);
@@ -2229,7 +2107,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getClosedTimeInterval()
   {
     return closedTimeIntervalEClass;
@@ -2240,7 +2117,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getOpenLeftTimeInterval()
   {
     return openLeftTimeIntervalEClass;
@@ -2251,7 +2127,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getOpenRightTimeInterval()
   {
     return openRightTimeIntervalEClass;
@@ -2262,7 +2137,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getOpenTimeInterval()
   {
     return openTimeIntervalEClass;
@@ -2273,7 +2147,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getMNSynchStatement()
   {
     return mnSynchStatementEClass;
@@ -2284,7 +2157,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getMNSynchStatement_Comp1()
   {
     return (EReference)mnSynchStatementEClass.getEStructuralFeatures().get(0);
@@ -2295,7 +2167,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getMNSynchStatement_Comp2()
   {
     return (EReference)mnSynchStatementEClass.getEStructuralFeatures().get(1);
@@ -2306,7 +2177,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getMNSynchStatement_Max()
   {
     return (EAttribute)mnSynchStatementEClass.getEStructuralFeatures().get(2);
@@ -2317,7 +2187,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getMNSynchStatement_Min()
   {
     return (EAttribute)mnSynchStatementEClass.getEStructuralFeatures().get(3);
@@ -2328,7 +2197,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getCalenStatement()
   {
     return calenStatementEClass;
@@ -2339,7 +2207,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getCalenStatement_Els()
   {
     return (EReference)calenStatementEClass.getEStructuralFeatures().get(0);
@@ -2350,7 +2217,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getAsynchStatement()
   {
     return asynchStatementEClass;
@@ -2361,7 +2227,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLatchedStatement()
   {
     return latchedStatementEClass;
@@ -2372,7 +2237,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNodeEq()
   {
     return nodeEqEClass;
@@ -2383,7 +2247,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNodeEq_Lhs()
   {
     return (EReference)nodeEqEClass.getEStructuralFeatures().get(0);
@@ -2394,7 +2257,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNodeLemma()
   {
     return nodeLemmaEClass;
@@ -2405,7 +2267,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getNodeLemma_Str()
   {
     return (EAttribute)nodeLemmaEClass.getEStructuralFeatures().get(0);
@@ -2416,7 +2277,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getArrayType()
   {
     return arrayTypeEClass;
@@ -2427,7 +2287,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArrayType_Stem()
   {
     return (EReference)arrayTypeEClass.getEStructuralFeatures().get(0);
@@ -2438,7 +2297,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getArrayType_Size()
   {
     return (EAttribute)arrayTypeEClass.getEStructuralFeatures().get(1);
@@ -2449,7 +2307,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getPrimType()
   {
     return primTypeEClass;
@@ -2460,7 +2317,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getPrimType_Name()
   {
     return (EAttribute)primTypeEClass.getEStructuralFeatures().get(0);
@@ -2471,7 +2327,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getPrimType_LowNeg()
   {
     return (EAttribute)primTypeEClass.getEStructuralFeatures().get(1);
@@ -2482,7 +2337,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getPrimType_RangeLow()
   {
     return (EAttribute)primTypeEClass.getEStructuralFeatures().get(2);
@@ -2493,7 +2347,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getPrimType_HighNeg()
   {
     return (EAttribute)primTypeEClass.getEStructuralFeatures().get(3);
@@ -2504,7 +2357,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getPrimType_RangeHigh()
   {
     return (EAttribute)primTypeEClass.getEStructuralFeatures().get(4);
@@ -2515,7 +2367,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getForallExpr()
   {
     return forallExprEClass;
@@ -2526,7 +2377,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getForallExpr_Binding()
   {
     return (EReference)forallExprEClass.getEStructuralFeatures().get(0);
@@ -2537,7 +2387,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getForallExpr_Array()
   {
     return (EReference)forallExprEClass.getEStructuralFeatures().get(1);
@@ -2548,7 +2397,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getForallExpr_Expr()
   {
     return (EReference)forallExprEClass.getEStructuralFeatures().get(2);
@@ -2559,7 +2407,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getExistsExpr()
   {
     return existsExprEClass;
@@ -2570,7 +2417,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getExistsExpr_Binding()
   {
     return (EReference)existsExprEClass.getEStructuralFeatures().get(0);
@@ -2581,7 +2427,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getExistsExpr_Array()
   {
     return (EReference)existsExprEClass.getEStructuralFeatures().get(1);
@@ -2592,7 +2437,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getExistsExpr_Expr()
   {
     return (EReference)existsExprEClass.getEStructuralFeatures().get(2);
@@ -2603,7 +2447,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getFlatmapExpr()
   {
     return flatmapExprEClass;
@@ -2614,7 +2457,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFlatmapExpr_Binding()
   {
     return (EReference)flatmapExprEClass.getEStructuralFeatures().get(0);
@@ -2625,7 +2467,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFlatmapExpr_Array()
   {
     return (EReference)flatmapExprEClass.getEStructuralFeatures().get(1);
@@ -2636,7 +2477,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFlatmapExpr_Expr()
   {
     return (EReference)flatmapExprEClass.getEStructuralFeatures().get(2);
@@ -2647,7 +2487,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getFoldLeftExpr()
   {
     return foldLeftExprEClass;
@@ -2658,7 +2497,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldLeftExpr_Binding()
   {
     return (EReference)foldLeftExprEClass.getEStructuralFeatures().get(0);
@@ -2669,7 +2507,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldLeftExpr_Array()
   {
     return (EReference)foldLeftExprEClass.getEStructuralFeatures().get(1);
@@ -2680,7 +2517,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldLeftExpr_Accumulator()
   {
     return (EReference)foldLeftExprEClass.getEStructuralFeatures().get(2);
@@ -2691,7 +2527,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldLeftExpr_Initial()
   {
     return (EReference)foldLeftExprEClass.getEStructuralFeatures().get(3);
@@ -2702,7 +2537,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldLeftExpr_Expr()
   {
     return (EReference)foldLeftExprEClass.getEStructuralFeatures().get(4);
@@ -2713,7 +2547,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getFoldRightExpr()
   {
     return foldRightExprEClass;
@@ -2724,7 +2557,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldRightExpr_Binding()
   {
     return (EReference)foldRightExprEClass.getEStructuralFeatures().get(0);
@@ -2735,7 +2567,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldRightExpr_Array()
   {
     return (EReference)foldRightExprEClass.getEStructuralFeatures().get(1);
@@ -2746,7 +2577,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldRightExpr_Accumulator()
   {
     return (EReference)foldRightExprEClass.getEStructuralFeatures().get(2);
@@ -2757,7 +2587,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldRightExpr_Initial()
   {
     return (EReference)foldRightExprEClass.getEStructuralFeatures().get(3);
@@ -2768,7 +2597,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFoldRightExpr_Expr()
   {
     return (EReference)foldRightExprEClass.getEStructuralFeatures().get(4);
@@ -2779,7 +2607,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getBinaryExpr()
   {
     return binaryExprEClass;
@@ -2790,7 +2617,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getBinaryExpr_Left()
   {
     return (EReference)binaryExprEClass.getEStructuralFeatures().get(0);
@@ -2801,7 +2627,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getBinaryExpr_Op()
   {
     return (EAttribute)binaryExprEClass.getEStructuralFeatures().get(1);
@@ -2812,7 +2637,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getBinaryExpr_Right()
   {
     return (EReference)binaryExprEClass.getEStructuralFeatures().get(2);
@@ -2823,7 +2647,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getUnaryExpr()
   {
     return unaryExprEClass;
@@ -2834,7 +2657,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getUnaryExpr_Op()
   {
     return (EAttribute)unaryExprEClass.getEStructuralFeatures().get(0);
@@ -2845,7 +2667,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getUnaryExpr_Expr()
   {
     return (EReference)unaryExprEClass.getEStructuralFeatures().get(1);
@@ -2856,7 +2677,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getIfThenElseExpr()
   {
     return ifThenElseExprEClass;
@@ -2867,7 +2687,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getIfThenElseExpr_A()
   {
     return (EReference)ifThenElseExprEClass.getEStructuralFeatures().get(0);
@@ -2878,7 +2697,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getIfThenElseExpr_B()
   {
     return (EReference)ifThenElseExprEClass.getEStructuralFeatures().get(1);
@@ -2889,7 +2707,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getIfThenElseExpr_C()
   {
     return (EReference)ifThenElseExprEClass.getEStructuralFeatures().get(2);
@@ -2900,7 +2717,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getThisRef()
   {
     return thisRefEClass;
@@ -2911,7 +2727,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getPrevExpr()
   {
     return prevExprEClass;
@@ -2922,7 +2737,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getPrevExpr_Delay()
   {
     return (EReference)prevExprEClass.getEStructuralFeatures().get(0);
@@ -2933,7 +2747,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getPrevExpr_Init()
   {
     return (EReference)prevExprEClass.getEStructuralFeatures().get(1);
@@ -2944,7 +2757,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getGetPropertyExpr()
   {
     return getPropertyExprEClass;
@@ -2955,7 +2767,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getGetPropertyExpr_ComponentRef()
   {
     return (EReference)getPropertyExprEClass.getEStructuralFeatures().get(0);
@@ -2966,7 +2777,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getGetPropertyExpr_Prop()
   {
     return (EReference)getPropertyExprEClass.getEStructuralFeatures().get(1);
@@ -2977,7 +2787,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getArrayUpdateExpr()
   {
     return arrayUpdateExprEClass;
@@ -2988,7 +2797,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArrayUpdateExpr_Array()
   {
     return (EReference)arrayUpdateExprEClass.getEStructuralFeatures().get(0);
@@ -2999,7 +2807,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArrayUpdateExpr_Indices()
   {
     return (EReference)arrayUpdateExprEClass.getEStructuralFeatures().get(1);
@@ -3010,7 +2817,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArrayUpdateExpr_ValueExprs()
   {
     return (EReference)arrayUpdateExprEClass.getEStructuralFeatures().get(2);
@@ -3021,7 +2827,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getRecordUpdateExpr()
   {
     return recordUpdateExprEClass;
@@ -3032,7 +2837,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordUpdateExpr_Record()
   {
     return (EReference)recordUpdateExprEClass.getEStructuralFeatures().get(0);
@@ -3043,7 +2847,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordUpdateExpr_Key()
   {
     return (EReference)recordUpdateExprEClass.getEStructuralFeatures().get(1);
@@ -3054,7 +2857,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordUpdateExpr_Expr()
   {
     return (EReference)recordUpdateExprEClass.getEStructuralFeatures().get(2);
@@ -3065,7 +2867,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getArraySubExpr()
   {
     return arraySubExprEClass;
@@ -3076,7 +2877,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArraySubExpr_Expr()
   {
     return (EReference)arraySubExprEClass.getEStructuralFeatures().get(0);
@@ -3087,7 +2887,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getArraySubExpr_Index()
   {
     return (EReference)arraySubExprEClass.getEStructuralFeatures().get(1);
@@ -3098,7 +2897,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getTagExpr()
   {
     return tagExprEClass;
@@ -3109,7 +2907,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getTagExpr_Stem()
   {
     return (EReference)tagExprEClass.getEStructuralFeatures().get(0);
@@ -3120,7 +2917,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getTagExpr_Tag()
   {
     return (EAttribute)tagExprEClass.getEStructuralFeatures().get(1);
@@ -3131,7 +2927,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getSelectionExpr()
   {
     return selectionExprEClass;
@@ -3142,7 +2937,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getSelectionExpr_Target()
   {
     return (EReference)selectionExprEClass.getEStructuralFeatures().get(0);
@@ -3153,7 +2947,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getSelectionExpr_Field()
   {
     return (EReference)selectionExprEClass.getEStructuralFeatures().get(1);
@@ -3164,7 +2957,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getNamedElmExpr()
   {
     return namedElmExprEClass;
@@ -3175,7 +2967,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getNamedElmExpr_Elm()
   {
     return (EReference)namedElmExprEClass.getEStructuralFeatures().get(0);
@@ -3186,7 +2977,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getTimeExpr()
   {
     return timeExprEClass;
@@ -3197,7 +2987,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getIndicesExpr()
   {
     return indicesExprEClass;
@@ -3208,7 +2997,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getIndicesExpr_Array()
   {
     return (EReference)indicesExprEClass.getEStructuralFeatures().get(0);
@@ -3219,7 +3007,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getCallExpr()
   {
     return callExprEClass;
@@ -3230,7 +3017,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getCallExpr_Ref()
   {
     return (EReference)callExprEClass.getEStructuralFeatures().get(0);
@@ -3241,7 +3027,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getCallExpr_Args()
   {
     return (EReference)callExprEClass.getEStructuralFeatures().get(1);
@@ -3252,7 +3037,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getRecordLitExpr()
   {
     return recordLitExprEClass;
@@ -3263,7 +3047,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordLitExpr_RecordType()
   {
     return (EReference)recordLitExprEClass.getEStructuralFeatures().get(0);
@@ -3274,7 +3057,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordLitExpr_Args()
   {
     return (EReference)recordLitExprEClass.getEStructuralFeatures().get(1);
@@ -3285,7 +3067,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRecordLitExpr_ArgExpr()
   {
     return (EReference)recordLitExprEClass.getEStructuralFeatures().get(2);
@@ -3296,7 +3077,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getEnumLitExpr()
   {
     return enumLitExprEClass;
@@ -3307,7 +3087,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getEnumLitExpr_EnumType()
   {
     return (EReference)enumLitExprEClass.getEStructuralFeatures().get(0);
@@ -3318,7 +3097,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getEnumLitExpr_Value()
   {
     return (EAttribute)enumLitExprEClass.getEStructuralFeatures().get(1);
@@ -3329,7 +3107,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getIntLitExpr()
   {
     return intLitExprEClass;
@@ -3340,7 +3117,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getIntLitExpr_Val()
   {
     return (EAttribute)intLitExprEClass.getEStructuralFeatures().get(0);
@@ -3351,7 +3127,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getPreExpr()
   {
     return preExprEClass;
@@ -3362,7 +3137,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getPreExpr_Expr()
   {
     return (EReference)preExprEClass.getEStructuralFeatures().get(0);
@@ -3373,7 +3147,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getEventExpr()
   {
     return eventExprEClass;
@@ -3384,7 +3157,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getEventExpr_Id()
   {
     return (EReference)eventExprEClass.getEStructuralFeatures().get(0);
@@ -3395,7 +3167,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getLatchedExpr()
   {
     return latchedExprEClass;
@@ -3406,7 +3177,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getLatchedExpr_Expr()
   {
     return (EReference)latchedExprEClass.getEStructuralFeatures().get(0);
@@ -3417,7 +3187,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getTimeOfExpr()
   {
     return timeOfExprEClass;
@@ -3428,7 +3197,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getTimeOfExpr_Id()
   {
     return (EReference)timeOfExprEClass.getEStructuralFeatures().get(0);
@@ -3439,7 +3207,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getTimeRiseExpr()
   {
     return timeRiseExprEClass;
@@ -3450,7 +3217,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getTimeRiseExpr_Id()
   {
     return (EReference)timeRiseExprEClass.getEStructuralFeatures().get(0);
@@ -3461,7 +3227,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getTimeFallExpr()
   {
     return timeFallExprEClass;
@@ -3472,7 +3237,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getTimeFallExpr_Id()
   {
     return (EReference)timeFallExprEClass.getEStructuralFeatures().get(0);
@@ -3483,7 +3247,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getRealLitExpr()
   {
     return realLitExprEClass;
@@ -3494,7 +3257,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EAttribute getRealLitExpr_Val()
   {
     return (EAttribute)realLitExprEClass.getEStructuralFeatures().get(0);
@@ -3505,7 +3267,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getBoolLitExpr()
   {
     return boolLitExprEClass;
@@ -3516,7 +3277,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getBoolLitExpr_Val()
   {
     return (EReference)boolLitExprEClass.getEStructuralFeatures().get(0);
@@ -3527,7 +3287,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getFloorCast()
   {
     return floorCastEClass;
@@ -3538,7 +3297,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getFloorCast_Expr()
   {
     return (EReference)floorCastEClass.getEStructuralFeatures().get(0);
@@ -3549,7 +3307,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EClass getRealCast()
   {
     return realCastEClass;
@@ -3560,7 +3317,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EReference getRealCast_Expr()
   {
     return (EReference)realCastEClass.getEStructuralFeatures().get(0);
@@ -3571,7 +3327,6 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public AgreeFactory getAgreeFactory()
   {
     return (AgreeFactory)getEFactoryInstance();

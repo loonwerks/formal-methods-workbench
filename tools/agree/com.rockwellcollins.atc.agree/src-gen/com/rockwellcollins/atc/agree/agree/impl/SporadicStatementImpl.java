@@ -65,7 +65,6 @@ public class SporadicStatementImpl extends RealTimeStatementImpl implements Spor
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getIat()
   {
     return iat;
@@ -93,7 +92,6 @@ public class SporadicStatementImpl extends RealTimeStatementImpl implements Spor
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setIat(Expr newIat)
   {
     if (newIat != iat)

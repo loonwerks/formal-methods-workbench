@@ -43,6 +43,7 @@ import com.rockwellcollins.atc.resolute.resolute.UnaryExpr
 import com.rockwellcollins.atc.resolute.services.ResoluteGrammarAccess
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.osate.xtext.aadl2.properties.formatting2.PropertiesFormatter
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement
 
 class ResoluteFormatter extends PropertiesFormatter {
 	
@@ -50,13 +51,11 @@ class ResoluteFormatter extends PropertiesFormatter {
 
 	def dispatch void format(ResoluteLibrary resolutelibrary, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		var i = 0;
+		
+		resolutelibrary.surround[noSpace]
+
 		for (Definition definitions : resolutelibrary.getDefinitions()) {
-			if(i != 0) {
-				definitions.prepend[newLines = 2]
-			}
 			format(definitions, document);
-			i = i + 1;
 		}
 	}
 
@@ -92,14 +91,16 @@ class ResoluteFormatter extends PropertiesFormatter {
 	}
 
 	def dispatch void format(FunctionDefinition functiondefinition, extension IFormattableDocument document) {
-		functiondefinition.regionFor.keyword("(").prepend[noSpace].append[oneSpace];
-		functiondefinition.regionFor.keyword(")").surround[oneSpace];
-		functiondefinition.regionFor.keyword(",").prepend[noSpace];
+
+		functiondefinition.regionFor.keyword("(").surround[noSpace];
+		functiondefinition.regionFor.keyword(")").prepend[noSpace];
+		functiondefinition.regionFor.keywords(",").forEach[prepend[noSpace]];
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		for (Arg args : functiondefinition.getArgs()) {
 			format(args, document);
 		}
 		format(functiondefinition.getBody(), document);
+		functiondefinition.append[newLines=2]
 	}
 
 	def dispatch void format(FunctionBody functionbody, extension IFormattableDocument document) {
@@ -110,7 +111,7 @@ class ResoluteFormatter extends PropertiesFormatter {
 
 	def dispatch void format(ClaimBody claimbody, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		claimbody.regionFor.keyword("<=").append[newLines = 1]
+		claimbody.regionFor.keyword("<=").prepend[oneSpace].append[newLines = 1]
 		for (ClaimText claim : claimbody.getClaim()) {
 			format(claim, document);
 		}
@@ -199,6 +200,11 @@ class ResoluteFormatter extends PropertiesFormatter {
 
 	def dispatch void format(FnCallExpr fncallexpr, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		
+		fncallexpr.regionFor.keyword("(").surround[noSpace]
+		fncallexpr.regionFor.keyword(")").prepend[noSpace]
+		fncallexpr.regionFor.keywords(",").forEach[prepend[noSpace]]
+		
 		for (Expr args : fncallexpr.getArgs()) {
 			format(args, document);
 		}
@@ -250,8 +256,10 @@ class ResoluteFormatter extends PropertiesFormatter {
 
 	def dispatch void format(ResoluteSubclause resolutesubclause, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		for (ProveStatement proves : resolutesubclause.getProves()) {
-			proves.surround[newLines=1]
+		
+		resolutesubclause.surround[noSpace]
+		
+		for (AnalysisStatement proves : resolutesubclause.getProves()) {
 			format(proves, document);
 		}
 	}
@@ -263,6 +271,7 @@ class ResoluteFormatter extends PropertiesFormatter {
 
 	def dispatch void format(ProveStatement provestatement, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		provestatement.append[newLines=1]
 		format(provestatement.getExpr(), document);
 	}
 }

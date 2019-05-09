@@ -78,7 +78,6 @@ public class LinearizationIntervalImpl extends ElementImpl implements Linearizat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getStart()
   {
     return start;
@@ -106,7 +105,6 @@ public class LinearizationIntervalImpl extends ElementImpl implements Linearizat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setStart(Expr newStart)
   {
     if (newStart != start)
@@ -128,7 +126,6 @@ public class LinearizationIntervalImpl extends ElementImpl implements Linearizat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getEnd()
   {
     return end;
@@ -156,7 +153,6 @@ public class LinearizationIntervalImpl extends ElementImpl implements Linearizat
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setEnd(Expr newEnd)
   {
     if (newEnd != end)

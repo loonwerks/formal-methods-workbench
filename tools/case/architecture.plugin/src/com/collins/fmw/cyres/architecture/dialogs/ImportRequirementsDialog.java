@@ -16,9 +16,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.aadl2.Classifier;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.handlers.AddRequirement.CASE_Requirement;
+import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
 
 public class ImportRequirementsDialog extends TitleAreaDialog {
 
@@ -27,11 +28,11 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	List<Text> txtIDs = new ArrayList<>();
 	List<String> lblComponents = new ArrayList<>();
 	List<Button> btnAgreeProps = new ArrayList<>();
-	List<Text> txtAgreeProps = new ArrayList<>();
 	List<Text> txtRationales = new ArrayList<>();
-	List<CASE_Requirement> existingRequirements = new ArrayList<>();
-	List<CASE_Requirement> importRequirements = new ArrayList<>();
-	List<CASE_Requirement> omitRequirements = new ArrayList<>();
+
+	List<CyberRequirement> importedRequirements = new ArrayList<>();
+	List<CyberRequirement> omittedRequirements = new ArrayList<>();
+	List<CyberRequirement> newRequirements = null;
 
 	public ImportRequirementsDialog(Shell parentShell) {
 		super(parentShell);
@@ -42,10 +43,9 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	public void create() {
 		super.create();
 		setTitle("Import Cybersecurity Requirements");
-		setMessage(
-				"Select the cybersecurity requirements to be imported into the model.",
-				IMessageProvider.NONE);
+		setMessage("Select the cybersecurity requirements to be imported into the model.", IMessageProvider.NONE);
 	}
+
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -98,27 +98,16 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Add requirements
-		addRequirement("trusted_source",
-				"The FlightPlanner shall only accept messages from a trusted GroundStation", "FlightPlanner",
-				container);
-		addRequirement("well_formed", "The FlightPlanner shall receive a well-formed command from the GroundStation",
-				"FlightPlanner", container);
-		addRequirement("not_hackable", "The WaypointManager shall never be hackable by anyone ever", "WaypointManager",
-				container);
+		for (CyberRequirement req : newRequirements) {
+			addRequirement(req, container);
+		}
 
 	}
 
-	private void addRequirement(String reqName, String reqText, String compName, Composite container) {
-
-		// If requirement has already been imported, ignore
-		for (CASE_Requirement req : existingRequirements) {
-			if (req.name.contentEquals(reqName) && req.component.contentEquals(compName)) {
-				return;
-			}
-		}
+	private void addRequirement(CyberRequirement req, Composite container) {
 
 		Button btnReq = new Button(container, SWT.CHECK);
-		btnReq.setText(reqName);
+		btnReq.setText(req.getType());
 		btnReq.setSelection(false);
 		btnReq.addListener(SWT.Selection, e -> {
 			if (e.type == SWT.Selection) {
@@ -133,24 +122,19 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		txtIDs.add(txtID);
 
 		Label lblReqText = new Label(container, SWT.NONE);
-		lblReqText.setText(reqText);
-		lblReqTexts.add(reqText);
+		lblReqText.setText(req.getText());
+		lblReqTexts.add(req.getText());
 
 		Label lblCompName = new Label(container, SWT.NONE);
-		lblCompName.setText(compName);
-		lblComponents.add(compName);
+		lblCompName.setText(req.getContext());
+		lblComponents.add(req.getContext());
 
-//		Button btnAgree = new Button(container, SWT.CHECK);
-//		btnAgree.setText("");
-//		btnAgree.setSelection(false);
-//		GridData agreePropInfoField = new GridData(SWT.CENTER, SWT.FILL, true, false);
-//		btnAgree.setLayoutData(agreePropInfoField);
-//		btnAgreeProps.add(btnAgree);
-
-		Text txtAgree = new Text(container, SWT.BORDER);
-		GridData agreeInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
-		txtAgree.setLayoutData(agreeInfoField);
-		txtAgreeProps.add(txtAgree);
+		Button btnAgree = new Button(container, SWT.CHECK);
+		GridData agreeInfoField = new GridData(SWT.CENTER, SWT.FILL, true, false);
+		btnAgree.setLayoutData(agreeInfoField);
+		btnAgree.setText("");
+		btnAgree.setSelection(false);
+		btnAgreeProps.add(btnAgree);
 
 		Text txtRationale = new Text(container, SWT.BORDER);
 		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -187,32 +171,39 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 	 */
 	private boolean saveInput() {
 
-		importRequirements.clear();
-		omitRequirements.clear();
+		importedRequirements.clear();
+		omittedRequirements.clear();
 		for (int i = 0; i < btnReqs.size(); i++) {
+
+			Classifier contextClassifier = CyberRequirement.getClassifier(lblComponents.get(i));
+			if (contextClassifier == null) {
+				Dialog.showError("Unknown context for " + btnReqs.get(i).getText(), lblComponents.get(i)
+						+ " could not be found in any AADL file in the project. A requirement context must be valid in order to import requirements into model.  This requirement will be de-selected.");
+				// Uncheck this requirement
+				btnReqs.get(i).setSelection(false);
+				return false;
+			}
 			if (btnReqs.get(i).getSelection()) {
 				if (txtIDs.get(i).getText().isEmpty()) {
 					Dialog.showError("Missing requirement ID", btnReqs.get(i).getText()
-							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.");
+							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model.  This requirement will be de-selected.");
+					// Uncheck this requirement
+					btnReqs.get(i).setSelection(false);
 					return false;
 				}
-//				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-//						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
-//						txtRationales.get(i).getText()));
-				importRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), lblComponents.get(i), txtAgreeProps.get(i).getText(),
-						txtRationales.get(i).getText()));
+
+				importedRequirements.add(new CyberRequirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
+						lblReqTexts.get(i), contextClassifier, btnAgreeProps.get(i).getSelection(), ""));
 			} else {
-//				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-//						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
-//						txtRationales.get(i).getText()));
-				omitRequirements.add(new CASE_Requirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), lblComponents.get(i), txtAgreeProps.get(i).getText(),
-						txtRationales.get(i).getText()));
+				omittedRequirements
+						.add(new CyberRequirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(), lblReqTexts.get(i),
+								contextClassifier, btnAgreeProps.get(i).getSelection(),
+								txtRationales.get(i).getText()));
 			}
 		}
 		return true;
 	}
+
 
 	@Override
 	protected void okPressed() {
@@ -221,16 +212,19 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		}
 	}
 
-	public List<CASE_Requirement> getImportRequirements() {
-		return importRequirements;
+
+	public List<CyberRequirement> getImportedRequirements() {
+		return importedRequirements;
 	}
 
-	public List<CASE_Requirement> getOmitRequirements() {
-		return omitRequirements;
+
+	public List<CyberRequirement> getOmittedRequirements() {
+		return omittedRequirements;
 	}
 
-	public void setResoluteClauses(List<CASE_Requirement> resoluteClauses) {
-		this.existingRequirements = resoluteClauses;
+
+	public void setRequirements(List<CyberRequirement> requirements) {
+		this.newRequirements = requirements;
 	}
 
 }

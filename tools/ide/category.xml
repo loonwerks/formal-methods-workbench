@@ -37,8 +37,8 @@
       <category name="osate2"/>
    </feature>
 
-   <feature url="features/com.collins.fmw.cyres.feature_0.0.0.jar" id="com.collins.fmw.cyres.feature" version="0.0.0">
-      <category name="cyres"/>
+   <feature url="features/com.collins.fmw.cyres.feature_1.0.0.qualifier.jar" id="com.collins.fmw.cyres.feature" version="1.0.0.qualifier">
+      <category name="fmworkbench"/>
    </feature>
    <feature url="features/com.rockwellcollins.atc.resolute.feature_1.0.0.qualifier.jar" id="com.rockwellcollins.atc.resolute.feature" version="1.0.0.qualifier">
       <category name="fmworkbench"/>
@@ -46,7 +46,7 @@
    <feature url="features/com.rockwellcollins.atc.agree.feature_2.4.0.qualifier.jar" id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier">
       <category name="fmworkbench"/>
    </feature>
-   <feature url="features/com.rockwellcollins.atc.z3.feature_4.7.1.qualifier.jar" id="com.rockwellcollins.atc.z3.feature" version="4.7.1.qualifier">
+   <feature url="features/com.collins.trustedsystems.z3.feature_4.7.1.qualifier.jar" id="com.collins.trustedsystems.z3.feature" version="4.7.1.qualifier">
       <category name="fmworkbench"/>
    </feature>
    <category-def name="osate2" label="OSATE2 for AADL2">

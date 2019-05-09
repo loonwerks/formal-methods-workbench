@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.collins.fmw.cyres.util.plugin
 Bundle-SymbolicName: com.collins.fmw.cyres.util.plugin;singleton:=true
-Bundle-Version: 0.0.0
+Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: com.collins.fmw.cyres.plugin.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jface,
@@ -14,6 +14,9 @@ Import-Package: org.eclipse.debug.ui.console,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.osate.aadl2.instantiation,
- org.osate.annexsupport
-Bundle-ClassPath: .
+ org.osate.aadl2.modelsupport.util,
+ org.osate.annexsupport,
+ org.osate.workspace
+Bundle-ClassPath: .,
+ dependencies/gson-2.8.5.jar
 Export-Package: com.collins.fmw.cyres.util.plugin

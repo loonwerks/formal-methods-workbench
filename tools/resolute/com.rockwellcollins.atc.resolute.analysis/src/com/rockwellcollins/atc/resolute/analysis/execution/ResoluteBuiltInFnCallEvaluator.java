@@ -395,6 +395,11 @@ public class ResoluteBuiltInFnCallEvaluator {
 			return new NamedElementValue(conn.getDestination());
 		}
 
+		case "is_bidirectional": {
+			ConnectionInstance conn = (ConnectionInstance) args.get(0).getNamedElement();
+			return new BoolValue(conn.isBidirectional());
+		}
+
 		/*
 		 * Primary type: feature
 		 */
@@ -675,6 +680,30 @@ public class ResoluteBuiltInFnCallEvaluator {
 			return new BoolValue(feat instanceof DataAccess);
 		}
 
+		case "is_bus_access": {
+			NamedElement feat = args.get(0).getNamedElement();
+			if (feat instanceof ConnectionInstance) {
+				ComponentInstance accessedComponent = null;
+				ConnectionInstance ci = (ConnectionInstance) feat;
+
+//				OsateDebug.osateDebug("source=" + ci.getSource());
+//				OsateDebug.osateDebug("destination=" + ci.getDestination());
+				if (ci.getSource() instanceof ComponentInstance) {
+					accessedComponent = (ComponentInstance) ci.getSource();
+				}
+
+				if (ci.getDestination() instanceof ComponentInstance) {
+					accessedComponent = (ComponentInstance) ci.getDestination();
+				}
+
+				return new BoolValue((ci.getKind() == org.osate.aadl2.instance.ConnectionKind.ACCESS_CONNECTION)
+						&& (accessedComponent.getCategory() == ComponentCategory.BUS));
+
+			}
+
+			return new BoolValue(feat instanceof BusAccess);
+		}
+
 		case "instance": {
 			NamedElement decl = args.get(0).getNamedElement();
 			SystemInstance top = context.getThisInstance().getSystemInstance();
@@ -696,7 +725,7 @@ public class ResoluteBuiltInFnCallEvaluator {
 		}
 
 		case "debug": {
-			int i = 0;
+//			int i = 0;
 			String s = "";
 			for (ResoluteValue arg : args) {
 //				if (i > 0) {
@@ -704,7 +733,7 @@ public class ResoluteBuiltInFnCallEvaluator {
 //				}
 				s += // "#" + i + ": " +
 						arg.toString();
-				i++;
+//				i++;
 			}
 			AssuranceCaseView.writeToConsole(s);
 

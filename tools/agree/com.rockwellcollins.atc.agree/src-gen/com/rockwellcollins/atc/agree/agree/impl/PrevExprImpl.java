@@ -76,7 +76,6 @@ public class PrevExprImpl extends ExprImpl implements PrevExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getDelay()
   {
     return delay;
@@ -104,7 +103,6 @@ public class PrevExprImpl extends ExprImpl implements PrevExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setDelay(Expr newDelay)
   {
     if (newDelay != delay)
@@ -126,7 +124,6 @@ public class PrevExprImpl extends ExprImpl implements PrevExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getInit()
   {
     return init;
@@ -154,7 +151,6 @@ public class PrevExprImpl extends ExprImpl implements PrevExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setInit(Expr newInit)
   {
     if (newInit != init)

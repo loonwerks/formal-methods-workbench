@@ -66,7 +66,6 @@ public class LiftStatementImpl extends SpecStatementImpl implements LiftStatemen
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedElement getSubcomp()
   {
     if (subcomp != null && ((EObject)subcomp).eIsProxy())
@@ -97,7 +96,6 @@ public class LiftStatementImpl extends SpecStatementImpl implements LiftStatemen
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setSubcomp(NamedElement newSubcomp)
   {
     NamedElement oldSubcomp = subcomp;

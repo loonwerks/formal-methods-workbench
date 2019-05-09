@@ -8,9 +8,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.framework.Bundle;
 
-import com.rockwellcollins.atc.agree.analysis.Activator;
 //import com.rockwellcollins.atc.z3.Z3Plugin;
-import com.rockwellcollins.atc.z3.Z3Plugin;
+import com.collins.trustedsystems.z3.Z3Plugin;
+import com.rockwellcollins.atc.agree.analysis.Activator;
 
 import jkind.JKindException;
 import jkind.SolverOption;

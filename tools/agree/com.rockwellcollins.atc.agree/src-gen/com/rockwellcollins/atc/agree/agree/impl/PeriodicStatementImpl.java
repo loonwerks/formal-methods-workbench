@@ -65,7 +65,6 @@ public class PeriodicStatementImpl extends RealTimeStatementImpl implements Peri
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getPeriod()
   {
     return period;
@@ -93,7 +92,6 @@ public class PeriodicStatementImpl extends RealTimeStatementImpl implements Peri
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setPeriod(Expr newPeriod)
   {
     if (newPeriod != period)

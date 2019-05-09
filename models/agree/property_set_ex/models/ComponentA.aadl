@@ -1,0 +1,15 @@
+package ComponentA
+public
+	with Component_IDs;
+	with Base_Types;
+	
+	thread ComponentA
+		
+		features
+			Output: in data port Base_Types::Integer;
+		annex agree{**
+			guarantee "Output is Own_ComponentID":
+				Output = Get_Property(this,Component_IDs::Own_ComponentID);
+		**};
+	end ComponentA;
+end ComponentA;

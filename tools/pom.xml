@@ -4,273 +4,72 @@
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>com.collins.fmw</groupId>
-	<artifactId>com.collins.fmw</artifactId>
-	<version>0.0.0</version>
+	<artifactId>com.collins.fmw.aggregator</artifactId>
+	<version>2.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho.version>1.0.0</tycho.version>
-		<tycho-extras.version>1.0.0</tycho-extras.version>
-		<xtext.version>2.12.0</xtext.version>
-		<xsemantics.version>1.16.0-SNAPSHOT</xsemantics.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!--
-		<osate.version>2.3.7</osate.version>
-    -->
-
-		<jacoco.version>0.8.2</jacoco.version>
-		<test.logging.1>-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog</test.logging.1>
-		<test.logging.2>-Dorg.apache.commons.logging.simplelog.defaultlog=error</test.logging.2>
-		<test.logging>${test.logging.1} ${test.logging.2}</test.logging>
-
-
-		<!-- The following are for use in poms for test plugins -->
-    <!--
-		<eclipse.repo.url>http://download.eclipse.org/releases/2018-12</eclipse.repo.url>
-		<xtext-testing.repo.url>https://dl.bintray.com/itemis/generic/xtext-testing/updates/0.2/</xtext-testing.repo.url>
-    -->
-
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- Tycho settings -->
+		<tycho.version>1.3.0</tycho.version>
+		<tycho-extras.version>1.3.0</tycho-extras.version>
+		<!-- Define overridable properties for tycho-surefire-plugin -->
+		<platformSystemProperties />
+		<moduleProperties />
+		<systemProperties />
+		<tycho.testArgLine />
+		<eclipse.mirror>http://download.eclipse.org</eclipse.mirror>
+		<emf-version>2.15.0</emf-version>
+		<emf-common-version>2.15.0</emf-common-version>
+		<emf-codegen-version>2.15.0</emf-codegen-version>
+		<xtext-version>2.16.0</xtext-version>
+		<ecore-xtext-version>1.4.0</ecore-xtext-version>
+		<ecore-xcore-version>1.8.0</ecore-xcore-version>
+		<ecore-xcore-lib-version>1.3.0</ecore-xcore-lib-version>
 	</properties>
 
-
-  <repositories>
-
-		<repository>
-			<id>eclipse</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/oxygen</url>
-		</repository>
-
-
-		<repository>
-			<id>Xsemantics</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/xsemantics/milestones/</url>
-		</repository>
-
-		<repository>
-			<id>Xtext</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/${xtext.version}</url>
-    </repository>
-
-   <repository>
-     <id>osate</id>
-     <layout>p2</layout>
-     <url>https://osate-build.sei.cmu.edu/download/osate/stable/latest/updates</url>
-   </repository>
-
-   <!--
-		<repository>
-			<id>Sireum ACT Update Site</id>
-			<layout>p2</layout>
-			<url>https://raw.githubusercontent.com/sireum/act-plugin-update-site/master</url>
-		</repository>
-    -->
-
-  </repositories>
-
 	<modules>
-		<module>z3</module>
-		<module>tcg</module>
-		<module>simulator</module>
+		<module>aadl2sexp</module>
 		<module>agree</module>
 		<module>resolute</module>
 		<module>case</module>
+		<module>tcg</module>
+		<module>simulator</module>
+		<module>repository</module>
+		<module>target-platform</module>
 		<module>ide</module>
 	</modules>
 
-
 	<profiles>
 		<profile>
-			<id>full</id>
-			<properties>
-				<jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>target-platform-configuration</artifactId>
-						<version>${tycho.version}</version>
-						<configuration>
-							<environments>
-								<environment>
-									<os>linux</os>
-									<ws>gtk</ws>
-									<arch>x86_64</arch>
-								</environment>
-								<environment>
-									<os>win32</os>
-									<ws>win32</ws>
-									<arch>x86_64</arch>
-								</environment>
-								<environment>
-									<os>macosx</os>
-									<ws>cocoa</ws>
-									<arch>x86_64</arch>
-								</environment>
-							</environments>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>local</id>
-			<properties>
-				<jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>target-platform-configuration</artifactId>
-						<version>${tycho.version}</version>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>update-branding-plugins-about.mappings</id>
-			<activation>
-				<file>
-					<exists>${basedir}/about.mappings</exists>
-				</file>
-			</activation>
-			<properties>
-				<build.version>${project.parent.version}</build.version>
-				<build.date>${maven.build.timestamp}</build.date>
-				<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>2.4.3</version>
-						<executions>
-							<execution>
-								<id>process-about.mappings</id>
-								<phase>prepare-package</phase>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-									<overwrite>true</overwrite>
-									<resources>
-										<resource>
-											<directory>${basedir}</directory>
-											<includes>
-												<include>about.mappings</include>
-												<include>plugin.properties</include>
-											</includes>
-											<filtering>true</filtering>
-										</resource>
-									</resources>
-								</configuration>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-packaging-plugin</artifactId>
-						<version>${tycho.version}</version>
-						<configuration>
-							<additionalFileSets>
-								<fileSet>
-									<directory>${project.build.directory}</directory>
-									<includes>
-										<include>about.mappings</include>
-										<include>plugin.properties</include>
-									</includes>
-								</fileSet>
-							</additionalFileSets>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>macosx</id>
+			<id>macos</id>
 			<activation>
 				<os>
 					<family>mac</family>
 				</os>
 			</activation>
 			<properties>
-				<ui.test.vmargs>-XstartOnFirstThread</ui.test.vmargs>
+				<!-- THE FOLLOWING LINE MUST NOT BE BROKEN BY AUTOFORMATTING -->
+				<platformSystemProperties>-XstartOnFirstThread</platformSystemProperties>
 			</properties>
 		</profile>
 		<profile>
-			<id>linux</id>
+			<id>jdk9-or-newer</id>
 			<activation>
-				<os>
-					<family>linux</family>
-				</os>
+				<jdk>[9,)</jdk>
 			</activation>
 			<properties>
-				<ui.test.vmargs></ui.test.vmargs>
+				<moduleProperties>--add-modules=ALL-SYSTEM</moduleProperties>
 			</properties>
 		</profile>
 		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<properties>
-				<ui.test.vmargs></ui.test.vmargs>
-			</properties>
-		</profile>
-		<profile>
-			<id>no-codecoverage</id>
-			<activation>
-				<property>
-					<name>codecoverage</name>
-					<value>!true</value>
-				</property>
-			</activation>
-			<properties>
-				<tycho.testArgLine>
-				</tycho.testArgLine>
-			</properties>
-		</profile>
-		<profile>
-			<id>codecoverage</id>
-			<activation>
-				<property>
-					<name>codecoverage</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco.version}</version>
-						<configuration>
-							<excludes>
-								<exclude>**/Aadl2Switch*</exclude>
-							</excludes>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
+			<id>build-update-site</id>
+			<modules>
+				<module>update-site</module>
+			</modules>
 		</profile>
 	</profiles>
 
@@ -282,7 +81,10 @@
 				<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
-			<!-- enable source bundle generation -->
+			<plugin>
+				<groupId>org.eclipse.xtend</groupId>
+				<artifactId>xtend-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
@@ -296,213 +98,319 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- compile xtend -->
 			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>xtend-gen</directory>
-							<excludes>
-								<exclude>.gitignore</exclude>
-							</excludes>
-						</fileset>
-						<fileset>
-							<directory>xsemantics-gen</directory>
-							<excludes>
-								<exclude>**/.gitignore</exclude>
-							</excludes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.xtend</groupId>
-				<artifactId>xtend-maven-plugin</artifactId>
-				<version>${xtext.version}</version>
+				<groupId>org.eclipse.tycho.extras</groupId>
+				<artifactId>tycho-source-feature-plugin</artifactId>
+				<version>${tycho.version}</version>
 				<executions>
 					<execution>
+						<id>source-feature</id>
+						<phase>package</phase>
 						<goals>
-							<goal>compile</goal>
-							<goal>testCompile</goal>
-							<goal>xtend-install-debug-info</goal>
-							<goal>xtend-test-install-debug-info</goal>
+							<goal>source-feature</goal>
 						</goals>
-						<configuration>
-							<xtendAsPrimaryDebugSource>true</xtendAsPrimaryDebugSource>
-							<outputDirectory>${basedir}/xtend-gen</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
-				<!-- workaround for dependency issue, see https://github.com/eclipse/xtext/issues/1231 -->
-				<dependencies>
-					<dependency>
-						<groupId>org.eclipse.platform</groupId>
-						<artifactId>org.eclipse.equinox.common</artifactId>
-						<version>3.10.0</version>
-					</dependency>
-					<dependency>
-						<groupId>org.eclipse.jdt</groupId>
-						<artifactId>org.eclipse.jdt.core</artifactId>
-						<version>3.13.102</version>
-					</dependency>
-					<dependency>
-						<groupId>org.eclipse.jdt</groupId>
-						<artifactId>org.eclipse.jdt.compiler.apt</artifactId>
-						<version>1.3.110</version>
-					</dependency>
-					<dependency>
-						<groupId>org.eclipse.jdt</groupId>
-						<artifactId>org.eclipse.jdt.compiler.tool</artifactId>
-						<version>1.2.101</version>
-					</dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.common</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.ecore</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.codegen</artifactId>
-                        <version>2.11.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>org.eclipse.emf.codegen.ecore</artifactId>
-                        <version>2.12.0</version>
-                    </dependency>
-				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
+				<artifactId>tycho-p2-plugin</artifactId>
 				<version>${tycho.version}</version>
-				<configuration>
-					<compilerArgument>-err:-forbidden</compilerArgument>
-				</configuration>
+				<executions>
+					<execution>
+						<id>attach-p2-metadata</id>
+						<phase>package</phase>
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-    <!--
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho.version}</version>
 				<configuration>
-					<resolveWithExecutionEnvironmentConstraints>false</resolveWithExecutionEnvironmentConstraints>
-					<resolver>p2</resolver>
 					<target>
 						<artifact>
-							<groupId>org.osate</groupId>
-							<artifactId>osate2-platform</artifactId>
-							<version>${osate.version}</version>
+							<groupId>com.collins.fmw</groupId>
+							<artifactId>com.collins.fmw.target</artifactId>
+							<version>2.4.0-SNAPSHOT</version>
 						</artifact>
 					</target>
-					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
-    -->
 		</plugins>
-
 		<pluginManagement>
 			<plugins>
-
-        
 				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-p2-repository-plugin</artifactId>
-					<version>${tycho.version}</version>
-        </plugin>
-        
-				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-packaging-plugin</artifactId>
-					<version>${tycho.version}</version>
-          <!--
-					<dependencies>
-						<dependency>
-							<groupId>org.eclipse.tycho.extras</groupId>
-							<artifactId>tycho-buildtimestamp-jgit</artifactId>
-							<version>${tycho-extras.version}</version>
-						</dependency>
-					</dependencies>
+					<groupId>org.eclipse.xtend</groupId>
+					<artifactId>xtend-maven-plugin</artifactId>
+					<version>${xtext-version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>compile</goal>
+								<goal>xtend-install-debug-info</goal>
+								<goal>testCompile</goal>
+								<goal>xtend-test-install-debug-info</goal>
+							</goals>
+						</execution>
+					</executions>
 					<configuration>
-						<timestampProvider>jgit</timestampProvider>
-						<format>'v'yyyyMMdd-HHmm</format>
-						<jgit.dirtyWorkingTree>${jgit.dirtyWorkingTree}</jgit.dirtyWorkingTree>
-						<jgit.ignore>
-							pom.xml
-						</jgit.ignore>
+						<outputDirectory>${basedir}/xtend-gen</outputDirectory>
+						<testOutputDirectory>${basedir}/xtend-gen</testOutputDirectory>
 					</configuration>
-          -->
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.5</version>
+					<configuration>
+						<filesets>
+							<fileset>
+								<directory>${basedir}/xtend-gen</directory>
+								<includes>
+									<include>**/*</include>
+								</includes>
+							</fileset>
+						</filesets>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.5.3</version>
+					<configuration>
+						<preparationGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho.version}:update-eclipse-metadata
+							org.apache.maven.plugins:maven-scm-plugin:1.9.5:add
+							org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</preparationGoals>
+						<completionGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho.version}:update-eclipse-metadata
+							org.apache.maven.plugins:maven-scm-plugin:1.9.5:add
+							org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</completionGoals>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>default-cli</id>
+							<goals>
+								<goal>add</goal>
+								<goal>checkin</goal>
+							</goals>
+							<configuration>
+								<includes>**/META-INF/MANIFEST.MF,**/feature.xml,**/*.product,**/category.xml</includes>
+								<excludes>**/target/**</excludes>
+								<message>Changing the version to reflect the pom versions for
+									the release</message>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-resources-plugin
+										</artifactId>
+										<versionRange>
+											[2.4.3,)
+										</versionRange>
+										<goals>
+											<goal>resources</goal>
+											<goal>testResources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											build-helper-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.9.1,)
+										</versionRange>
+										<goals>
+											<goal>add-resource</goal>
+											<goal>add-source</goal>
+											<goal>add-test-resource</goal>
+											<goal>add-test-source</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.eclipse.tycho
+										</groupId>
+										<artifactId>
+											tycho-compiler-plugin
+										</artifactId>
+										<versionRange>
+											[0.23.1,)
+										</versionRange>
+										<goals>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.eclipse.tycho
+										</groupId>
+										<artifactId>
+											tycho-packaging-plugin
+										</artifactId>
+										<versionRange>
+											[0.23.1,)
+										</versionRange>
+										<goals>
+											<goal>build-qualifier</goal>
+											<goal>build-qualifier-aggregator</goal>
+											<goal>validate-id</goal>
+											<goal>validate-version</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<!-- Can be removed after first generator execution https://bugs.eclipse.org/bugs/show_bug.cgi?id=480097 -->
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<compilerArgument>-err:-forbidden</compilerArgument>
+						<useProjectSettings>false</useProjectSettings>
+					</configuration>
+				</plugin>
+				<!-- to skip running (and compiling) tests use commandline flag: -Dmaven.test.skip 
+					To skip tests, but still compile them, use: -DskipTests To allow all tests 
+					in a pom to pass/fail, use commandline flag: -fae (fail at end) -->
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-surefire-plugin</artifactId>
 					<version>${tycho.version}</version>
 					<configuration>
-						<argLine>${tycho.testArgLine} ${ui.test.vmargs} ${test.logging}</argLine>
-						<useUIHarness>true</useUIHarness>
-						<!-- Use this if there's an org.eclipse.swt.SWTException: Invalid thread 
-							access <useUIThread>true</useUIThread> -->
+						<!-- THE FOLLOWING LINE MUST NOT BE BROKEN BY AUTOFORMATTING -->
+						<argLine>${tycho.testArgLine} ${platformSystemProperties}
+							${systemProperties} ${moduleProperties}</argLine>
+						<failIfNoTests>false</failIfNoTests>
+						<useUIHarness>false</useUIHarness>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.eclipse.xtext</groupId>
-					<artifactId>xtext-maven-plugin</artifactId>
-					<version>${xtext.version}</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>generate</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<languages>
-							<language>
-								<setup>org.eclipse.xsemantics.dsl.XsemanticsStandaloneSetup</setup>
-								<outputConfigurations>
-									<outputConfiguration>
-										<outputDirectory>${basedir}/xsemantics-gen</outputDirectory>
-									</outputConfiguration>
-								</outputConfigurations>
-							</language>
-						</languages>
-					</configuration>
-					<dependencies>
-						<dependency>
-							<groupId>org.eclipse.xsemantics</groupId>
-							<artifactId>org.eclipse.xsemantics.dsl</artifactId>
-							<version>${xsemantics.version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>com.ruleoftech</groupId>
-					<artifactId>markdown-page-generator-plugin</artifactId>
-					<version>2.1.0</version>
-					<executions>
-						<execution>
-							<phase>process-resources</phase>
-							<goals>
-								<goal>generate</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
-
 	</build>
+	<repositories>
+		<!-- add Eclipse repository to resolve dependencies -->
+		<repository>
+			<id>Eclipse</id>
+			<layout>p2</layout>
+			<url>${eclipse.mirror}/releases/photon/</url>
+		</repository>
+		<repository>
+			<id>Xsemantics</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/xsemantics/milestones/</url>
+		</repository>
+		<repository>
+			<id>codehaus-snapshots</id>
+			<name>disable dead 'Codehaus Snapshots' repository, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478</name>
+			<url>http://nexus.codehaus.org/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>codehaus-snapshots</id>
+			<name>disable dead 'Codehaus Snapshots' repository, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478</name>
+			<url>http://nexus.codehaus.org/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.emf</groupId>
+			<artifactId>org.eclipse.emf.common</artifactId>
+			<version>${emf-common-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.emf</groupId>
+			<artifactId>org.eclipse.emf.ecore</artifactId>
+			<version>${emf-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.emf</groupId>
+			<artifactId>org.eclipse.emf.ecore.xcore.lib</artifactId>
+			<version>${ecore-xcore-lib-version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<scm>
+		<connection>scm:git:git@github.com:loonwerks/formal-methods-workbench.git</connection>
+		<developerConnection>scm:git:git@github.com:loonwerks/formal-methods-workbench.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
 </project>

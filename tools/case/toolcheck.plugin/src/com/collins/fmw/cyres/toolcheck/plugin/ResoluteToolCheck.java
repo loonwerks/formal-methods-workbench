@@ -54,8 +54,22 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		String outputFileName = Activator.getDefault()
 				.getPreferenceStore()
 				.getString(arg.getString().toLowerCase() + "OutputFileName");
+
+		if (arg.getString().toLowerCase().equalsIgnoreCase("UofM")) {
+			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/Test_Input_Prioritization.txt";
+		} else if (arg.getString().toLowerCase().equalsIgnoreCase("Marabou")) {
+			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/NN_Formal_Analysis.txt";
+		} else if (arg.getString().toLowerCase().equalsIgnoreCase("?")) {
+			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/Safety_Aware_Constrained_Learning.txt";
+		} else if (arg.getString().toLowerCase().startsWith("apt")) {
+			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/APT.txt";
+		} else {
+
 		// TODO: THIS CAN'T BE HARDCODED!!!! GET PREFERENCES WORKING AGAIN
 		outputFileName = "/home/collins/git/formal-methods-workbench/tools/ide/target/products/com.collins.fmw.ide/linux/gtk/x86_64/SWTheory.sml";
+
+		}
+
 		if (outputFileName.isEmpty()) {
 			throw new ResoluteFailException("Resolute ToolCheck could not determine the output file name of the "
 					+ arg.getString() + " tool.  It must be specified in the preferences.",

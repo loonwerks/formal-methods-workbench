@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>toolcheck.plugin</name>
+	<name>com.collins.fmw.cyres.toolcheck.plugin</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -37,4 +37,11 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>META-INF/MANIFEST.MF</name>
+			<type>1</type>
+			<location>C:/Users/ieamunds/Documents/GitHub/formal-methods-workbench/tools/case/toolcheck.plugin/META-INF/MANIFEST.MF</location>
+		</link>
+	</linkedResources>
 </projectDescription>

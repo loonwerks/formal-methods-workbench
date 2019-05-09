@@ -79,7 +79,6 @@ public class ConnectionStatementImpl extends SpecStatementImpl implements Connec
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public NamedElement getConn()
   {
     if (conn != null && ((EObject)conn).eIsProxy())
@@ -110,7 +109,6 @@ public class ConnectionStatementImpl extends SpecStatementImpl implements Connec
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setConn(NamedElement newConn)
   {
     NamedElement oldConn = conn;
@@ -124,7 +122,6 @@ public class ConnectionStatementImpl extends SpecStatementImpl implements Connec
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -152,7 +149,6 @@ public class ConnectionStatementImpl extends SpecStatementImpl implements Connec
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

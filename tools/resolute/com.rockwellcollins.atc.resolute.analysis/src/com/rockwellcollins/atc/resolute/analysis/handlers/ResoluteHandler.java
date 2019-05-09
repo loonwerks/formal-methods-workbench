@@ -30,11 +30,8 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.IEObjectDescription;
-import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.instance.ComponentInstance;
@@ -44,7 +41,6 @@ import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.modelsupport.scoping.Aadl2GlobalScopeUtil;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.aadl2.util.Aadl2Util;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.ui.dialogs.Dialog;
@@ -55,6 +51,7 @@ import com.rockwellcollins.atc.resolute.analysis.execution.NamedElementComparato
 import com.rockwellcollins.atc.resolute.analysis.execution.ResoluteInterpreter;
 import com.rockwellcollins.atc.resolute.analysis.results.ResoluteResult;
 import com.rockwellcollins.atc.resolute.analysis.views.AssuranceCaseView;
+import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.IdExpr;
@@ -137,64 +134,64 @@ public class ResoluteHandler extends AadlHandler {
 		return result;
 	}
 
-	private List<ComponentImplementation> getComponentImplementations(ComponentType ct) {
-		List<ComponentImplementation> result = new ArrayList<>();
-		AadlPackage pkg = AadlUtil.getContainingPackage(ct);
-		for (ComponentImplementation ci : EcoreUtil2.getAllContentsOfType(pkg, ComponentImplementation.class)) {
-			if (ci.getType().equals(ct)) {
-				result.add(ci);
-			}
-		}
-		return result;
-	}
-
-	private Classifier getOutermostClassifier(Element element) {
-		List<EObject> containers = new ArrayList<>();
-		EObject curr = element;
-		while (curr != null) {
-			containers.add(curr);
-			curr = curr.eContainer();
-		}
-		Collections.reverse(containers);
-		for (EObject container : containers) {
-			if (container instanceof Classifier) {
-				// System.out.println(container);
-				return (Classifier) container;
-			}
-		}
-		return null;
-	}
-
-	private ComponentImplementation getComponentImplementation(Element root) {
-		Classifier classifier = getOutermostClassifier(root);
-
-		if (classifier instanceof ComponentImplementation) {
-			return (ComponentImplementation) classifier;
-		}
-		if (!(classifier instanceof ComponentType)) {
-			Dialog.showError("Model Instantiate", "Must select an AADL Component Type or Implementation");
-			return null;
-		}
-		ComponentType ct = (ComponentType) classifier;
-		List<ComponentImplementation> cis = getComponentImplementations(ct);
-		if (cis.size() == 0) {
-			Dialog.showError("Model Instantiate", "AADL Component Type has no implementation to check");
-			return null;
-		} else if (cis.size() == 1) {
-			ComponentImplementation ci = cis.get(0);
-			String message = "User selected " + ct.getFullName() + ". Run checks on " + ci.getFullName() + " instead?";
-			if (Dialog.askQuestion("Model Instantiation", message)) {
-				return ci;
-			} else {
-				return null;
-			}
-		} else {
-			Dialog.showError("Model Instantiate",
-					"AADL Component Type has multiple implementation to verify: please select just one");
-			return null;
-		}
-
-	}
+//	private List<ComponentImplementation> getComponentImplementations(ComponentType ct) {
+//		List<ComponentImplementation> result = new ArrayList<>();
+//		AadlPackage pkg = AadlUtil.getContainingPackage(ct);
+//		for (ComponentImplementation ci : EcoreUtil2.getAllContentsOfType(pkg, ComponentImplementation.class)) {
+//			if (ci.getType().equals(ct)) {
+//				result.add(ci);
+//			}
+//		}
+//		return result;
+//	}
+//
+//	private Classifier getOutermostClassifier(Element element) {
+//		List<EObject> containers = new ArrayList<>();
+//		EObject curr = element;
+//		while (curr != null) {
+//			containers.add(curr);
+//			curr = curr.eContainer();
+//		}
+//		Collections.reverse(containers);
+//		for (EObject container : containers) {
+//			if (container instanceof Classifier) {
+//				// System.out.println(container);
+//				return (Classifier) container;
+//			}
+//		}
+//		return null;
+//	}
+//
+//	private ComponentImplementation getComponentImplementation(Element root) {
+//		Classifier classifier = getOutermostClassifier(root);
+//
+//		if (classifier instanceof ComponentImplementation) {
+//			return (ComponentImplementation) classifier;
+//		}
+//		if (!(classifier instanceof ComponentType)) {
+//			Dialog.showError("Model Instantiate", "Must select an AADL Component Type or Implementation");
+//			return null;
+//		}
+//		ComponentType ct = (ComponentType) classifier;
+//		List<ComponentImplementation> cis = getComponentImplementations(ct);
+//		if (cis.size() == 0) {
+//			Dialog.showError("Model Instantiate", "AADL Component Type has no implementation to check");
+//			return null;
+//		} else if (cis.size() == 1) {
+//			ComponentImplementation ci = cis.get(0);
+//			String message = "User selected " + ct.getFullName() + ". Run checks on " + ci.getFullName() + " instead?";
+//			if (Dialog.askQuestion("Model Instantiation", message)) {
+//				return ci;
+//			} else {
+//				return null;
+//			}
+//		} else {
+//			Dialog.showError("Model Instantiate",
+//					"AADL Component Type has multiple implementation to verify: please select just one");
+//			return null;
+//		}
+//
+//	}
 
 	@Override
 	protected IStatus runJob(Element root, IProgressMonitor monitor) {
@@ -256,13 +253,17 @@ public class ResoluteHandler extends AadlHandler {
 			//
 			ResoluteInterpreter interpreter = new ResoluteInterpreter(context);
 
-			for (ProveStatement ps : resoluteSubclause.getProves()) {
-				try {
-					proofTrees.add(interpreter.evaluateProveStatement(ps));
-				} catch (Exception e) {
-					handleProveStatementException(ps, e);
+//			for (ProveStatement ps : resoluteSubclause.getProves()) {
+			for (AnalysisStatement as : resoluteSubclause.getProves()) {
+				if (as instanceof ProveStatement) {
+					ProveStatement ps = (ProveStatement) as;
+					try {
+						proofTrees.add(interpreter.evaluateProveStatement(ps));
+					} catch (Exception e) {
+						handleProveStatementException(ps, e);
+					}
+					drawProofs(proofTrees);
 				}
-				drawProofs(proofTrees);
 			}
 
 		} else {
@@ -276,13 +277,17 @@ public class ResoluteHandler extends AadlHandler {
 						ResoluteSubclause resoluteSubclause = (ResoluteSubclause) subclause;
 						EvaluationContext context = new EvaluationContext(compInst, sets, featToConnsMap);
 						ResoluteInterpreter interpreter = new ResoluteInterpreter(context);
-						for (ProveStatement ps : resoluteSubclause.getProves()) {
-							try {
-								proofTrees.add(interpreter.evaluateProveStatement(ps));
-							} catch (Exception e) {
-								handleProveStatementException(ps, e);
+//						for (ProveStatement ps : resoluteSubclause.getProves()) {
+						for (AnalysisStatement as : resoluteSubclause.getProves()) {
+							if (as instanceof ProveStatement) {
+								ProveStatement ps = (ProveStatement) as;
+								try {
+									proofTrees.add(interpreter.evaluateProveStatement(ps));
+								} catch (Exception e) {
+									handleProveStatementException(ps, e);
+								}
+								drawProofs(proofTrees);
 							}
-							drawProofs(proofTrees);
 						}
 					}
 				}

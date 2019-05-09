@@ -154,7 +154,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private void createCacheTimeoutField(Composite container) {
 
 		Label lblCacheTimeoutField = new Label(container, SWT.NONE);
-		lblCacheTimeoutField.setText("Cache Timeout");
+		lblCacheTimeoutField.setText("Cache Timeout (minutes)");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -221,9 +221,9 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 
 		Label lblPropagateGuaranteesField = new Label(container, SWT.NONE);
 		if (commDriver.isEmpty()) {
-			lblPropagateGuaranteesField.setText("Propagate Guarantees from Comm Driver");
+			lblPropagateGuaranteesField.setText("Preserve Guarantees from Comm Driver");
 		} else {
-			lblPropagateGuaranteesField.setText("Propagate Guarantees from " + commDriver);
+			lblPropagateGuaranteesField.setText("Preserve Guarantees from " + commDriver);
 		}
 
 		GridData dataInfoField = new GridData();

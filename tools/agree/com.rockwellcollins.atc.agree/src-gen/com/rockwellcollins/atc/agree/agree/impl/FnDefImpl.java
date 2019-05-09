@@ -98,7 +98,6 @@ public class FnDefImpl extends NamedElementImpl implements FnDef
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public EList<Arg> getArgs()
   {
     if (args == null)
@@ -113,7 +112,6 @@ public class FnDefImpl extends NamedElementImpl implements FnDef
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Type getType()
   {
     return type;
@@ -141,7 +139,6 @@ public class FnDefImpl extends NamedElementImpl implements FnDef
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setType(Type newType)
   {
     if (newType != type)
@@ -163,7 +160,6 @@ public class FnDefImpl extends NamedElementImpl implements FnDef
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public Expr getExpr()
   {
     return expr;
@@ -191,7 +187,6 @@ public class FnDefImpl extends NamedElementImpl implements FnDef
    * <!-- end-user-doc -->
    * @generated
    */
-  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)
