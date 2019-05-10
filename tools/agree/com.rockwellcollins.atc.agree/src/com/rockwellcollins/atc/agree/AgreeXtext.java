@@ -41,6 +41,7 @@ import org.osate.aadl2.FeatureGroup;
 import org.osate.aadl2.FeatureGroupType;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
+import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
@@ -51,6 +52,7 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.RangeValue;
 import org.osate.aadl2.RealLiteral;
+import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
@@ -63,6 +65,7 @@ import com.rockwellcollins.atc.agree.Nenola.EnumContract;
 import com.rockwellcollins.atc.agree.Nenola.Interval;
 import com.rockwellcollins.atc.agree.Nenola.NodeGen;
 import com.rockwellcollins.atc.agree.Nenola.Prim;
+import com.rockwellcollins.atc.agree.Nenola.PropVal;
 import com.rockwellcollins.atc.agree.Nenola.RangeIntContract;
 import com.rockwellcollins.atc.agree.Nenola.RangeRealContract;
 import com.rockwellcollins.atc.agree.Nenola.Spec;
@@ -860,6 +863,7 @@ public class AgreeXtext {
 
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(c);
 
+		Map<String, Nenola.PropVal> propAssocs = new HashMap<>();
 		List<Nenola.Connection> connections = new ArrayList<>();
 		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
@@ -898,12 +902,62 @@ public class AgreeXtext {
 		if (ct != null) {
 
 			channels.putAll(extractChannels("", ct));
+			propAssocs.putAll(extractPropAssocMap(ct));
 
 		}
 
 		String name = c.getQualifiedName();
 
-		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, connections, specs, timingMode, isImpl, c);
+		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, propAssocs, connections, specs, timingMode,
+				isImpl, c);
+	}
+
+	private static Map<String, PropVal> extractPropAssocMap(ComponentType ct) {
+		Map<String, PropVal> propAssocMap = new HashMap<>();
+		for (PropertyAssociation pa : ct.getOwnedPropertyAssociations()) {
+			String name = pa.getProperty().getQualifiedName();
+
+			ModalPropertyValue v = pa.getOwnedValues().get(0);
+			if (v instanceof NamedValue) {
+
+				AbstractNamedValue nv = ((NamedValue) v).getNamedValue();
+				if (nv instanceof EnumerationLiteral) {
+					String val = ((EnumerationLiteral) nv).getName();
+					propAssocMap.put(name, new Nenola.StringPropVal(val));
+
+				} else if (nv instanceof PropertyConstant) {
+					String val = ((PropertyConstant) nv).getName();
+					propAssocMap.put(name, new Nenola.StringPropVal(val));
+				}
+
+			} else if (v instanceof StringLiteral) {
+				String val = ((StringLiteral) v).getValue();
+				propAssocMap.put(name, new Nenola.StringPropVal(val));
+
+			} else if (v instanceof IntegerLiteral) {
+				long val = ((IntegerLiteral) v).getValue();
+				propAssocMap.put(name, new Nenola.IntPropVal(val));
+
+			} else if (v instanceof ReferenceValue) {
+				String val = ((ReferenceValue) v).getPath().getNamedElement().getName();
+				propAssocMap.put(name, new Nenola.StringPropVal(val));
+
+			} else if (v instanceof ClassifierValue) {
+				String val = ((ClassifierValue) v).getClassifier().getQualifiedName();
+				propAssocMap.put(name, new Nenola.StringPropVal(val));
+
+			} else if (v instanceof BooleanLiteral) {
+				String val = ((BooleanLiteral) v).getValue() + "";
+				propAssocMap.put(name, new Nenola.StringPropVal(val));
+
+			} else if (v instanceof RealLiteral) {
+				double val = ((RealLiteral) v).getValue();
+				propAssocMap.put(name, new Nenola.RealPropVal(val));
+
+			}
+		}
+
+		throw new RuntimeException();
 	}
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {

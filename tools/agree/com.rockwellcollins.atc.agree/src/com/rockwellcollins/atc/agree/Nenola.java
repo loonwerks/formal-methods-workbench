@@ -3150,6 +3150,33 @@ public class Nenola {
 
 	}
 
+	public static interface PropVal {
+	}
+
+	public static class StringPropVal implements PropVal {
+		public final String val;
+
+		public StringPropVal(String val) {
+			this.val = val;
+		}
+	}
+
+	public static class IntPropVal implements PropVal {
+		public final long val;
+
+		public IntPropVal(long val) {
+			this.val = val;
+		}
+	}
+
+	public static class RealPropVal implements PropVal {
+		public final double val;
+
+		public RealPropVal(double val) {
+			this.val = val;
+		}
+	}
+
 	public static class NodeContract implements Contract {
 
 		private final String name;
@@ -3164,9 +3191,11 @@ public class Nenola {
 		/* reference to Xtext elm for gui update */
 		public final NamedElement namedElement;
 
+
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
 				Map<String, NodeGen> nodeGenMap,
-				List<Connection> connections, List<Spec> specList, Optional<TimingMode> timingMode, boolean isImpl,
+				Map<String, PropVal> propAssocs, List<Connection> connections, List<Spec> specList,
+				Optional<TimingMode> timingMode, boolean isImpl,
 				NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
@@ -3241,7 +3270,6 @@ public class Nenola {
 			return null;
 		}
 
-		private Map<Boolean, Node> lustreNodeCache = new HashMap<>();
 
 		private jkind.lustre.Node toLustreSubNode(boolean isMonolithic) {
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
@@ -3348,7 +3376,7 @@ public class Nenola {
 			List<String> properties = new ArrayList<>();
 			List<String> ivcs = new ArrayList<>();
 
-			int j = 0;
+
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
 
 				String inputName = entry.getKey();
@@ -3378,8 +3406,6 @@ public class Nenola {
 			for (Entry<String,NodeContract> entry : this.subNodes.entrySet()) {
 
 				String id = entry.getKey() + Lustre.assumeHistVar;
-				NodeContract subNode = entry.getValue();
-
 				assumeConj = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(id), jkind.lustre.BinaryOp.AND,
 						assumeConj);
 			}
