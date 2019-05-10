@@ -79,6 +79,9 @@ public class PreferencesUtil {
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
 			// Z3Plugin not present
+		} catch (Exception e) {
+			// Some unknown exception finding Z3
+			e.printStackTrace();
 		}
 
 		String solverString = prefs.getString(PreferenceConstants.PREF_SOLVER).toUpperCase().replaceAll(" ", "");
@@ -114,6 +117,9 @@ public class PreferencesUtil {
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
 			// Z3Plugin not present
+		} catch (Exception e) {
+			// Some unknown exception finding Z3
+			e.printStackTrace();
 		}
 
 		api.setN(prefs.getInt(PreferenceConstants.PREF_DEPTH));
