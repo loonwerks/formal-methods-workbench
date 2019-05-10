@@ -7,7 +7,7 @@ public
 system Extra
 		
 	properties
-			Props::COMP_TYPE => COMM_DRIVER;
+		Props::COMP_TYPE => COMM_DRIVER;
 
 	
 end Extra;
@@ -59,6 +59,8 @@ system top_level
 --			Props::COMP_TYPE => COMM_DRIVER;
 			
 	annex agree {** 
+	    
+	  eq x : bool = Get_Property(Extra, Props::COMP_TYPE) = Get_Property(Extra, Props::COMP_TYPE);
 	    
 	  eq mode : int;
 		assume "System input range " : Lib::ident(Input) < 10;
