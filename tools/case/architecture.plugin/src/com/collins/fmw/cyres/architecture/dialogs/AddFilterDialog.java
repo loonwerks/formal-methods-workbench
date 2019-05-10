@@ -231,7 +231,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 		return strPropagateGuarantees;
 	}
 
-	public String getResoluteClause() {
+	public String getRequirement() {
 		return strFilterRequirement;
 	}
 

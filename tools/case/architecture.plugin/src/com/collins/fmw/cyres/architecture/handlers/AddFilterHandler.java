@@ -1,18 +1,22 @@
 package com.collins.fmw.cyres.architecture.handlers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
+import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AbstractNamedValue;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
@@ -21,15 +25,19 @@ import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
@@ -69,8 +77,36 @@ public class AddFilterHandler extends AadlHandler {
 			return;
 		}
 
-		// TODO: Make sure the source and destination components are not filters.
+		// Make sure the source and destination components are not filters.
 		// If one (or both) is, they will need to be combined, so alert the user
+		final PortConnection selectedConnection = (PortConnection) eObj;
+		Subcomponent subcomponent = (Subcomponent) selectedConnection.getDestination().getContext();
+		ComponentType comp = subcomponent.getComponentType();
+		if (isFilter(comp)) {
+			if (Dialog.askQuestion("Add Filter",
+					"A CASE Filter cannot be inserted next to another CASE Filter.  Instead, would you like to add a new filter specification to the existing filter?")) {
+				filterAgreeProperty = Dialog.getInput("Add Filter",
+						"Enter the AGREE contract for the new filter specification.", "", null);
+				if (filterAgreeProperty != null) {
+					addFilterSpec(EcoreUtil.getURI(comp));
+				}
+			}
+			return;
+		}
+
+		subcomponent = (Subcomponent) selectedConnection.getSource().getContext();
+		comp = subcomponent.getComponentType();
+		if (isFilter(comp)) {
+			if (Dialog.askQuestion("Add Filter",
+					"A CASE Filter cannot be inserted next to another CASE Filter.  Instead, would you like to add a new filter specification to the existing filter?")) {
+				filterAgreeProperty = Dialog.getInput("Add Filter",
+						"Enter the AGREE contract for the new filter specification.", "", null);
+				if (filterAgreeProperty != null) {
+					addFilterSpec(EcoreUtil.getURI(comp));
+				}
+			}
+			return;
+		}
 
 		// Open wizard to enter filter info
 		final AddFilterDialog wizard = new AddFilterDialog(
@@ -88,7 +124,7 @@ public class AddFilterHandler extends AadlHandler {
 			if (filterImplementationName == "") {
 				filterImplementationName = FILTER_IMPL_NAME;
 			}
-			filterResoluteClause = wizard.getResoluteClause();
+			filterResoluteClause = wizard.getRequirement();
 			filterAgreeProperty = wizard.getAgreeProperty();
 			propagatedGuarantees = wizard.getGuaranteeList();
 		} else {
@@ -209,25 +245,27 @@ public class AddFilterHandler extends AadlHandler {
 				if (!addPropertyAssociation("COMP_TYPE", "FILTER", filterType, casePropSet)) {
 //					return;
 				}
-//				// CASE::COMP_IMPL property
-//				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterType, casePropSet)) {
-////					return;
-//				}
-//				// CASE::COMP_SPEC property
-//				// Parse the ID from the Filter AGREE property
-//				String filterPropId = "";
-//				try {
-//					filterPropId = filterAgreeProperty
-//							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-//									filterAgreeProperty.indexOf("\""))
-//							.trim();
-//
-//				} catch (IndexOutOfBoundsException e) {
-//					// agree property is malformed, so leave blank
-//				}
-//				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
-////					return;
-//				}
+
+				// CASE::COMP_SPEC property
+				// Parse the ID from the Filter AGREE property
+				String filterPropId = "";
+				try {
+					filterPropId = filterAgreeProperty
+							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+									filterAgreeProperty.indexOf("\""))
+							.trim();
+
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed
+					Dialog.showError("Add Filter", "AGREE statement is malformed.");
+					return;
+				}
+
+				if (!filterPropId.isEmpty()) {
+					if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
+//						return;
+					}
+				}
 
 				// Move filter to proper location
 				// (just before component it connects to on communication pathway)
@@ -256,21 +294,6 @@ public class AddFilterHandler extends AadlHandler {
 
 				// CASE::COMP_IMPL property
 				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl, casePropSet)) {
-//					return;
-				}
-				// CASE::COMP_SPEC property
-				// Parse the ID from the Filter AGREE property
-				String filterPropId = "";
-				try {
-					filterPropId = filterAgreeProperty
-							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-									filterAgreeProperty.indexOf("\""))
-							.trim();
-
-				} catch (IndexOutOfBoundsException e) {
-					// agree property is malformed, so leave blank
-				}
-				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterImpl, casePropSet)) {
 //					return;
 				}
 
@@ -394,6 +417,117 @@ public class AddFilterHandler extends AadlHandler {
 			return guarantees;
 		});
 
+	}
+
+	/**
+	 * Determines if the specified component is a CASE filter
+	 * @param comp
+	 */
+	private boolean isFilter(ComponentType comp) {
+		EList<PropertyExpression> propVal = comp.getPropertyValues(CASE_PROPSET_NAME, "COMP_TYPE");
+		if (propVal != null) {
+			for (PropertyExpression expr : propVal) {
+				if (expr instanceof NamedValue) {
+					NamedValue namedVal = (NamedValue) expr;
+					AbstractNamedValue absVal = namedVal.getNamedValue();
+					if (absVal instanceof EnumerationLiteral) {
+						EnumerationLiteral enVal = (EnumerationLiteral) absVal;
+						if (enVal.getName().equalsIgnoreCase("FILTER")) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Adds a new spec to the specified filter
+	 * @param uri
+	 */
+	private void addFilterSpec(URI uri) {
+		// Get the active xtext editor so we can make modifications
+		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+
+		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
+
+			@Override
+			public void process(final XtextResource resource) throws Exception {
+
+				ComponentType filter = (ComponentType) resource.getEObject(uri.fragment());
+
+				String filterPropId = "";
+				try {
+					filterPropId = filterAgreeProperty
+							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+									filterAgreeProperty.indexOf("\""))
+							.trim();
+
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed
+					Dialog.showError("Add Filter", "AGREE statement is malformed.");
+					return;
+				}
+
+				if (filterPropId.isEmpty()) {
+					// agree property id is missing
+					Dialog.showError("Add Filter", "AGREE statements on CASE components require a unique ID.");
+					return;
+				}
+
+				// Add AGREE spec
+				DefaultAnnexSubclause subclause = null;
+				String agreeClauses = "{** **}";
+				for (AnnexSubclause sc : filter.getOwnedAnnexSubclauses()) {
+					if (sc instanceof DefaultAnnexSubclause && sc.getName().equalsIgnoreCase("agree")) {
+						subclause = (DefaultAnnexSubclause) sc;
+						break;
+					}
+				}
+
+				if (subclause != null) {
+					agreeClauses = subclause.getSourceText();
+				}
+
+				// Remove current agree annex. The modified one will be added below.
+				Iterator<AnnexSubclause> i = filter.getOwnedAnnexSubclauses().iterator();
+				while (i.hasNext()) {
+					subclause = (DefaultAnnexSubclause) i.next();
+					if (subclause.getName().equalsIgnoreCase("agree")) {
+						i.remove();
+						break;
+					}
+				}
+				agreeClauses = agreeClauses.replace("**}", filterAgreeProperty + System.lineSeparator() + "**}");
+				DefaultAnnexSubclause newSubclause = (DefaultAnnexSubclause) filter
+						.createOwnedAnnexSubclause(Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
+				newSubclause.setName("agree");
+				newSubclause.setSourceText(agreeClauses);
+
+				// Add AGREE spec ID to COMP_SPEC property
+				// Get current property value
+				String propVal = "";
+				EList<PropertyExpression> propVals = filter.getPropertyValues(CASE_PROPSET_NAME, "COMP_SPEC");
+				if (propVals != null) {
+					for (PropertyExpression expr : propVals) {
+						if (expr instanceof StringLiteral) {
+							propVal += ((StringLiteral) expr).getValue() + ",";
+						}
+					}
+				}
+
+				// Append new spec ID
+				propVal += filterPropId;
+
+				// Write property to filter component
+				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
+						resource.getResourceSet());
+				if (!addPropertyAssociation("COMP_SPEC", propVal, filter, casePropSet)) {
+//						return;
+				}
+			}
+		});
 	}
 
 }

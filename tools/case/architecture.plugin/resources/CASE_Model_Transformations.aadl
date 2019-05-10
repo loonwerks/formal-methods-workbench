@@ -353,10 +353,7 @@ public
 			** "AGREE properties passed" **
 			AgreeLib.hasAgreeProperty(c, property_id) and analysis("AgreeCheck")	
 		
-		-- Ideally, we want to check that there's a filter anywhere between
-		-- pairs of components (such as the ground station and flight planner).
-		-- However, there's a bug in Resolute that prevents us from doing that.
-		-- So for now, we just check to see if there is a filter immediately before 
+		-- Check to see if there is a filter immediately before 
 		-- the component on the communication pathway.
 		filter_exists(c : component) <=
 			** "A filter exists on the communication pathway immediately before " c **
