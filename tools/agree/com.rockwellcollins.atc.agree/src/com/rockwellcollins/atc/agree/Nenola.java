@@ -41,9 +41,9 @@ public class Nenola {
 		public final Map<String, NodeContract> nodeContractMap;
 		public final Map<String, DataContract> typeEnv;
 		public final Map<String, DataContract> valueEnv;
-		public final Map<String, List<DataContract>> nodeEnv;
+		public final Map<String, List<DataContract>> nodeParams;
 		public final Map<String, Map<String, PropVal>> props;
-		public final Optional<String> currentOp;
+		public final Optional<String> currNodeConOp;
 
 		public StaticState(Map<String, NodeContract> nodeContractMap,
 				Map<String, DataContract> types, Map<String, DataContract> values,
@@ -59,35 +59,35 @@ public class Nenola {
 			this.valueEnv = new HashMap<>();
 			this.valueEnv.putAll(values);
 
-			this.nodeEnv = new HashMap<>();
-			this.nodeEnv.putAll(funcs);
+			this.nodeParams = new HashMap<>();
+			this.nodeParams.putAll(funcs);
 
 			this.props = new HashMap<>();
 			this.props.putAll(props);
 
-			this.currentOp = currentOp;
+			this.currNodeConOp = currentOp;
 
 		}
 
 
 		public StaticState newTypes(Map<String, DataContract> types) {
-			return new StaticState(nodeContractMap, types, valueEnv, nodeEnv, props, currentOp);
+			return new StaticState(nodeContractMap, types, valueEnv, nodeParams, props, currNodeConOp);
 		}
 
 		public StaticState newValues(Map<String, DataContract> values) {
-			return new StaticState(nodeContractMap, typeEnv, values, nodeEnv, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, values, nodeParams, props, currNodeConOp);
 		}
 
 		public StaticState newFuncs(Map<String, List<DataContract>> funcs) {
-			return new StaticState(nodeContractMap, typeEnv, valueEnv, funcs, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, valueEnv, funcs, props, currNodeConOp);
 		}
 
 		public StaticState newProps(Map<String, Map<String, PropVal>> props) {
-			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeEnv, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeParams, props, currNodeConOp);
 		}
 
 		public StaticState newCurrentOp(Optional<String> currentOp) {
-			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeEnv, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeParams, props, currentOp);
 		}
 
 	}
@@ -504,7 +504,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			PropVal pv = state.props.get(state.currentOp.get()).get(this.propName);
+			PropVal pv = state.props.get(state.currNodeConOp.get()).get(this.propName);
 			return pv.inferDataContract(state);
 
 		}
@@ -1185,7 +1185,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.nodeEnv.get(fnName).get(0);
+			return state.nodeParams.get(fnName).get(0);
 		}
 
 		@Override
@@ -3342,7 +3342,7 @@ public class Nenola {
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 			Map<String, List<DataContract>> funcs = new HashMap<>();
-			funcs.putAll(state.nodeEnv);
+			funcs.putAll(state.nodeParams);
 			funcs.putAll(getNodeTypes(this.nodeGenMap));
 			StaticState newState = state.newValues(values).newFuncs(funcs).newCurrentOp(Optional.of(this.name));
 
@@ -4113,7 +4113,8 @@ public class Nenola {
 
 		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(boolean isMonolithic) {
 
-			StaticState state = null; // TODO : create initial state
+			StaticState state = new StaticState(this.nodeContractMap, this.types, new HashMap<>(), new HashMap<>(),
+					propMap, Optional.empty());
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
