@@ -4061,21 +4061,21 @@ public class Nenola {
 			return null;
 		}
 
-		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(StaticState state, boolean usingKind2) {
+		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(boolean usingKind2) {
 			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
 
 			if (usingKind2) {
 				programMap.putAll(this.toContractPrograms());
 			} else {
-				programMap.putAll(this.toAssumeGuaranteePrograms(state, true));
+				programMap.putAll(this.toAssumeGuaranteePrograms(true));
 			}
 
 			return programMap;
 		}
 
-		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(StaticState state) {
+		public Map<String, jkind.lustre.Program> toSingleLustrePrograms() {
 			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
-			programMap.putAll(this.toAssumeGuaranteePrograms(state, false));
+			programMap.putAll(this.toAssumeGuaranteePrograms(false));
 			return programMap;
 		}
 
@@ -4085,8 +4085,9 @@ public class Nenola {
 			return null;
 		}
 
-		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(StaticState state, boolean isMonolithic) {
+		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(boolean isMonolithic) {
 
+			StaticState state = null; // TODO : create initial state
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
