@@ -1862,14 +1862,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			stemString = dottedNameToString(e.getStem());
 		} else {
 			throw new AgreeException("Pattern");
-//			=======
-//					while (id.getSub() != null
-//					&& (base instanceof FeatureGroup || base instanceof AadlPackage || base instanceof Subcomponent)) {
-//						jKindVar += base.getName().replace("::", "__") + dotChar;
-//						aadlVar += base.getName() + ".";
-//						id = id.getSub();
-//						base = id.getBase();
-//						>>>>>>> origin/develop
+
 		}
 
 		String tag = e.getTag();

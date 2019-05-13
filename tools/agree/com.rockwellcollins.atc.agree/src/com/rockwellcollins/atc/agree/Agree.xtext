@@ -258,10 +258,10 @@ AddSubExpr returns Expr:
 	MultDivExpr (=> ({BinaryExpr.left=current} op=('+' | '-')) right=MultDivExpr)*;
 
 MultDivExpr returns Expr:
-	PowerExpr (=> ({BinaryExpr.left=current} op=('*' | '/' | 'div' | 'mod')) right=PowerExpr)*;//todo remove div
+	UnaryExpr (=> ({BinaryExpr.left=current} op=('*' | '/' | 'mod')) right=UnaryExpr)*;
 
-PowerExpr returns Expr:
-	UnaryExpr (=> ({BinaryExpr.left=current} op=('^')) right=UnaryExpr)*;
+//PowerExpr returns Expr:
+//	UnaryExpr (=> ({BinaryExpr.left=current} op=('^')) right=UnaryExpr)*;
 
 UnaryExpr returns Expr:
 	{UnaryExpr} op=('-' | 'not') expr=UnaryExpr
@@ -359,10 +359,10 @@ QCPREF:
  
 	
 ReservedVarTag:
-	'_REMOVE'
-|	'_INSERT'
-|	'_COUNT'
-|   '_CLK';
+//	'_REMOVE'
+//|	'_INSERT'
+//|	'_COUNT'
+	'_CLK';
 
 
 NamedID:

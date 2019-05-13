@@ -1725,8 +1725,6 @@ public class AgreeXtext {
 				rator = Nenola.BinRator.Mod;
 			case "div":
 				rator = Nenola.BinRator.Div;
-			case "^":
-				rator = Nenola.BinRator.Pow;
 			}
 
 			return new Nenola.BinExpr(toExprFromExpr(left), rator, toExprFromExpr(right));
