@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -46,32 +47,17 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 
 		// Make sure this instance is a component
 		if (!(evalContext.getThisInstance() instanceof ComponentInstanceImpl)) {
-			throw new ResoluteFailException("Resolute ToolCheck can only be called from a component.",
+			throw new ResoluteFailException("ToolCheck can only be called from a component.",
 					evalContext.getThisInstance());
 		}
 
 		// Get the tool output file
-		String outputFileName = Activator.getDefault()
-				.getPreferenceStore()
-				.getString(arg.getString().toLowerCase() + "OutputFileName");
-
-		if (arg.getString().toLowerCase().equalsIgnoreCase("UofM")) {
-			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/Test_Input_Prioritization.txt";
-		} else if (arg.getString().toLowerCase().equalsIgnoreCase("Marabou")) {
-			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/NN_Formal_Analysis.txt";
-		} else if (arg.getString().toLowerCase().equalsIgnoreCase("?")) {
-			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/Safety_Aware_Constrained_Learning.txt";
-		} else if (arg.getString().toLowerCase().startsWith("apt")) {
-			outputFileName = "C:/Users/ieamunds/Desktop/AAHAA/Demo/APT.txt";
-		} else {
-
-		// TODO: THIS CAN'T BE HARDCODED!!!! GET PREFERENCES WORKING AGAIN
-		outputFileName = "/home/collins/git/formal-methods-workbench/tools/ide/target/products/com.collins.fmw.ide/linux/gtk/x86_64/SWTheory.sml";
-
-		}
+		String toolName = arg.getString().toLowerCase() + "OutputFileName";
+		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
+				toolName, "", null);
 
 		if (outputFileName.isEmpty()) {
-			throw new ResoluteFailException("Resolute ToolCheck could not determine the output file name of the "
+			throw new ResoluteFailException("ToolCheck could not determine the output file name of the "
 					+ arg.getString() + " tool.  It must be specified in the preferences.",
 					evalContext.getThisInstance());
 		}

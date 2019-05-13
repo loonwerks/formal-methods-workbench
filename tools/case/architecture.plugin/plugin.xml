@@ -528,18 +528,18 @@
       </aadlcontribution>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.collins.fmw.cyres.architecture.preferences.CasePreferenceInitializer">
-      </initializer>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
             id="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
             name="CASE">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.collins.fmw.cyres.architecture.preferences.CasePreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>
