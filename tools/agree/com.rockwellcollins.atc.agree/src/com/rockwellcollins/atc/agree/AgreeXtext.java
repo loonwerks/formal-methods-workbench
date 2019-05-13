@@ -52,7 +52,6 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.RangeValue;
 import org.osate.aadl2.RealLiteral;
-import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.annexsupport.AnnexUtil;
@@ -863,7 +862,6 @@ public class AgreeXtext {
 
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(c);
 
-		Map<String, Nenola.PropVal> propAssocs = new HashMap<>();
 		List<Nenola.Connection> connections = new ArrayList<>();
 		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
@@ -902,17 +900,16 @@ public class AgreeXtext {
 		if (ct != null) {
 
 			channels.putAll(extractChannels("", ct));
-			propAssocs.putAll(extractPropAssocMap(ct));
 
 		}
 
 		String name = c.getQualifiedName();
 
-		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, propAssocs, connections, specs, timingMode,
+		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, connections, specs, timingMode,
 				isImpl, c);
 	}
 
-	private static Map<String, PropVal> extractPropAssocMap(ComponentType ct) {
+	private static Map<String, PropVal> extractPropMapFromCompType(ComponentType ct) {
 		Map<String, PropVal> propAssocMap = new HashMap<>();
 		for (PropertyAssociation pa : ct.getOwnedPropertyAssociations()) {
 			String name = pa.getProperty().getQualifiedName();
@@ -921,34 +918,16 @@ public class AgreeXtext {
 			if (v instanceof NamedValue) {
 
 				AbstractNamedValue nv = ((NamedValue) v).getNamedValue();
-				if (nv instanceof EnumerationLiteral) {
-					String val = ((EnumerationLiteral) nv).getName();
-					propAssocMap.put(name, new Nenola.StringPropVal(val));
-
-				} else if (nv instanceof PropertyConstant) {
-					String val = ((PropertyConstant) nv).getName();
-					propAssocMap.put(name, new Nenola.StringPropVal(val));
+				if (nv instanceof PropertyConstant) {
+					String qualName = ((PropertyConstant) nv).getQualifiedName();
+					String valName = ((PropertyConstant) nv).getName();
+					String pkgName = qualName.substring(0, qualName.length() - valName.length() - 2);
+					propAssocMap.put(name, new Nenola.NamedPropVal(pkgName, valName));
 				}
-
-			} else if (v instanceof StringLiteral) {
-				String val = ((StringLiteral) v).getValue();
-				propAssocMap.put(name, new Nenola.StringPropVal(val));
 
 			} else if (v instanceof IntegerLiteral) {
 				long val = ((IntegerLiteral) v).getValue();
 				propAssocMap.put(name, new Nenola.IntPropVal(val));
-
-			} else if (v instanceof ReferenceValue) {
-				String val = ((ReferenceValue) v).getPath().getNamedElement().getName();
-				propAssocMap.put(name, new Nenola.StringPropVal(val));
-
-			} else if (v instanceof ClassifierValue) {
-				String val = ((ClassifierValue) v).getClassifier().getQualifiedName();
-				propAssocMap.put(name, new Nenola.StringPropVal(val));
-
-			} else if (v instanceof BooleanLiteral) {
-				String val = ((BooleanLiteral) v).getValue() + "";
-				propAssocMap.put(name, new Nenola.StringPropVal(val));
 
 			} else if (v instanceof RealLiteral) {
 				double val = ((RealLiteral) v).getValue();
@@ -958,6 +937,36 @@ public class AgreeXtext {
 		}
 
 		throw new RuntimeException();
+	}
+
+	private static Map<String, Map<String, PropVal>> extractPropMapFromCompImp(ComponentImplementation ci) {
+		Map<String, Map<String, PropVal>> result = new HashMap<>();
+
+		{
+			String qualName = ci.getQualifiedName();
+			String name = ci.getName();
+			String pkgName = qualName.substring(0, qualName.length() - name.length() - 2);
+
+			result.put(pkgName, extractPropMapFromCompType(ci.getType()));
+		}
+
+		for (Subcomponent sub : ci.getAllSubcomponents()) {
+
+			Classifier c = sub.getClassifier();
+			if (c instanceof ComponentImplementation) {
+				result.putAll(extractPropMapFromCompImp((ComponentImplementation) c));
+			} else if (c instanceof ComponentType) {
+
+				String qualName = c.getQualifiedName();
+				String name = ci.getName();
+				String pkgName = qualName.substring(0, qualName.length() - name.length() - 2);
+				result.put(pkgName, extractPropMapFromCompType((ComponentType) c));
+			}
+
+		}
+
+		return result;
+
 	}
 
 	public static Nenola.Contract inferContractFromNamedElement(NamedElement ne) {
@@ -2004,12 +2013,14 @@ public class AgreeXtext {
 		Map<String, Nenola.NodeContract> nodeContractMap = extractNodeContractMap(ci);
 		Map<String, Nenola.DataContract> dataContractMap = extractDataContractMap(ci);
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(ci);
+		Map<String, Map<String, PropVal>> props = extractPropMapFromCompImp(ci);
 
 		if (main instanceof Nenola.NodeContract) {
-			return new Nenola.Program((Nenola.NodeContract) main, nodeContractMap, dataContractMap, nodeGenMap);
+			return new Nenola.Program((Nenola.NodeContract) main, nodeContractMap, dataContractMap, nodeGenMap, props);
 		}
 
 		throw new RuntimeException("Component Implementation cannot be converted to Node Contract");
 	}
+
 
 }

@@ -42,13 +42,13 @@ public class Nenola {
 		public final Map<String, DataContract> typeEnv;
 		public final Map<String, DataContract> valueEnv;
 		public final Map<String, List<DataContract>> nodeEnv;
-		public final Map<String, Map<String, DataContract>> props;
+		public final Map<String, Map<String, PropVal>> props;
 		public final Optional<String> currentOp;
 
 		public StaticState(Map<String, NodeContract> nodeContractMap,
 				Map<String, DataContract> types, Map<String, DataContract> values,
 				Map<String, List<DataContract>> funcs,
-				Map<String, Map<String, DataContract>> props,
+				Map<String, Map<String, PropVal>> props,
 				Optional<String> currentOp) {
 			this.nodeContractMap = new HashMap<>();
 			this.nodeContractMap.putAll(nodeContractMap);
@@ -82,7 +82,7 @@ public class Nenola {
 			return new StaticState(nodeContractMap, typeEnv, valueEnv, funcs, props, currentOp);
 		}
 
-		public StaticState newProps(Map<String, Map<String, DataContract>> props) {
+		public StaticState newProps(Map<String, Map<String, PropVal>> props) {
 			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeEnv, props, currentOp);
 		}
 
@@ -380,8 +380,8 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.BinaryExpr(this.e1.toLustreExpr(state), this.rator.toLustreRator(),
+					this.e2.toLustreExpr(state));
 		}
 
 		@Override
@@ -431,8 +431,8 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.IfThenElseExpr(condition.toLustreExpr(state), trueBody.toLustreExpr(state),
+					falseBody.toLustreExpr(state));
 		}
 
 		@Override
@@ -469,8 +469,12 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+
+			jkind.lustre.Expr preExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE, this.body.toLustreExpr(state));
+
+			jkind.lustre.Expr res = new BinaryExpr(this.init.toLustreExpr(state), BinaryOp.ARROW, preExpr);
+
+			return res;
 		}
 
 		@Override
@@ -500,7 +504,9 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.props.get(state.currentOp.get()).get(propName);
+			PropVal pv = state.props.get(state.currentOp.get()).get(this.propName);
+			return pv.inferDataContract(state);
+
 		}
 
 		@Override
@@ -537,7 +543,7 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.props.get(nodeName).get(propName);
+			return state.props.get(nodeName).get(propName).inferDataContract(state);
 		}
 
 		@Override
@@ -3222,21 +3228,20 @@ public class Nenola {
 	}
 
 	public static interface PropVal {
+		DataContract inferDataContract(StaticState state);
 	}
 
-	public static class StringPropVal implements PropVal {
-		public final String val;
-
-		public StringPropVal(String val) {
-			this.val = val;
-		}
-	}
 
 	public static class IntPropVal implements PropVal {
 		public final long val;
 
 		public IntPropVal(long val) {
 			this.val = val;
+		}
+
+		@Override
+		public DataContract inferDataContract(StaticState state) {
+			return Prim.IntContract;
 		}
 	}
 
@@ -3245,6 +3250,26 @@ public class Nenola {
 
 		public RealPropVal(double val) {
 			this.val = val;
+		}
+
+		@Override
+		public DataContract inferDataContract(StaticState state) {
+			return Prim.RealContract;
+		}
+	}
+
+	public static class NamedPropVal implements PropVal {
+		public final String packageName;
+		public final String name;
+
+		public NamedPropVal(String packageName, String name) {
+			this.packageName = packageName;
+			this.name = name;
+		}
+
+		@Override
+		public DataContract inferDataContract(StaticState state) {
+			return state.props.get(packageName).get(name).inferDataContract(state);
 		}
 	}
 
@@ -3264,8 +3289,7 @@ public class Nenola {
 
 
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
-				Map<String, NodeGen> nodeGenMap,
-				Map<String, PropVal> propAssocs, List<Connection> connections, List<Spec> specList,
+				Map<String, NodeGen> nodeGenMap, List<Connection> connections, List<Spec> specList,
 				Optional<TimingMode> timingMode, boolean isImpl,
 				NamedElement namedElement) {
 			this.name = name;
@@ -4042,13 +4066,16 @@ public class Nenola {
 		public final Map<String, NodeContract> nodeContractMap;
 		public final Map<String, DataContract> types;
 		public final Map<String, NodeGen> nodeGenMap;
+		public final Map<String, Map<String, PropVal>> propMap;
 
 		public Program(NodeContract main, Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> types, Map<String, NodeGen> nodeGenMap) {
+				Map<String, DataContract> types, Map<String, NodeGen> nodeGenMap,
+				Map<String, Map<String, PropVal>> propMap) {
 			this.main = main;
 			this.nodeContractMap = nodeContractMap;
 			this.types = types;
 			this.nodeGenMap = nodeGenMap;
+			this.propMap = propMap;
 		}
 
 		public Map<String, jkind.lustre.Program> toRecursiveLustrePrograms() {
@@ -4081,7 +4108,6 @@ public class Nenola {
 
 		private Map<String, jkind.lustre.Program> toContractPrograms() {
 			// TODO Auto-generated method stub
-
 			return null;
 		}
 
@@ -4109,7 +4135,7 @@ public class Nenola {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			Map<String, DataContract> values = new HashMap<>();
 			Map<String, List<DataContract>> funcs = getNodeTypes(this.nodeGenMap);
-			Map<String, Map<String, DataContract>> props = this.getPropTypes();
+			Map<String, Map<String, PropVal>> props = this.propMap;
 			StaticState state = new StaticState(this.nodeContractMap, this.types, values, funcs, props,
 					Optional.empty());
 
@@ -4129,14 +4155,6 @@ public class Nenola {
 			}
 
 			return lustreNodes;
-		}
-
-
-		private Map<String, Map<String, DataContract>> getPropTypes() {
-			for (Entry<String, NodeContract> entry : this.nodeContractMap.entrySet()) {
-				// TODO Auto-generated method stub
-			}
-			return null;
 		}
 
 		private List<Node> toLustreNodesFromNodeGenList() {
