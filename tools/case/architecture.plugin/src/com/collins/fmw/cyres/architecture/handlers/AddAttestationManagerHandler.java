@@ -283,22 +283,21 @@ public class AddAttestationManagerHandler extends AadlHandler {
 //						casePropSet)) {
 ////					return;
 //				}
-//
-//				// CASE_Properties::COMP_SPEC property
-//				// Parse the ID from the Attestation Manager AGREE property
-//				String attestationPropId = "";
-//				try {
-//					attestationPropId = attestationAgreeProperty.substring(
-//							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-//							attestationAgreeProperty.indexOf("\"")).trim();
-//				} catch (IndexOutOfBoundsException e) {
-//					// agree property is malformed, so leave blank
-//				}
-//				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType,
-//						casePropSet)) {
-////					return;
-//				}
-//
+
+				// CASE_Properties::COMP_SPEC property
+				// Parse the ID from the Attestation Manager AGREE property
+				String attestationPropId = "";
+				try {
+					attestationPropId = attestationAgreeProperty.substring(
+							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+							attestationAgreeProperty.indexOf("\"")).trim();
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed, so leave blank
+				}
+				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType, casePropSet)) {
+//					return;
+				}
+
 //				// CASE_Properties::CACHE_TIMEOUT property
 //				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerType, casePropSet)) {
 ////					return;
@@ -346,18 +345,18 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				// CASE_Properties::COMP_SPEC property
 				// Parse the ID from the Attestation Manager AGREE property
-				String attestationPropId = "";
-				try {
-					attestationPropId = attestationAgreeProperty.substring(
-							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-							attestationAgreeProperty.indexOf("\"")).trim();
-				} catch (IndexOutOfBoundsException e) {
-					// agree property is malformed, so leave blank
-				}
-				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerImpl,
-						casePropSet)) {
-//					return;
-				}
+//				String attestationPropId = "";
+//				try {
+//					attestationPropId = attestationAgreeProperty.substring(
+//							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+//							attestationAgreeProperty.indexOf("\"")).trim();
+//				} catch (IndexOutOfBoundsException e) {
+//					// agree property is malformed, so leave blank
+//				}
+//				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerImpl,
+//						casePropSet)) {
+////					return;
+//				}
 
 				// CASE_Properties::CACHE_TIMEOUT property
 				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
