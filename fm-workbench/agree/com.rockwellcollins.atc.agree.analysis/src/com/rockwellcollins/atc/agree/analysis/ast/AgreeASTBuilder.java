@@ -459,6 +459,8 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		for (AgreeStatement statement : lemmas) {
 			allExprIds.addAll(gatherStatementIds(statement));
 		}
+		Set<String> enumLiterals = globalTypes.stream().filter(it -> it instanceof jkind.lustre.EnumType)
+				.flatMap(et -> ((jkind.lustre.EnumType) et).values.stream()).collect(Collectors.toSet());
 		for (String idStr : allExprIds) {
 			if (idStr.contains(dotChar) && !(idStr.endsWith(AgreePatternTranslator.FALL_SUFFIX)
 					|| idStr.endsWith(AgreePatternTranslator.RISE_SUFFIX)
@@ -482,6 +484,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 						found = true;
 						break;
 					}
+				}
+				if (enumLiterals.contains(idStr)) {
+					found = true;
 				}
 				if (!found) {
 					throw new AgreeException(
