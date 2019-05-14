@@ -1844,6 +1844,7 @@ public class AgreeXtext {
 
 		} else if (expr instanceof ArrayUpdateExpr) {
 
+			Nenola.Expr arrayExpr = toExprFromExpr(((ArrayUpdateExpr) expr).getArray());
 			List<Nenola.Expr> indices = new ArrayList<>();
 			for (Expr e : ((ArrayUpdateExpr) expr).getIndices()) {
 				indices.add(toExprFromExpr(e));
@@ -1853,7 +1854,7 @@ public class AgreeXtext {
 			for (Expr e : ((ArrayUpdateExpr) expr).getValueExprs()) {
 				elements.add(toExprFromExpr(e));
 			}
-			return new Nenola.ArrayUpdate(indices, elements);
+			return new Nenola.ArrayUpdate(arrayExpr, indices, elements);
 
 
 		} else if (expr instanceof RecordLitExpr) {

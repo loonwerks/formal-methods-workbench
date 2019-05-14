@@ -16,9 +16,11 @@ import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
 
+import jkind.lustre.ArrayExpr;
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.BoolExpr;
+import jkind.lustre.CastExpr;
 import jkind.lustre.EnumType;
 import jkind.lustre.Equation;
 import jkind.lustre.IfThenElseExpr;
@@ -511,8 +513,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return state.props.get(state.currNodeConOp.get()).get(propName).toLustreExpr();
 		}
 
 		@Override
@@ -548,8 +549,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return state.props.get(nodeName).get(propName).toLustreExpr();
 		}
 
 		@Override
@@ -583,8 +583,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.IntExpr(Integer.parseInt(val));
 		}
 
 		@Override
@@ -618,8 +617,8 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			BigDecimal bd = BigDecimal.valueOf(Double.parseDouble(val));
+			return new jkind.lustre.RealExpr(bd);
 		}
 
 		@Override
@@ -653,8 +652,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.BoolExpr(val);
 		}
 
 		@Override
@@ -723,8 +721,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new CastExpr(NamedType.INT, arg.toLustreExpr(state));
 		}
 
 		@Override
@@ -758,8 +755,9 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			jkind.lustre.IdExpr nestIdExpr = (jkind.lustre.IdExpr) arg.toLustreExpr(state);
+			String latchedStr = nestIdExpr.id + "__LATCHED_";
+			return new jkind.lustre.IdExpr(latchedStr);
 		}
 
 		@Override
@@ -793,8 +791,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.UnaryExpr(UnaryOp.PRE, arg.toLustreExpr(state));
 		}
 
 		@Override
@@ -828,8 +825,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.IdExpr(arg + "___EVENT_");
 		}
 
 		@Override
@@ -863,8 +859,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.IdExpr(Lustre.getTimeOfVar(arg).id);
 		}
 
 		@Override
@@ -898,8 +893,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.IdExpr(Lustre.getTimeRiseVar(arg).id);
 		}
 
 		@Override
@@ -933,8 +927,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.IdExpr(Lustre.getTimeFallVar(arg).id);
 		}
 
 		@Override
@@ -967,8 +960,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return Lustre.timeExpr;
 		}
 
 		@Override
@@ -1005,8 +997,8 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			String typeStr = this.contractName.replace("::", "__").replace(".", "_");
+			return new jkind.lustre.IdExpr(typeStr + "_" + this.variantName);
 		}
 
 		@Override
@@ -1040,8 +1032,11 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Expr> elems = new ArrayList<>();
+			for (Expr agreeElem : this.elements) {
+				elems.add(agreeElem.toLustreExpr(state));
+			}
+			return new ArrayExpr(elems);
 		}
 
 		@Override
@@ -1062,10 +1057,12 @@ public class Nenola {
 	}
 
 	public static class ArrayUpdate implements Expr {
+		public final Expr arrayExpr;
 		public final List<Expr> indices;
 		public final List<Expr> elements;
 
-		public ArrayUpdate(List<Expr> indices, List<Expr> elements) {
+		public ArrayUpdate(Expr arrayExpr, List<Expr> indices, List<Expr> elements) {
+			this.arrayExpr = arrayExpr;
 			this.indices = indices;
 			this.elements = elements;
 		}
@@ -1077,8 +1074,14 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			jkind.lustre.Expr arrayExpr = this.arrayExpr.toLustreExpr(state);
+			for (int i = 0; i < this.indices.size(); i++) {
+				jkind.lustre.Expr indexExpr = this.indices.get(i).toLustreExpr(state);
+				jkind.lustre.Expr newExpr = this.elements.get(i).toLustreExpr(state);
+				arrayExpr = new jkind.lustre.ArrayUpdateExpr(arrayExpr, indexExpr, newExpr);
+
+			}
+			return arrayExpr;
 		}
 
 		@Override
@@ -1114,8 +1117,18 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			Map<String, jkind.lustre.Expr> argExprMap = new HashMap<>();
+
+			for (Entry<String, Expr> entry : this.fields.entrySet()) {
+				jkind.lustre.Expr lustreExpr = entry.getValue().toLustreClockedExpr(state);
+				String argName = entry.getKey();
+
+				argExprMap.put(argName, lustreExpr);
+
+			}
+
+			String recName = contractName.replace("::", "__").replace(".", "_");
+			return new jkind.lustre.RecordExpr(recName, argExprMap);
 		}
 
 		@Override
@@ -1153,8 +1166,8 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new jkind.lustre.RecordUpdateExpr(record.toLustreExpr(state), selector,
+					element.toLustreExpr(state));
 		}
 
 		@Override
@@ -3229,6 +3242,8 @@ public class Nenola {
 
 	public static interface PropVal {
 		DataContract inferDataContract(StaticState state);
+
+		jkind.lustre.Expr toLustreExpr();
 	}
 
 
@@ -3243,6 +3258,12 @@ public class Nenola {
 		public DataContract inferDataContract(StaticState state) {
 			return Prim.IntContract;
 		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class RealPropVal implements PropVal {
@@ -3255,6 +3276,12 @@ public class Nenola {
 		@Override
 		public DataContract inferDataContract(StaticState state) {
 			return Prim.RealContract;
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -3270,6 +3297,12 @@ public class Nenola {
 		@Override
 		public DataContract inferDataContract(StaticState state) {
 			return state.props.get(packageName).get(name).inferDataContract(state);
+		}
+
+		@Override
+		public jkind.lustre.Expr toLustreExpr() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
