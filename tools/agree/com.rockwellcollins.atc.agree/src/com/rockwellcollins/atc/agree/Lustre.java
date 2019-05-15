@@ -6,18 +6,30 @@ import static jkind.lustre.parsing.LustreParseUtil.to;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
+import jkind.lustre.ArrayAccessExpr;
+import jkind.lustre.ArrayExpr;
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.BoolExpr;
+import jkind.lustre.CastExpr;
+import jkind.lustre.CondactExpr;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
+import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.IfThenElseExpr;
+import jkind.lustre.IntExpr;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
+import jkind.lustre.RecordAccessExpr;
+import jkind.lustre.RecordExpr;
+import jkind.lustre.TupleExpr;
 import jkind.lustre.UnaryExpr;
 import jkind.lustre.UnaryOp;
 import jkind.lustre.VarDecl;
@@ -245,6 +257,120 @@ public class Lustre {
 
 		builder.addEquation(new Equation(ret, ifANeg));
 		return builder.build();
+	}
+
+	public static Expr substitute(Expr context, String name, Expr newExpr) {
+
+		if (context instanceof IdExpr) {
+			if (((IdExpr) context).id.equals(name)) {
+				return newExpr;
+			} else {
+				return context;
+			}
+		} else if (context instanceof ArrayAccessExpr) {
+
+			Expr arrayExpr = substitute(((ArrayAccessExpr) context).array, name, newExpr);
+			Expr indexExpr = substitute(((ArrayAccessExpr) context).index, name, newExpr);
+			return new ArrayAccessExpr(arrayExpr, indexExpr);
+
+		} else if (context instanceof ArrayExpr) {
+			List<Expr> elems = new ArrayList<>();
+			for (Expr raw : ((ArrayExpr) context).elements) {
+				Expr elem = substitute(raw, name, newExpr);
+				elems.add(elem);
+			}
+			return new ArrayExpr(elems);
+
+		} else if (context instanceof jkind.lustre.ArrayUpdateExpr) {
+			Expr arrayExpr = substitute(((jkind.lustre.ArrayUpdateExpr) context).array, name, newExpr);
+			Expr indexExpr = substitute(((jkind.lustre.ArrayUpdateExpr) context).index, name, newExpr);
+			Expr valExpr = substitute(((jkind.lustre.ArrayUpdateExpr) context).value, name, newExpr);
+			return new jkind.lustre.ArrayUpdateExpr(arrayExpr, indexExpr, valExpr);
+
+		} else if (context instanceof BinaryExpr) {
+			Expr left = substitute(((BinaryExpr) context).left, name, newExpr);
+			Expr right = substitute(((BinaryExpr) context).right, name, newExpr);
+			return new BinaryExpr(left, ((BinaryExpr) context).op, right);
+
+		} else if (context instanceof BoolExpr) {
+			return context;
+		} else if (context instanceof CastExpr) {
+			Expr expr = substitute(((CastExpr) context).expr, name, newExpr);
+			return new CastExpr(((CastExpr) context).type, expr);
+		} else if (context instanceof CondactExpr) {
+			Expr clock = substitute(((CondactExpr) context).clock, name, newExpr);
+			Expr call = substitute(((CondactExpr) context).call, name, newExpr);
+			List<Expr> args = new ArrayList<>();
+			for (Expr raw : ((CondactExpr) context).args) {
+				Expr arg = substitute(raw, name, newExpr);
+				args.add(arg);
+			}
+			return new CondactExpr(clock, (NodeCallExpr) call, args);
+
+		} else if (context instanceof FunctionCallExpr) {
+			List<Expr> args = new ArrayList<>();
+			for (Expr raw : ((FunctionCallExpr) context).args) {
+				Expr arg = substitute(raw, name, newExpr);
+				args.add(arg);
+			}
+			return new FunctionCallExpr(((FunctionCallExpr) context).function, args);
+
+		} else if (context instanceof IfThenElseExpr) {
+			Expr cond = substitute(((IfThenElseExpr) context).cond, name, newExpr);
+			Expr thenExpr = substitute(((IfThenElseExpr) context).thenExpr, name, newExpr);
+			Expr elseExpr = substitute(((IfThenElseExpr) context).elseExpr, name, newExpr);
+			return new IfThenElseExpr(cond, thenExpr, elseExpr);
+
+		} else if (context instanceof IntExpr) {
+			return context;
+
+		} else if (context instanceof NodeCallExpr) {
+			List<Expr> args = new ArrayList<>();
+			for (Expr raw : ((NodeCallExpr) context).args) {
+				Expr arg = substitute(raw, name, newExpr);
+				args.add(arg);
+			}
+			return new FunctionCallExpr(((NodeCallExpr) context).node, args);
+
+		} else if (context instanceof RealExpr) {
+			return context;
+
+		} else if (context instanceof RecordAccessExpr) {
+			Expr rec = substitute(((RecordAccessExpr) context).record, name, newExpr);
+			return new RecordAccessExpr(rec, ((RecordAccessExpr) context).field);
+
+		} else if (context instanceof RecordExpr) {
+
+			Map<String, Expr> fields = new TreeMap<>();
+			for (Entry<String, Expr> raw : ((RecordExpr) context).fields.entrySet()) {
+				String key = raw.getKey();
+				Expr fieldExpr = substitute(raw.getValue(), name, newExpr);
+				fields.put(key, fieldExpr);
+			}
+
+			return new RecordExpr(((RecordExpr) context).id, fields);
+
+		} else if (context instanceof jkind.lustre.RecordUpdateExpr) {
+
+			Expr rec = substitute(((jkind.lustre.RecordUpdateExpr) context).record, name, newExpr);
+			Expr valueExpr = substitute(((jkind.lustre.RecordUpdateExpr) context).value, name, newExpr);
+			return new jkind.lustre.RecordUpdateExpr(rec, ((jkind.lustre.RecordUpdateExpr) context).field, valueExpr);
+
+		} else if (context instanceof TupleExpr) {
+
+			List<Expr> elems = new ArrayList<>();
+			for (Expr raw : ((TupleExpr) context).elements) {
+				Expr elem = substitute(raw, name, newExpr);
+				elems.add(elem);
+			}
+			return new TupleExpr(elems);
+
+		} else if (context instanceof UnaryExpr) {
+			Expr expr = substitute(((UnaryExpr) context).expr, name, newExpr);
+			return new UnaryExpr(((UnaryExpr) context).op, expr);
+		}
+
+		throw new RuntimeException("Error: substitute - " + context);
 	}
 
 	public final static String statVarPrefix = "_STATE";

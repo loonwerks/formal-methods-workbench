@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import org.osate.aadl2.NamedElement;
 
+import jkind.lustre.ArrayAccessExpr;
 import jkind.lustre.ArrayExpr;
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
@@ -24,6 +25,7 @@ import jkind.lustre.CastExpr;
 import jkind.lustre.EnumType;
 import jkind.lustre.Equation;
 import jkind.lustre.IfThenElseExpr;
+import jkind.lustre.IntExpr;
 import jkind.lustre.Location;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
@@ -1261,8 +1263,9 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			assert (this.rator != UniRator.Pre);
+
+			return new jkind.lustre.UnaryExpr(this.rator.toLustreRator(), rand.toLustreExpr(state));
 		}
 
 		@Override
@@ -1343,8 +1346,9 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			jkind.lustre.Expr index = this.index.toLustreExpr(state);
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			return new ArrayAccessExpr(array, index);
 		}
 
 		@Override
@@ -1379,8 +1383,18 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			Nenola.Contract arrayTypeDef = array.inferDataContract(state);
+
+			if (arrayTypeDef instanceof Nenola.ArrayContract) {
+				int size = ((Nenola.ArrayContract) arrayTypeDef).size;
+				List<jkind.lustre.Expr> elems = new ArrayList<>();
+				for (int i = 0; i < size; i++) {
+					elems.add(new IntExpr(i));
+				}
+
+				return new ArrayExpr(elems);
+			}
+			throw new RuntimeException("Error caseIndicesExpr");
 		}
 
 		@Override
@@ -1420,8 +1434,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
+
+			int size = 0;
+			if (agreeType instanceof Nenola.ArrayContract) {
+				size = ((Nenola.ArrayContract) agreeType).size;
+			} else {
+				throw new RuntimeException("ERROR: caseForallExpr - '" + agreeType.getClass() + "' not handled");
+			}
+			jkind.lustre.Expr final_expr = new BoolExpr(true);
+
+			for (int i = 0; i < size; ++i) {
+				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
+				jkind.lustre.Expr body = Lustre.substitute(this.body.toLustreExpr(state), binding, arrayAccess);
+				final_expr = Lustre.makeANDExpr(final_expr, body);
+			}
+
+			return final_expr;
 		}
 
 		@Override
@@ -1460,8 +1490,24 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
+			int size = 0;
+			if (agreeType instanceof Nenola.ArrayContract) {
+				size = ((Nenola.ArrayContract) agreeType).size;
+			} else {
+				throw new RuntimeException("ERROR: caseExistsExpr - '" + agreeType.getClass() + "' not handled");
+			}
+			jkind.lustre.Expr final_expr = new BoolExpr(true);
+
+			for (int i = 0; i < size; ++i) {
+				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
+				jkind.lustre.Expr body = Lustre.substitute(this.body.toLustreExpr(state), binding, arrayAccess);
+				final_expr = Lustre.makeORExpr(final_expr, body);
+			}
+
+			return final_expr;
 		}
 
 		@Override
@@ -1506,8 +1552,30 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
+			int size = 0;
+			if (agreeType instanceof Nenola.ArrayContract) {
+				size = ((Nenola.ArrayContract) agreeType).size;
+			} else {
+				throw new RuntimeException("ERROR: caseFlatmapExpr");
+			}
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			List<jkind.lustre.Expr> elems = new ArrayList<>();
+			for (int i = 0; i < size; ++i) {
+				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
+				jkind.lustre.Expr body = Lustre.substitute(this.body.toLustreExpr(state), binding, arrayAccess);
+
+				Nenola.Contract innerArrType = this.body.inferDataContract(state);
+				if (innerArrType instanceof Nenola.ArrayContract) {
+					int innerSize = ((Nenola.ArrayContract) innerArrType).size;
+					for (int j = 0; j < innerSize; j++) {
+						jkind.lustre.Expr innerAccess = new ArrayAccessExpr(body, j);
+						elems.add(innerAccess);
+					}
+				}
+
+			}
+			return new ArrayExpr(elems);
 		}
 
 		@Override
@@ -1550,8 +1618,22 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
+
+			int size = 0;
+			if (agreeType instanceof Nenola.ArrayContract) {
+				size = ((Nenola.ArrayContract) agreeType).size;
+			} else {
+				throw new RuntimeException("ERROR: caseFoldLeftExpr");
+			}
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			jkind.lustre.Expr accExpr = this.initial.toLustreExpr(state);
+			for (int i = 0; i < size; i++) {
+				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
+				accExpr = Lustre.substitute(Lustre.substitute(this.update.toLustreExpr(state), binding, arrayAccess),
+						this.acc, accExpr);
+			}
+			return accExpr;
 		}
 
 		@Override
@@ -1595,8 +1677,22 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
+
+			int size = 0;
+			if (agreeType instanceof Nenola.ArrayContract) {
+				size = ((Nenola.ArrayContract) agreeType).size;
+			} else {
+				throw new RuntimeException("ERROR: caseFoldRightExpr");
+			}
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			jkind.lustre.Expr accExpr = this.initial.toLustreExpr(state);
+			for (int i = size - 1; i >= 0; i--) {
+				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
+				accExpr = Lustre.substitute(Lustre.substitute(this.update.toLustreExpr(state), binding, arrayAccess),
+						this.acc, accExpr);
+			}
+			return accExpr;
 		}
 
 		@Override
