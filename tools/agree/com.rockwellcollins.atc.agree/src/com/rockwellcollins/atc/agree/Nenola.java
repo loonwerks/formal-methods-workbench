@@ -42,14 +42,16 @@ public class Nenola {
 
 		public final Map<String, NodeContract> nodeContractMap;
 		public final Map<String, DataContract> typeEnv;
+		public final Map<String, NodeGen> globalNodeGenEnv;
 		public final Map<String, DataContract> valueEnv;
-		public final Map<String, List<DataContract>> nodeParams;
+		public final Map<String, NodeGen> localNodeGenEnv;
 		public final Map<String, Map<String, PropVal>> props;
 		public final Optional<String> currNodeConOp;
 
 		public StaticState(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> types, Map<String, DataContract> values,
-				Map<String, List<DataContract>> funcs,
+				Map<String, DataContract> types, Map<String, NodeGen> globalNodeGenEnv,
+				Map<String, DataContract> values,
+				Map<String, NodeGen> localNodeGenEnv,
 				Map<String, Map<String, PropVal>> props,
 				Optional<String> currentOp) {
 			this.nodeContractMap = new HashMap<>();
@@ -58,11 +60,14 @@ public class Nenola {
 			this.typeEnv = new HashMap<>();
 			this.typeEnv.putAll(types);
 
+			this.globalNodeGenEnv = new HashMap<>();
+			this.globalNodeGenEnv.putAll(globalNodeGenEnv);
+
 			this.valueEnv = new HashMap<>();
 			this.valueEnv.putAll(values);
 
-			this.nodeParams = new HashMap<>();
-			this.nodeParams.putAll(funcs);
+			this.localNodeGenEnv = new HashMap<>();
+			this.localNodeGenEnv.putAll(localNodeGenEnv);
 
 			this.props = new HashMap<>();
 			this.props.putAll(props);
@@ -73,23 +78,28 @@ public class Nenola {
 
 
 		public StaticState newTypes(Map<String, DataContract> types) {
-			return new StaticState(nodeContractMap, types, valueEnv, nodeParams, props, currNodeConOp);
+			return new StaticState(nodeContractMap, types, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
+					currNodeConOp);
 		}
 
 		public StaticState newValues(Map<String, DataContract> values) {
-			return new StaticState(nodeContractMap, typeEnv, values, nodeParams, props, currNodeConOp);
+			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, values, localNodeGenEnv, props,
+					currNodeConOp);
 		}
 
-		public StaticState newFuncs(Map<String, List<DataContract>> funcs) {
-			return new StaticState(nodeContractMap, typeEnv, valueEnv, funcs, props, currNodeConOp);
+		public StaticState newLocalNodeGenEnv(Map<String, NodeGen> localNodeGenEnv) {
+			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
+					currNodeConOp);
 		}
 
 		public StaticState newProps(Map<String, Map<String, PropVal>> props) {
-			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeParams, props, currNodeConOp);
+			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
+					currNodeConOp);
 		}
 
 		public StaticState newCurrentOp(Optional<String> currentOp) {
-			return new StaticState(nodeContractMap, typeEnv, valueEnv, nodeParams, props, currentOp);
+			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
+					currentOp);
 		}
 
 	}
@@ -686,8 +696,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			return new CastExpr(NamedType.INT, arg.toLustreExpr(state));
 		}
 
 		@Override
@@ -1198,13 +1207,25 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			return state.nodeParams.get(fnName).get(0);
+			return Nenola.getNodeTypes(state.localNodeGenEnv.get(fnName)).get(0);
 		}
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Expr> argResults = new ArrayList<>();
+
+			for (Expr argExpr : this.args) {
+				argResults.add(argExpr.toLustreExpr(state));
+			}
+
+			String lustreName = null;
+			if (state.globalNodeGenEnv.containsKey(fnName)) {
+				lustreName = fnName.replace("::", "__");
+			} else if (state.localNodeGenEnv.containsKey(fnName)) {
+				lustreName = state.currNodeConOp.get().replace("::", "__") + "__" + fnName.replace("::", "__");
+			}
+
+			return new NodeCallExpr((lustreName), argResults);
 		}
 
 		@Override
@@ -3374,10 +3395,7 @@ public class Nenola {
 			Map<String, DataContract> values = new HashMap<>();
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
-			Map<String, List<DataContract>> funcs = new HashMap<>();
-			funcs.putAll(state.nodeParams);
-			funcs.putAll(getNodeTypes(this.nodeGenMap));
-			StaticState newState = state.newValues(values).newFuncs(funcs).newCurrentOp(Optional.of(this.name));
+			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap).newCurrentOp(Optional.of(this.name));
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
@@ -4071,6 +4089,17 @@ public class Nenola {
 		return nodes;
 	}
 
+	private static List<DataContract> getNodeTypes(NodeGen ng) {
+
+		List<DataContract> nodeTypes = new ArrayList<>();
+		for (Channel c : ng.channels.values()) {
+			if (c.direction instanceof Nenola.Out) {
+				nodeTypes.add(c.dataContract);
+			}
+		}
+		return nodeTypes;
+	}
+
 	private static Map<String, List<DataContract>> getNodeTypes(Map<String, NodeGen> nodeGenMap) {
 		Map<String, List<DataContract>> result = new HashMap<>();
 
@@ -4079,14 +4108,7 @@ public class Nenola {
 			String name = entry.getKey();
 			NodeGen ng = entry.getValue();
 
-			List<DataContract> nodeTypes = new ArrayList<>();
-			for (Channel c : ng.channels.values()) {
-				if (c.direction instanceof Nenola.Out) {
-					nodeTypes.add(c.dataContract);
-				}
-			}
-
-			result.put(name, nodeTypes);
+			result.put(name, getNodeTypes(ng));
 
 		}
 
@@ -4146,7 +4168,8 @@ public class Nenola {
 
 		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(boolean isMonolithic) {
 
-			StaticState state = new StaticState(this.nodeContractMap, this.types, new HashMap<>(), new HashMap<>(),
+			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
+					new HashMap<>(),
 					propMap, Optional.empty());
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
@@ -4168,9 +4191,9 @@ public class Nenola {
 		private List<Node> toLustreClockedNodesFromNodeGenList() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			Map<String, DataContract> values = new HashMap<>();
-			Map<String, List<DataContract>> funcs = getNodeTypes(this.nodeGenMap);
 			Map<String, Map<String, PropVal>> props = this.propMap;
-			StaticState state = new StaticState(this.nodeContractMap, this.types, values, funcs, props,
+			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, values,
+					new HashMap<>(), props,
 					Optional.empty());
 
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
