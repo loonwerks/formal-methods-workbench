@@ -4115,6 +4115,16 @@ public class Nenola {
 			this.tgts = Collections.singletonList(tgt);
 			this.src = src;
 		}
+
+		public Equation toLustreEquation(StaticState state) {
+
+			jkind.lustre.Expr expr = src.toLustreExpr(state);
+			List<jkind.lustre.IdExpr> ids = new ArrayList<>();
+			for (String tgt : tgts) {
+				ids.add(new jkind.lustre.IdExpr(tgt));
+			}
+			return new Equation(ids, expr);
+		}
 	}
 
 	public static class NodeGen {
@@ -4131,24 +4141,78 @@ public class Nenola {
 			this.properties = properties;
 		}
 
-		public Node toLustreNode() {
-			// TODO Auto-generated method stub
+		public Node toLustreNode(StaticState state) {
+
+			List<VarDecl> inputs = this.toLustreInputlList();
+			List<VarDecl> outputs = this.toLustreOutputlList();
+			List<VarDecl> internals = this.toLustreLocallList();
+			List<Equation> eqs = this.toLustreEquations(state);
+			List<String> props = this.properties;
+
+			NodeBuilder builder = new NodeBuilder(this.name);
+			builder.addInputs(inputs);
+			builder.addOutputs(outputs);
+			builder.addLocals(internals);
+			builder.addEquations(eqs);
+			builder.addProperties(props);
+
+			return builder.build();
+		}
+
+
+		private List<Equation> toLustreEquations(StaticState state) {
+			List<Equation> equations = new ArrayList<>();
+			for (DataFlow df : this.dataFlows) {
+				equations.add(df.toLustreEquation(state));
+			}
+			return equations;
+		}
+
+		private List<VarDecl> toLustreInputlList() {
+
+			for (Channel c : this.channels.values()) {
+				if (c.direction instanceof Nenola.In) {
+					// TODO Auto-generated method stub
+
+				}
+			}
 			return null;
 		}
 
+		private List<VarDecl> toLustreOutputlList() {
+
+			for (Channel c : this.channels.values()) {
+				if (c.direction instanceof Nenola.Out) {
+					// TODO Auto-generated method stub
+
+				}
+			}
+			return null;
+		}
+
+		private List<VarDecl> toLustreLocallList() {
+
+			for (Channel c : this.channels.values()) {
+				if (c.direction instanceof Nenola.Bi) {
+					// TODO Auto-generated method stub
+
+				}
+			}
+			return null;
+		}
 
 		private Optional<Node> clockedNodeMap = Optional.empty();
 
 		public Node toLustreClockedNode(StaticState state) {
 			if (!clockedNodeMap.isPresent()) {
 
-				NodeBuilder builder = new NodeBuilder(this.toLustreNode());
-				builder.setId(Lustre.clockedNodePrefix + this.toLustreNode().id);
+				NodeBuilder builder = new NodeBuilder(this.toLustreNode(state));
+				builder.setId(Lustre.clockedNodePrefix + this.toLustreNode(state).id);
 				builder.clearEquations();
 				builder.clearInputs();
 				builder.addInput(new VarDecl(Lustre.clockVarName, NamedType.BOOL));
 				builder.addInput(new VarDecl(Lustre.initVarName, NamedType.BOOL));
-				builder.addInputs(this.toLustreNode().inputs);
+				builder.addInputs(this.toLustreNode(state).inputs);
 
 
 				for (DataFlow df : this.dataFlows) {
@@ -4269,7 +4333,7 @@ public class Nenola {
 					propMap, Optional.empty());
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
-			lustreNodes.addAll(this.toLustreNodesFromNodeGenList());
+			lustreNodes.addAll(this.toLustreNodesFromNodeGenList(state));
 			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGenList());
 			lustreNodes.addAll(Nenola.lustreNodesFromMain(state, main, isMonolithic));
 
@@ -4310,11 +4374,11 @@ public class Nenola {
 			return lustreNodes;
 		}
 
-		private List<Node> toLustreNodesFromNodeGenList() {
+		private List<Node> toLustreNodesFromNodeGenList(StaticState state) {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
-				jkind.lustre.Node lustreNode = nodeGen.toLustreNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreNode(state);
 				lustreNodes.add(lustreNode);
 
 			}
