@@ -1,11 +1,11 @@
 package com.rockwellcollins.atc.agree;
 
-
 import static jkind.lustre.parsing.LustreParseUtil.equation;
 import static jkind.lustre.parsing.LustreParseUtil.expr;
 import static jkind.lustre.parsing.LustreParseUtil.to;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,11 +50,9 @@ public class Nenola {
 		public final Map<String, Map<String, PropVal>> props;
 		public final Optional<String> currNodeConOp;
 
-		public StaticState(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> types, Map<String, NodeGen> globalNodeGenEnv,
-				Map<String, DataContract> values,
-				Map<String, NodeGen> localNodeGenEnv,
-				Map<String, Map<String, PropVal>> props,
+		public StaticState(Map<String, NodeContract> nodeContractMap, Map<String, DataContract> types,
+				Map<String, NodeGen> globalNodeGenEnv, Map<String, DataContract> values,
+				Map<String, NodeGen> localNodeGenEnv, Map<String, Map<String, PropVal>> props,
 				Optional<String> currentOp) {
 			this.nodeContractMap = new HashMap<>();
 			this.nodeContractMap.putAll(nodeContractMap);
@@ -77,7 +75,6 @@ public class Nenola {
 			this.currNodeConOp = currentOp;
 
 		}
-
 
 		public StaticState newTypes(Map<String, DataContract> types) {
 			return new StaticState(nodeContractMap, types, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
@@ -105,7 +102,6 @@ public class Nenola {
 		}
 
 	}
-
 
 	public static enum BinRator {
 		Equal, StreamCons, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod;
@@ -249,14 +245,12 @@ public class Nenola {
 
 	}
 
-
 	public static class IdExpr implements Expr {
 		public final String name;
 
 		public IdExpr(String name) {
 			this.name = name;
 		}
-
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
@@ -354,7 +348,7 @@ public class Nenola {
 		public DataContract inferDataContract(StaticState state) {
 
 			switch (this.rator) {
-			case Equal :
+			case Equal:
 				return this.e1.inferDataContract(state);
 			case StreamCons:
 				return this.e1.inferDataContract(state);
@@ -475,7 +469,6 @@ public class Nenola {
 			this.init = init;
 		}
 
-
 		@Override
 		public DataContract inferDataContract(StaticState state) {
 			return this.init.inferDataContract(state);
@@ -515,7 +508,6 @@ public class Nenola {
 			this.propName = propName;
 		}
 
-
 		@Override
 		public DataContract inferDataContract(StaticState state) {
 			PropVal pv = state.props.get(state.currNodeConOp.get()).get(this.propName);
@@ -525,7 +517,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			return state.props.get(state.currNodeConOp.get()).get(propName).toLustreExpr();
+			return state.props.get(state.currNodeConOp.get()).get(propName).toLustreExpr(state);
 		}
 
 		@Override
@@ -561,7 +553,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			return state.props.get(nodeName).get(propName).toLustreExpr();
+			return state.props.get(nodeName).get(propName).toLustreExpr(state);
 		}
 
 		@Override
@@ -1177,8 +1169,7 @@ public class Nenola {
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			return new jkind.lustre.RecordUpdateExpr(record.toLustreExpr(state), selector,
-					element.toLustreExpr(state));
+			return new jkind.lustre.RecordUpdateExpr(record.toLustreExpr(state), selector, element.toLustreExpr(state));
 		}
 
 		@Override
@@ -1301,7 +1292,6 @@ public class Nenola {
 
 		}
 
-
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 
@@ -1411,7 +1401,6 @@ public class Nenola {
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
-
 
 	}
 
@@ -1651,7 +1640,6 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
-
 	}
 
 	public static class FoldRightExpr implements Expr {
@@ -1712,7 +1700,6 @@ public class Nenola {
 
 	}
 
-
 	public static interface Prop {
 
 	}
@@ -1733,7 +1720,6 @@ public class Nenola {
 			this.pattern = pattern;
 		}
 	}
-
 
 	public static interface Pattern {
 		public jkind.lustre.Expr toLustreExprProperty(StaticState state);
@@ -1770,7 +1756,6 @@ public class Nenola {
 
 	}
 
-
 	public static class AlwaysPattern implements Pattern {
 
 		public final Expr expr;
@@ -1778,7 +1763,6 @@ public class Nenola {
 		public AlwaysPattern(Expr expr) {
 			this.expr = expr;
 		}
-
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
@@ -1884,7 +1868,6 @@ public class Nenola {
 		public final boolean exclusive;
 		public final Interval effectInterval;
 
-
 		public WhenHoldsPattern(Expr causeCondition, Interval causeInterval, Expr effectEvent, boolean exclusive,
 				Interval effectInterval) {
 			this.causeCondition = causeCondition;
@@ -1939,8 +1922,7 @@ public class Nenola {
 
 				jkind.lustre.Expr rise = new NodeCallExpr("__Rise", new jkind.lustre.IdExpr(lustreCauseCondition.id));
 				jkind.lustre.Expr timeVarExpr = expr("timeRise = (if rise then time else (-1.0 -> pre timeRise))",
-						to("timeRise", causeRiseTimeVar.id), to("rise", rise),
-						to("time", Lustre.timeExpr));
+						to("timeRise", causeRiseTimeVar.id), to("rise", rise), to("time", Lustre.timeExpr));
 				assertList.add(timeVarExpr);
 
 				jkind.lustre.Expr lemmaExpr = expr("timeRise <= time and timeRise >= -1.0",
@@ -1954,8 +1936,7 @@ public class Nenola {
 
 				jkind.lustre.Expr Fall = new NodeCallExpr("__Fall", new jkind.lustre.IdExpr(lustreCauseCondition.id));
 				jkind.lustre.Expr timeVarExpr = expr("timeFall = (if Fall then time else (-1.0 -> pre timeFall))",
-						to("timeFall", causeFallTimeVar.id), to("Fall", Fall),
-						to("time", Lustre.timeExpr));
+						to("timeFall", causeFallTimeVar.id), to("Fall", Fall), to("time", Lustre.timeExpr));
 				assertList.add(timeVarExpr);
 
 				jkind.lustre.Expr lemmaExpr = expr("timeFall <= time and timeFall >= -1.0",
@@ -2073,8 +2054,7 @@ public class Nenola {
 			jkind.lustre.IdExpr causeHeldId = new jkind.lustre.IdExpr(causeHeldVar.id);
 			jkind.lustre.IdExpr causeHeldTimeoutId = new jkind.lustre.IdExpr(causeHeldTimeoutVar.id);
 
-			jkind.lustre.Expr causeHeldExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL,
-					causeHeldTimeoutId);
+			jkind.lustre.Expr causeHeldExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, causeHeldTimeoutId);
 			jkind.lustre.Equation equation = new jkind.lustre.Equation(causeHeldId, causeHeldExpr);
 			equations.add(equation);
 
@@ -2127,7 +2107,6 @@ public class Nenola {
 			return vars;
 		}
 	}
-
 
 	public static class WheneverHoldsPattern implements Pattern {
 		public final Expr causeEvent;
@@ -2305,7 +2284,6 @@ public class Nenola {
 
 	}
 
-
 	public static class WheneverOccursPattern implements Pattern {
 		public final Expr causeEvent;
 		public final Expr effectEvent;
@@ -2333,7 +2311,6 @@ public class Nenola {
 			jkind.lustre.Expr higher = new BinaryExpr(occurs, right, this.effectInterval.high.toLustreExpr(state));
 			return new BinaryExpr(lower, BinaryOp.AND, higher);
 		}
-
 
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
@@ -2365,12 +2342,10 @@ public class Nenola {
 
 		}
 
-
 		@Override
 		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
 			return new HashMap<>();
 		}
-
 
 		@Override
 		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
@@ -2398,8 +2373,8 @@ public class Nenola {
 					causeExpr = new jkind.lustre.IdExpr(causeEventExpr.id);
 				} else {
 					jkind.lustre.Expr eAndLZero = new jkind.lustre.BinaryExpr(
-							this.effectInterval.low.toLustreExpr(state),
-							BinaryOp.EQUAL, new jkind.lustre.RealExpr(BigDecimal.ZERO));
+							this.effectInterval.low.toLustreExpr(state), BinaryOp.EQUAL,
+							new jkind.lustre.RealExpr(BigDecimal.ZERO));
 					eAndLZero = new BinaryExpr(this.effectEvent.toLustreExpr(state), BinaryOp.AND, eAndLZero);
 					jkind.lustre.Expr notEAndLZero = new jkind.lustre.UnaryExpr(UnaryOp.NOT, eAndLZero);
 					causeExpr = new BinaryExpr(new jkind.lustre.IdExpr(causeEventExpr.id), BinaryOp.AND, notEAndLZero);
@@ -2439,8 +2414,7 @@ public class Nenola {
 			// a lemma that may be helpful
 
 			jkind.lustre.Expr lemma1 = expr("timeEffect <= time + intHigh", to("timeEffect", timeEffectVar),
-					to("time", Lustre.timeExpr),
-					to("intHigh", this.effectInterval.high.toLustreExpr(state)));
+					to("time", Lustre.timeExpr), to("intHigh", this.effectInterval.high.toLustreExpr(state)));
 
 			assertions.add(lemma1);
 
@@ -2482,7 +2456,6 @@ public class Nenola {
 		@Override
 		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-
 
 			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state));
 			vars.add(Lustre.getTimeOfVar(causeEventExpr.id));
@@ -2588,8 +2561,7 @@ public class Nenola {
 		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
 			VarDecl timeEffectVar = Lustre.getTimeWillVar(patternIndex);
 			jkind.lustre.IdExpr timeEffectId = new jkind.lustre.IdExpr(timeEffectVar.id);
-			jkind.lustre.Expr timeEqualsEffectTime = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL,
-					timeEffectId);
+			jkind.lustre.Expr timeEqualsEffectTime = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, timeEffectId);
 			// if the event is exclusive it only occurs when scheduled
 			jkind.lustre.BinaryOp effectOp = this.exclusive ? BinaryOp.EQUAL : BinaryOp.IMPLIES;
 			jkind.lustre.Expr impliesEffect = new BinaryExpr(timeEqualsEffectTime, effectOp,
@@ -2610,8 +2582,6 @@ public class Nenola {
 		}
 
 	}
-
-
 
 	public static class PeriodicPattern implements Pattern {
 		public final Expr event;
@@ -2651,11 +2621,8 @@ public class Nenola {
 					"(timeOfEvent >= 0.0 and timeOfEvent <> time => timeout - timeOfEvent >= p - j) and "
 							+ "(true -> (period <> pre(period) => period - pre(period) <= p + j)) and "
 							+ "(timeOfEvent >= 0.0 => timeout - timeOfEvent <= p + j)",
-					to("timeOfEvent", timeofEvent), to("time", Lustre.timeExpr),
-					to("timeout", timeoutId), to("p", this.period.toLustreExpr(state)), to("j", jitter),
-					to("period", periodVar));
-
-
+					to("timeOfEvent", timeofEvent), to("time", Lustre.timeExpr), to("timeout", timeoutId),
+					to("p", this.period.toLustreExpr(state)), to("j", jitter), to("period", periodVar));
 
 			jkind.lustre.Expr lemma2 = expr("true -> timeout <> pre(timeout) => timeout - pre(timeout) >= p - j",
 					to("timeout", timeoutId), to("p", this.period.toLustreExpr(state)), to("j", jitter));
@@ -2688,8 +2655,7 @@ public class Nenola {
 //			// -j <= jitter <= j
 			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr(state) : null;
 			jkind.lustre.Expr jitterLow = new jkind.lustre.BinaryExpr(
-					new jkind.lustre.UnaryExpr(UnaryOp.NEGATIVE, lustreJitter), BinaryOp.LESSEQUAL,
-					jitterId);
+					new jkind.lustre.UnaryExpr(UnaryOp.NEGATIVE, lustreJitter), BinaryOp.LESSEQUAL, jitterId);
 			jkind.lustre.Expr jitterHigh = new jkind.lustre.BinaryExpr(jitterId, BinaryOp.LESSEQUAL, lustreJitter);
 			asserts.add(new BinaryExpr(jitterLow, BinaryOp.AND, jitterHigh));
 
@@ -2702,8 +2668,7 @@ public class Nenola {
 
 			// helper assertion (should be true)
 			jkind.lustre.Expr lemma = expr("period - time < p - j and period >= time", to("period", periodVar),
-					to("p", this.period.toLustreExpr(state)), to("time", Lustre.timeExpr),
-					to("j", lustreJitter));
+					to("p", this.period.toLustreExpr(state)), to("time", Lustre.timeExpr), to("j", lustreJitter));
 
 			asserts.add(lemma);
 			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id));
@@ -2789,9 +2754,8 @@ public class Nenola {
 
 			jkind.lustre.Expr prop = expr(
 					"true -> (time >= P + j => event => (pre period) - j <= time and time <= (pre period) + j)",
-					to("time", Lustre.timeExpr), to("period", periodVar),
-					to("P", this.period.toLustreExpr(state)), to("j", lustreJitter),
-					to("event", this.event.toLustreExpr(state)));
+					to("time", Lustre.timeExpr), to("period", periodVar), to("P", this.period.toLustreExpr(state)),
+					to("j", lustreJitter), to("event", this.event.toLustreExpr(state)));
 			return prop;
 		}
 
@@ -2989,7 +2953,6 @@ public class Nenola {
 
 	}
 
-
 	public enum SpecTag {
 		Assume, Guarantee, Lemma, Assert
 	}
@@ -3030,9 +2993,9 @@ public class Nenola {
 			this.exprOp = exprOp;
 		}
 
-		public Equation toLustreEquation() {
-			// TODO Auto-generated method stub
-			return null;
+		public Equation toLustreEquation(StaticState state) {
+			jkind.lustre.IdExpr dstIdExpr = (jkind.lustre.IdExpr) this.dst.toLustreExpr(state);
+			return new jkind.lustre.Equation(dstIdExpr, this.src.toLustreExpr(state));
 		}
 	}
 
@@ -3099,7 +3062,6 @@ public class Nenola {
 
 	}
 
-
 	public static enum Prim implements DataContract {
 		IntContract("int", NamedType.INT), RealContract("real", NamedType.REAL), BoolContract("bool",
 				NamedType.BOOL), ErrorContract("<error>", null);
@@ -3126,7 +3088,6 @@ public class Nenola {
 		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
-
 
 	}
 
@@ -3189,7 +3150,6 @@ public class Nenola {
 		private final String name;
 		public final List<String> values;
 
-
 		public EnumContract(String name, List<String> values) {
 			this.name = name;
 			this.values = new ArrayList<>();
@@ -3217,7 +3177,6 @@ public class Nenola {
 		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
 		}
-
 
 	}
 
@@ -3247,8 +3206,6 @@ public class Nenola {
 		}
 
 	}
-
-
 
 	public static class RecordContract implements DataContract {
 
@@ -3295,7 +3252,6 @@ public class Nenola {
 
 	}
 
-
 	public static class ArrayContract implements DataContract {
 
 		private final String name;
@@ -3329,7 +3285,8 @@ public class Nenola {
 		@Override
 		public boolean staticEquals(Contract other) {
 			if (other instanceof ArrayContract) {
-				return size == ((ArrayContract) other).size && stemContract.staticEquals(((ArrayContract) other).stemContract);
+				return size == ((ArrayContract) other).size
+						&& stemContract.staticEquals(((ArrayContract) other).stemContract);
 			} else {
 				return false;
 			}
@@ -3351,8 +3308,7 @@ public class Nenola {
 		}
 
 		public VarDecl toLustreVar() {
-			// TODO Auto-generated method stub
-			return null;
+			return new VarDecl(this.name, this.dataContract.toLustreType());
 		}
 
 	}
@@ -3360,9 +3316,9 @@ public class Nenola {
 	public static interface PropVal {
 		DataContract inferDataContract(StaticState state);
 
-		jkind.lustre.Expr toLustreExpr();
-	}
+		jkind.lustre.Expr toLustreExpr(StaticState state);
 
+	}
 
 	public static class IntPropVal implements PropVal {
 		public final long val;
@@ -3377,9 +3333,8 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new jkind.lustre.IntExpr(BigInteger.valueOf(this.val));
 		}
 	}
 
@@ -3396,9 +3351,8 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new jkind.lustre.RealExpr(BigDecimal.valueOf(this.val));
 		}
 	}
 
@@ -3417,9 +3371,9 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr() {
-			// TODO Auto-generated method stub
-			return null;
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			PropVal pv = state.props.get(packageName).get(name);
+			return pv.toLustreExpr(state);
 		}
 	}
 
@@ -3757,7 +3711,7 @@ public class Nenola {
 			List<Equation> equations = new ArrayList<>();
 
 			for (Connection conn : this.connections) {
-				equations.add(conn.toLustreEquation());
+				equations.add(conn.toLustreEquation(state));
 			}
 
 			for (Spec spec : this.specList) {
