@@ -302,7 +302,6 @@ public class AddFilterHandler extends AadlHandler {
 					String agreeClauses = "{**" + System.lineSeparator();
 
 					for (String guarantee : propagatedGuarantees) {
-//						agreeClauses = agreeClauses + "\t\t\t" + guarantee + System.lineSeparator();
 						agreeClauses = agreeClauses + guarantee + System.lineSeparator();
 					}
 
@@ -311,7 +310,6 @@ public class AddFilterHandler extends AadlHandler {
 							FILTER_PORT_OUT_NAME);
 
 					if (!filterAgreeProperty.isEmpty()) {
-//						agreeClauses = agreeClauses + "\t\t\t" + filterAgreeProperty + System.lineSeparator();
 						agreeClauses = agreeClauses + filterAgreeProperty + System.lineSeparator();
 					}
 
@@ -323,7 +321,6 @@ public class AddFilterHandler extends AadlHandler {
 							+ "_DataPreservation \"Preserve filter input data\" : filter_out = filter_in;"
 							+ System.lineSeparator();
 
-//					agreeClauses = agreeClauses + "\t\t**}";
 					agreeClauses = agreeClauses + "**}";
 
 					final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper

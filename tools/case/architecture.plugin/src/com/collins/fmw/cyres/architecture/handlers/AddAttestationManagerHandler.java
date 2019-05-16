@@ -278,12 +278,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 //					return;
 				}
 
-//				// CASE_Properties::COMP_IMPL property
-//				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerType,
-//						casePropSet)) {
-////					return;
-//				}
-
 				// CASE_Properties::COMP_SPEC property
 				// Parse the ID from the Attestation Manager AGREE property
 				String attestationPropId = "";
@@ -297,21 +291,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType, casePropSet)) {
 //					return;
 				}
-
-//				// CASE_Properties::CACHE_TIMEOUT property
-//				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerType, casePropSet)) {
-////					return;
-//				}
-//
-//				// CASE_Properties::CACHE_SIZE property
-//				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerType, casePropSet)) {
-////					return;
-//				}
-//
-//				// CASE_Properties::LOG_SIZE property
-//				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerType, casePropSet)) {
-////					return;
-//				}
 
 				// Put Attestation Manager in proper location (just after the comm driver)
 				String destName = "";
@@ -342,21 +321,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						casePropSet)) {
 //					return;
 				}
-
-				// CASE_Properties::COMP_SPEC property
-				// Parse the ID from the Attestation Manager AGREE property
-//				String attestationPropId = "";
-//				try {
-//					attestationPropId = attestationAgreeProperty.substring(
-//							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-//							attestationAgreeProperty.indexOf("\"")).trim();
-//				} catch (IndexOutOfBoundsException e) {
-//					// agree property is malformed, so leave blank
-//				}
-//				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerImpl,
-//						casePropSet)) {
-////					return;
-//				}
 
 				// CASE_Properties::CACHE_TIMEOUT property
 				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
@@ -537,14 +501,14 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 
 					for (String guarantee : guarantees) {
-						agreeClauses = agreeClauses + "\t\t\t" + guarantee + System.lineSeparator();
+						agreeClauses = agreeClauses + guarantee + System.lineSeparator();
 					}
 
 					if (!attestationAgreeProperty.isEmpty()) {
-						agreeClauses = agreeClauses + "\t\t\t" + attestationAgreeProperty + System.lineSeparator();
+						agreeClauses = agreeClauses + attestationAgreeProperty + System.lineSeparator();
 					}
 
-					agreeClauses = agreeClauses + "\t\t**}";
+					agreeClauses = agreeClauses + "**}";
 
 					final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper
 							.createOwnedAnnexSubclause(attestationManagerType);
