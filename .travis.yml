@@ -41,10 +41,10 @@ before_deploy:
 
 deploy:
   # Deploy update site back to repository
-  - provider: script
-    script: python3 .travis/push_update_site.py $TRAVIS_TAG
-    on:
-      tags: true
+  # - provider: script
+  #   script: python3 .travis/push_update_site.py $TRAVIS_TAG
+  #   on:
+  #     tags: true
   # Deploy nightly build to github releases
   - provider: releases
     api-key: $GH_TOKEN
