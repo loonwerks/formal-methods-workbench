@@ -2985,6 +2985,7 @@ public class Nenola {
 		public final Expr src;
 		public final Expr dst;
 		public final Optional<Expr> exprOp;
+		public boolean delayed;
 
 		public Connection(String name, Expr src, Expr dst, Optional<Expr> exprOp) {
 			this.name = name;
@@ -3534,7 +3535,7 @@ public class Nenola {
 			outputs.add(new VarDecl(outputName, NamedType.BOOL));
 			equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
 
-			assertions.addAll(this.toLustreAssertionsFromConnections());
+			assertions.addAll(this.toLustreAssertionsFromConnections(state));
 
 			NodeBuilder builder = new NodeBuilder(this.getName());
 			builder.addInputs(inputs);
@@ -3546,40 +3547,64 @@ public class Nenola {
 			return node;
 		}
 
-		private List<jkind.lustre.Expr> toLustreAssertionsFromConnections() {
-			// TODO:
-//			for (AgreeConnection conn : agreeNode.connections) {
-//				if (conn instanceof AgreeAADLConnection) {
-//					AgreeAADLConnection aadlConn = (AgreeAADLConnection) conn;
-//					String destName = aadlConn.destinationNode == null ? ""
-//							: aadlConn.destinationNode.id + AgreeASTBuilder.dotChar;
-//					destName = destName + aadlConn.destinationVarName.id;
-//
-//					String sourName = aadlConn.sourceNode == null ? ""
-//							: aadlConn.sourceNode.id + AgreeASTBuilder.dotChar;
-//					sourName = sourName + aadlConn.sourceVarName.id;
-//
-//					Expr aadlConnExpr;
-//
-//					if (!aadlConn.delayed) {
-//						aadlConnExpr = new BinaryExpr(new IdExpr(sourName), BinaryOp.EQUAL, new IdExpr(destName));
-//					} else {
-//						// we need to get the correct type for the aadlConnection
-//						// we can assume that the source and destination types are
-//						// the same at this point
-//						Expr initExpr = AgreeUtils.getInitValueFromType(aadlConn.sourceVarName.type);
-//						Expr preSource = new UnaryExpr(UnaryOp.PRE, new IdExpr(sourName));
-//						Expr sourExpr = new BinaryExpr(initExpr, BinaryOp.ARROW, preSource);
-//						aadlConnExpr = new BinaryExpr(sourExpr, BinaryOp.EQUAL, new IdExpr(destName));
-//					}
-//
-//					assertions.add(new AgreeStatement("", aadlConnExpr, aadlConn.reference));
-//				} else {
-//					AgreeOverriddenConnection agreeConn = (AgreeOverriddenConnection) conn;
-//					assertions.add(agreeConn.statement);
-//				}
-//			}
-			return null;
+		private List<jkind.lustre.Expr> toLustreAssertionsFromConnections(StaticState state) {
+
+			List<jkind.lustre.Expr> acc = new ArrayList<>();
+			for (Connection conn : this.connections) {
+				if (conn.exprOp.isPresent()) {
+					acc.add(conn.exprOp.get().toLustreExpr(state));
+				} else {
+
+					String dstName = null;
+					if (conn.dst instanceof IdExpr) {
+						dstName = ((IdExpr) conn.dst).name;
+					} else if (conn.dst instanceof SelectionExpr) {
+						Expr stem = ((SelectionExpr) conn.dst).target;
+						String prefix = ((IdExpr) stem).name.replaceAll("::", "__");
+						String suffix = ((IdExpr) conn.dst).name;
+						dstName = prefix + "__" + suffix;
+
+
+					}
+
+
+					String srcName = null;
+					if (conn.src instanceof IdExpr) {
+						srcName = ((IdExpr) conn.src).name;
+					} else if (conn.src instanceof SelectionExpr) {
+						Expr stem = ((SelectionExpr) conn.src).target;
+						String prefix = ((IdExpr) stem).name.replaceAll("::", "__");
+						String suffix = ((IdExpr) conn.src).name;
+						srcName = prefix + "__" + suffix;
+
+
+					}
+
+
+					jkind.lustre.Expr aadlConnExpr;
+
+					if (!conn.delayed) {
+						aadlConnExpr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(srcName),
+								jkind.lustre.BinaryOp.EQUAL, new jkind.lustre.IdExpr(dstName));
+					} else {
+						// we need to get the correct type for the aadlConnection
+						// we can assume that the source and destination types are
+						// the same at this point
+
+						DataContract srcType = conn.src.inferDataContract(state);
+						jkind.lustre.Expr initExpr = Lustre.getInitValueFromType(srcType.toLustreType());
+						jkind.lustre.Expr preSource = new jkind.lustre.UnaryExpr(UnaryOp.PRE,
+								new jkind.lustre.IdExpr(srcName));
+						jkind.lustre.Expr srcExpr = new jkind.lustre.BinaryExpr(initExpr, BinaryOp.ARROW, preSource);
+						aadlConnExpr = new jkind.lustre.BinaryExpr(srcExpr, BinaryOp.EQUAL,
+								new jkind.lustre.IdExpr(dstName));
+					}
+
+					acc.add(aadlConnExpr);
+
+				}
+			}
+			return acc;
 		}
 
 //		public Node toLustreNode(boolean isMain, boolean isMonolithic) {
