@@ -1,4 +1,4 @@
-open splatLib AADL;
+open splatLib AADL listTheory;
 val int_ss = intLib.int_ss;
 
 infix byA;
@@ -23,10 +23,8 @@ val fn_defs = #3 logic_defs;
 val [filter_spec] = #4 logic_defs
 val (fname,thm) = filter_spec;
 
-val filter_defs_and_props = map splatLib.filter_correctness (#4 logic_defs);
-
-val [{name,regexp,encode_def,decode_def,
-      inversion, correctness, implicit_constraints}] = filter_defs_and_props;
+val {name,regexp,encode_def,decode_def, inversion, correctness, implicit_constraints}
+   = splatLib.filter_correctness filter_spec;
 
 val dfa = regexpLib.matcher regexpLib.SML regexp;
 PolyML.objSize (#table dfa);
@@ -35,8 +33,8 @@ val SOME implicit_constraints_def = implicit_constraints;
 
 val (_ :: _ :: 
      good_coordinate_def :: good_pattern_def :: valid_message_def :: good_map_def :: 
-     good_mission_def :: good_mission_window_def :: good_command_def :: well_formed_message_def
-     :: _) = fn_defs;
+     good_mission_def :: good_mission_window_def :: good_command_def :: 
+     well_formed_message_def :: _) = fn_defs;
 
 open splatTheory;
 
@@ -59,6 +57,85 @@ val list_case_eq = TypeBase.case_eq_of ``:'a list``;
 --       (b) calculate all (sub-)records, find their component-equality theorems, and
 --           invoke them at the right place in the tactic scheme.
 --
+
+val lem = Q.prove
+(`(?h. enc 1 n = [h]) <=> n < 256`,
+rw_tac list_ss [EQ_IMP_THM, enc_bytes]
+>> pop_assum mp_tac
+>> rw_tac list_ss [enc_def,layout_def, PAD_RIGHT, Ntimes n2l_256 2])
+
+val lem1 = Q.prove
+(`(?a b. enc 2 n = [a;b]) <=> n < 65536`,
+ rw_tac list_ss [EQ_IMP_THM, enc_bytes]
+ >> pop_assum mp_tac
+ >> rw_tac list_ss [enc_def,layout_def, PAD_RIGHT, Ntimes n2l_256 3]
+ >> full_simp_tac list_ss [arithmeticTheory.DIV_LT_X])
+
+
+val inversion_thm = store_thm
+("inversion",
+ inversion,
+ CONV_TAC (RENAME_VARS_CONV ["r"])
+  >> rpt strip_tac
+  >> rw_tac list_ss [decode_def, encode_def,list_case_eq, PULL_EXISTS,
+                     fetch "-" "RF_Msg_component_equality",
+                     fetch "-" "Command_component_equality",
+                     fetch "-" "CASE_MsgHeader_component_equality",
+                     fetch "-" "Coordinate_component_equality"]
+
+  ,good_command_def, well_formed_message_def,
+      implicit_constraints_def, good_map_def,good_coordinate_def,good_pattern_def]
+
+
+
+
+ >> rw_tac list_ss [decode_def, encode_def,good_command_def, well_formed_message_def,
+      implicit_constraints_def, good_map_def,good_coordinate_def,good_pattern_def]
+ >> full_simp_tac (srw_ss()) [fcp_every_thm,arithmeticTheory.BOUNDED_FORALL_THM]
+ >> rw_tac list_ss [list_case_eq, option_case_eq]
+ >> `(?p1 p2 p3 p4 p5 p6 p7 p8. enci 8 r.header.src = [p1;p2;p3;p4;p5;p6;p7;p8]) /\
+     (?q1 q2 q3 q4 q5 q6 q7 q8. enci 8 r.header.dst = [q1;q2;q3;q4;q5;q6;q7;q8]) /\
+     (?u. enc_bool r.header.trusted = [u]) /\
+     (?v. enc_bool r.header.HMAC = [v]) /\
+     (?a.     enci 1 ((r.payload.map ' 0).latitude)  = [a])   /\
+     (?b c.   enci 2 ((r.payload.map ' 0).longitude) = [b;c]) /\
+     (?d e.   enci 2 ((r.payload.map ' 0).altitude)  = [d;e]) /\
+     (?a1.    enci 1 ((r.payload.map ' 1).latitude)  = [a1])  /\
+     (?b1 c1. enci 2 ((r.payload.map ' 1).longitude) = [b1;c1]) /\
+     (?d1 e1. enci 2 ((r.payload.map ' 1).altitude)  = [d1;e1]) /\
+     (?a2.    enci 1 ((r.payload.map ' 2).latitude)  = [a2])    /\
+     (?b2 c2. enci 2 ((r.payload.map ' 2).longitude) = [b2;c2]) /\
+     (?d2 e2. enci 2 ((r.payload.map ' 2).altitude)  = [d2;e2]) /\
+     (?a3.    enci 1 ((r.payload.map ' 3).latitude)  = [a3])    /\
+     (?b3 c3. enci 2 ((r.payload.map ' 3).longitude) = [b3;c3]) /\
+     (?d3 e3. enci 2 ((r.payload.map ' 3).altitude)  = [d3;e3]) /\
+     (?f.     enc_FlightPattern r.payload.pattern = [f])`
+      by (rpt conj_tac 
+          >> ((FIRST (map match_mp_tac (CONJUNCTS enci_bytes))
+                   >> rw_tac int_ss [] >> intLib.ARITH_TAC)
+              ORELSE
+                (rw_tac std_ss [fetch "-" "enc_FlightPattern_def",
+                                splatTheory.enc_bool_def] 
+                    >> metis_tac [FlightPattern_bound,bool_bound,enc_bytes])))
+ >> rw_tac list_ss [option_case_eq,enc_FlightPattern_def,num_of_FlightPattern_def,enc_bytes]
+ >> rw_tac (srw_ss()) [fetch "-" "RF_Msg_component_equality",
+                       fetch "-" "Command_component_equality",
+                       fetch "-" "CASE_MsgHeader_component_equality",
+                       fetch "-" "Coordinate_component_equality"]
+ >> ((rpt (qpat_x_assum `_ = _` (SUBST_ALL_TAC o SYM))
+      >> FIRST (metis_tac dec_encs :: map match_mp_tac (CONJUNCTS deci_encis))
+      >> intLib.ARITH_TAC)
+     ORELSE
+     (rw_tac (srw_ss()) [fcpTheory.CART_EQ]
+      >> `(i=0) \/ (i=1) \/ (i=2) \/ (i=3)` by decide_tac
+      >> pop_assum SUBST_ALL_TAC >> rw_tac (srw_ss()) [fcpTheory.READ_L2V]
+      >> rw_tac list_ss [fetch "-" "Coordinate_component_equality"]
+      >> rpt (qpat_x_assum `_ = _` (SUBST_ALL_TAC o SYM))
+      >> FIRST (metis_tac dec_encs :: map match_mp_tac (CONJUNCTS deci_encis))
+      >> intLib.ARITH_TAC)
+     ORELSE 
+     EVAL_TAC)
+);
 
 val inversion_thm = store_thm
 ("inversion",

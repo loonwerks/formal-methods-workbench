@@ -18,6 +18,7 @@ import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.aadl2.util.Aadl2Util;
+import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.util.plugin.Filesystem;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
@@ -25,6 +26,7 @@ import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreeFactory;
 import com.rockwellcollins.atc.agree.agree.NamedSpecStatement;
+import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.parsing.AgreeAnnexParser;
 import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
 import com.rockwellcollins.atc.resolute.resolute.Definition;
@@ -42,7 +44,6 @@ public class CyberRequirement {
 	private String id = "";
 	private String text = "";
 	private String context = ""; // this is the qualified name of the component
-	private Classifier contextClassifier = null;
 	private boolean agree = false;
 	private String rationale = "";
 
@@ -50,13 +51,11 @@ public class CyberRequirement {
 		this.type = type;
 	}
 
-	public CyberRequirement(String type, String id, String text, String context, boolean agree,
-			String rationale) {
+	public CyberRequirement(String type, String id, String text, String context, boolean agree, String rationale) {
 		this.type = type;
 		this.id = id;
 		this.text = text;
 		this.context = context;
-		this.contextClassifier = getClassifier(context);
 		this.agree = agree;
 		this.rationale = rationale;
 	}
@@ -67,7 +66,6 @@ public class CyberRequirement {
 		this.id = id;
 		this.text = text;
 		this.context = contextClassifier.getQualifiedName();
-		this.contextClassifier = contextClassifier;
 		this.agree = agree;
 		this.rationale = rationale;
 	}
@@ -90,6 +88,10 @@ public class CyberRequirement {
 
 	public boolean hasAgree() {
 		return this.agree;
+	}
+
+	public void setAgree() {
+		this.agree = true;
 	}
 
 	public void insertClaim(BuiltInClaim claim, Resource resource) {
@@ -306,11 +308,22 @@ public class CyberRequirement {
 			subclause.setSourceText("{** **}");
 
 			agreeSubclause = AgreeFactory.eINSTANCE.createAgreeContractSubclause();
+		} else {
+			// If an agree statement with this id already exists, do nothing
+			for (SpecStatement spec : ((AgreeContract) agreeSubclause.getContract()).getSpecs()) {
+				if (spec instanceof NamedSpecStatement) {
+					if (((NamedSpecStatement) spec).getName().equalsIgnoreCase(this.id)) {
+						Dialog.showError("Formalize Requirement",
+								"Requirement " + this.id + " has already been formalized in AGREE.");
+						return;
+					}
+				}
+			}
 		}
 
 		String assume = "assume ";
-		if (!id.isEmpty()) {
-			assume += id + " ";
+		if (!this.id.isEmpty()) {
+			assume += this.id + " ";
 		}
 		assume += "\"" + this.text + "\" : false;";
 		AgreeAnnexParser parser = new AgreeAnnexParser();
@@ -369,4 +382,3 @@ public class CyberRequirement {
 	}
 
 }
-

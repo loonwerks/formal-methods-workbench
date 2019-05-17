@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -18,6 +19,7 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
@@ -95,82 +97,89 @@ public class RequirementsManager {
 			List<CyberRequirement> resoluteClauses = new ArrayList<>();
 
 			// Get all the packages in this project
-			for (AadlPackage aadlPkg : TraverseProject.getPackagesInProject(currentProject)) {
+			ResourceSet rs = resource.getResourceSet();
+			for (Resource r : rs.getResources()) {
 
 				// Get the components in the model
-				PublicPackageSection pkgSection = aadlPkg.getOwnedPublicSection();
-				for (Classifier classifier : pkgSection.getOwnedClassifiers()) {
+				ModelUnit modelUnit = (ModelUnit) r.getContents().get(0);
+				if (modelUnit instanceof AadlPackage) {
+					AadlPackage aadlPkg = (AadlPackage) modelUnit;
+					PublicPackageSection pkgSection = aadlPkg.getOwnedPublicSection();
+					for (Classifier classifier : pkgSection.getOwnedClassifiers()) {
 
-					for (AnnexSubclause annexSubclause : classifier.getOwnedAnnexSubclauses()) {
-						DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-						// See if there's a resolute annex
-						if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-							ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
-									.getParsedAnnexSubclause();
-							// See if there are any 'prove' clauses
-							for (AnalysisStatement as : resoluteClause.getProves()) {
-								if (as instanceof ProveStatement) {
-									ProveStatement prove = (ProveStatement) as;
-									Expr expr = prove.getExpr();
-									if (expr instanceof FnCallExpr) {
-										FnCallExpr fnCall = (FnCallExpr) expr;
-										// Check if the corresponding function definition is in private section
-										FunctionDefinition fd = fnCall.getFn();
-										if (AadlUtil.getContainingPackageSection(fd) instanceof PrivatePackageSection
-												&& AadlUtil.getContainingPackage(fd) == aadlPkg) {
-											String reqType = "";
-											String reqText = "";
-											DefinitionBody db = fd.getBody();
-											if (db instanceof ClaimBody) {
-												ClaimBody cb = (ClaimBody) db;
-												for (ClaimText ct : cb.getClaim()) {
-													// Assumption that claim text is only a string
-													if (ct instanceof ClaimString) {
-														ClaimString cs = (ClaimString) ct;
-														reqText += cs.getStr();
-													}
-												}
-											}
-											if (reqText.matches("^\\[.+\\]\\s.+")) {
-												// Extract the Requirement type from the text
-												reqType = reqText.substring(1, reqText.indexOf("]") - 2);
-											}
-											// See if there is an agree statement with this requirement id
-											boolean agree = false;
-
-											for (AnnexSubclause agreeAnnexSubclause : classifier
-													.getOwnedAnnexSubclauses()) {
-												DefaultAnnexSubclause defaultAgreeSubclause = (DefaultAnnexSubclause) agreeAnnexSubclause;
-												// See if there's an agree annex
-												if (defaultAgreeSubclause
-														.getParsedAnnexSubclause() instanceof AgreeContractSubclause) {
-													AgreeContractSubclause agreeSubclause = (AgreeContractSubclause) defaultAgreeSubclause
-															.getParsedAnnexSubclause();
-													AgreeContract contract = (AgreeContract) agreeSubclause
-															.getContract();
-													for (SpecStatement ss : contract.getSpecs()) {
-														if (ss instanceof NamedSpecStatement) {
-															NamedSpecStatement nss = (NamedSpecStatement) ss;
-															if (nss.getName().equalsIgnoreCase(fd.getName())) {
-																agree = true;
-																break;
-															}
+						for (AnnexSubclause annexSubclause : classifier.getOwnedAnnexSubclauses()) {
+							DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
+							// See if there's a resolute annex
+							if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
+								ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
+										.getParsedAnnexSubclause();
+								// See if there are any 'prove' clauses
+								for (AnalysisStatement as : resoluteClause.getProves()) {
+									if (as instanceof ProveStatement) {
+										ProveStatement prove = (ProveStatement) as;
+										Expr expr = prove.getExpr();
+										if (expr instanceof FnCallExpr) {
+											FnCallExpr fnCall = (FnCallExpr) expr;
+											// Check if the corresponding function definition is in private section
+											FunctionDefinition fd = fnCall.getFn();
+											if (AadlUtil
+													.getContainingPackageSection(fd) instanceof PrivatePackageSection
+													&& AadlUtil.getContainingPackage(fd) == aadlPkg) {
+												String reqType = "";
+												String reqText = "";
+												DefinitionBody db = fd.getBody();
+												if (db instanceof ClaimBody) {
+													ClaimBody cb = (ClaimBody) db;
+													for (ClaimText ct : cb.getClaim()) {
+														// Assumption that claim text is only a string
+														if (ct instanceof ClaimString) {
+															ClaimString cs = (ClaimString) ct;
+															reqText += cs.getStr();
 														}
 													}
-													break;
 												}
-											}
-											CyberRequirement req = new CyberRequirement(reqType, fd.getName(), reqText,
-													classifier, agree, "");
+												if (reqText.matches("^\\[.+\\]\\s.+")) {
+													// Extract the Requirement type from the text
+													reqType = reqText.substring(1, reqText.indexOf("]"));
+													reqText = reqText.substring(reqText.indexOf("]") + 1).trim();
+												}
+												// See if there is an agree statement with this requirement id
+												boolean agree = false;
 
-											if (fd.getName() != null && !resoluteClauses.contains(req)) {
-												resoluteClauses.add(req);
+												for (AnnexSubclause agreeAnnexSubclause : classifier
+														.getOwnedAnnexSubclauses()) {
+													DefaultAnnexSubclause defaultAgreeSubclause = (DefaultAnnexSubclause) agreeAnnexSubclause;
+													// See if there's an agree annex
+													if (defaultAgreeSubclause
+															.getParsedAnnexSubclause() instanceof AgreeContractSubclause) {
+														AgreeContractSubclause agreeSubclause = (AgreeContractSubclause) defaultAgreeSubclause
+																.getParsedAnnexSubclause();
+														AgreeContract contract = (AgreeContract) agreeSubclause
+																.getContract();
+														for (SpecStatement ss : contract.getSpecs()) {
+															if (ss instanceof NamedSpecStatement) {
+																NamedSpecStatement nss = (NamedSpecStatement) ss;
+																if (nss.getName().equalsIgnoreCase(fd.getName())) {
+																	agree = true;
+																	break;
+																}
+															}
+														}
+														break;
+													}
+												}
+												CyberRequirement req = new CyberRequirement(reqType, fd.getName(),
+														reqText, classifier, agree, "");
+
+												if (fd.getName() != null && !resoluteClauses.contains(req)) {
+													resoluteClauses.add(req);
+												}
 											}
 										}
 									}
 								}
+								break;
 							}
-							break;
 						}
 					}
 				}
@@ -212,8 +221,7 @@ public class RequirementsManager {
 
 				// Add AGREE, if necessary
 				if (req.hasAgree()) {
-					req.insertClaim(new AgreePropCheckedClaim(req.getId()), resource);
-					req.insertAgree(resource);
+					formalizeRequirement(req, resource);
 				}
 
 				return null;
@@ -227,7 +235,6 @@ public class RequirementsManager {
 		importedRequirements.add(req);
 	}
 
-
 	public void modifyRequirement(String reqId, Resource resource, BuiltInClaim claim) {
 
 		for (CyberRequirement req : importedRequirements) {
@@ -236,6 +243,22 @@ public class RequirementsManager {
 				break;
 			}
 		}
+	}
+
+	public boolean formalizeRequirement(String reqId, Resource resource) {
+		for (CyberRequirement req : importedRequirements) {
+			if (req.getId().equalsIgnoreCase(reqId)) {
+				req.setAgree();
+				formalizeRequirement(req, resource);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void formalizeRequirement(CyberRequirement req, Resource resource) {
+		req.insertClaim(new AgreePropCheckedClaim(req.getId()), resource);
+		req.insertAgree(resource);
 	}
 
 	public void addOmittedRequirements(List<CyberRequirement> omittedReqs, String implementation) {

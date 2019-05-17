@@ -7,7 +7,7 @@ Bundle-Activator: com.collins.fmw.cyres.toolcheck.plugin.Activator
 Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.12.0",
+ org.eclipse.core.resources,
  com.rockwellcollins.atc.resolute,
  com.rockwellcollins.atc.resolute.analysis
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

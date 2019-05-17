@@ -99,6 +99,31 @@ val dec_enc_dms = Q.store_thm
   >> rw_tac list_ss [fetch "-" "dms_component_equality"]
   >> metis_tac [splatTheory.dec_enc]);
 
+(*
+val list_case_eq = TypeBase.case_eq_of ``:'a list``;
+
+val lem = Q.prove
+(`(?h. enc 1 n = [h]) <=> n < 256`,
+rw_tac list_ss [EQ_IMP_THM, enc_bytes]
+>> pop_assum mp_tac
+>> rw_tac list_ss [enc_def,layout_def, PAD_RIGHT, Ntimes n2l_256 2])
+
+val lem1 = Q.prove
+(`(?a b. enc 2 n = [a;b]) <=> n < 65536`,
+ rw_tac list_ss [EQ_IMP_THM, enc_bytes]
+ >> pop_assum mp_tac
+ >> rw_tac list_ss [enc_def,layout_def, PAD_RIGHT, Ntimes n2l_256 3]
+ >> full_simp_tac list_ss [arithmeticTheory.DIV_LT_X])
+
+ rw_tac list_ss [dec_dms_def, enc_dms_def,
+                 enc_degrees_def, enc_minutes_def, enc_seconds_def,list_case_eq,
+		 PULL_EXISTS,fetch "-" "dms_component_equality"]
+  >> metis_tac [STRCAT_ASSOC,STRCAT_EQNS,dec_enc,lem,lem1,good_dms_def,
+                qdecide `0n <= x /\ x <= 90 ==> x < 256`,
+                qdecide `0n <= x /\ x <= 59 ==> x < 256`,
+                qdecide `0n <= x /\ x <= 5999 ==> x < 65536`]
+*)
+
 (*---------------------------------------------------------------------------*)
 (* Regexp expressing the interval constraints                                *)
 (*---------------------------------------------------------------------------*)

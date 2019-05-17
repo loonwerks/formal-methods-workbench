@@ -11,18 +11,21 @@ import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.AadlReal;
+import org.osate.aadl2.AadlString;
 import org.osate.aadl2.AbstractNamedValue;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.ArraySize;
 import org.osate.aadl2.ArraySizeProperty;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ClassifierType;
 import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.EnumerationType;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
@@ -111,6 +114,14 @@ public class AgreeTypeSystem {
 			this.name = name;
 		}
 
+	}
+
+	public static class NamedTypeDef implements TypeDef {
+		public final String name;
+
+		public NamedTypeDef(String name) {
+			this.name = name;
+		}
 	}
 
 	public static class RangeIntTypeDef implements TypeDef {
@@ -311,6 +322,7 @@ public class AgreeTypeSystem {
 				PropertyExpression v = choice.getOwnedValues().get(0).getOwnedValue();
 
 				String key = p.getQualifiedName();
+				key = key == null ? p.getName() : key;
 
 				if (key.equals("Data_Model::Data_Representation")) {
 					if (v instanceof NamedValue) {
@@ -684,7 +696,7 @@ public class AgreeTypeSystem {
 				if (prop instanceof Property) {
 					PropertyType pt = ((Property) prop).getPropertyType();
 
-					return inferFromNamedElement(pt);
+					return toTypeFromPropertyType(pt);
 
 				} else {
 
@@ -693,7 +705,7 @@ public class AgreeTypeSystem {
 					for (PropertyAssociation choice : pas) {
 						if (choice.getProperty().getName().equals(prop.getName())) {
 							PropertyType pt = choice.getProperty().getPropertyType();
-							return inferFromNamedElement(pt);
+							return toTypeFromPropertyType(pt);
 						}
 					}
 				}
@@ -829,6 +841,22 @@ public class AgreeTypeSystem {
 		}
 		return Prim.ErrorTypeDef;
 
+	}
+
+	private static TypeDef toTypeFromPropertyType(PropertyType propType) {
+		if (propType instanceof AadlBoolean) {
+			return Prim.BoolTypeDef;
+		} else if (propType instanceof AadlString || propType instanceof EnumerationType) {
+			return new NamedTypeDef("string");
+		} else if (propType instanceof AadlInteger) {
+			return Prim.IntTypeDef;
+		} else if (propType instanceof AadlReal) {
+			return Prim.RealTypeDef;
+		} else if (propType instanceof ClassifierType) {
+			return new NamedTypeDef("component");
+		}
+
+		throw new RuntimeException();
 	}
 
 	public static TypeDef inferFromNamedElement(NamedElement ne) {

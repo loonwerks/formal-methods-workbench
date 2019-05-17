@@ -12,11 +12,12 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Aadl2Factory;
-import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
@@ -24,23 +25,21 @@ import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
-import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.ThreadImplementation;
-import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddAttestationManagerDialog;
 import com.collins.fmw.cyres.architecture.requirements.AddAttestationManagerClaim;
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
+import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.unparsing.AgreeAnnexUnparser;
@@ -92,7 +91,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		}
 		List<String> resoluteClauses = new ArrayList<>();
 		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
-//		wizard.create(selectedSubcomponent, subcomponents, getResoluteClauses(selectedSubcomponent, ci));
 		wizard.create(selectedSubcomponent, subcomponents, resoluteClauses);
 		if (wizard.open() == Window.OK) {
 			commDriverComponent = wizard.getCommDriverComponent();
@@ -139,10 +137,10 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			@Override
 			public void process(final XtextResource resource) throws Exception {
 
-				ThreadSubcomponent commDriver = null;
+				Subcomponent commDriver = null;
 				for (Subcomponent comp : ci.getAllSubcomponents()) {
 					if (comp.getName().equalsIgnoreCase(commDriverComponent)) {
-						commDriver = (ThreadSubcomponent) comp;
+						commDriver = comp;
 						break;
 					}
 				}
@@ -177,15 +175,22 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					return;
 				}
 
-				// TODO: Add CASE_Model_Transformations rename, if not already present
+				ComponentCategory compCategory = commDriver.getCategory();
+				// If the component type is a process, we will need to put a single thread inside.
+				// Per convention, we will attach all properties and contracts to the thread.
+				// For this model transformation, we will create the thread first, then wrap it in a process
+				// component, using the same mechanism we use for the seL4 transformation
+				boolean isProcess = (compCategory == ComponentCategory.PROCESS);
+				if (isProcess) {
+					compCategory = ComponentCategory.THREAD;
+				}
 
 				// TODO: check to see if the comm driver already has an attestation manager?
-
-				// Create Attestation Manager thread type
-				final ThreadType attestationManagerThreadType = (ThreadType) pkgSection
-						.createOwnedClassifier(Aadl2Package.eINSTANCE.getThreadType());
+				// Create Attestation Manager component type
+				final ComponentType attestationManagerType = (ComponentType) pkgSection
+						.createOwnedClassifier(ComponentCreateHelper.getTypeClass(compCategory));
 				// Give it a unique name
-				attestationManagerThreadType
+				attestationManagerType
 						.setName(getUniqueName(AM_COMP_TYPE_NAME, true, pkgSection.getOwnedClassifiers()));
 
 				// Create Attestation Manager ports
@@ -201,16 +206,16 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						Port portOut = null;
 						DataSubcomponentType dataFeatureClassifier = null;
 						if (commPort instanceof EventDataPort) {
-							portIn = attestationManagerThreadType.createOwnedEventDataPort();
+							portIn = ComponentCreateHelper.createOwnedEventDataPort(attestationManagerType);
 							dataFeatureClassifier = ((EventDataPort) commPort).getDataFeatureClassifier();
 							((EventDataPort) portIn).setDataFeatureClassifier(dataFeatureClassifier);
-							portOut = attestationManagerThreadType.createOwnedEventDataPort();
+							portOut = ComponentCreateHelper.createOwnedEventDataPort(attestationManagerType);
 							((EventDataPort) portOut).setDataFeatureClassifier(dataFeatureClassifier);
 						} else if (commPort instanceof DataPort) {
-							portIn = attestationManagerThreadType.createOwnedDataPort();
+							portIn = ComponentCreateHelper.createOwnedDataPort(attestationManagerType);
 							dataFeatureClassifier = ((DataPort) commPort).getDataFeatureClassifier();
 							((DataPort) portIn).setDataFeatureClassifier(dataFeatureClassifier);
-							portOut = attestationManagerThreadType.createOwnedDataPort();
+							portOut = ComponentCreateHelper.createOwnedDataPort(attestationManagerType);
 							((DataPort) portOut).setDataFeatureClassifier(dataFeatureClassifier);
 						}
 
@@ -240,8 +245,10 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				}
 
 				// Add the ports for communicating attestation requests/responses with the Comm Driver
-				final EventDataPort amReq = attestationManagerThreadType.createOwnedEventDataPort();
-				final EventDataPort amRes = attestationManagerThreadType.createOwnedEventDataPort();
+				final EventDataPort amReq = (EventDataPort) ComponentCreateHelper
+						.createOwnedEventDataPort(attestationManagerType);
+				final EventDataPort amRes = (EventDataPort) ComponentCreateHelper
+						.createOwnedEventDataPort(attestationManagerType);
 				// Set data feature classifier
 				amReq.setDataFeatureClassifier(requestMsgImpl);
 				amRes.setDataFeatureClassifier(responseMsgImpl);
@@ -251,9 +258,11 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				amRes.setIn(true);
 
 				// Add attestation request/response ports on comm driver (or create new comm driver component?)
-				final ThreadType commDriverThreadType = (ThreadType) commDriver.getComponentType();
-				final EventDataPort commReq = commDriverThreadType.createOwnedEventDataPort();
-				final EventDataPort commRes = commDriverThreadType.createOwnedEventDataPort();
+				final ComponentType commDriverType = commDriver.getComponentType();
+				final EventDataPort commReq = (EventDataPort) ComponentCreateHelper
+						.createOwnedEventDataPort(commDriverType);
+				final EventDataPort commRes = (EventDataPort) ComponentCreateHelper
+						.createOwnedEventDataPort(commDriverType);
 				commReq.setDataFeatureClassifier(requestMsgImpl);
 				commRes.setDataFeatureClassifier(responseMsgImpl);
 				commReq.setName(AM_PORT_ATTESTATION_REQUEST_NAME);
@@ -265,14 +274,15 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
 						resource.getResourceSet());
 				// CASE_Properties::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerThreadType, casePropSet)) {
+				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerType, casePropSet)) {
 //					return;
 				}
-				// CASE_Properties::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerThreadType,
-						casePropSet)) {
-//					return;
-				}
+
+//				// CASE_Properties::COMP_IMPL property
+//				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerType,
+//						casePropSet)) {
+////					return;
+//				}
 
 				// CASE_Properties::COMP_SPEC property
 				// Parse the ID from the Attestation Manager AGREE property
@@ -284,29 +294,28 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				} catch (IndexOutOfBoundsException e) {
 					// agree property is malformed, so leave blank
 				}
-				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerThreadType,
-						casePropSet)) {
+				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType, casePropSet)) {
 //					return;
 				}
 
-				// CASE_Properties::CACHE_TIMEOUT property
-				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerThreadType, casePropSet)) {
-//					return;
-				}
-
-				// CASE_Properties::CACHE_SIZE property
-				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerThreadType, casePropSet)) {
-//					return;
-				}
-
-				// CASE_Properties::LOG_SIZE property
-				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerThreadType, casePropSet)) {
-//					return;
-				}
+//				// CASE_Properties::CACHE_TIMEOUT property
+//				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerType, casePropSet)) {
+////					return;
+//				}
+//
+//				// CASE_Properties::CACHE_SIZE property
+//				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerType, casePropSet)) {
+////					return;
+//				}
+//
+//				// CASE_Properties::LOG_SIZE property
+//				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerType, casePropSet)) {
+////					return;
+//				}
 
 				// Put Attestation Manager in proper location (just after the comm driver)
 				String destName = "";
-				if (commDriver.getThreadSubcomponentType() instanceof ThreadImplementation) {
+				if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
 					// Get the component type implementation name
 					destName = commDriver.getComponentImplementation().getName();
 				} else {
@@ -318,94 +327,79 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create Attestation Manager implementation
-				final ThreadImplementation attestationManagerThreadImpl = (ThreadImplementation) pkgSection
-						.createOwnedClassifier(Aadl2Package.eINSTANCE.getThreadImplementation());
-				attestationManagerThreadImpl.setName(attestationManagerThreadType.getName() + ".Impl");
-				final Realization r = attestationManagerThreadImpl.createOwnedRealization();
-				r.setImplemented(attestationManagerThreadType);
+				final ComponentImplementation attestationManagerImpl = (ComponentImplementation) pkgSection
+						.createOwnedClassifier(ComponentCreateHelper.getImplClass(compCategory));
+				attestationManagerImpl.setName(attestationManagerType.getName() + ".Impl");
+				final Realization r = attestationManagerImpl.createOwnedRealization();
+				r.setImplemented(attestationManagerType);
 
 				// Add it to proper place
 				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 2,
 						pkgSection.getOwnedClassifiers().size() - 1);
 
-				// Make a copy of the process component implementation
-				final ProcessImplementation procImpl = (ProcessImplementation) commDriver.getContainingComponentImpl();
-//				final ProcessImplementation newImpl = EcoreUtil.copy(procImpl);
-//				// Give it a unique name
-//				newImpl.setName(getUniqueName(newImpl.getName(), true, pkgSection.getOwnedClassifiers()));
+				// CASE_Properties::COMP_IMPL property
+				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerImpl,
+						casePropSet)) {
+//					return;
+				}
 
-//				// Change commDriver to refer to the subcomponent on the new implementation
-//				for (ThreadSubcomponent c : newImpl.getOwnedThreadSubcomponents()) {
-//					if (c.getName().equalsIgnoreCase(commDriver.getName())) {
-//						commDriver = c;
-//						break;
-//					}
+				// CASE_Properties::COMP_SPEC property
+				// Parse the ID from the Attestation Manager AGREE property
+//				String attestationPropId = "";
+//				try {
+//					attestationPropId = attestationAgreeProperty.substring(
+//							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+//							attestationAgreeProperty.indexOf("\"")).trim();
+//				} catch (IndexOutOfBoundsException e) {
+//					// agree property is malformed, so leave blank
+//				}
+//				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerImpl,
+//						casePropSet)) {
+////					return;
 //				}
 
+				// CASE_Properties::CACHE_TIMEOUT property
+				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
+//					return;
+				}
+
+				// CASE_Properties::CACHE_SIZE property
+				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerImpl, casePropSet)) {
+//					return;
+				}
+
+				// CASE_Properties::LOG_SIZE property
+				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerImpl, casePropSet)) {
+//					return;
+				}
+
+				// Get the parent component implementation
+				final ComponentImplementation containingImpl = commDriver.getContainingComponentImpl();
+
 				// Insert attestation manager in process component implementation
-//				final ThreadSubcomponent attestationManagerThreadSubComp = newImpl.createOwnedThreadSubcomponent();
-				final ThreadSubcomponent attestationManagerThreadSubComp = procImpl.createOwnedThreadSubcomponent();
+				final Subcomponent attestationManagerSubcomp = ComponentCreateHelper
+						.createOwnedSubcomponent(containingImpl, compCategory);
 
 				// Give it a unique name
-//				attestationManagerThreadSubComp
-//						.setName(getUniqueName(implementationName, true, newImpl.getOwnedSubcomponents()));
-				attestationManagerThreadSubComp
-						.setName(getUniqueName(implementationName, true, procImpl.getOwnedSubcomponents()));
+				attestationManagerSubcomp
+						.setName(getUniqueName(implementationName, true, containingImpl.getOwnedSubcomponents()));
 				// Assign thread implementation
-				attestationManagerThreadSubComp.setThreadSubcomponentType(attestationManagerThreadImpl);
+				ComponentCreateHelper.setSubcomponentType(attestationManagerSubcomp, attestationManagerImpl);
 
-				// Put it in the right place
-//				newImpl.getOwnedThreadSubcomponents().move(
-//						getIndex(commDriver.getName(), newImpl.getOwnedThreadSubcomponents()) + 1,
-//						newImpl.getOwnedThreadSubcomponents().size() - 1);
-				procImpl.getOwnedThreadSubcomponents().move(
-						getIndex(commDriver.getName(), procImpl.getOwnedThreadSubcomponents()) + 1,
-						procImpl.getOwnedThreadSubcomponents().size() - 1);
-
-//				// Create attestation request / response connections between comm driver and attestation manager
 				List<PortConnection> newPortConns = new ArrayList<>();
-////				final PortConnection portConnReq = newImpl.createOwnedPortConnection();
-//				final PortConnection portConnReq = Aadl2Factory.eINSTANCE.createPortConnection();
-//				// Give it a unique name
-////				portConnReq.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
-//				portConnReq.setBidirectional(false);
-//				final ConnectedElement reqSrc = portConnReq.createSource();
-//				reqSrc.setContext(attestationManagerThreadSubComp);
-//				reqSrc.setConnectionEnd(amReq);
-//				final ConnectedElement reqDst = portConnReq.createDestination();
-//				reqDst.setContext(commDriver);
-//				reqDst.setConnectionEnd(commReq);
-//				newPortConns.add(portConnReq);
-//
-////				final PortConnection portConnRes = newImpl.createOwnedPortConnection();
-//				final PortConnection portConnRes = Aadl2Factory.eINSTANCE.createPortConnection();
-//				// Give it a unique name
-////				portConnRes.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
-//				portConnRes.setBidirectional(false);
-//				final ConnectedElement resSrc = portConnRes.createSource();
-//				resSrc.setContext(commDriver);
-//				resSrc.setConnectionEnd(amRes);
-//				final ConnectedElement resDst = portConnRes.createDestination();
-//				resDst.setContext(attestationManagerThreadSubComp);
-//				resDst.setConnectionEnd(commRes);
-//				newPortConns.add(portConnRes);
 
 				// Create new connections between comm driver / attestation manager / destination components
 				String connName = "";
-//				for (PortConnection conn : newImpl.getOwnedPortConnections()) {
-				for (PortConnection conn : procImpl.getOwnedPortConnections()) {
+				for (PortConnection conn : containingImpl.getOwnedPortConnections()) {
 					// Ignore bus connections (destination context not null)
 					if (conn.getSource().getContext() == commDriver && conn.getDestination().getContext() != null) {
 						// Create connection from attestation manager to destination components
-//						final PortConnection portConnOut = newImpl.createOwnedPortConnection();
 						final PortConnection portConnOut = Aadl2Factory.eINSTANCE.createPortConnection();
 						// Give it a unique name
-//						portConnOut
-//								.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
 						portConnOut.setBidirectional(false);
 						final ConnectedElement connSrc = portConnOut.createSource();
-						connSrc.setContext(attestationManagerThreadSubComp);
-						for (Feature feature : attestationManagerThreadType.getAllFeatures()) {
+						connSrc.setContext(attestationManagerSubcomp);
+						for (Feature feature : attestationManagerType.getAllFeatures()) {
 							if (feature.getName()
 									.equalsIgnoreCase("am_" + conn.getSource().getConnectionEnd().getName() + "_out")) {
 								connSrc.setConnectionEnd(feature);
@@ -419,8 +413,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						newPortConns.add(portConnOut);
 
 						// Rewire connections from comm driver into attestation manager
-						conn.getDestination().setContext(attestationManagerThreadSubComp);
-						for (Feature feature : attestationManagerThreadType.getAllFeatures()) {
+						conn.getDestination().setContext(attestationManagerSubcomp);
+						for (Feature feature : attestationManagerType.getAllFeatures()) {
 							if (feature.getName()
 									.equalsIgnoreCase("am_" + conn.getSource().getConnectionEnd().getName() + "_in")) {
 								conn.getDestination().setConnectionEnd(feature);
@@ -435,60 +429,55 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				}
 
 				// Create attestation request / response connections between comm driver and attestation manager
-//				List<PortConnection> newPortConns = new ArrayList<>();
-//				final PortConnection portConnReq = newImpl.createOwnedPortConnection();
 				final PortConnection portConnReq = Aadl2Factory.eINSTANCE.createPortConnection();
 				// Give it a unique name
-//				portConnReq.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
 				portConnReq.setBidirectional(false);
 				final ConnectedElement reqSrc = portConnReq.createSource();
-				reqSrc.setContext(attestationManagerThreadSubComp);
+				reqSrc.setContext(attestationManagerSubcomp);
 				reqSrc.setConnectionEnd(amReq);
 				final ConnectedElement reqDst = portConnReq.createDestination();
 				reqDst.setContext(commDriver);
 				reqDst.setConnectionEnd(commReq);
 				newPortConns.add(portConnReq);
 
-//				final PortConnection portConnRes = newImpl.createOwnedPortConnection();
 				final PortConnection portConnRes = Aadl2Factory.eINSTANCE.createPortConnection();
 				// Give it a unique name
-//				portConnRes.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
 				portConnRes.setBidirectional(false);
 				final ConnectedElement resSrc = portConnRes.createSource();
 				resSrc.setContext(commDriver);
 				resSrc.setConnectionEnd(amRes);
 				final ConnectedElement resDst = portConnRes.createDestination();
-				resDst.setContext(attestationManagerThreadSubComp);
+				resDst.setContext(attestationManagerSubcomp);
 				resDst.setConnectionEnd(commRes);
 				newPortConns.add(portConnRes);
 
 				int idxOffset = 1;
 				for (PortConnection newPortConn : newPortConns) {
 					// Make sure each new connection has a unique name
-//					newPortConn.setName(getUniqueName(CONNECTION_IMPL_NAME, false, newImpl.getOwnedPortConnections()));
-					newPortConn.setName(getUniqueName(CONNECTION_IMPL_NAME, false, procImpl.getOwnedPortConnections()));
-//					newImpl.getOwnedPortConnections().add(newPortConn);
-					procImpl.getOwnedPortConnections().add(newPortConn);
+					newPortConn.setName(
+							getUniqueName(CONNECTION_IMPL_NAME, false, containingImpl.getOwnedPortConnections()));
+					containingImpl.getOwnedPortConnections().add(newPortConn);
 					// Move to right place
-//					newImpl.getOwnedPortConnections().move(
-//							getIndex(connName, newImpl.getOwnedPortConnections()) + idxOffset,
-//							newImpl.getOwnedPortConnections().size() - 1);
-					procImpl.getOwnedPortConnections().move(
-							getIndex(connName, procImpl.getOwnedPortConnections()) + idxOffset,
-							procImpl.getOwnedPortConnections().size() - 1);
+					containingImpl.getOwnedPortConnections().move(
+							getIndex(connName, containingImpl.getOwnedPortConnections()) + idxOffset,
+							containingImpl.getOwnedPortConnections().size() - 1);
 					idxOffset++;
 				}
-
-//				// Add new implementation to package and place immediately above original implementation
-//				pkgSection.getOwnedClassifiers().add(newImpl);
-//				pkgSection.getOwnedClassifiers().move(getIndex(procImpl.getName(), pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Add add_attestation claims to resolute prove statement, if applicable
 				if (!attestationResoluteClause.isEmpty()) {
 
+					NamedElement commDriverComp = null;
+					if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
+						// Get the component implementation
+						commDriverComp = commDriver.getComponentImplementation();
+					} else {
+						// Get the component type
+						commDriverComp = commDriverType;
+					}
+
 					RequirementsManager.getInstance().modifyRequirement(attestationResoluteClause, resource,
-							new AddAttestationManagerClaim(commDriverThreadType, attestationManagerThreadType));
+							new AddAttestationManagerClaim(commDriverComp, attestationManagerImpl));
 
 				}
 
@@ -557,11 +546,19 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 					agreeClauses = agreeClauses + "\t\t**}";
 
-					final DefaultAnnexSubclause annexSubclauseImpl = attestationManagerThreadType
-							.createOwnedAnnexSubclause();
+					final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper
+							.createOwnedAnnexSubclause(attestationManagerType);
 					annexSubclauseImpl.setName("agree");
 					annexSubclauseImpl.setSourceText(agreeClauses);
 				}
+
+				if (isProcess) {
+
+					// TODO: Wrap thread component in a process
+
+					// TODO: Bind process to processor
+				}
+
 			}
 		});
 

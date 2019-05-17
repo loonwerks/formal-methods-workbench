@@ -166,7 +166,7 @@ val tmToString =
 fun simpfrag_to_ssfrag {rewrs,convs} =
  let open simpLib
  in SSFRAG {name = NONE,
-            convs = convs, rewrs = rewrs, 
+            convs = convs, rewrs = map (fn th => (NONE,th)) rewrs, 
             filter = NONE, dprocs = [], ac = [], congs = []}
  end;
 
@@ -194,7 +194,8 @@ val basic_ss =
              trace=2,
              key=SOME ([],``(\x:'a. y:'b) z``),
   	   conv=K (K BETA_CONV)}],
-     rewrs=[REFL_CLAUSE,  EQ_CLAUSES,
+     rewrs = map (fn th => (NONE,th))
+           [REFL_CLAUSE,  EQ_CLAUSES,
             NOT_CLAUSES,  AND_CLAUSES,
             OR_CLAUSES,   IMP_CLAUSES,
             COND_CLAUSES, FORALL_SIMP,
@@ -233,7 +234,8 @@ val kstd_ss =
              trace=2,
              key=SOME ([],``(\x:'a. y:'b) z``),
   	   conv=K (K BETA_CONV)}],
-     rewrs=[REFL_CLAUSE,  EQ_CLAUSES,
+     rewrs= map (fn th => (NONE,th))
+           [REFL_CLAUSE,  EQ_CLAUSES,
             NOT_CLAUSES,  AND_CLAUSES,
             OR_CLAUSES,   IMP_CLAUSES,
             COND_CLAUSES, FORALL_SIMP,
@@ -370,7 +372,7 @@ fun FAPPLY_FUPDATE_CONV key_eq_conv tm =
                  val eqthm = key_eq_conv (mk_eq(key,ki))
                  val fupd_thm = ISPECL [rst,ki,x,key] FAPPLY_FUPDATE_THM
                  val fupd_thm' = CONV_RULE (TEST_CONV eqthm) fupd_thm
-             in if snd(dest_eq(concl eqthm)) = boolSyntax.T
+             in if same_const (snd(dest_eq(concl eqthm))) boolSyntax.T
                  then fupd_thm'
                  else let val subthm = steps rst
                       in TRANS fupd_thm' subthm
@@ -564,7 +566,8 @@ fun sort_on_qid_key list =
 
 (*---------------------------------------------------------------------------
  Following are unused, but may be useful again.
-fun classes P [] = []
+
+ fun classes P [] = []
   | classes P (h::t)= 
      let val (pass,fail) = Lib.partition (P h) t
      in (h::pass)::classes P fail

@@ -1,0 +1,6 @@
+property set Props is
+
+	COMP_TYPE: enumeration (FILTER, ATTESTATION, MONITOR, ROUTER, ISOLATOR, COMM_DRIVER, SWITCH, SAFETY_CONTROLLER) applies to (system, process, thread, device, abstract);
+
+
+end Props;

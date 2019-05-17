@@ -12,7 +12,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.json.plugin.AgreeJson;
+import com.collins.fmw.cyres.json.plugin.Aadl2Json;
 
 public class GenerateRequirementsHandler extends AbstractHandler {
 
@@ -32,7 +32,7 @@ public class GenerateRequirementsHandler extends AbstractHandler {
 
 			try {
 				// Generate json
-				URI jsonURI = AgreeJson.createJson(event);
+				URI jsonURI = Aadl2Json.createJson(event);
 			} catch (CoreException | IOException e) {
 				Dialog.showError("Model Export", "Unable to export model to JSON format.");
 				e.printStackTrace();

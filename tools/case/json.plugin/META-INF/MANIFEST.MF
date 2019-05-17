@@ -12,10 +12,13 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.ui.console
 Import-Package: com.collins.fmw.cyres.util.plugin,
  com.rockwellcollins.atc.agree.agree,
+ com.rockwellcollins.atc.agree.analysis.handlers,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.osate.aadl2.instantiation,
- org.osate.annexsupport
-Bundle-ClassPath: lib/gson-2.8.5, 
- .
+ org.osate.aadl2.modelsupport.resources,
+ org.osate.annexsupport,
+ org.osate.ge
+Bundle-ClassPath: .,
+ lib/gson-2.8.5.jar
 Export-Package: com.collins.fmw.cyres.json.plugin

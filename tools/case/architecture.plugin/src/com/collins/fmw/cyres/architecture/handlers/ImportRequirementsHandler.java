@@ -100,10 +100,8 @@ public class ImportRequirementsHandler extends AbstractHandler {
 	 * @param reqList
 	 */
 	private void removeExistingRequirements(JsonRequirementsFile jsonFile, final List<CyberRequirement> reqList) {
-//		Iterator<JsonRequirement> i = jsonFile.getRequirements().iterator();
 		Iterator<CyberRequirement> i = jsonFile.getRequirements().iterator();
 		while (i.hasNext()) {
-//			JsonRequirement jsonReq = i.next();
 			CyberRequirement jsonReq = i.next();
 			for (CyberRequirement req : reqList) {
 				if (req.getType().equalsIgnoreCase(jsonReq.getType())

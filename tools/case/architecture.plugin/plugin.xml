@@ -41,6 +41,16 @@
                      label="Import Requirements..."
                      style="push">
                </command>
+               <separator
+                     name="architecture.plugin.requirements.separator1"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.formalize"
+                     label="Formalize Requirement"
+                     style="push">
+               </command>
             </menu>
             <menu
                   id="com.collins.fmw.cyres.menus.outline.resiliency"
@@ -152,6 +162,16 @@
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.menubar.requirements.import"
                      label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="architecture.plugin.requirements.separator1"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.formalize"
+                     label="Formalize Requirement"
                      style="push">
                </command>
             </menu>
@@ -288,6 +308,16 @@
                      label="Import Requirements..."
                      style="push">
                </command>
+               <separator
+                     name="architecture.plugin.requirements.separator1"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.formalize"
+                     label="Formalize Requirement"
+                     style="push">
+               </command>
             </menu>
             <menu
                   id="com.collins.fmw.cyres.menus.editor.resiliency"
@@ -411,6 +441,10 @@
             name="Model Annotations">
       </command>
       <command
+            id="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
+            name="Formalize Requirement">
+      </command>
+      <command
             id="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
             name="Select Implementation">
       </command>
@@ -448,6 +482,10 @@
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.FormalizeRequirementHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.SelectImplementationHandler"
@@ -490,18 +528,18 @@
       </aadlcontribution>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.collins.fmw.cyres.architecture.preferences.CasePreferenceInitializer">
-      </initializer>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
             id="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
             name="CASE">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.collins.fmw.cyres.architecture.preferences.CasePreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>
