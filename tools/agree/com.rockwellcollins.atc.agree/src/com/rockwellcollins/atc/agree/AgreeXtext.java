@@ -62,6 +62,7 @@ import com.rockwellcollins.atc.agree.Nenola.Contract;
 import com.rockwellcollins.atc.agree.Nenola.DataContract;
 import com.rockwellcollins.atc.agree.Nenola.EnumContract;
 import com.rockwellcollins.atc.agree.Nenola.Interval;
+import com.rockwellcollins.atc.agree.Nenola.LinearNodeGen;
 import com.rockwellcollins.atc.agree.Nenola.NodeGen;
 import com.rockwellcollins.atc.agree.Nenola.Prim;
 import com.rockwellcollins.atc.agree.Nenola.PropVal;
@@ -861,6 +862,7 @@ public class AgreeXtext {
 		Map<String, Nenola.NodeContract> subNodes = new HashMap<>();
 
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(c);
+		Map<String, Nenola.LinearNodeGen> linearNodeGenMap = extractLinearNodeGenMap(c);
 
 		List<Nenola.Connection> connections = new ArrayList<>();
 		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
@@ -905,7 +907,8 @@ public class AgreeXtext {
 
 		String name = c.getQualifiedName();
 
-		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, connections, specs, timingMode,
+		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, linearNodeGenMap, connections, specs,
+				timingMode,
 				isImpl, c);
 	}
 
@@ -2009,19 +2012,27 @@ public class AgreeXtext {
 		return result;
 	}
 
+	private static Map<String, LinearNodeGen> extractLinearNodeGenMap(ComponentClassifier c) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public static Nenola.Program toProgram(ComponentImplementation ci) {
 		Nenola.Contract main = toNodeContractFromClassifier(ci, true);
 		Map<String, Nenola.NodeContract> nodeContractMap = extractNodeContractMap(ci);
 		Map<String, Nenola.DataContract> dataContractMap = extractDataContractMap(ci);
 		Map<String, Nenola.NodeGen> nodeGenMap = extractNodeGenMap(ci);
+		Map<String, Nenola.LinearNodeGen> linearNodeGenMap = extractLinearNodeGenMap(ci);
 		Map<String, Map<String, PropVal>> props = extractPropMapFromCompImp(ci);
 
 		if (main instanceof Nenola.NodeContract) {
-			return new Nenola.Program((Nenola.NodeContract) main, nodeContractMap, dataContractMap, nodeGenMap, props);
+			return new Nenola.Program((Nenola.NodeContract) main, nodeContractMap, dataContractMap, nodeGenMap,
+					linearNodeGenMap, props);
 		}
 
 		throw new RuntimeException("Component Implementation cannot be converted to Node Contract");
 	}
+
 
 
 }
