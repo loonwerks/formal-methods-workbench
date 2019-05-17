@@ -3459,11 +3459,11 @@ public class Nenola {
 		}
 
 		private Map<String, DataContract> getValueTypes() {
-
+			Map<String, DataContract> acc = new HashMap<>();
 			for (Channel c : this.channels.values()) {
-				// TODO Auto-generated method stub
+				acc.put(c.name, c.dataContract);
 			}
-			return null;
+			return acc;
 		}
 
 
@@ -4123,36 +4123,39 @@ public class Nenola {
 		}
 
 		private List<VarDecl> toLustreInputlList() {
-
+			List<VarDecl> acc = new ArrayList<>();
 			for (Channel c : this.channels.values()) {
 				if (c.direction instanceof Nenola.In) {
-					// TODO Auto-generated method stub
-
+					VarDecl var = new VarDecl(c.name, c.dataContract.toLustreType());
+					acc.add(var);
 				}
 			}
-			return null;
+			return acc;
 		}
 
 		private List<VarDecl> toLustreOutputlList() {
 
+			List<VarDecl> acc = new ArrayList<>();
 			for (Channel c : this.channels.values()) {
 				if (c.direction instanceof Nenola.Out) {
-					// TODO Auto-generated method stub
+					VarDecl var = new VarDecl(c.name, c.dataContract.toLustreType());
+					acc.add(var);
 
 				}
 			}
-			return null;
+			return acc;
 		}
 
 		private List<VarDecl> toLustreLocallList() {
 
+			List<VarDecl> acc = new ArrayList<>();
 			for (Channel c : this.channels.values()) {
 				if (c.direction instanceof Nenola.Bi) {
-					// TODO Auto-generated method stub
-
+					VarDecl var = new VarDecl(c.name, c.dataContract.toLustreType());
+					acc.add(var);
 				}
 			}
-			return null;
+			return acc;
 		}
 
 		private Optional<Node> clockedNodeMap = Optional.empty();
