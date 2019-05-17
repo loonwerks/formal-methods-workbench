@@ -3471,7 +3471,7 @@ public class Nenola {
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
-			List<jkind.lustre.Expr> assertions = this.toLustreAssertList(state, isMonolithic);
+			List<jkind.lustre.Expr> assertions = this.toLustreAssertionsFromAsserts(state, isMonolithic);
 			List<String> ivcs = new ArrayList<>();
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
@@ -3521,20 +3521,20 @@ public class Nenola {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
-			inputs.addAll(this.toLustreChanInList(state, isMonolithic));
+			inputs.addAll(this.toLustreVarsFromInChans(state, isMonolithic));
 
-			inputs.addAll(this.toLustreChanOutList(state, isMonolithic));
+			inputs.addAll(this.toLustreVarsFromOutChans(state, isMonolithic));
 
-			inputs.addAll(this.toLustreChanBiList(state, isMonolithic));
+			locals.addAll(this.toLustreVarsFromBiChans(state, isMonolithic));
 
-			equations.addAll(this.toLustreEquationList(state, isMonolithic));
+			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
 
 			String outputName = "__ASSERT";
 			List<VarDecl> outputs = new ArrayList<>();
 			outputs.add(new VarDecl(outputName, NamedType.BOOL));
 			equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
 
-			// TODO : add in properties for Nenola connections - see ASTBuilder
+			assertions.addAll(this.toLustreAssertionsFromConnections());
 
 			NodeBuilder builder = new NodeBuilder(this.getName());
 			builder.addInputs(inputs);
@@ -3544,6 +3544,42 @@ public class Nenola {
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
 			return node;
+		}
+
+		private List<jkind.lustre.Expr> toLustreAssertionsFromConnections() {
+			// TODO:
+//			for (AgreeConnection conn : agreeNode.connections) {
+//				if (conn instanceof AgreeAADLConnection) {
+//					AgreeAADLConnection aadlConn = (AgreeAADLConnection) conn;
+//					String destName = aadlConn.destinationNode == null ? ""
+//							: aadlConn.destinationNode.id + AgreeASTBuilder.dotChar;
+//					destName = destName + aadlConn.destinationVarName.id;
+//
+//					String sourName = aadlConn.sourceNode == null ? ""
+//							: aadlConn.sourceNode.id + AgreeASTBuilder.dotChar;
+//					sourName = sourName + aadlConn.sourceVarName.id;
+//
+//					Expr aadlConnExpr;
+//
+//					if (!aadlConn.delayed) {
+//						aadlConnExpr = new BinaryExpr(new IdExpr(sourName), BinaryOp.EQUAL, new IdExpr(destName));
+//					} else {
+//						// we need to get the correct type for the aadlConnection
+//						// we can assume that the source and destination types are
+//						// the same at this point
+//						Expr initExpr = AgreeUtils.getInitValueFromType(aadlConn.sourceVarName.type);
+//						Expr preSource = new UnaryExpr(UnaryOp.PRE, new IdExpr(sourName));
+//						Expr sourExpr = new BinaryExpr(initExpr, BinaryOp.ARROW, preSource);
+//						aadlConnExpr = new BinaryExpr(sourExpr, BinaryOp.EQUAL, new IdExpr(destName));
+//					}
+//
+//					assertions.add(new AgreeStatement("", aadlConnExpr, aadlConn.reference));
+//				} else {
+//					AgreeOverriddenConnection agreeConn = (AgreeOverriddenConnection) conn;
+//					assertions.add(agreeConn.statement);
+//				}
+//			}
+			return null;
 		}
 
 //		public Node toLustreNode(boolean isMain, boolean isMonolithic) {
@@ -3584,12 +3620,12 @@ public class Nenola {
 				ivcs.add(inputName);
 			}
 
-			for (jkind.lustre.Expr assertion : this.toLustreAssertList(state, isMonolithic)) {
+			for (jkind.lustre.Expr assertion : this.toLustreAssertionsFromAsserts(state, isMonolithic)) {
 				assertions.add(assertion);
 			}
 
 			// add assumption and monolithic lemmas first (helps with proving)
-			for (VarDecl var : this.toLustreChanOutList(state, isMonolithic)) {
+			for (VarDecl var : this.toLustreVarsFromOutChans(state, isMonolithic)) {
 				inputs.add(var);
 			}
 
@@ -3636,16 +3672,16 @@ public class Nenola {
 				properties.add(name);
 			}
 
-			for (VarDecl var : this.toLustreChanInList(state, isMonolithic)) {
+			for (VarDecl var : this.toLustreVarsFromInChans(state, isMonolithic)) {
 				inputs.add(var);
 			}
-			for (VarDecl var : this.toLustreChanBiList(state, isMonolithic)) {
+			for (VarDecl var : this.toLustreVarsFromBiChans(state, isMonolithic)) {
 				locals.add(var);
 			}
 
 
 
-			equations.addAll(this.toLustreEquationList(state, isMonolithic));
+			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
 			assertions.add(Lustre.getTimeConstraint(this.toEventTimeVarList(state, isMonolithic)));
 
 			NodeBuilder builder = new NodeBuilder("main");
@@ -3707,7 +3743,7 @@ public class Nenola {
 		}
 
 
-		private List<Equation> toLustreEquationList(StaticState state, boolean isMonolithic) {
+		private List<Equation> toLustreEquationsFromConnections(StaticState state, boolean isMonolithic) {
 			List<Equation> equations = new ArrayList<>();
 
 			for (Connection conn : this.connections) {
@@ -3729,7 +3765,7 @@ public class Nenola {
 			return equations;
 		}
 
-		private List<VarDecl> toLustreChanBiList(StaticState state, boolean isMonolithic) {
+		private List<VarDecl> toLustreVarsFromBiChans(StaticState state, boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 
@@ -3756,7 +3792,7 @@ public class Nenola {
 		}
 
 
-		private List<VarDecl> toLustreChanOutList(StaticState state, boolean isMonolithic) {
+		private List<VarDecl> toLustreVarsFromOutChans(StaticState state, boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
@@ -3782,7 +3818,7 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (VarDecl nestedVar : nc.toLustreChanOutList(state, isMonolithic)) {
+				for (VarDecl nestedVar : nc.toLustreVarsFromOutChans(state, isMonolithic)) {
 					String id = prefix + "__" + nestedVar.id;
 					jkind.lustre.Type type = nestedVar.type;
 					vars.add(new VarDecl(id, type));
@@ -3810,7 +3846,7 @@ public class Nenola {
 			return vars;
 		}
 
-		private List<VarDecl> toLustreChanInList(StaticState state, boolean isMonolithic) {
+		private List<VarDecl> toLustreVarsFromInChans(StaticState state, boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
@@ -3835,7 +3871,7 @@ public class Nenola {
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
-				for (VarDecl nestedVar : nc.toLustreChanInList(state, isMonolithic)) {
+				for (VarDecl nestedVar : nc.toLustreVarsFromInChans(state, isMonolithic)) {
 					String id = prefix + "__" + nestedVar.id;
 					jkind.lustre.Type type = nestedVar.type;
 					vars.add(new VarDecl(id, type));
@@ -3894,7 +3930,7 @@ public class Nenola {
 			return props;
 		}
 
-		private List<jkind.lustre.Expr> toLustreAssertList(StaticState state, boolean isMonolithic) {
+		private List<jkind.lustre.Expr> toLustreAssertionsFromAsserts(StaticState state, boolean isMonolithic) {
 
 			List<jkind.lustre.Expr> exprs = new ArrayList<>();
 
@@ -3930,7 +3966,7 @@ public class Nenola {
 
 				NodeContract nc = entry.getValue();
 
-				for (jkind.lustre.Expr subAssert : nc.toLustreAssertList(state, isMonolithic)) {
+				for (jkind.lustre.Expr subAssert : nc.toLustreAssertionsFromAsserts(state, isMonolithic)) {
 					exprs.add(subAssert);
 				}
 
