@@ -42,7 +42,7 @@ before_deploy:
 deploy:
   # Deploy update site back to repository
   - provider: script
-    script: python3 push_update_site.py $TRAVIS_TAG
+    script: python3 .travis/push_update_site.py $TRAVIS_TAG
     on:
       tags: true
   # Deploy nightly build to github releases
@@ -57,9 +57,15 @@ deploy:
     body: Automated CASE integration build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
       by Travis CI on $(date +'%F %T %Z').
     prerelease: true
-    overwrite: true
+    overwrite: false
     skip_cleanup: true
     target_commitish: $TRAVIS_COMMIT
+    on:
+      branch: master
+      condition: $TRAVIS_EVENT_TYPE = cron
+  # Delete older nightly build releases
+  - provider: script
+    script: python3 .travis/manage_daily_builds.py
     on:
       branch: master
       condition: $TRAVIS_EVENT_TYPE = cron
