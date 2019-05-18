@@ -7,7 +7,6 @@ import static jkind.lustre.parsing.LustreParseUtil.to;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -3466,7 +3465,7 @@ public class Nenola {
 			return lustreNodes;
 		}
 
-		private List<Node> toLustreNodesFromNodeGenList(StaticState state) {
+		private List<Node> toLustreNodesFromNodeGens(StaticState state) {
 			Map<String, DataContract> values = new HashMap<>();
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
@@ -4135,9 +4134,39 @@ public class Nenola {
 
 		}
 
-		public Collection<? extends Node> toLustreNodesFromNodeGens(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+		public List<Node> toLustreNodesFromLinearNodeGens(StaticState state) {
+			Map<String, DataContract> values = new HashMap<>();
+			values.putAll(state.valueEnv);
+			values.putAll(this.getValueTypes());
+			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap)
+					.newCurrentOp(Optional.of(this.name));
+
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			for (LinearNodeGen linearNodeGen : this.linearNodeGenMap.values()) {
+				jkind.lustre.Node lustreNode = linearNodeGen.toLustreNode(newState);
+				lustreNodes.add(lustreNode);
+
+			}
+
+			return lustreNodes;
+		}
+
+		public List<Node> toLustreClockedNodesFromLinearNodeGens(StaticState state) {
+			Map<String, DataContract> values = new HashMap<>();
+			values.putAll(state.valueEnv);
+			values.putAll(this.getValueTypes());
+			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap)
+					.newCurrentOp(Optional.of(this.name));
+
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			for (LinearNodeGen linearNodeGen : this.linearNodeGenMap.values()) {
+
+				jkind.lustre.Node lustreNode = linearNodeGen.toLustreClockedNode(newState);
+				lustreNodes.add(lustreNode);
+
+			}
+
+			return lustreNodes;
 		}
 
 	}
@@ -4389,10 +4418,10 @@ public class Nenola {
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGens(state));
-			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGens());
+			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGens(state));
 
 			lustreNodes.addAll(this.toLustreNodesFromLinearNodeGens(state));
-			lustreNodes.addAll(this.toLustreClockedNodesFromLinearNodeGens());
+			lustreNodes.addAll(this.toLustreClockedNodesFromLinearNodeGens(state));
 
 			lustreNodes.addAll(Nenola.lustreNodesFromMain(state, main, isMonolithic));
 
@@ -4407,24 +4436,48 @@ public class Nenola {
 
 
 
-		private List<Node> toLustreClockedNodesFromLinearNodeGens() {
-			// TODO Auto-generated method stub
-			return null;
+		private List<Node> toLustreClockedNodesFromLinearNodeGens(StaticState state) {
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			for (LinearNodeGen nodeGen : this.linearNodeGenMap.values()) {
+
+				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state);
+				lustreNodes.add(lustreNode);
+
+			}
+
+			for (Entry<String, NodeContract> entry : this.nodeContractMap.entrySet()) {
+
+				NodeContract nc = entry.getValue();
+
+				lustreNodes.addAll(nc.toLustreClockedNodesFromLinearNodeGens(state));
+
+			}
+
+			return lustreNodes;
 		}
 
 		private List<Node> toLustreNodesFromLinearNodeGens(StaticState state) {
-			// TODO Auto-generated method stub
-			return null;
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			for (LinearNodeGen nodeGen : this.linearNodeGenMap.values()) {
+
+				jkind.lustre.Node lustreNode = nodeGen.toLustreNode(state);
+				lustreNodes.add(lustreNode);
+
+			}
+
+			for (Entry<String, NodeContract> entry : this.nodeContractMap.entrySet()) {
+
+				NodeContract nc = entry.getValue();
+
+				lustreNodes.addAll(nc.toLustreNodesFromLinearNodeGens(state));
+
+			}
+
+			return lustreNodes;
 		}
 
-		private List<Node> toLustreClockedNodesFromNodeGens() {
+		private List<Node> toLustreClockedNodesFromNodeGens(StaticState state) {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
-			Map<String, DataContract> values = new HashMap<>();
-			Map<String, Map<String, PropVal>> props = this.propMap;
-			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, values,
-					new HashMap<>(), props,
-					Optional.empty());
-
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
 				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state);
@@ -4472,7 +4525,6 @@ public class Nenola {
 				jkind.lustre.Type lustreType = contract.toLustreType();
 				jkind.lustre.TypeDef lustreTypeDef = new jkind.lustre.TypeDef(name, lustreType);
 				lustreTypes.add(lustreTypeDef);
-
 
 			}
 
