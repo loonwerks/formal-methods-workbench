@@ -2042,6 +2042,7 @@ public class AgreeXtext {
 
 	private static LinearNodeGen toLinearNodeGenFromLinearizationDef(LinearizationDef linDef) {
 		assert (linDef.getArgs().size() == 1);
+		assert (linDef.getIntervals().size() == 1);
 //		'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
 //				'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']'
 //				('within' precision=Expr)? ':' exprBody=Expr ';'
@@ -2049,9 +2050,16 @@ public class AgreeXtext {
 		String name = linDef.getName();
 		String argName = linDef.getArgs().get(0).getName();
 
-		// TODO Auto-generated method stub
+		Nenola.Expr start = toExprFromExpr(linDef.getIntervals().get(0).getStart());
+		Nenola.Expr stop = toExprFromExpr(linDef.getIntervals().get(0).getEnd());
+		Nenola.Expr bound = new Nenola.RealLit("0.1");
+		if (linDef.getPrecision() != null) {
+			bound = toExprFromExpr(linDef.getPrecision());
+		}
 
-		return null;
+		Nenola.Expr body = toExprFromExpr(linDef.getExprBody());
+
+		return new Nenola.LinearNodeGen(name, argName, start, stop, bound, body);
 	}
 
 	public static Nenola.Program toProgram(ComponentImplementation ci) {

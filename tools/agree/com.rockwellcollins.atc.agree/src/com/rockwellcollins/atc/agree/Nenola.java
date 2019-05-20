@@ -4320,9 +4320,19 @@ public class Nenola {
 	public static class LinearNodeGen {
 
 		public final String name;
+		public final String argName;
+		public final Expr start;
+		public final Expr stop;
+		public final Expr bound;
+		public final Expr body;
 
-		public LinearNodeGen(String name) {
+		public LinearNodeGen(String name, String argName, Expr start, Expr stop, Expr bound, Expr body) {
 			this.name = name;
+			this.argName = argName;
+			this.start = start;
+			this.stop = stop;
+			this.bound = bound;
+			this.body = body;
 		}
 
 		private Node toLustreNode(StaticState state) {
