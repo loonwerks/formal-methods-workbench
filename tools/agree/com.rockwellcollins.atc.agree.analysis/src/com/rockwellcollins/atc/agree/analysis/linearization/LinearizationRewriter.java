@@ -178,11 +178,6 @@ public class LinearizationRewriter {
 
 		NamedElmExpr resultId = af.createNamedElmExpr();
 		resultId.setElm(EcoreUtil.copy(resultArg));
-//=======
-//
-//		NestedDotID resultId = af.createNestedDotID();
-//		resultId.setBase(EcoreUtil.copy(resultArg));
-//>>>>>>> origin/develop
 
 
 		BinaryExpr rangeMinExpr = af.createBinaryExpr();

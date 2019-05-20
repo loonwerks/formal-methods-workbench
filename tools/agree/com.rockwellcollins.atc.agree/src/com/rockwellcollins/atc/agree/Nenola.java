@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.osate.aadl2.NamedElement;
 
@@ -194,6 +195,10 @@ public class Nenola {
 
 		List<jkind.lustre.Equation> toLustreClockedEquations(StaticState state);
 
+		Function<Double, Double> toDoubleFunction();
+
+		Double toDouble();
+
 	}
 
 	public static class TagExpr implements Expr {
@@ -243,6 +248,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class IdExpr implements Expr {
@@ -275,6 +292,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -328,6 +357,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -419,6 +460,18 @@ public class Nenola {
 			return eqs;
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class DistinctionExpr implements Expr {
@@ -456,6 +509,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -499,6 +564,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class LocalProperty implements Expr {
@@ -533,6 +610,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -571,6 +660,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class IntLit implements Expr {
@@ -603,6 +704,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -640,6 +753,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class BoolLit implements Expr {
@@ -672,6 +797,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -708,6 +845,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class RealCast implements Expr {
@@ -740,6 +889,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -778,6 +939,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class Pre implements Expr {
@@ -810,6 +983,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -846,6 +1031,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class TimeOf implements Expr {
@@ -878,6 +1075,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -914,6 +1123,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class TimeFall implements Expr {
@@ -948,6 +1169,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class Time implements Expr {
@@ -979,6 +1212,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1019,6 +1264,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class ArrayLit implements Expr {
@@ -1055,6 +1312,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1100,6 +1369,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1149,6 +1430,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class RecordUpdate implements Expr {
@@ -1185,6 +1478,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1234,6 +1539,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1317,6 +1634,18 @@ public class Nenola {
 			}
 
 		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public static class ArraySubExpr implements Expr {
@@ -1354,6 +1683,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1400,6 +1741,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1458,6 +1811,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class ExistsExpr implements Expr {
@@ -1512,6 +1877,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -1582,6 +1959,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class FoldLeftExpr implements Expr {
@@ -1640,6 +2029,18 @@ public class Nenola {
 			return new ArrayList<>();
 		}
 
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	public static class FoldRightExpr implements Expr {
@@ -1696,6 +2097,18 @@ public class Nenola {
 		@Override
 		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Function<Double, Double> toDoubleFunction() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Double toDouble() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -4317,6 +4730,160 @@ public class Nenola {
 
 	}
 
+	// A line segment is represented by Cartesian coordinates of its endpoints
+	public static class Segment {
+		public double startX, startY, stopX, stopY;
+
+		public Segment(double startX, double startY, double stopX, double stopY) {
+			this.startX = startX;
+			this.startY = startY;
+			this.stopX = stopX;
+			this.stopY = stopY;
+		}
+	}
+
+	public static class SegmentPair {
+		public final Segment lower;
+		public final Segment upper;
+
+		public SegmentPair(Segment lower, Segment upper) {
+			this.lower = lower;
+			this.upper = upper;
+		}
+	}
+
+	// Distance holds the distance the non-linear function extends
+	// below and above a straight line through its endpoints
+	public static class Distance {
+
+		public double below, above;
+
+		public Distance(double below, double above) {
+			this.below = below;
+			this.above = above;
+		}
+
+		public Distance(Function<Double, Double> f, double start, double stop) {
+			int checks = 100000; // number of points to check between start and stop
+									// positions
+
+			double distAbove = 0.0;
+			double distBelow = 0.0;
+			double dist = 0.0;
+			double step = (stop - start) / checks;
+			double x = start;
+			double y = f.apply(start);
+			double slope = (f.apply(stop) - f.apply(start)) / (stop - start);
+			while (x < stop) {
+				dist = f.apply(x) - (y + slope * (x - start));
+				if (dist > distAbove) {
+					distAbove = dist;
+				}
+				if (dist < distBelow) {
+					distBelow = dist;
+				}
+				x = x + step;
+			}
+			this.below = distBelow;
+			this.above = distAbove;
+
+		}
+	}
+
+	private static List<SegmentPair> linearize(Function<Double, Double> f, double start, double stop,
+			double bound) {
+
+		List<SegmentPair> acc = new ArrayList<>();
+
+		Distance dist = new Distance(f, start, stop);
+
+		if (dist.above < bound & dist.below > -bound) {
+			// Found lower and upper segments whose distance lies within the
+			// acceptable bounds
+			acc.add(new SegmentPair(new Segment(start, f.apply(start) + dist.below, stop, f.apply(stop) + dist.below),
+					new Segment(start, f.apply(start) + dist.above, stop, f.apply(stop) + dist.above)));
+		} else {
+			// Bound is exceeded. Divide in half and try again.
+			double mid = (start + stop) / 2.0;
+
+			acc.addAll(linearize(f, start, mid, bound));
+			acc.addAll(linearize(f, mid, stop, bound));
+		}
+
+		return acc;
+	}
+
+	private static Expr generateAgreeLinearBoundImplicationExpr(IdExpr inputIdExpr, IdExpr resultIdExpr,
+			BinRator lesseq, Segment upper) {
+		// TODO Auto-generated method stub
+
+//
+//		RealLitExpr inputMinExpr = af.createRealLitExpr();
+//		inputMinExpr.setVal(Double.toString(seg.startX));
+//
+//		RealLitExpr inputMaxExpr = af.createRealLitExpr();
+//		inputMaxExpr.setVal(Double.toString(seg.stopX));
+//
+//		RealLitExpr resultOriginExpr = af.createRealLitExpr();
+//		resultOriginExpr.setVal(Double.toString(seg.startY));
+//
+//		RealLitExpr resultSlopeExpr = af.createRealLitExpr();
+//		resultSlopeExpr.setVal(Double.toString((seg.stopY - seg.startY) / (seg.stopX - seg.startX)));
+//
+//		NamedElmExpr inputId = af.createNamedElmExpr();
+//		inputId.setElm(EcoreUtil.copy(inputArg));
+//
+//
+//		NamedElmExpr resultId = af.createNamedElmExpr();
+//		resultId.setElm(EcoreUtil.copy(resultArg));
+//
+//
+//		BinaryExpr rangeMinExpr = af.createBinaryExpr();
+//		rangeMinExpr.setOp(">=");
+//		rangeMinExpr.setLeft(EcoreUtil.copy(inputId));
+//		rangeMinExpr.setRight(EcoreUtil.copy(inputMinExpr));
+//
+//		BinaryExpr rangeMaxExpr = af.createBinaryExpr();
+//		rangeMaxExpr.setOp("<=");
+//		rangeMaxExpr.setLeft(EcoreUtil.copy(inputId));
+//		rangeMaxExpr.setRight(EcoreUtil.copy(inputMaxExpr));
+//
+//		BinaryExpr rangeExpr = af.createBinaryExpr();
+//		rangeExpr.setOp("and");
+//		rangeExpr.setLeft(EcoreUtil.copy(rangeMinExpr));
+//		rangeExpr.setRight(EcoreUtil.copy(rangeMaxExpr));
+//
+//		BinaryExpr shiftExpr = af.createBinaryExpr();
+//		shiftExpr.setOp("-");
+//		shiftExpr.setLeft(EcoreUtil.copy(inputId));
+//		shiftExpr.setRight(EcoreUtil.copy(inputMinExpr));
+//
+//		BinaryExpr multiplyExpr = af.createBinaryExpr();
+//		multiplyExpr.setOp("*");
+//		multiplyExpr.setLeft(EcoreUtil.copy(resultSlopeExpr));
+//		multiplyExpr.setRight(shiftExpr);
+//
+//		BinaryExpr additionExpr = af.createBinaryExpr();
+//		additionExpr.setOp("+");
+//		additionExpr.setLeft(EcoreUtil.copy(resultOriginExpr));
+//		additionExpr.setRight(multiplyExpr);
+//
+//		BinaryExpr linearBoundExpr = af.createBinaryExpr();
+//		linearBoundExpr.setOp(relop);
+//		linearBoundExpr.setLeft(EcoreUtil.copy(resultId));
+//		linearBoundExpr.setRight(additionExpr);
+//
+//		BinaryExpr result = af.createBinaryExpr();
+//		result.setOp("=>");
+//		result.setLeft(rangeExpr);
+//		result.setRight(linearBoundExpr);
+//
+//		return result;
+
+		return null;
+	}
+
+
 	public static class LinearNodeGen {
 
 		public final String name;
@@ -4335,12 +4902,101 @@ public class Nenola {
 			this.body = body;
 		}
 
-		private Node toLustreNode(StaticState state) {
-			// TODO
+		private NodeGen toNodeGen() {
+
+			String nodeName = "__constraint__" + name;
+
+			Channel inChan = new Nenola.Channel("inp", Nenola.Prim.RealContract, new Nenola.In(), false);
+			Channel resultChan = new Nenola.Channel("result", Nenola.Prim.RealContract,
+					new Nenola.In(),
+					false);
+			Channel constraintChan = new Nenola.Channel("constraint", Nenola.Prim.BoolContract,
+					new Nenola.Out(Optional.empty()), false);
+
+			Function<Double, Double> f = this.body.toDoubleFunction();
+
+			Double startDouble = this.start.toDouble();
+			Double stopDouble = this.stop.toDouble();
+			Double boundDouble = this.bound.toDouble();
+
+			List<SegmentPair> segPairList = linearize(f, startDouble, stopDouble, boundDouble);
+
+			IdExpr inputIdExpr = new Nenola.IdExpr(inChan.name);
+
+			IdExpr resultIdExpr = new Nenola.IdExpr(resultChan.name);
+			RealLit domainCheckLowerLit = new RealLit(Double.toString(segPairList.get(0).lower.startX));
+
+			BinExpr domainCheckLowerExpr = new Nenola.BinExpr(domainCheckLowerLit, Nenola.BinRator.LessEq,
+					inputIdExpr);
+
+			RealLit domainCheckUpperLit = new RealLit(
+					Double.toString(segPairList.get(segPairList.size() - 1).lower.stopX));
+
+
+			BinExpr domainCheckUpperExpr = new Nenola.BinExpr(inputIdExpr, Nenola.BinRator.LessEq,
+					domainCheckUpperLit);
+
+
+			BinExpr domainCheckExpr  = new Nenola.BinExpr(domainCheckLowerExpr, Nenola.BinRator.Conj,
+					domainCheckUpperExpr);
+
+
+			BoolLit trueLitExpr = new BoolLit(true);
+
+			Expr upperBoundExpr = trueLitExpr;
+			for (SegmentPair pair : segPairList) {
+				BinExpr andExpr = new BinExpr(upperBoundExpr, BinRator.Conj, generateAgreeLinearBoundImplicationExpr(inputIdExpr, resultIdExpr, BinRator.LessEq, pair.upper));
+				upperBoundExpr = andExpr;
+			}
+
+			//TODO
+
+//			Expr lowerBoundExpr = EcoreUtil.copy(trueLitExpr);
+//			for (Segment seg : segs.lower) {
+//				BinaryExpr andExpr = af.createBinaryExpr();
+//				andExpr.setOp("and");
+//				andExpr.setLeft(lowerBoundExpr);
+//				andExpr.setRight(generateAgreeLinearBoundImplicationExpr(inputIdExpr, resultIdExpr, ">=", seg));
+//
+//				lowerBoundExpr = andExpr;
+//			}
+//
+//			BinaryExpr boundsCheckExpr = af.createBinaryExpr();
+//			boundsCheckExpr.setOp("and");
+//			boundsCheckExpr.setLeft(upperBoundExpr);
+//			boundsCheckExpr.setRight(lowerBoundExpr);
+//
+//			BinaryExpr constraintExpr = af.createBinaryExpr();
+//			constraintExpr.setOp("and");
+//			constraintExpr.setLeft(domainCheckExpr);
+//			constraintExpr.setRight(boundsCheckExpr);
+//
+//			NodeEq constraintEq = af.createNodeEq();
+//			constraintEq.getLhs().add(constraintArg);
+//			constraintEq.setExpr(constraintExpr);
+//
+//			NodeBodyExpr nodeBody = af.createNodeBodyExpr();
+//			nodeBody.getStmts().add(constraintEq);
+//			result.setNodeBody(nodeBody);
+//
+//			NodeLemma domainCheckLemma = af.createNodeLemma();
+//			domainCheckLemma.setStr(result.getName() + " domain check");
+//			domainCheckLemma.setExpr(EcoreUtil.copy(domainCheckExpr));
+//			nodeBody.getStmts().add(domainCheckLemma);
+
+//			String name, Map<String, Channel> channels, List<DataFlow> dataFlows, List<String> properties
+
+//			return NodeGen(nodeName, channels, dataFlows, properties);
+
 			return null;
+
 		}
 
-		private Node toLustreClockedNode(StaticState state) {
+		private jkind.lustre.Node toLustreNode(StaticState state) {
+			return this.toNodeGen().toLustreNode(state);
+		}
+
+		private jkind.lustre.Node toLustreClockedNode(StaticState state) {
 			// TODO
 			return null;
 		}
