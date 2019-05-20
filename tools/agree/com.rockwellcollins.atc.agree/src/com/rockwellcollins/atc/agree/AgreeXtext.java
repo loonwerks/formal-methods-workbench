@@ -1983,7 +1983,7 @@ public class AgreeXtext {
 	}
 
 	public static Map<String, Nenola.NodeGen> extractNodeGenMap(ComponentClassifier c) {
-		Map<String, Nenola.NodeGen> result = new HashMap<String, Nenola.NodeGen>();
+		Map<String, Nenola.NodeGen> acc = new HashMap<String, Nenola.NodeGen>();
 		AgreeContractSubclause annex = getAgreeAnnex(c);
 		if (annex != null) {
 			AgreeContract contract = (AgreeContract) annex.getContract();
@@ -1991,10 +1991,10 @@ public class AgreeXtext {
 			for (SpecStatement spec : contract.getSpecs()) {
 				if (spec instanceof NodeDef) {
 					Nenola.NodeGen ng = toNodeGenFromNodeDef((NodeDef) spec);
-					result.putIfAbsent(ng.name, ng);
+					acc.putIfAbsent(ng.name, ng);
 				} else if (spec instanceof FnDef) {
 					Nenola.NodeGen ng = toNodeGenFromFnDef((FnDef) spec);
-					result.putIfAbsent(ng.name, ng);
+					acc.putIfAbsent(ng.name, ng);
 				}
 			}
 
@@ -2002,18 +2002,55 @@ public class AgreeXtext {
 
 		if (c instanceof ComponentImplementation) {
 			Map<String, Nenola.NodeGen> ccResult = extractNodeGenMap(((ComponentImplementation) c).getType());
-			result.putAll(ccResult);
+			acc.putAll(ccResult);
 
 			for (Subcomponent sub : ((ComponentImplementation) c).getAllSubcomponents()) {
 				Map<String, Nenola.NodeGen> subResult = extractNodeGenMap(sub.getClassifier());
-				result.putAll(subResult);
+				acc.putAll(subResult);
 			}
 		}
-		return result;
+		return acc;
 	}
 
 	private static Map<String, LinearNodeGen> extractLinearNodeGenMap(ComponentClassifier c) {
+		Map<String, Nenola.LinearNodeGen> acc = new HashMap<>();
+		AgreeContractSubclause annex = getAgreeAnnex(c);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement spec : contract.getSpecs()) {
+				if (spec instanceof LinearizationDef) {
+					Nenola.LinearNodeGen ng = toLinearNodeGenFromLinearizationDef((LinearizationDef) spec);
+					acc.putIfAbsent(ng.name, ng);
+				}
+			}
+
+		}
+
+		if (c instanceof ComponentImplementation) {
+			Map<String, Nenola.LinearNodeGen> ccResult = extractLinearNodeGenMap(
+					((ComponentImplementation) c).getType());
+			acc.putAll(ccResult);
+
+			for (Subcomponent sub : ((ComponentImplementation) c).getAllSubcomponents()) {
+				Map<String, Nenola.LinearNodeGen> subResult = extractLinearNodeGenMap(sub.getClassifier());
+				acc.putAll(subResult);
+			}
+		}
+		return acc;
+	}
+
+	private static LinearNodeGen toLinearNodeGenFromLinearizationDef(LinearizationDef linDef) {
+		assert (linDef.getArgs().size() == 1);
+//		'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
+//				'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']'
+//				('within' precision=Expr)? ':' exprBody=Expr ';'
+
+		String name = linDef.getName();
+		String argName = linDef.getArgs().get(0).getName();
+
 		// TODO Auto-generated method stub
+
 		return null;
 	}
 
