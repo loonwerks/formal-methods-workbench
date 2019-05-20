@@ -4904,14 +4904,22 @@ public class Nenola {
 
 		private NodeGen toNodeGen() {
 
+
+			Map<String, Channel> channels = new HashMap<>();
+			List<DataFlow> dataFlows = new ArrayList<>();
+			List<String> properties = new ArrayList<>();
+
 			String nodeName = "__constraint__" + name;
 
 			Channel inChan = new Nenola.Channel("inp", Nenola.Prim.RealContract, new Nenola.In(), false);
+			channels.put(inChan.name, inChan);
 			Channel resultChan = new Nenola.Channel("result", Nenola.Prim.RealContract,
 					new Nenola.In(),
 					false);
+			channels.put(resultChan.name, resultChan);
 			Channel constraintChan = new Nenola.Channel("constraint", Nenola.Prim.BoolContract,
 					new Nenola.Out(Optional.empty()), false);
+			channels.put(constraintChan.name, constraintChan);
 
 			Function<Double, Double> f = this.body.toDoubleFunction();
 
@@ -4932,10 +4940,8 @@ public class Nenola {
 			RealLit domainCheckUpperLit = new RealLit(
 					Double.toString(segPairList.get(segPairList.size() - 1).lower.stopX));
 
-
 			BinExpr domainCheckUpperExpr = new Nenola.BinExpr(inputIdExpr, Nenola.BinRator.LessEq,
 					domainCheckUpperLit);
-
 
 			BinExpr domainCheckExpr  = new Nenola.BinExpr(domainCheckLowerExpr, Nenola.BinRator.Conj,
 					domainCheckUpperExpr);
@@ -4949,46 +4955,33 @@ public class Nenola {
 				upperBoundExpr = andExpr;
 			}
 
-			//TODO
 
-//			Expr lowerBoundExpr = EcoreUtil.copy(trueLitExpr);
-//			for (Segment seg : segs.lower) {
-//				BinaryExpr andExpr = af.createBinaryExpr();
-//				andExpr.setOp("and");
-//				andExpr.setLeft(lowerBoundExpr);
-//				andExpr.setRight(generateAgreeLinearBoundImplicationExpr(inputIdExpr, resultIdExpr, ">=", seg));
-//
-//				lowerBoundExpr = andExpr;
-//			}
-//
-//			BinaryExpr boundsCheckExpr = af.createBinaryExpr();
-//			boundsCheckExpr.setOp("and");
-//			boundsCheckExpr.setLeft(upperBoundExpr);
-//			boundsCheckExpr.setRight(lowerBoundExpr);
-//
-//			BinaryExpr constraintExpr = af.createBinaryExpr();
-//			constraintExpr.setOp("and");
-//			constraintExpr.setLeft(domainCheckExpr);
-//			constraintExpr.setRight(boundsCheckExpr);
-//
-//			NodeEq constraintEq = af.createNodeEq();
-//			constraintEq.getLhs().add(constraintArg);
-//			constraintEq.setExpr(constraintExpr);
-//
-//			NodeBodyExpr nodeBody = af.createNodeBodyExpr();
-//			nodeBody.getStmts().add(constraintEq);
-//			result.setNodeBody(nodeBody);
-//
-//			NodeLemma domainCheckLemma = af.createNodeLemma();
-//			domainCheckLemma.setStr(result.getName() + " domain check");
-//			domainCheckLemma.setExpr(EcoreUtil.copy(domainCheckExpr));
-//			nodeBody.getStmts().add(domainCheckLemma);
+			Expr lowerBoundExpr = trueLitExpr;
+			for (SegmentPair pair : segPairList) {
+				BinExpr andExpr = new BinExpr(lowerBoundExpr, BinRator.Conj, generateAgreeLinearBoundImplicationExpr(
+						inputIdExpr, resultIdExpr, BinRator.GreatEq, pair.lower));
+				lowerBoundExpr = andExpr;
+			}
+
+			BinExpr boundsCheckExpr = new BinExpr(upperBoundExpr, BinRator.Conj, lowerBoundExpr);
+			BinExpr constraintExpr = new BinExpr(domainCheckExpr, BinRator.Conj, boundsCheckExpr);
+
+
+			DataFlow constraintEq = new DataFlow(constraintChan.name, constraintExpr);
+
+			dataFlows.add(constraintEq);
+
+			String domainCheckLemmaName = resultChan.name + "__domain__check";
+			DataFlow domainCheckEq = new DataFlow(domainCheckLemmaName, domainCheckExpr);
+			dataFlows.add(domainCheckEq);
+			properties.add(domainCheckLemmaName);
+
+//			//TODO
 
 //			String name, Map<String, Channel> channels, List<DataFlow> dataFlows, List<String> properties
 
-//			return NodeGen(nodeName, channels, dataFlows, properties);
+			return new NodeGen(nodeName, channels, dataFlows, properties);
 
-			return null;
 
 		}
 
