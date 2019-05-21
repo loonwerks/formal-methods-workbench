@@ -256,8 +256,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -302,8 +301,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -367,8 +365,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -468,8 +465,21 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+
+			Double left = this.e1.toDouble();
+			Double right = this.e2.toDouble();
+			switch (this.rator) {
+			case Plus:
+				return left + right;
+			case Minus:
+				return left - right;
+			case Mult:
+				return left * right;
+			case Div:
+				return left / right;
+			}
+
+			throw new RuntimeException();
 		}
 
 	}
@@ -519,8 +529,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -572,8 +581,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -620,8 +628,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -668,8 +675,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -714,8 +720,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			return Double.valueOf(this.val);
 		}
 
 	}
@@ -761,8 +766,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			return Double.valueOf(this.val);
 		}
 
 	}
@@ -807,8 +811,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -853,8 +856,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -899,8 +901,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -947,8 +948,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -993,8 +993,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1039,8 +1038,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1085,8 +1083,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1131,8 +1128,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1177,8 +1173,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1222,8 +1217,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1272,8 +1266,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1322,8 +1315,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1379,8 +1371,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1438,8 +1429,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1488,8 +1478,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1549,8 +1538,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1643,8 +1631,12 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			if (this.rator == UniRator.Neg) {
+				Double rand = this.rand.toDouble();
+				return -rand;
+			}
+
+			throw new RuntimeException();
 		}
 	}
 
@@ -1693,8 +1685,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1751,8 +1742,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1819,8 +1809,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1887,8 +1876,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -1967,8 +1955,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -2037,8 +2024,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
@@ -2107,8 +2093,7 @@ public class Nenola {
 
 		@Override
 		public Double toDouble() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 	}
