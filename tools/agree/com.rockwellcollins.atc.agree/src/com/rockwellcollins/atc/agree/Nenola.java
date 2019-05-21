@@ -195,7 +195,7 @@ public class Nenola {
 
 		List<jkind.lustre.Equation> toLustreClockedEquations(StaticState state);
 
-		Function<Double, Double> toDoubleFunction();
+		Function<Double, Double> toDoubleFunction(String id);
 
 		Double toDouble();
 
@@ -249,7 +249,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -295,7 +295,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -360,7 +360,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -461,7 +461,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -512,7 +512,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -565,7 +565,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -613,7 +613,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -661,7 +661,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -707,7 +707,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -754,7 +754,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -800,7 +800,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -846,7 +846,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -892,7 +892,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -940,7 +940,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -986,7 +986,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1032,7 +1032,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1078,7 +1078,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1124,7 +1124,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1170,7 +1170,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1215,7 +1215,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1265,7 +1265,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1315,7 +1315,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1372,7 +1372,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1431,7 +1431,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1481,7 +1481,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1542,7 +1542,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1636,7 +1636,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1686,7 +1686,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1744,7 +1744,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1812,7 +1812,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1880,7 +1880,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -1960,7 +1960,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -2030,7 +2030,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -2100,7 +2100,7 @@ public class Nenola {
 		}
 
 		@Override
-		public Function<Double, Double> toDoubleFunction() {
+		public Function<Double, Double> toDoubleFunction(String id) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -4881,7 +4881,7 @@ public class Nenola {
 					new Nenola.Out(Optional.empty()), false);
 			channels.put(constraintChan.name, constraintChan);
 
-			Function<Double, Double> f = this.body.toDoubleFunction();
+			Function<Double, Double> f = this.body.toDoubleFunction(this.argName);
 
 			Double startDouble = this.start.toDouble();
 			Double stopDouble = this.stop.toDouble();
@@ -4936,10 +4936,6 @@ public class Nenola {
 			dataFlows.add(domainCheckEq);
 			properties.add(domainCheckLemmaName);
 
-//			//TODO
-
-//			String name, Map<String, Channel> channels, List<DataFlow> dataFlows, List<String> properties
-
 			return new NodeGen(nodeName, channels, dataFlows, properties);
 
 
@@ -4950,8 +4946,7 @@ public class Nenola {
 		}
 
 		private jkind.lustre.Node toLustreClockedNode(StaticState state) {
-			// TODO
-			return null;
+			return this.toNodeGen().toLustreClockedNode(state);
 		}
 
 	}
