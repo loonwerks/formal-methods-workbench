@@ -250,8 +250,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -295,8 +294,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -359,8 +357,11 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			if (this.selection.equals(id)) {
+				return x -> x;
+			}
+
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -459,8 +460,22 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			Function<Double, Double> left = this.e1.toDoubleFunction(id);
+			Function<Double, Double> right = this.e2.toDoubleFunction(id);
+
+			switch (this.rator) {
+			case Plus:
+				return x -> left.apply(x) + right.apply(x);
+			case Minus:
+				return x -> left.apply(x) - right.apply(x);
+			case Mult:
+				return x -> left.apply(x) * right.apply(x);
+			case Div:
+				return x -> left.apply(x) / right.apply(x);
+
+			default:
+				throw new RuntimeException();
+			}
 		}
 
 		@Override
@@ -477,9 +492,10 @@ public class Nenola {
 				return left * right;
 			case Div:
 				return left / right;
+			default:
+				throw new RuntimeException();
 			}
 
-			throw new RuntimeException();
 		}
 
 	}
@@ -523,8 +539,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -575,8 +590,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -622,8 +636,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -669,8 +682,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -714,8 +726,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -760,8 +771,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -805,8 +815,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -850,8 +859,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -895,8 +903,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -942,8 +949,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -987,8 +993,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1032,8 +1037,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1077,8 +1081,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1122,8 +1125,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1167,8 +1169,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1211,8 +1212,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1260,8 +1260,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1309,8 +1308,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1365,8 +1363,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1423,8 +1420,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1472,8 +1468,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1532,8 +1527,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1625,8 +1619,11 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			if (this.rator == UniRator.Neg) {
+				Function<Double, Double> argF = this.rand.toDoubleFunction(id);
+				return x -> -argF.apply(x);
+			}
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1679,8 +1676,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1736,8 +1732,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1803,8 +1798,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1870,8 +1864,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -1949,8 +1942,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -2018,8 +2010,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -2087,8 +2078,7 @@ public class Nenola {
 
 		@Override
 		public Function<Double, Double> toDoubleFunction(String id) {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException();
 		}
 
 		@Override
