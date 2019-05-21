@@ -202,7 +202,8 @@ public abstract class VerifyHandler extends AadlHandler {
 					throw new RuntimeException("Kind2 only supports monolithic verification");
 				}
 
-				Map<String, Program> lustrePrograms = nenolaProgram.toRecursiveLustrePrograms();
+				Map<String, Program> lustrePrograms = nenolaProgram.toRecursiveLustrePrograms("__TOP__",
+						nenolaProgram.main);
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isRealizability()) {
@@ -214,7 +215,7 @@ public abstract class VerifyHandler extends AadlHandler {
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isSingle()) {
-				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms();
+				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms(nenolaProgram.main);
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			}

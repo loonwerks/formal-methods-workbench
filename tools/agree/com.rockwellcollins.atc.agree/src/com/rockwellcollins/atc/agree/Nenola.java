@@ -4966,9 +4966,21 @@ public class Nenola {
 			this.propMap = propMap;
 		}
 
-		public Map<String, jkind.lustre.Program> toRecursiveLustrePrograms() {
-			// TODO Auto-generated method stub
-			return null;
+		public Map<String, jkind.lustre.Program> toRecursiveLustrePrograms(String name, NodeContract main) {
+
+			Map<String, jkind.lustre.Program> acc = new HashMap<>();
+			acc.putAll(this.toSingleLustrePrograms(main));
+			for (Entry<String, NodeContract> subEntry : main.subNodes.entrySet()) {
+				String subName = subEntry.getKey();
+				NodeContract subNode = subEntry.getValue();
+
+				if (subNode.isImpl) {
+					acc.putAll(this.toRecursiveLustrePrograms(subName, subNode));
+				}
+
+			}
+			return acc;
+
 		}
 
 		public Map<String, jkind.lustre.Program> toRealizabilityLustrePrograms() {
@@ -4976,30 +4988,36 @@ public class Nenola {
 			return null;
 		}
 
+		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
+			// TODO Auto-generated method stub
+
+			return null;
+		}
+
 		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(boolean usingKind2) {
 			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
 
 			if (usingKind2) {
-				programMap.putAll(this.toContractPrograms());
+				programMap.putAll(this.toAssumeGuaranteePrograms(this.main, true));
+//				programMap.putAll(this.toContractPrograms());
 			} else {
-				programMap.putAll(this.toAssumeGuaranteePrograms(true));
+				programMap.putAll(this.toAssumeGuaranteePrograms(this.main, true));
 			}
 
 			return programMap;
 		}
 
-		public Map<String, jkind.lustre.Program> toSingleLustrePrograms() {
+		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(NodeContract main) {
 			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
-			programMap.putAll(this.toAssumeGuaranteePrograms(false));
+			programMap.putAll(this.toAssumeGuaranteePrograms(main, false));
 			return programMap;
 		}
 
-		private Map<String, jkind.lustre.Program> toContractPrograms() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+//		private Map<String, jkind.lustre.Program> toContractPrograms() {
+//			return null;
+//		}
 
-		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(boolean isMonolithic) {
+		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(NodeContract main, boolean isMonolithic) {
 
 			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
 					new HashMap<>(),
@@ -5120,12 +5138,6 @@ public class Nenola {
 			return lustreTypes;
 		}
 
-
-		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
-			// TODO Auto-generated method stub
-
-			return null;
-		}
 
 	}
 
