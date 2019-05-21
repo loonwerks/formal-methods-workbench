@@ -4814,73 +4814,33 @@ public class Nenola {
 	}
 
 	private static Expr generateAgreeLinearBoundImplicationExpr(IdExpr inputIdExpr, IdExpr resultIdExpr,
-			BinRator lesseq, Segment upper) {
-		// TODO Auto-generated method stub
+			BinRator rator, Segment seg) {
 
-//
-//		RealLitExpr inputMinExpr = af.createRealLitExpr();
-//		inputMinExpr.setVal(Double.toString(seg.startX));
-//
-//		RealLitExpr inputMaxExpr = af.createRealLitExpr();
-//		inputMaxExpr.setVal(Double.toString(seg.stopX));
-//
-//		RealLitExpr resultOriginExpr = af.createRealLitExpr();
-//		resultOriginExpr.setVal(Double.toString(seg.startY));
-//
-//		RealLitExpr resultSlopeExpr = af.createRealLitExpr();
-//		resultSlopeExpr.setVal(Double.toString((seg.stopY - seg.startY) / (seg.stopX - seg.startX)));
-//
-//		NamedElmExpr inputId = af.createNamedElmExpr();
-//		inputId.setElm(EcoreUtil.copy(inputArg));
-//
-//
-//		NamedElmExpr resultId = af.createNamedElmExpr();
-//		resultId.setElm(EcoreUtil.copy(resultArg));
-//
-//
-//		BinaryExpr rangeMinExpr = af.createBinaryExpr();
-//		rangeMinExpr.setOp(">=");
-//		rangeMinExpr.setLeft(EcoreUtil.copy(inputId));
-//		rangeMinExpr.setRight(EcoreUtil.copy(inputMinExpr));
-//
-//		BinaryExpr rangeMaxExpr = af.createBinaryExpr();
-//		rangeMaxExpr.setOp("<=");
-//		rangeMaxExpr.setLeft(EcoreUtil.copy(inputId));
-//		rangeMaxExpr.setRight(EcoreUtil.copy(inputMaxExpr));
-//
-//		BinaryExpr rangeExpr = af.createBinaryExpr();
-//		rangeExpr.setOp("and");
-//		rangeExpr.setLeft(EcoreUtil.copy(rangeMinExpr));
-//		rangeExpr.setRight(EcoreUtil.copy(rangeMaxExpr));
-//
-//		BinaryExpr shiftExpr = af.createBinaryExpr();
-//		shiftExpr.setOp("-");
-//		shiftExpr.setLeft(EcoreUtil.copy(inputId));
-//		shiftExpr.setRight(EcoreUtil.copy(inputMinExpr));
-//
-//		BinaryExpr multiplyExpr = af.createBinaryExpr();
-//		multiplyExpr.setOp("*");
-//		multiplyExpr.setLeft(EcoreUtil.copy(resultSlopeExpr));
-//		multiplyExpr.setRight(shiftExpr);
-//
-//		BinaryExpr additionExpr = af.createBinaryExpr();
-//		additionExpr.setOp("+");
-//		additionExpr.setLeft(EcoreUtil.copy(resultOriginExpr));
-//		additionExpr.setRight(multiplyExpr);
-//
-//		BinaryExpr linearBoundExpr = af.createBinaryExpr();
-//		linearBoundExpr.setOp(relop);
-//		linearBoundExpr.setLeft(EcoreUtil.copy(resultId));
-//		linearBoundExpr.setRight(additionExpr);
-//
-//		BinaryExpr result = af.createBinaryExpr();
-//		result.setOp("=>");
-//		result.setLeft(rangeExpr);
-//		result.setRight(linearBoundExpr);
-//
-//		return result;
+		RealLit inputMinExpr = new RealLit(Double.toString(seg.startX));
 
-		return null;
+		RealLit inputMaxExpr = new RealLit(Double.toString(seg.stopX));
+
+		RealLit resultOriginExpr = new RealLit(Double.toString(seg.startY));
+
+		RealLit resultSlopeExpr = new RealLit(Double.toString((seg.stopY - seg.startY) / (seg.stopX - seg.startX)));
+
+		BinExpr rangeMinExpr = new BinExpr(inputIdExpr, BinRator.GreatEq, inputMinExpr);
+
+		BinExpr rangeMaxExpr = new BinExpr(inputIdExpr, BinRator.LessEq, inputMaxExpr);
+
+		BinExpr rangeExpr = new BinExpr(rangeMinExpr, BinRator.Conj, rangeMaxExpr);
+
+		BinExpr shiftExpr = new BinExpr(inputIdExpr, BinRator.Minus, inputMinExpr);
+
+		BinExpr multiplyExpr = new BinExpr(resultSlopeExpr, BinRator.Mult, shiftExpr);
+
+		BinExpr additionExpr = new BinExpr(resultOriginExpr, BinRator.Plus, multiplyExpr);
+
+		BinExpr linearBoundExpr = new BinExpr(resultIdExpr, rator, additionExpr);
+
+		BinExpr result = new BinExpr(rangeExpr, BinRator.Implies, linearBoundExpr);
+
+		return result;
 	}
 
 
