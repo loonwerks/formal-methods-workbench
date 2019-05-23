@@ -70,10 +70,6 @@ public class SplatHandler extends AbstractHandler {
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
 			String fullpath = file.getRawLocation().toOSString();
 
-			MessageDialog.openInformation(window.getShell(), "Transfer to HOL",
-					"Running HOL proof of Filter Properties.\n" + "File: " + fullpath + "\n"
-							+ "See output in console.");
-
 			Bundle bundle = Platform.getBundle(bundleId);
 
 			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
