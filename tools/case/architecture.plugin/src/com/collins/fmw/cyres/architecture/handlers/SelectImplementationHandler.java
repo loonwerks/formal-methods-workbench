@@ -30,7 +30,7 @@ public class SelectImplementationHandler extends AadlHandler {
 	private String legacyComponentImplementationEntryFunction;
 //	private String legacyComponentImplementationFunctionAddress;
 
-	static final String RESOLUTE_CLAUSE = "prove (LegacyComponentVerificationCheck(this))";
+	static final String RESOLUTE_CLAUSE = "prove (legacy_component_verification(this))";
 
 	@Override
 	public void runCommand(URI uri) {

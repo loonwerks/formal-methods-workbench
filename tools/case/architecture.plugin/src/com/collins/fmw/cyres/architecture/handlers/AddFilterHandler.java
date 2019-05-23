@@ -205,25 +205,22 @@ public class AddFilterHandler extends AadlHandler {
 				if (!addPropertyAssociation("COMP_TYPE", "FILTER", filterType, casePropSet)) {
 //					return;
 				}
-//				// CASE::COMP_IMPL property
-//				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterType, casePropSet)) {
-////					return;
-//				}
-//				// CASE::COMP_SPEC property
-//				// Parse the ID from the Filter AGREE property
-//				String filterPropId = "";
-//				try {
-//					filterPropId = filterAgreeProperty
-//							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-//									filterAgreeProperty.indexOf("\""))
-//							.trim();
-//
-//				} catch (IndexOutOfBoundsException e) {
-//					// agree property is malformed, so leave blank
-//				}
-//				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
-////					return;
-//				}
+
+				// CASE::COMP_SPEC property
+				// Parse the ID from the Filter AGREE property
+				String filterPropId = "";
+				try {
+					filterPropId = filterAgreeProperty
+							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
+									filterAgreeProperty.indexOf("\""))
+							.trim();
+
+				} catch (IndexOutOfBoundsException e) {
+					// agree property is malformed, so leave blank
+				}
+				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
+//					return;
+				}
 
 				// Move filter to proper location
 				// (just before component it connects to on communication pathway)
@@ -254,21 +251,7 @@ public class AddFilterHandler extends AadlHandler {
 				if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl, casePropSet)) {
 //					return;
 				}
-				// CASE::COMP_SPEC property
-				// Parse the ID from the Filter AGREE property
-				String filterPropId = "";
-				try {
-					filterPropId = filterAgreeProperty
-							.substring(filterAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
-									filterAgreeProperty.indexOf("\""))
-							.trim();
 
-				} catch (IndexOutOfBoundsException e) {
-					// agree property is malformed, so leave blank
-				}
-				if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterImpl, casePropSet)) {
-//					return;
-				}
 
 				final ComponentImplementation containingImpl = selectedConnection
 						.getContainingComponentImpl();
@@ -319,7 +302,7 @@ public class AddFilterHandler extends AadlHandler {
 					String agreeClauses = "{**" + System.lineSeparator();
 
 					for (String guarantee : propagatedGuarantees) {
-						agreeClauses = agreeClauses + "\t\t\t" + guarantee + System.lineSeparator();
+						agreeClauses = agreeClauses + guarantee + System.lineSeparator();
 					}
 
 					// replace source out port name with filter out port name
@@ -327,10 +310,18 @@ public class AddFilterHandler extends AadlHandler {
 							FILTER_PORT_OUT_NAME);
 
 					if (!filterAgreeProperty.isEmpty()) {
-						agreeClauses = agreeClauses + "\t\t\t" + filterAgreeProperty + System.lineSeparator();
+						agreeClauses = agreeClauses + filterAgreeProperty + System.lineSeparator();
 					}
 
-					agreeClauses = agreeClauses + "\t\t**}";
+					// Add message preservation spec
+					if (filterPropId.isEmpty()) {
+						filterPropId = "Filter";
+					}
+					agreeClauses = agreeClauses + "guarantee " + filterPropId
+							+ "_DataPreservation \"Preserve filter input data\" : filter_out = filter_in;"
+							+ System.lineSeparator();
+
+					agreeClauses = agreeClauses + "**}";
 
 					final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper
 							.createOwnedAnnexSubclause(filterType);

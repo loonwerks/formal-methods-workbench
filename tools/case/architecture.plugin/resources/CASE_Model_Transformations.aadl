@@ -342,7 +342,19 @@ public
 		-- Top-level claim for proper insertion of an isolator
 		add_isolator(c : component) <=
 			** "Isolator added to " c **
-			true	
+			true
+			
+		--------------------------
+		-- PROJECT-LEVEL CLAIMS --
+		--------------------------
+		
+		aadl_linter() <=
+			** "Static model analysis was performed" **
+			analysis("ToolCheck", "Resolint")
+		
+		legacy_component_verification(c : component) <=
+			** "Implementation of component " c " was verified" **
+			analysis("ToolCheck", "Ivaldi")
 		
 		----------------
 		-- SUB CLAIMS --
