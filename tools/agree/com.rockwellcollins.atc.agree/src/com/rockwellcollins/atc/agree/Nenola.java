@@ -17,9 +17,6 @@ import java.util.function.Function;
 
 import org.osate.aadl2.NamedElement;
 
-import com.rockwellcollins.atc.agree.analysis.AgreeUtils;
-import com.rockwellcollins.atc.agree.analysis.ast.AgreeStatement;
-
 import jkind.lustre.ArrayAccessExpr;
 import jkind.lustre.ArrayExpr;
 import jkind.lustre.BinaryExpr;
@@ -4613,8 +4610,8 @@ public class Nenola {
 			// perhaps we should break out eq statements into implementation
 			// equations
 			// and type equations. This would clear this up
-			for (AgreeStatement statement : topNode.assertions) {
-				if (AgreeUtils.referenceIsInContract(statement, topNode.compInst)) {
+			for (Spec spec : this.specList) {
+				if (spec.specTag == SpecTag.Assert && spec.prop instanceof ExprProp) {
 
 					// this is a strange hack we have to do. we have to make
 					// equation and property
@@ -4623,16 +4620,18 @@ public class Nenola {
 					// equals operator. We will need to removing their corresponding
 					// variable
 					// from the inputs and add them to the local variables
-					BinaryExpr binExpr;
-					IdExpr varId;
+					jkind.lustre.BinaryExpr binExpr;
+					jkind.lustre.IdExpr varId;
+
+					jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 					try {
-						binExpr = (BinaryExpr) statement.expr;
+						binExpr = (BinaryExpr) expr;
 						varId = (jkind.lustre.IdExpr) binExpr.left;
 					} catch (ClassCastException e) {
 						// some equation variables are assertions for
 						// subrange types. do not translate these to
 						// local equations. Just add them to assertions
-						assertions.add(statement.expr);
+						assertions.add(expr);
 						continue;
 					}
 
@@ -4649,9 +4648,10 @@ public class Nenola {
 					if (!found || binExpr.op != BinaryOp.EQUAL) {
 						throw new RuntimeException(
 								"Something went very wrong with the lustre generation in the realizability analysis");
-					}
+						}
 					locals.add(inputs.remove(index));
 					equations.add(new Equation(varId, binExpr.right));
+
 				}
 			}
 
@@ -4663,7 +4663,8 @@ public class Nenola {
 			builder.addAssertions(assertions);
 			builder.setRealizabilityInputs(inputStrs);
 
-			Node main = builder.build();
+			Node node = builder.build();
+			return node;
 		}
 
 	}
