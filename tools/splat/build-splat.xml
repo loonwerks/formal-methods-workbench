@@ -105,7 +105,7 @@
 	</macrodef>
 
 	<target name="build-splat" depends="acquire-hol">
-	  <exec dir="${builddir}" spawn="false" executable="${hol4.dir}/bin/Holmake" />
+	  <exec dir="${basedir}" spawn="false" executable="${hol4.dir}/bin/Holmake" />
 	</target>
 
 </project>
