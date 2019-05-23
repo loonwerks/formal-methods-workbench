@@ -17,6 +17,9 @@ import java.util.function.Function;
 
 import org.osate.aadl2.NamedElement;
 
+import com.rockwellcollins.atc.agree.analysis.AgreeUtils;
+import com.rockwellcollins.atc.agree.analysis.ast.AgreeStatement;
+
 import jkind.lustre.ArrayAccessExpr;
 import jkind.lustre.ArrayExpr;
 import jkind.lustre.BinaryExpr;
@@ -4557,6 +4560,112 @@ public class Nenola {
 			return lustreNodes;
 		}
 
+		public Node toLustreRealizabilityNode(StaticState state) {
+
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+			List<VarDecl> locals = new ArrayList<>();
+			List<VarDecl> inputs = new ArrayList<>();
+			List<jkind.lustre.Equation> equations = new ArrayList<>();
+			List<String> properties = new ArrayList<>();
+
+			for (Nenola.Spec spec : this.specList) {
+
+				if (spec.specTag == SpecTag.Assume && spec.prop instanceof ExprProp) {
+					Expr e = ((ExprProp) spec.prop).expr;
+					assertions.add(e.toLustreExpr(state));
+
+				}
+			}
+
+			{
+				int suffix = 0;
+				for (Spec spec : this.specList) {
+
+					if (spec.specTag == SpecTag.Guarantee && spec.prop instanceof ExprProp) {
+						String guarName = SpecTag.Guarantee.name() + "__" + suffix;
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
+						locals.add(new VarDecl(guarName, NamedType.BOOL));
+
+						equations.add(new Equation(new jkind.lustre.IdExpr(guarName), expr));
+						properties.add(guarName);
+
+						suffix = suffix + 1;
+					}
+
+				}
+			}
+
+
+			List<String> inputStrs = new ArrayList<>();
+			for (Channel chan : this.channels.values()) {
+				if (chan.direction instanceof In) {
+					VarDecl var = chan.toLustreVar();
+					inputs.add(var);
+					inputStrs.add(var.id);
+				} else if (chan.direction instanceof Out) {
+					VarDecl var = chan.toLustreVar();
+					inputs.add(var);
+
+				}
+			}
+
+
+			// perhaps we should break out eq statements into implementation
+			// equations
+			// and type equations. This would clear this up
+			for (AgreeStatement statement : topNode.assertions) {
+				if (AgreeUtils.referenceIsInContract(statement, topNode.compInst)) {
+
+					// this is a strange hack we have to do. we have to make
+					// equation and property
+					// statements not assertions. They should all be binary
+					// expressions with an
+					// equals operator. We will need to removing their corresponding
+					// variable
+					// from the inputs and add them to the local variables
+					BinaryExpr binExpr;
+					IdExpr varId;
+					try {
+						binExpr = (BinaryExpr) statement.expr;
+						varId = (jkind.lustre.IdExpr) binExpr.left;
+					} catch (ClassCastException e) {
+						// some equation variables are assertions for
+						// subrange types. do not translate these to
+						// local equations. Just add them to assertions
+						assertions.add(statement.expr);
+						continue;
+					}
+
+					boolean found = false;
+					int index;
+					for (index = 0; index < inputs.size(); index++) {
+						VarDecl var = inputs.get(index);
+						if (var.id.equals(varId.id)) {
+							found = true;
+							break;
+						}
+
+					}
+					if (!found || binExpr.op != BinaryOp.EQUAL) {
+						throw new RuntimeException(
+								"Something went very wrong with the lustre generation in the realizability analysis");
+					}
+					locals.add(inputs.remove(index));
+					equations.add(new Equation(varId, binExpr.right));
+				}
+			}
+
+			NodeBuilder builder = new NodeBuilder("main");
+			builder.addInputs(inputs);
+			builder.addLocals(locals);
+			builder.addEquations(equations);
+			builder.addProperties(properties);
+			builder.addAssertions(assertions);
+			builder.setRealizabilityInputs(inputStrs);
+
+			Node main = builder.build();
+		}
+
 	}
 
 
@@ -4984,8 +5093,24 @@ public class Nenola {
 		}
 
 		public Map<String, jkind.lustre.Program> toRealizabilityLustrePrograms() {
-			// TODO Auto-generated method stub
-			return null;
+			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
+					new HashMap<>(), propMap, Optional.empty());
+			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
+			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+			lustreNodes.addAll(this.toLustreNodesFromNodeGens(state));
+			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGens(state));
+			lustreNodes.addAll(this.toLustreNodesFromLinearNodeGens(state));
+			lustreNodes.addAll(this.toLustreClockedNodesFromLinearNodeGens(state));
+
+			lustreNodes.add(main.toLustreRealizabilityNode(state));
+
+			lustreNodes.add(Lustre.getHistNode());
+			lustreNodes.addAll(Lustre.getRealTimeNodes());
+			jkind.lustre.Program program = new jkind.lustre.Program(Location.NULL, lustreTypes, null, null, lustreNodes,
+					main.getName());
+			Map<String, jkind.lustre.Program> programs = new HashMap<>();
+			programs.put("Realizability", program);
+			return programs;
 		}
 
 		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
@@ -4999,7 +5124,6 @@ public class Nenola {
 
 			if (usingKind2) {
 				programMap.putAll(this.toAssumeGuaranteePrograms(this.main, true));
-//				programMap.putAll(this.toContractPrograms());
 			} else {
 				programMap.putAll(this.toAssumeGuaranteePrograms(this.main, true));
 			}
@@ -5013,10 +5137,6 @@ public class Nenola {
 			return programMap;
 		}
 
-//		private Map<String, jkind.lustre.Program> toContractPrograms() {
-//			return null;
-//		}
-
 		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(NodeContract main, boolean isMonolithic) {
 
 			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
@@ -5026,7 +5146,6 @@ public class Nenola {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGens(state));
 			lustreNodes.addAll(this.toLustreClockedNodesFromNodeGens(state));
-
 			lustreNodes.addAll(this.toLustreNodesFromLinearNodeGens(state));
 			lustreNodes.addAll(this.toLustreClockedNodesFromLinearNodeGens(state));
 
