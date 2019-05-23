@@ -23,9 +23,13 @@ RUN git clone https://github.com/loonwerks/formal-methods-workbench.git
 WORKDIR /formal-methods-workbench/tools/splat
 RUN /HOL/bin/Holmake
 
-FROM ubuntu:16:04
+FROM ubuntu:16.04
 WORKDIR /
 COPY --from=build /polyml-bin /polyml-bin
 COPY --from=build /HOL /HOL
 COPY --from=build /formal-methods-workbench/tools/splat /splat
-# ENTRYPOINT [ "/splat/splat" ]
+WORKDIR /user
+ENV LD_LIBRARY_PATH=/polyml-bin/lib
+ENTRYPOINT [ "/splat/splat" ]
+CMD []
+
