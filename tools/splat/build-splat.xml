@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Build splat executable (for Linux) from sources" basedir=".">
 
+	<property name="builddir" location="${basedir}/build" />
 	<property name="polyml.version" value="5.8" />
-	<property name="polyml.zipfile" value="polyml-${polyml.version}.zip" />
+	<property name="polyml.zipfile" location="${builddir}/polyml-${polyml.version}.zip" />
 	<property name="polyml.url" value="https://github.com/polyml/polyml/archive" />
-	<property name="polyml.dir" value="./polyml-${polyml.version}" />
+	<property name="polyml.dir" location="${builddir}/polyml-${polyml.version}" />
 	<property name="polyml.binary.dir" location="${polyml.dir}-bin" />
 
-	<property name="hol4.repository" value="git://github.com/HOL-Theorem-Prover/HOL.git" />
-	<property name="hol4.dir" value="HOL" />
-	<property name="hol4.release.tag" value="kananaskis-12" />
+	<property name="hol4.repository" value="https://github.com/HOL-Theorem-Prover/HOL.git" />
+	<property name="hol4.dir" location="${builddir}/HOL" />
+	<!-- <property name="hol4.release.tag" value="kananaskis-12" /> -->
+	<property name="hol4.release.tag" value="1557f72fc9a7a80bc5ce2e4df30afd51803c8b75" />
 
-	<target name="acquire-polyml">
+    <target name="clean-dir">
+        <delete includeEmptyDirs="true" dir="${builddir}" />
+    </target>
+
+	<target name="acquire-polyml" depends="clean-dir">
+        <mkdir dir="${builddir}"/>
 		<download-polyml />
 		<unzip-polyml />
 		<configure-polyml />
@@ -27,7 +34,7 @@
 
 	<macrodef name="unzip-polyml" description="Unzip polyml zipfile">
 		<sequential>
-			<unzip src="${polyml.zipfile}" dest="." />
+			<unzip src="${polyml.zipfile}" dest="${builddir}/." />
 		</sequential>
 	</macrodef>
 
@@ -61,7 +68,7 @@
 
 	<macrodef name="clone-hol" description="Clone HOL-4 repository">
 		<sequential>
-		  <exec dir="." spawn="false" executable="git">
+		  <exec dir="${builddir}/." spawn="false" executable="git">
 		    <arg value="clone" />
 		    <arg value="${hol4.repository}" />
 		    <arg value="${hol4.dir}" />
@@ -98,7 +105,7 @@
 	</macrodef>
 
 	<target name="build-splat" depends="acquire-hol">
-	  <exec dir="." spawn="false" executable="${hol4.dir}/bin/Holmake" />
+	  <exec dir="${builddir}" spawn="false" executable="${hol4.dir}/bin/Holmake" />
 	</target>
 
 </project>

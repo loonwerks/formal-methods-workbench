@@ -46,6 +46,7 @@
 		    </executions>
 		  </plugin>
 		</plugins>
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -55,10 +56,9 @@
 					<configuration>
 						<filesets>
 							<fileset>
-								<directory>${basedir}</directory>
+								<directory>${basedir}/build</directory>
 								<includes>
-									<include>polyml-*/*</include>
-									<include>HOL*/*</include>
+									<include>**/*</include>
 								</includes>
 							</fileset>
 						</filesets>
