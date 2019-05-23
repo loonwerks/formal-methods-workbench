@@ -1,0 +1,62 @@
+Network Message Ecosystem
+==========================
+
+(Notes on discussion with 
+  Dave Greve, Thomas Logan, David Hardin, Konrad Slind)
+
+The general idea is to support handling message formats in a
+high-level way so that encoders, decoders, and guards on messages can
+be specified and auto-generated in order to avoid tedious and
+error-prone manual programming.
+
+The focus, at least initially, would be on being able to handle
+existing message formats well.
+
+At the center of things will be the AST type, which will provide a
+target for parsers from higher level formats and which will also
+contain sufficiently precise information to generate encoders,
+decoders, and predicates (guards).
+
+Design issues.
+--------------
+
+1. Order of record fields in target bitstring must be specified.
+
+2. Each field may have a specific encoder/decoder required for it,
+   (e.g. different occurences of signed integers in a message may be
+   encoded differently)
+
+3. Some fields may be dropped
+
+4. Some fields may be added (e.g. length)
+
+5. Padding, markers, magic numbers, etc.
+
+6. Packed data
+
+7. Varying width fields
+
+8. Range restrictions on fields (other predicates were also mentioned,
+   e.g. units of measure, although it's not clear that these naturally
+   occur "in the wild")
+
+9. Relations between fields (e.g. "field X is the length of field Y")
+
+10. Types?
+
+11. Specifying well-formedness properties on messages. What kind of
+    language can be used to state these properties, etc.
+
+12. Formal properties and correctness proofs
+
+13. Ability to declare new encoder/decoder pairs. Again, do we need a
+    language for expressing such computations.
+
+14. Given a description at the AST level we want to push a button and 
+    generate :
+
+      - an encoder a decoder a well-formedness checker for high-level
+      - data (e.g. records) a well-formedness checker (guard) for
+        bitstring data
+      - correctness proofs relating the encoder and decoder to 
+        wellformedness properties

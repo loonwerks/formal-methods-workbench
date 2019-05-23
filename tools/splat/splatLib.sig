@@ -4,7 +4,7 @@ sig
 
   type regexp = Regexp_Type.regexp
 
-  type ('a, 'b) fmap = ('a, 'b) Redblackmap.dict
+  type ('a,'b) fmap = ('a,'b) Redblackmap.dict
 
   datatype width
     = BITWIDTH of int
@@ -59,6 +59,7 @@ sig
           decode_def : thm,
           inversion : term,
           correctness : term,
+          receiver_correctness : term,
           implicit_constraints : thm option}
 
   val filter_correctness : string * thm -> filter_info

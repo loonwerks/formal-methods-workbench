@@ -1,0 +1,64 @@
+May 22 2019. Case Site Visit 
+============================
+
+Visitors: R. Richards + TA7 people
+
+SPLAT overview.
+===============
+
+SPLAT is a plugin to the Collins "Architecture-Level Designer
+Workbench". At present SPLAT provides support for adding filters
+between existing AADL components in order to prevent reception of
+badly formed or malicious messages
+
+Input: 
+------
+
+The input to SPLAT is an AADL architecture annotated with filter specifications
+
+Output:
+------
+
+ The output of SPLAT is a logical theory containing the
+following elements for each filter specified in the architecture:
+
+  . declaration of the record and enumeration type(s) corresponding to 
+    the filter input
+  . definition(s) of the wellformedness of the filter input
+  . a table-driven DFA that renders a pass-fail verdict on messages,
+    allowing only wellformed messages to pass
+  . an encoder and a decoder from records to message formats
+  . theorems showing the correctness of the DFA.
+
+Picture.
+--------
+
+Records.
+--------
+
+  . signed/unsigned numbers of any size
+  . constants
+  . elements of enumerated types
+  . arrays
+  . characters
+  . sub-records
+
+Wellformedness.
+---------------
+
+ . numeric fields can be given interval constraints
+ . enumeration fields can be restricted to only a subset of the enumeration
+
+Pragmatics.
+------------
+
+Wellformedness is a high level predicate, it applies at the level of record datatypes.
+The following considerations are needed to truly pin down the actual message format:
+
+ . Byte order
+ . Order of layout of fields
+ . skipped fields
+ . Padding
+ . markers, magic numbers, etc
+ . Packing
+

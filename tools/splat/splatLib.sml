@@ -28,6 +28,7 @@ type filter_info
       decode_def : thm,
       inversion : term,
       correctness : term,
+      receiver_correctness : term,
       implicit_constraints : thm option};
 
      
@@ -273,23 +274,23 @@ val base_codingMap =
          dec_def = splatTheory.dec_def,
          dec_enc = splatTheory.dec_enc}),
      (BINARY(SIGNED LSB,BYTEWIDTH 1),
-        {enc = ``splat$enci 1``, 
-         dec = ``splat$deci 1``,
-         enc_def = splatTheory.enci_def,
-         dec_def = splatTheory.deci_def,
-         dec_enc = el 1 (CONJUNCTS splatTheory.deci_encis)}),
+        {enc = ``splat$encZ 1``, 
+         dec = ``splat$decZ``,
+         enc_def = splatTheory.encZ_def,
+         dec_def = splatTheory.decZ_def,
+         dec_enc = splatTheory.decz_encz}),
      (BINARY(SIGNED LSB,BYTEWIDTH 2),
-        {enc = ``splat$enci 2``, 
-         dec = ``splat$deci 2``,
-         enc_def = splatTheory.enci_def,
-         dec_def = splatTheory.deci_def,
-         dec_enc = el 2 (CONJUNCTS splatTheory.deci_encis)}),
+        {enc = ``splat$encZ 2``, 
+         dec = ``splat$decZ``,
+         enc_def = splatTheory.encZ_def,
+         dec_def = splatTheory.decZ_def,
+         dec_enc = splatTheory.decz_encz}),
      (BINARY(SIGNED LSB,BYTEWIDTH 8),
-        {enc = ``splat$enci 8``, 
-         dec = ``splat$deci 8``,
-         enc_def = splatTheory.enci_def,
-         dec_def = splatTheory.deci_def,
-         dec_enc = el 8 (CONJUNCTS splatTheory.deci_encis)}),
+        {enc = ``splat$encZ 8``, 
+         dec = ``splat$decZ``,
+         enc_def = splatTheory.encZ_def,
+         dec_def = splatTheory.decZ_def,
+         dec_enc = splatTheory.decz_encz}),
      (ENUM Type.bool,
         {enc = ``splat$enc_bool``, 
          dec = ``splat$dec_bool``,
@@ -435,7 +436,7 @@ fun all_paths recdvar =
 (*	  -->                                                                *)
 (*        regexp                  ; Regexp_Type.tree_to_regexp               *)
 (*	  -->                                                                *)
-(*	  term                    ; regexpSyntax.mk_regexp                   *)
+(*	  term                    ; regexpSyntax.regexp_to_term              *)
 (*                                                                           *)
 (*---------------------------------------------------------------------------*)
 
@@ -592,7 +593,7 @@ fun filter_correctness (fname,thm) =
      val treevals = List.map (fieldval_to_tree (the_enumMap())) fvals
      val regexps = map Regexp_Type.tree_to_regexp treevals
      val the_regexp = Regexp_Match.normalize (catlist regexps)
-     val the_regexp_tm = regexpSyntax.mk_regexp the_regexp
+     val the_regexp_tm = regexpSyntax.regexp_to_term the_regexp
      
      val codings = List.map (curry Finmap.find (the_codingMap()) o format_of) fvals
 
@@ -718,6 +719,14 @@ fun filter_correctness (fname,thm) =
      val decodeFn_def = Define `^(mk_eq(decodeFn_lhs,decodeFn_rhs))`
      val decodeFn = mk_const(decodeFn_name,decodeFn_ty)
 
+    (* Construct the formula of the receiver correctness theorem *)
+    val svar = mk_var("s",stringSyntax.string_ty)
+    val receiver_correctness_goal = mk_forall(svar,
+        mk_imp
+         (pred_setSyntax.mk_in
+             (svar, mk_comb(regexp_lang_tm,the_regexp_tm)),
+          mk_comb(wfpred,
+                  optionSyntax.mk_the(mk_comb(decodeFn,svar)))))
     (* Construct the formula of the inversion theorem *)
     val inversion_goal = mk_forall(recdvar,
         mk_imp(wfpred_app',
@@ -730,6 +739,7 @@ fun filter_correctness (fname,thm) =
       decode_def  = decodeFn_def,
       inversion   = inversion_goal,
       correctness = correctness_goal,
+      receiver_correctness = receiver_correctness_goal,
       implicit_constraints = iconstraints_opt}
  end
  handle e => raise wrap_exn "splatLib" "mk_correctness_goals" e;

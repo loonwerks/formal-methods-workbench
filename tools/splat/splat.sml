@@ -33,10 +33,11 @@ fun parse_args args =
 fun shortcut g = ACCEPT_TAC (mk_thm([],snd g)) g;
 
 fun prove_filter_props {name,regexp,encode_def,decode_def,
-                        inversion, correctness, implicit_constraints} =
+                        inversion, correctness, receiver_correctness, implicit_constraints} =
  let in
-     store_thm(name^"inversion",inversion,shortcut);
-     store_thm(name^"correctness",correctness,shortcut);
+     store_thm(name^"_inversion",inversion,shortcut);
+     store_thm(name^"_correctness",correctness,shortcut);
+     store_thm(name^"_receiver_correctness",receiver_correctness,shortcut);
      ()
  end;
 
@@ -56,7 +57,7 @@ fun main () =
      val filter_spec_thms = filters_of logic_defs
      val filter_defs_and_props = apply_with_chatter 
            (List.map splatLib.filter_correctness) filter_spec_thms
-	   ("Constructing filters, encoders, and decoders ... ") 
+	   ("Constructing filters, encoders, decoders, and properties ... ") 
            "succeeded.\n"
      val _ = apply_with_chatter (List.app prove_filter_props) filter_defs_and_props
 	   ("Proving filter properties ... ") "succeeded.\n"

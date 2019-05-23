@@ -5,7 +5,6 @@
 open HolKernel Parse boolLib bossLib BasicProvers;
 
 open arithmeticTheory listTheory stringTheory 
-(*     charsetTheory FormalLangTheory regexpTheory regexpLib *)
      ASCIInumbersTheory numposrepTheory ASCIInumbersLib integerTheory;
 
 val int_ss = intLib.int_ss;
@@ -331,10 +330,11 @@ val enc_bytes = save_thm
 (* Lower bounds on encoding lengths                                          *)
 (*---------------------------------------------------------------------------*)
 
-val lower_enc = Q.store_thm
-("lower_enc",
- `!w n. w <= LENGTH (enc w n)`,
- rw_tac list_ss [enc_def,layout_def, PAD_RIGHT]);
+Theorem lower_enc :
+  !w n. w <= LENGTH (enc w n)
+Proof
+  rw_tac list_ss [enc_def,layout_def, PAD_RIGHT]
+QED
 
 (*---------------------------------------------------------------------------*)
 (* Mapping from string lengths to character lists with abstract contents     *)
@@ -768,6 +768,174 @@ val deci_encis = save_thm
 ("deci_encis",
  LIST_CONJ
      (map (C qspec_arith deci_enci) [`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`]));
+
+
+(*---------------------------------------------------------------------------*)
+(* sign+magnitude representation of ints                                     *)
+(*---------------------------------------------------------------------------*)
+
+val encZ_def = 
+ Define 
+  `encZ w i =
+     if 0 <= i then 
+        #"+" :: enc w (Num (ABS i))
+     else #"-" :: enc w (Num (ABS i))`
+;
+
+val decZ_def =
+ Define 
+   `decZ s = 
+     case s of 
+       | #"+" :: t => int_of_num(dec t)
+       | #"-" :: t => -int_of_num(dec t)`
+;
+
+Theorem decz_encz : 
+  !w i. decZ (encZ w i) = i
+Proof
+  BasicProvers.NORM_TAC (srw_ss()) [decZ_def, encZ_def,dec_enc] 
+  >> intLib.ARITH_TAC
+QED
+  
+val lem = 
+  intLib.ARITH_PROVE 
+    ``-i < j /\ j < i <=> ((-i < j /\ j < 0) \/ (0 <= j /\ j < i))``;
+
+val encZ_byte_1A = Q.prove
+(`!i:int. -256 < i /\ i < 0 ==> ?a. encZ 1 i = [#"-"; a]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >- intLib.ARITH_TAC
+ >- (`Num(ABS i)  < 256` by intLib.ARITH_TAC >> metis_tac [enc_bytes'])
+);
+
+val encZ_byte_1B = Q.prove
+(`!i:int. 0 <= i /\ i < 256 ==> ?a. encZ 1 i = [#"+"; a]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >> `Num(ABS i)  < 256` by intLib.ARITH_TAC 
+ >> metis_tac [enc_bytes']
+);
+
+val encZ_byte_1 = Q.prove
+(`!i:int. 
+     -256 < i /\ i < 256 
+     ==> 
+     (?a. encZ 1 i = [#"-";a]) \/ 
+     (?a. encZ 1 i = [#"+";a])`,
+ metis_tac [encZ_byte_1A, encZ_byte_1B,lem]);
+
+val encZ_byte_2A = Q.prove
+(`!i:int. -65536 < i /\ i < 0 ==> ?a b. encZ 2 i = [#"-"; a; b]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >- intLib.ARITH_TAC
+ >- (`Num(ABS i)  < 65536` by intLib.ARITH_TAC >> metis_tac [enc_bytes'])
+);
+
+val encZ_byte_2B = Q.prove
+(`!i:int. 0 <= i /\ i < 65536 ==> ?a b. encZ 2 i = [#"+"; a; b]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >> `Num(ABS i)  < 65536` by intLib.ARITH_TAC 
+ >> metis_tac [enc_bytes']
+);
+
+val encZ_byte_2 = Q.prove
+(`!i:int. 
+     -65536 < i /\ i < 65536
+    ==> 
+      (?a b. encZ 2 i = [#"-";a;b]) \/ 
+      (?a b. encZ 2 i = [#"+";a;b])`,
+ metis_tac [encZ_byte_2A, encZ_byte_2B, lem]);
+
+val encZ_byte_3A = Q.prove
+(`!i:int. 
+     -16777216 < i /\ i < 0 
+    ==> 
+     ?a b c. encZ 3 i = [#"-"; a; b; c]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >- intLib.ARITH_TAC
+ >- (`Num(ABS i)  < 16777216` by intLib.ARITH_TAC >> metis_tac [enc_bytes'])
+);
+
+val encZ_byte_3B = Q.prove
+(`!i:int. 
+    0 <= i /\ i < 16777216
+   ==> 
+   ?a b c. encZ 3 i = [#"+"; a; b; c]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >> `Num(ABS i)  < 16777216` by intLib.ARITH_TAC 
+ >> metis_tac [enc_bytes']
+);
+
+val encZ_byte_3 = Q.prove
+(`!i:int. 
+     -16777216 < i /\ i < 16777216
+    ==> 
+    (?a b c. encZ 3 i = [#"-";a;b;c]) \/ 
+    (?a b c. encZ 3 i = [#"+";a;b;c])`,
+ metis_tac [encZ_byte_3A, encZ_byte_3B, lem]);
+
+val encZ_byte_4A = Q.prove
+(`!i:int. 
+     -4294967296 < i /\ i < 0 
+    ==> 
+    ?a b c d. encZ 4 i = [#"-"; a; b; c; d]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >- intLib.ARITH_TAC
+ >- (`Num(ABS i)  < 4294967296` by intLib.ARITH_TAC >> metis_tac [enc_bytes'])
+);
+
+val encZ_byte_4B = Q.prove
+(`!i:int. 
+    0 <= i /\ i < 4294967296 
+   ==> 
+   ?a b c d. encZ 4 i = [#"+"; a; b; c; d]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >> `Num(ABS i)  < 4294967296` by intLib.ARITH_TAC 
+ >> metis_tac [enc_bytes']
+);
+
+val encZ_byte_4 = Q.prove
+(`!i:int. 
+     -4294967296 < i /\ i < 4294967296 
+    ==> 
+    (?a b c d. encZ 4 i = [#"-";a;b;c;d]) \/ 
+    (?a b c d. encZ 4 i = [#"+";a;b;c;d])`,
+ metis_tac [encZ_byte_4A, encZ_byte_4B, lem]);
+
+val encZ_byte_8A = Q.prove
+(`!i:int. 
+    -18446744073709551616 < i /\ i < 0 
+    ==> 
+    ?a b c d e f g h. 
+    encZ 8 i = [#"-"; a; b; c; d; e; f; g; h]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >- intLib.ARITH_TAC
+ >- (`Num(ABS i) < 18446744073709551616` 
+       by intLib.ARITH_TAC 
+     >> metis_tac [enc_bytes'])
+);
+
+val encZ_byte_8B = Q.prove
+(`!i:int. 
+    0 <= i /\ i < 18446744073709551616 
+   ==> 
+    ?a b c d e f g h. 
+    encZ 8 i = [#"+"; a;b;c;d;e;f;g;h]`,
+ BasicProvers.NORM_TAC (srw_ss()) [encZ_def]
+ >> `Num(ABS i)  < 18446744073709551616` by intLib.ARITH_TAC 
+ >> metis_tac [enc_bytes']
+);
+
+val encZ_byte_8 = Q.prove
+(`!i:int. 
+    -18446744073709551616 < i /\ i < 18446744073709551616 
+    ==> 
+    (?a b c d e f g h. encZ 8 i = [#"+"; a;b;c;d;e;f;g;h]) \/
+    (?a b c d e f g h. encZ 8 i = [#"-"; a;b;c;d;e;f;g;h])`,
+ metis_tac [encZ_byte_8A, encZ_byte_8B, lem]);
+
+val encZ_bytes = save_thm
+ ("encZ_bytes",
+  LIST_CONJ [encZ_byte_1,encZ_byte_2,encZ_byte_3,encZ_byte_4,encZ_byte_8]);
 
 
 (*---------------------------------------------------------------------------*)
