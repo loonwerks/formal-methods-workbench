@@ -36,6 +36,7 @@ import jkind.lustre.TypeDef;
 import jkind.lustre.UnaryOp;
 import jkind.lustre.VarDecl;
 import jkind.lustre.builders.NodeBuilder;
+import jkind.lustre.builders.ProgramBuilder;
 import jkind.lustre.parsing.LustreParseUtil;
 
 //Nenola = Nested Node Language
@@ -4667,6 +4668,20 @@ public class Nenola {
 			return node;
 		}
 
+		public Node toLustreMainConsistencyNode() {
+			// TODO Auto-generated method stub
+			// See LustreASTBuilder.getConsistencyLustreNode(agreeProgram.topNode, false);
+			return null;
+		}
+
+		public Node toLustreCompositionConsistencyNode() {
+			// TODO Auto-generated method stub
+			// recursively flatten like toLustreSubNode()
+			// See LustreASTBuilder.getConsistencyLustreNode(agreeProgram.topNode, true);
+			return null;
+		}
+
+
 	}
 
 
@@ -5115,9 +5130,67 @@ public class Nenola {
 		}
 
 		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
-			// TODO Auto-generated method stub
+			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
+					new HashMap<>(), propMap, Optional.empty());
+			Map<String, jkind.lustre.Program> programs = new HashMap<>();
+			List<TypeDef> types = this.lustreTypesFromDataContracts();
 
-			return null;
+			{
+				List<Node> nodes = new ArrayList<>();
+
+				Node topConsist = this.main.toLustreMainConsistencyNode();
+
+				// we don't want node lemmas to show up in the consistency check
+				for (Node node : this.toLustreNodesFromNodeGens(state)) {
+					nodes.add(Lustre.removeProperties(node));
+				}
+				nodes.add(topConsist);
+				nodes.add(Lustre.getHistNode());
+				nodes.addAll(Lustre.getRealTimeNodes());
+
+				jkind.lustre.Program topConsistProg = new ProgramBuilder().addTypes(types).addNodes(nodes)
+						.setMain(topConsist.id).build();
+				programs.put("This component consistent", topConsistProg);
+			}
+
+			for (NodeContract subNode : this.main.subNodes.values()) {
+
+				List<Node> nodes = new ArrayList<>();
+				Node subConsistNode = subNode.toLustreCompositionConsistencyNode();
+				for (Node node : this.toLustreNodesFromNodeGens(state)) {
+					nodes.add(Lustre.removeProperties(node));
+				}
+				nodes.add(subConsistNode);
+				nodes.add(Lustre.getHistNode());
+				nodes.addAll(Lustre.getRealTimeNodes());
+
+				jkind.lustre.Program subConsistProg = new ProgramBuilder().addTypes(types).addNodes(nodes)
+						.setMain(subConsistNode.id)
+						.build();
+
+				programs.put(subConsistNode.id + " consistent", subConsistProg);
+			}
+
+			{
+				List<Node> nodes = new ArrayList<>();
+
+				Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode();
+				for (Node node : this.toLustreNodesFromNodeGens(state)) {
+					nodes.add(Lustre.removeProperties(node));
+				}
+				// nodes.addAll(agreeProgram.globalLustreNodes);
+				nodes.add(topCompositionConsist);
+				nodes.add(Lustre.getHistNode());
+				nodes.addAll(Lustre.getRealTimeNodes());
+
+				jkind.lustre.Program topCompositConsistProg = new ProgramBuilder().addTypes(types).addNodes(nodes)
+						.setMain(topCompositionConsist.id).build();
+
+				programs.put("Component composition consistent", topCompositConsistProg);
+			}
+
+			return programs;
+
 		}
 
 		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(boolean usingKind2) {
@@ -5141,8 +5214,7 @@ public class Nenola {
 		private Map<String, jkind.lustre.Program> toAssumeGuaranteePrograms(NodeContract main, boolean isMonolithic) {
 
 			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
-					new HashMap<>(),
-					propMap, Optional.empty());
+					new HashMap<>(), propMap, Optional.empty());
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGens(state));

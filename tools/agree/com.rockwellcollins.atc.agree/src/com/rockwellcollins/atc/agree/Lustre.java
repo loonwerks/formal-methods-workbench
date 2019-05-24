@@ -397,6 +397,16 @@ public class Lustre {
 	public final static String initVarName = "_INIT";
 	public final static String clockedNodePrefix = "_CLOCKED_";
 
+	public static Node removeProperties(Node node) {
+		NodeBuilder builder = new NodeBuilder(node.id);
+		builder.addInputs(node.inputs);
+		builder.addOutputs(node.outputs);
+		builder.addLocals(node.locals);
+		builder.addEquations(node.equations);
+
+		return builder.build();
+	}
+
 //
 //	public static Expr toClockedExpr(Expr expr) {
 //		if (expr instanceof UnaryExpr) {
