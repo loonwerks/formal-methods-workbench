@@ -52,12 +52,12 @@ public class Nenola {
 		public final Map<String, DataContract> valueEnv;
 		public final Map<String, NodeGen> localNodeGenEnv;
 		public final Map<String, Map<String, PropVal>> props;
-		public final Optional<String> currNodeConOp;
+		public final Optional<NodeContract> parentNodeOp;
 
 		public StaticState(Map<String, NodeContract> nodeContractMap, Map<String, DataContract> types,
 				Map<String, NodeGen> globalNodeGenEnv, Map<String, DataContract> values,
 				Map<String, NodeGen> localNodeGenEnv, Map<String, Map<String, PropVal>> props,
-				Optional<String> currentOp) {
+				Optional<NodeContract> parentNodeOp) {
 			this.nodeContractMap = new HashMap<>();
 			this.nodeContractMap.putAll(nodeContractMap);
 
@@ -76,33 +76,34 @@ public class Nenola {
 			this.props = new HashMap<>();
 			this.props.putAll(props);
 
-			this.currNodeConOp = currentOp;
+			this.parentNodeOp = parentNodeOp;
 
 		}
 
 		public StaticState newTypes(Map<String, DataContract> types) {
 			return new StaticState(nodeContractMap, types, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-					currNodeConOp);
+					parentNodeOp);
 		}
 
 		public StaticState newValues(Map<String, DataContract> values) {
 			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, values, localNodeGenEnv, props,
-					currNodeConOp);
+					parentNodeOp);
 		}
 
 		public StaticState newLocalNodeGenEnv(Map<String, NodeGen> localNodeGenEnv) {
 			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-					currNodeConOp);
+					parentNodeOp);
 		}
 
 		public StaticState newProps(Map<String, Map<String, PropVal>> props) {
 			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-					currNodeConOp);
+					parentNodeOp);
 		}
 
-		public StaticState newCurrentOp(Optional<String> currentOp) {
+
+		public StaticState newParentNodeOp(Optional<NodeContract> parentNodeOp) {
 			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-					currentOp);
+					parentNodeOp);
 		}
 
 	}
@@ -612,14 +613,16 @@ public class Nenola {
 
 		@Override
 		public DataContract inferDataContract(StaticState state) {
-			PropVal pv = state.props.get(state.currNodeConOp.get()).get(this.propName);
+			String nodeContractName = state.parentNodeOp.get().name;
+			PropVal pv = state.props.get(nodeContractName).get(this.propName);
 			return pv.inferDataContract(state);
 
 		}
 
 		@Override
 		public jkind.lustre.Expr toLustreExpr(StaticState state) {
-			return state.props.get(state.currNodeConOp.get()).get(propName).toLustreExpr(state);
+			String nodeContractName = state.parentNodeOp.get().name;
+			return state.props.get(nodeContractName).get(propName).toLustreExpr(state);
 		}
 
 		@Override
@@ -1507,7 +1510,9 @@ public class Nenola {
 			if (state.globalNodeGenEnv.containsKey(fnName)) {
 				lustreName = fnName.replace("::", "__");
 			} else if (state.localNodeGenEnv.containsKey(fnName)) {
-				lustreName = state.currNodeConOp.get().replace("::", "__") + "__" + fnName.replace("::", "__");
+
+				String nodeContractName = state.parentNodeOp.get().name;
+				lustreName = nodeContractName.replace("::", "__") + "__" + fnName.replace("::", "__");
 			}
 
 			return new NodeCallExpr((lustreName), argResults);
@@ -3843,7 +3848,7 @@ public class Nenola {
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap)
-					.newCurrentOp(Optional.of(this.name));
+					.newParentNodeOp(Optional.of(this));
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
@@ -3861,7 +3866,7 @@ public class Nenola {
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap)
-					.newCurrentOp(Optional.of(this.name));
+					.newParentNodeOp(Optional.of(this));
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
@@ -3883,7 +3888,7 @@ public class Nenola {
 		}
 
 
-		private jkind.lustre.Node toLustreSubNode(StaticState state, boolean isMonolithic) {
+		private jkind.lustre.Node toLustreFlattenedNode(StaticState state, boolean isMonolithic) {
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
@@ -3952,6 +3957,78 @@ public class Nenola {
 
 			assertions.addAll(this.toLustreAssertionsFromConnections(state));
 
+			// TODO : make sure Condact translation is done: see LustreCondactNodeVisitor.translate
+
+			boolean isAsync = false;
+			if (state.parentNodeOp.isPresent()) {
+
+				NodeContract parentNode = state.parentNodeOp.get();
+				if (parentNode.timingMode.isPresent()) {
+					TimingMode tm = parentNode.timingMode.get();
+					isAsync = tm instanceof Nenola.AsyncMode || tm instanceof Nenola.LatchedMode;
+				}
+			}
+			if (!isAsync) {
+				assertions.addAll(this.toLustreAssertionsFromConnections(state));
+			} else {
+//			builder.clearEquations();
+//
+//			builder.addInput(new AgreeVar(clockVarName, NamedType.BOOL, null));
+//			addTickedEq(builder);
+//			addInitEq(builder);
+//
+//			Expr holdExpr = new BoolExpr(true);
+//			// make clock hold exprs
+//			for (AgreeVar var : agreeNode.outputs) {
+//				Expr varId = new IdExpr(var.id);
+//				Expr preVar = new UnaryExpr(UnaryOp.PRE, varId);
+//				holdExpr = new BinaryExpr(holdExpr, BinaryOp.AND, new BinaryExpr(varId, BinaryOp.EQUAL, preVar));
+//			}
+//			holdExpr = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, holdExpr);
+//
+//			for (int i = 0; i < agreeNode.assumptions.size(); i++) {
+//				Expr varId = new IdExpr(LustreAstBuilder.assumeSuffix + i);
+//				Expr preVar = new UnaryExpr(UnaryOp.PRE, varId);
+//				preVar = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, preVar);
+//				holdExpr = new BinaryExpr(holdExpr, BinaryOp.AND, new BinaryExpr(varId, BinaryOp.EQUAL, preVar));
+//			}
+//
+//			holdExpr = expr("(not clk => holdExpr)", to("clk", clockVarName), to("holdExpr", holdExpr));
+//
+//			// make the constraint for the initial outputs
+//			Expr initConstr = expr("not ticked => initExpr", to("ticked", tickedVarName),
+//					to("initExpr", agreeNode.initialConstraint));
+//
+//			// re-write the old expression using the visitor
+//			for (Equation eq : node.equations) {
+//				if (eq.lhs.size() != 1) {
+//					throw new AgreeException("we expect that all eqs have a single lhs now");
+//				}
+//				IdExpr var = eq.lhs.get(0);
+//				boolean isLocal = false;
+//				for (VarDecl local : node.locals) {
+//					if (local.id.equals(var.id)) {
+//						isLocal = true;
+//						break;
+//					}
+//				}
+//				if (isLocal) {
+//					Expr newExpr = eq.expr.accept(visitor);
+//					newExpr = new IfThenElseExpr(new IdExpr(clockVarName), newExpr, new UnaryExpr(UnaryOp.PRE, var));
+//					builder.addEquation(new Equation(eq.lhs, newExpr));
+//				} else {
+//					// this is the only output
+//					Expr newExpr = eq.expr.accept(visitor);
+//					newExpr = new BinaryExpr(new IdExpr(clockVarName), BinaryOp.IMPLIES, newExpr);
+//					builder.addEquation(new Equation(eq.lhs,
+//							new BinaryExpr(initConstr, BinaryOp.AND, new BinaryExpr(holdExpr, BinaryOp.AND, newExpr))));
+//				}
+//			}
+//			// this var equations should be populated by the visitor call above
+//			builder.addEquations(visitor.stateVarEqs);
+//			builder.addLocals(visitor.stateVars);
+			}
+
 			NodeBuilder builder = new NodeBuilder(this.getName());
 			builder.addInputs(inputs);
 			builder.addOutputs(outputs);
@@ -3959,8 +4036,6 @@ public class Nenola {
 			builder.addEquations(equations);
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
-
-			// TODO : make sure Condact translation is done: see LustreCondactNodeVisitor.translate
 			return node;
 		}
 
@@ -4023,24 +4098,6 @@ public class Nenola {
 			}
 			return acc;
 		}
-
-//		public Node toLustreNode(boolean isMain, boolean isMonolithic) {
-//
-//			if (this.lustreNodeCache.containsKey(isMonolithic)) {
-//				return lustreNodeCache.get(isMonolithic);
-//			}
-//
-//			Node node = null;
-//			if (isMain && this.isImpl) {
-//				node = this.toLustreMainNode(isMonolithic);
-//			} else {
-//				node = this.toLustreSubNode(isMonolithic);
-//			}
-//
-//			lustreNodeCache.put(isMonolithic, node);
-//			return node;
-//
-//		}
 
 		private Node toLustreMainNode(StaticState state, boolean isMonolithic) {
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -4235,7 +4292,6 @@ public class Nenola {
 
 
 		private List<VarDecl> toLustreVarsFromOutChans(StaticState state, boolean isMonolithic) {
-
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
 				if (chan.direction instanceof Out) {
@@ -4515,12 +4571,12 @@ public class Nenola {
 			return exprMap;
 		}
 
-		public List<Node> toLustreSubNodes(StaticState state, boolean isMonolithic) {
+		public List<Node> toLustreFlattenedNodes(StaticState state, boolean isMonolithic) {
 
 			List<Node> nodes = new ArrayList<>();
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.add(this.toLustreSubNode(state, isMonolithic));
-				nodes.addAll(subNodeContract.toLustreSubNodes(state, isMonolithic));
+				nodes.add(this.toLustreFlattenedNode(state, isMonolithic));
+				nodes.addAll(subNodeContract.toLustreFlattenedNodes(state, isMonolithic));
 			}
 
 			return nodes;
@@ -4532,7 +4588,7 @@ public class Nenola {
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap)
-					.newCurrentOp(Optional.of(this.name));
+					.newParentNodeOp(Optional.of(this));
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (LinearNodeGen linearNodeGen : this.linearNodeGenMap.values()) {
@@ -4549,7 +4605,7 @@ public class Nenola {
 			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 			StaticState newState = state.newValues(values).newLocalNodeGenEnv(this.nodeGenMap)
-					.newCurrentOp(Optional.of(this.name));
+					.newParentNodeOp(Optional.of(this));
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (LinearNodeGen linearNodeGen : this.linearNodeGenMap.values()) {
@@ -5311,7 +5367,7 @@ public class Nenola {
 		List<Node> nodes = new ArrayList<>();
 		Node mainNode = main.toLustreMainNode(state, isMonolithic);
 		nodes.add(mainNode);
-		List<Node> subs = main.toLustreSubNodes(state, isMonolithic);
+		List<Node> subs = main.toLustreFlattenedNodes(state, isMonolithic);
 		nodes.addAll(subs);
 		return nodes;
 	}
@@ -5412,7 +5468,8 @@ public class Nenola {
 			for (NodeContract subNode : this.main.subNodes.values()) {
 
 				List<Node> nodes = new ArrayList<>();
-				Node subConsistNode = subNode.toLustreCompositionConsistencyNode(state, isMonolithic, depth);
+				Node subConsistNode = subNode.toLustreCompositionConsistencyNode(
+						state.newParentNodeOp(Optional.of(main)), isMonolithic, depth);
 				for (Node node : this.toLustreNodesFromNodeGens(state)) {
 					nodes.add(Lustre.removeProperties(node));
 				}
