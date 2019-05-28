@@ -4768,13 +4768,25 @@ public class Nenola {
 				}
 			}
 
-			// add realtime constraints
-			Set<VarDecl> eventTimes = new HashSet<>();
-			for (VarDecl eventVar : this.toEventTimeVarList(state, isMonolithic)) {
-				eventTimes.add(eventVar);
+			{
+				// add realtime constraints
+				Set<VarDecl> eventTimes = new HashSet<>();
+				for (Spec spec : this.specList) {
+
+					if (spec.prop instanceof PatternProp) {
+						Pattern pattern = ((PatternProp) spec.prop).pattern;
+						List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
+								? pattern.toLustrePatternTimeEventPropertyList(state)
+								: pattern.toLustrePatternTimeEventConstraintList(state);
+
+						eventTimes.addAll(localList);
+					}
+
+				}
+
+				assertions.add(Lustre.getTimeConstraint(eventTimes));
 			}
 
-			assertions.add(Lustre.getTimeConstraint(eventTimes));
 
 			for (Channel chan : this.channels.values()) {
 				if (chan.direction instanceof In) {
@@ -4785,9 +4797,6 @@ public class Nenola {
 					locals.add(chan.toLustreVar());
 				}
 			}
-
-
-//			EObject classifier = agreeNode.compInst.getComponentClassifier();
 
 			VarDecl countVar = new VarDecl("__COUNT", NamedType.INT);
 			VarDecl stuffVar = new VarDecl(stuffPrefix, NamedType.BOOL);
@@ -4852,70 +4861,52 @@ public class Nenola {
 			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
 
 			// TODO : switch spec gathering to recursively gathered specs
-			{
-				int stuffAssumptionIndex = 0;
-				for (Spec spec : this.specList) {
-					if (spec.specTag == SpecTag.Assume && spec.prop instanceof ExprProp) {
-						String assumeSuffix = "__" + SpecTag.Assume.name() + "__";
-						VarDecl stuffAssumptionVar = new VarDecl(stuffPrefix + assumeSuffix + stuffAssumptionIndex,
-								NamedType.BOOL);
-						locals.add(stuffAssumptionVar);
-						ivcs.add(stuffAssumptionVar.id);
-						jkind.lustre.IdExpr stuffAssumptionId = new jkind.lustre.IdExpr(stuffAssumptionVar.id);
 
-						Expr e = ((ExprProp) spec.prop).expr;
-						equations.add(new Equation(stuffAssumptionId, e.toLustreExpr(state)));
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				VarDecl stuffAssumptionVar = new VarDecl(inputName, NamedType.BOOL);
 
-						stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssumptionId);
-						stuffAssumptionIndex++;
-					}
-				}
+				locals.add(stuffAssumptionVar);
+				ivcs.add(stuffAssumptionVar.id);
+				jkind.lustre.IdExpr stuffAssumptionId = new jkind.lustre.IdExpr(stuffAssumptionVar.id);
+				equations.add(new Equation(stuffAssumptionId, expr));
+
+				stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssumptionId);
 			}
 
-			{
-				int stuffGuaranteeIndex = 0;
-				for (Spec spec : this.specList) {
-					if (spec.specTag == SpecTag.Guarantee && spec.prop instanceof ExprProp) {
-						String guarSuffix = "__" + SpecTag.Guarantee.name() + "__";
-						VarDecl stuffGuaranteeVar = new VarDecl(stuffPrefix + guarSuffix + stuffGuaranteeIndex,
-								NamedType.BOOL);
-						locals.add(stuffGuaranteeVar);
-						ivcs.add(stuffGuaranteeVar.id);
-						jkind.lustre.IdExpr stuffGuaranteeId = new jkind.lustre.IdExpr(stuffGuaranteeVar.id);
 
-						Expr e = ((ExprProp) spec.prop).expr;
-						equations.add(new Equation(stuffGuaranteeId, e.toLustreExpr(state)));
-
-						stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
-						stuffGuaranteeIndex++;
-					}
-				}
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				VarDecl stuffGuaranteeVar = new VarDecl(inputName, NamedType.BOOL);
+				locals.add(stuffGuaranteeVar);
+				ivcs.add(stuffGuaranteeVar.id);
+				jkind.lustre.IdExpr stuffGuaranteeId = new jkind.lustre.IdExpr(stuffGuaranteeVar.id);
+				equations.add(new Equation(stuffGuaranteeId, expr));
+				stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
 			}
 
-			// assertions: equations.addAll(agreeNode.localEquations);
-			for (Connection conn : this.connections) {
-				equations.add(conn.toLustreEquation(state));
-			}
+
+			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
 
 			// TODO should we include lemmas in the consistency check?
 			// for(AgreeStatement guarantee : agreeNode.lemmas){
 			// histConj = new BinaryExpr(histConj, BinaryOp.AND, guarantee.expr);
 			// }
 
-			{
-				int stuffAssertionIndex = 0;
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
+				String inputName = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
 
-				for (AgreeStatement assertion : agreeNode.assertions) {
-					AgreeVar stuffAssertionVar = new AgreeVar(stuffPrefix + assertSuffix + stuffAssertionIndex++,
-							NamedType.BOOL, assertion.reference, null, null);
-					locals.add(stuffAssertionVar);
-					IdExpr stuffAssertionId = new IdExpr(stuffAssertionVar.id);
-					equations.add(new Equation(stuffAssertionId, assertion.expr));
+				VarDecl stuffAssertionVar = new VarDecl(inputName, NamedType.BOOL);
+				locals.add(stuffAssertionVar);
+				jkind.lustre.IdExpr stuffAssertionId = new jkind.lustre.IdExpr(stuffAssertionVar.id);
+				equations.add(new Equation(stuffAssertionId, expr));
 
-					stuffConj = LustreExprFactory.makeANDExpr(stuffConj, stuffAssertionId);
-				}
-
+				stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssertionId);
 			}
+
 
 			// add realtime constraints
 			Set<VarDecl> eventTimes = new HashSet<>();
@@ -4925,15 +4916,9 @@ public class Nenola {
 
 			assertions.add(Lustre.getTimeConstraint(eventTimes));
 
-			for (Channel chan : this.channels.values()) {
-				if (chan.direction instanceof In) {
-					inputs.add(chan.toLustreVar());
-				} else if (chan.direction instanceof Out) {
-					inputs.add(chan.toLustreVar());
-				} else if (chan.direction instanceof Bi) {
-					locals.add(chan.toLustreVar());
-				}
-			}
+			inputs.addAll(this.toLustreVarsFromInChans(state, isMonolithic));
+			inputs.addAll(this.toLustreVarsFromOutChans(state, isMonolithic));
+			locals.addAll(this.toLustreVarsFromBiChans(state, isMonolithic));
 
 //			EObject classifier = agreeNode.compInst.getComponentClassifier();
 
@@ -5396,7 +5381,7 @@ public class Nenola {
 		public Map<String, jkind.lustre.Program> toRecursiveLustrePrograms(String name, NodeContract main) {
 
 			Map<String, jkind.lustre.Program> acc = new HashMap<>();
-			acc.putAll(this.toSingleLustrePrograms(main));
+			acc.putAll(this.toSingleLustrePrograms(main, 4));
 			for (Entry<String, NodeContract> subEntry : main.subNodes.entrySet()) {
 				String subName = subEntry.getKey();
 				NodeContract subNode = subEntry.getValue();
@@ -5431,7 +5416,7 @@ public class Nenola {
 			return programs;
 		}
 
-		private Map<String, jkind.lustre.Program> toConsistencyPrograms() {
+		private Map<String, jkind.lustre.Program> toConsistencyPrograms(boolean isMonolithic, int depth) {
 			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
 					new HashMap<>(), propMap, Optional.empty());
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
@@ -5440,7 +5425,7 @@ public class Nenola {
 			{
 				List<Node> nodes = new ArrayList<>();
 
-				Node topConsist = this.main.toLustreMainConsistencyNode();
+				Node topConsist = this.main.toLustreMainConsistencyNode(state, isMonolithic, depth);
 
 				// we don't want node lemmas to show up in the consistency check
 				for (Node node : this.toLustreNodesFromNodeGens(state)) {
@@ -5458,7 +5443,7 @@ public class Nenola {
 			for (NodeContract subNode : this.main.subNodes.values()) {
 
 				List<Node> nodes = new ArrayList<>();
-				Node subConsistNode = subNode.toLustreCompositionConsistencyNode();
+				Node subConsistNode = subNode.toLustreCompositionConsistencyNode(state, isMonolithic, depth);
 				for (Node node : this.toLustreNodesFromNodeGens(state)) {
 					nodes.add(Lustre.removeProperties(node));
 				}
@@ -5476,7 +5461,7 @@ public class Nenola {
 			{
 				List<Node> nodes = new ArrayList<>();
 
-				Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode();
+				Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode(state, isMonolithic, depth);
 				for (Node node : this.toLustreNodesFromNodeGens(state)) {
 					nodes.add(Lustre.removeProperties(node));
 				}
@@ -5496,7 +5481,7 @@ public class Nenola {
 		}
 
 		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(boolean usingKind2) {
-			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
+			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms(true, 4);
 
 			if (usingKind2) {
 				programMap.putAll(this.toAssumeGuaranteePrograms(this.main, true));
@@ -5507,8 +5492,9 @@ public class Nenola {
 			return programMap;
 		}
 
-		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(NodeContract main) {
-			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms();
+		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(NodeContract main,
+				int depth) {
+			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms(false, depth);
 			programMap.putAll(this.toAssumeGuaranteePrograms(main, false));
 			return programMap;
 		}

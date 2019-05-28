@@ -215,7 +215,7 @@ public abstract class VerifyHandler extends AadlHandler {
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			} else if (isSingle()) {
-				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms(nenolaProgram.main);
+				Map<String, Program> lustrePrograms = nenolaProgram.toSingleLustrePrograms(nenolaProgram.main, 4);
 				return runLustrePrograms(lustrePrograms, ci, monitor);
 
 			}
