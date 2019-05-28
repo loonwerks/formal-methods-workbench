@@ -9,10 +9,12 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.osate.aadl2.NamedElement;
@@ -4668,17 +4670,317 @@ public class Nenola {
 			return node;
 		}
 
-		public Node toLustreMainConsistencyNode() {
+		public Node toLustreMainConsistencyNode(StaticState state, boolean isMonolithic, int consistDetph) {
 			// TODO Auto-generated method stub
 			// See LustreASTBuilder.getConsistencyLustreNode(agreeProgram.topNode, false);
-			return null;
+
+			final String stuffPrefix = "__STUFF";
+
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+			List<VarDecl> locals = new ArrayList<>();
+			List<VarDecl> inputs = new ArrayList<>();
+			List<Equation> equations = new ArrayList<>();
+			List<String> properties = new ArrayList<>();
+			List<String> ivcs = new ArrayList<>();
+
+			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
+
+			{
+				int stuffAssumptionIndex = 0;
+				for (Spec spec : this.specList) {
+					if (spec.specTag == SpecTag.Assume && spec.prop instanceof ExprProp) {
+						String assumeSuffix = "__" + SpecTag.Assume.name() + "__";
+						VarDecl stuffAssumptionVar = new VarDecl(stuffPrefix + assumeSuffix + stuffAssumptionIndex,
+								NamedType.BOOL);
+						locals.add(stuffAssumptionVar);
+						ivcs.add(stuffAssumptionVar.id);
+						jkind.lustre.IdExpr stuffAssumptionId = new jkind.lustre.IdExpr(stuffAssumptionVar.id);
+
+						Expr e = ((ExprProp) spec.prop).expr;
+						equations.add(new Equation(stuffAssumptionId, e.toLustreExpr(state)));
+
+						stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssumptionId);
+						stuffAssumptionIndex++;
+					}
+				}
+			}
+
+			{
+				int stuffGuaranteeIndex = 0;
+				for (Spec spec : this.specList) {
+					if (spec.specTag == SpecTag.Guarantee && spec.prop instanceof ExprProp) {
+						String guarSuffix = "__" + SpecTag.Guarantee.name() + "__";
+						VarDecl stuffGuaranteeVar = new VarDecl(stuffPrefix + guarSuffix + stuffGuaranteeIndex,
+								NamedType.BOOL);
+						locals.add(stuffGuaranteeVar);
+						ivcs.add(stuffGuaranteeVar.id);
+						jkind.lustre.IdExpr stuffGuaranteeId = new jkind.lustre.IdExpr(stuffGuaranteeVar.id);
+
+						Expr e = ((ExprProp) spec.prop).expr;
+						equations.add(new Equation(stuffGuaranteeId, e.toLustreExpr(state)));
+
+						stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
+						stuffGuaranteeIndex++;
+					}
+				}
+			}
+
+			// assertions: equations.addAll(agreeNode.localEquations);
+			for (Connection conn : this.connections) {
+				equations.add(conn.toLustreEquation(state));
+			}
+
+			// TODO should we include lemmas in the consistency check?
+			// for(AgreeStatement guarantee : agreeNode.lemmas){
+			// histConj = new BinaryExpr(histConj, BinaryOp.AND, guarantee.expr);
+			// }
+
+			{
+				int stuffAssertionIndex = 0;
+//			if (withAssertions) {
+//				for (AgreeStatement assertion : agreeNode.assertions) {
+//					AgreeVar stuffAssertionVar = new AgreeVar(stuffPrefix + assertSuffix + stuffAssertionIndex++,
+//							NamedType.BOOL, assertion.reference, null, null);
+//					locals.add(stuffAssertionVar);
+//					IdExpr stuffAssertionId = new IdExpr(stuffAssertionVar.id);
+//					equations.add(new Equation(stuffAssertionId, assertion.expr));
+//
+//					stuffConj = LustreExprFactory.makeANDExpr(stuffConj, stuffAssertionId);
+//				}
+//			} else {
+				// perhaps we should break out eq statements into implementation
+				// equations and type equations. That would clear this up.
+				for (Spec spec : this.specList) {
+					if (spec.specTag == SpecTag.Assert && spec.prop instanceof ExprProp) {
+						String assertSuffix = "__" + SpecTag.Assert.name() + "__";
+						VarDecl stuffAssertionVar = new VarDecl(stuffPrefix + assertSuffix + stuffAssertionIndex++,
+								NamedType.BOOL);
+						locals.add(stuffAssertionVar);
+						jkind.lustre.IdExpr stuffAssertionId = new jkind.lustre.IdExpr(stuffAssertionVar.id);
+
+						Expr e = ((ExprProp) spec.prop).expr;
+
+						equations.add(new Equation(stuffAssertionId, e.toLustreExpr(state)));
+
+						stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssertionId);
+
+					}
+				}
+			}
+
+			// add realtime constraints
+			Set<VarDecl> eventTimes = new HashSet<>();
+			for (VarDecl eventVar : this.toEventTimeVarList(state, isMonolithic)) {
+				eventTimes.add(eventVar);
+			}
+
+			assertions.add(Lustre.getTimeConstraint(eventTimes));
+
+			for (Channel chan : this.channels.values()) {
+				if (chan.direction instanceof In) {
+					inputs.add(chan.toLustreVar());
+				} else if (chan.direction instanceof Out) {
+					inputs.add(chan.toLustreVar());
+				} else if (chan.direction instanceof Bi) {
+					locals.add(chan.toLustreVar());
+				}
+			}
+
+
+//			EObject classifier = agreeNode.compInst.getComponentClassifier();
+
+			VarDecl countVar = new VarDecl("__COUNT", NamedType.INT);
+			VarDecl stuffVar = new VarDecl(stuffPrefix, NamedType.BOOL);
+			VarDecl histVar = new VarDecl("__HIST", NamedType.BOOL);
+			VarDecl propVar = new VarDecl("__PROP", NamedType.BOOL);
+
+			locals.add(countVar);
+			locals.add(stuffVar);
+			locals.add(histVar);
+			locals.add(propVar);
+
+			jkind.lustre.IdExpr countId = new jkind.lustre.IdExpr(countVar.id);
+			jkind.lustre.IdExpr stuffId = new jkind.lustre.IdExpr(stuffVar.id);
+			jkind.lustre.IdExpr histId = new jkind.lustre.IdExpr(histVar.id);
+			jkind.lustre.IdExpr propId = new jkind.lustre.IdExpr(propVar.id);
+
+			equations.add(new Equation(stuffId, stuffConj));
+
+			jkind.lustre.Expr histExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE, histId);
+			histExpr = Lustre.makeANDExpr(histExpr, stuffId);
+			histExpr = new BinaryExpr(stuffId, BinaryOp.ARROW, histExpr);
+			equations.add(new Equation(histId, histExpr));
+
+			jkind.lustre.Expr countExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE, countId);
+			countExpr = new BinaryExpr(countExpr, BinaryOp.PLUS, new IntExpr(BigInteger.ONE));
+			countExpr = new BinaryExpr(new IntExpr(BigInteger.ZERO), BinaryOp.ARROW, countExpr);
+			equations.add(new Equation(countId, countExpr));
+
+
+			jkind.lustre.Expr propExpr = new BinaryExpr(countId, BinaryOp.EQUAL,
+					new IntExpr(BigInteger.valueOf(consistDetph)));
+			propExpr = new BinaryExpr(propExpr, BinaryOp.AND, histId);
+			equations.add(new Equation(propId, new jkind.lustre.UnaryExpr(UnaryOp.NOT, propExpr)));
+			properties.add(propId.id);
+
+			NodeBuilder builder = new NodeBuilder("consistency");
+			builder.addInputs(inputs);
+			builder.addLocals(locals);
+			builder.addEquations(equations);
+			builder.addProperties(properties);
+			builder.addAssertions(assertions);
+			builder.addIvcs(ivcs);
+
+			Node node = builder.build();
+
+			return node;
 		}
 
-		public Node toLustreCompositionConsistencyNode() {
+		public Node toLustreCompositionConsistencyNode(StaticState state, boolean isMonolithic, int consistDetph) {
 			// TODO Auto-generated method stub
 			// recursively flatten like toLustreSubNode()
 			// See LustreASTBuilder.getConsistencyLustreNode(agreeProgram.topNode, true);
-			return null;
+			final String stuffPrefix = "__STUFF";
+
+			List<jkind.lustre.Expr> assertions = new ArrayList<>();
+			List<VarDecl> locals = new ArrayList<>();
+			List<VarDecl> inputs = new ArrayList<>();
+			List<Equation> equations = new ArrayList<>();
+			List<String> properties = new ArrayList<>();
+			List<String> ivcs = new ArrayList<>();
+
+			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
+
+			// TODO : switch spec gathering to recursively gathered specs
+			{
+				int stuffAssumptionIndex = 0;
+				for (Spec spec : this.specList) {
+					if (spec.specTag == SpecTag.Assume && spec.prop instanceof ExprProp) {
+						String assumeSuffix = "__" + SpecTag.Assume.name() + "__";
+						VarDecl stuffAssumptionVar = new VarDecl(stuffPrefix + assumeSuffix + stuffAssumptionIndex,
+								NamedType.BOOL);
+						locals.add(stuffAssumptionVar);
+						ivcs.add(stuffAssumptionVar.id);
+						jkind.lustre.IdExpr stuffAssumptionId = new jkind.lustre.IdExpr(stuffAssumptionVar.id);
+
+						Expr e = ((ExprProp) spec.prop).expr;
+						equations.add(new Equation(stuffAssumptionId, e.toLustreExpr(state)));
+
+						stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssumptionId);
+						stuffAssumptionIndex++;
+					}
+				}
+			}
+
+			{
+				int stuffGuaranteeIndex = 0;
+				for (Spec spec : this.specList) {
+					if (spec.specTag == SpecTag.Guarantee && spec.prop instanceof ExprProp) {
+						String guarSuffix = "__" + SpecTag.Guarantee.name() + "__";
+						VarDecl stuffGuaranteeVar = new VarDecl(stuffPrefix + guarSuffix + stuffGuaranteeIndex,
+								NamedType.BOOL);
+						locals.add(stuffGuaranteeVar);
+						ivcs.add(stuffGuaranteeVar.id);
+						jkind.lustre.IdExpr stuffGuaranteeId = new jkind.lustre.IdExpr(stuffGuaranteeVar.id);
+
+						Expr e = ((ExprProp) spec.prop).expr;
+						equations.add(new Equation(stuffGuaranteeId, e.toLustreExpr(state)));
+
+						stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
+						stuffGuaranteeIndex++;
+					}
+				}
+			}
+
+			// assertions: equations.addAll(agreeNode.localEquations);
+			for (Connection conn : this.connections) {
+				equations.add(conn.toLustreEquation(state));
+			}
+
+			// TODO should we include lemmas in the consistency check?
+			// for(AgreeStatement guarantee : agreeNode.lemmas){
+			// histConj = new BinaryExpr(histConj, BinaryOp.AND, guarantee.expr);
+			// }
+
+			{
+				int stuffAssertionIndex = 0;
+
+				for (AgreeStatement assertion : agreeNode.assertions) {
+					AgreeVar stuffAssertionVar = new AgreeVar(stuffPrefix + assertSuffix + stuffAssertionIndex++,
+							NamedType.BOOL, assertion.reference, null, null);
+					locals.add(stuffAssertionVar);
+					IdExpr stuffAssertionId = new IdExpr(stuffAssertionVar.id);
+					equations.add(new Equation(stuffAssertionId, assertion.expr));
+
+					stuffConj = LustreExprFactory.makeANDExpr(stuffConj, stuffAssertionId);
+				}
+
+			}
+
+			// add realtime constraints
+			Set<VarDecl> eventTimes = new HashSet<>();
+			for (VarDecl eventVar : this.toEventTimeVarList(state, isMonolithic)) {
+				eventTimes.add(eventVar);
+			}
+
+			assertions.add(Lustre.getTimeConstraint(eventTimes));
+
+			for (Channel chan : this.channels.values()) {
+				if (chan.direction instanceof In) {
+					inputs.add(chan.toLustreVar());
+				} else if (chan.direction instanceof Out) {
+					inputs.add(chan.toLustreVar());
+				} else if (chan.direction instanceof Bi) {
+					locals.add(chan.toLustreVar());
+				}
+			}
+
+//			EObject classifier = agreeNode.compInst.getComponentClassifier();
+
+			VarDecl countVar = new VarDecl("__COUNT", NamedType.INT);
+			VarDecl stuffVar = new VarDecl(stuffPrefix, NamedType.BOOL);
+			VarDecl histVar = new VarDecl("__HIST", NamedType.BOOL);
+			VarDecl propVar = new VarDecl("__PROP", NamedType.BOOL);
+
+			locals.add(countVar);
+			locals.add(stuffVar);
+			locals.add(histVar);
+			locals.add(propVar);
+
+			jkind.lustre.IdExpr countId = new jkind.lustre.IdExpr(countVar.id);
+			jkind.lustre.IdExpr stuffId = new jkind.lustre.IdExpr(stuffVar.id);
+			jkind.lustre.IdExpr histId = new jkind.lustre.IdExpr(histVar.id);
+			jkind.lustre.IdExpr propId = new jkind.lustre.IdExpr(propVar.id);
+
+			equations.add(new Equation(stuffId, stuffConj));
+
+			jkind.lustre.Expr histExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE, histId);
+			histExpr = Lustre.makeANDExpr(histExpr, stuffId);
+			histExpr = new BinaryExpr(stuffId, BinaryOp.ARROW, histExpr);
+			equations.add(new Equation(histId, histExpr));
+
+			jkind.lustre.Expr countExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE, countId);
+			countExpr = new BinaryExpr(countExpr, BinaryOp.PLUS, new IntExpr(BigInteger.ONE));
+			countExpr = new BinaryExpr(new IntExpr(BigInteger.ZERO), BinaryOp.ARROW, countExpr);
+			equations.add(new Equation(countId, countExpr));
+
+			jkind.lustre.Expr propExpr = new BinaryExpr(countId, BinaryOp.EQUAL,
+					new IntExpr(BigInteger.valueOf(consistDetph)));
+			propExpr = new BinaryExpr(propExpr, BinaryOp.AND, histId);
+			equations.add(new Equation(propId, new jkind.lustre.UnaryExpr(UnaryOp.NOT, propExpr)));
+			properties.add(propId.id);
+
+			NodeBuilder builder = new NodeBuilder("consistency");
+			builder.addInputs(inputs);
+			builder.addLocals(locals);
+			builder.addEquations(equations);
+			builder.addProperties(properties);
+			builder.addAssertions(assertions);
+			builder.addIvcs(ivcs);
+
+			Node node = builder.build();
+
+			return node;
 		}
 
 

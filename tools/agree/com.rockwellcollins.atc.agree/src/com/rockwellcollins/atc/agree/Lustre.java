@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import jkind.lustre.ArrayAccessExpr;
@@ -42,6 +43,28 @@ public class Lustre {
 	public static final jkind.lustre.IdExpr timeExpr = new jkind.lustre.IdExpr("time");
 
 	public static final VarDecl assumeHistVar = new VarDecl("__ASSUME__HIST", NamedType.BOOL);
+
+	public static Expr getTimeConstraint(Set<VarDecl> events) {
+
+		IdExpr timeId = timeExpr;
+		Expr preTime = new UnaryExpr(UnaryOp.PRE, timeId);
+
+		Expr nodeCall = new BinaryExpr(timeId, BinaryOp.MINUS, preTime);
+		for (VarDecl eventVar : events) {
+			Expr event = new IdExpr(eventVar.id);
+			BinaryExpr timeChange = new BinaryExpr(event, BinaryOp.MINUS, timeId);
+			Expr preTimeChange = new UnaryExpr(UnaryOp.PRE, timeChange);
+			nodeCall = new NodeCallExpr(MIN_POS_NODE_NAME, preTimeChange, nodeCall);
+		}
+
+		nodeCall = new BinaryExpr(preTime, BinaryOp.PLUS, nodeCall);
+		Expr timeExpr = new BinaryExpr(timeId, BinaryOp.EQUAL, nodeCall);
+		timeExpr = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, timeExpr);
+		Expr timeGrtPreTime = new BinaryExpr(timeId, BinaryOp.GREATER, preTime);
+		Expr timeInitZero = new BinaryExpr(timeId, BinaryOp.EQUAL, new RealExpr(BigDecimal.ZERO));
+		timeInitZero = new BinaryExpr(timeInitZero, BinaryOp.ARROW, timeGrtPreTime);
+		return new BinaryExpr(timeInitZero, BinaryOp.AND, timeExpr);
+	}
 
 	public static Expr getInitValueFromType(Type type) {
 		if (type instanceof NamedType) {
