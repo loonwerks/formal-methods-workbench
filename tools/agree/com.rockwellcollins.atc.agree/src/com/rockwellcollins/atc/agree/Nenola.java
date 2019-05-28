@@ -3784,6 +3784,7 @@ public class Nenola {
 		public final List<Connection> connections;
 		public final List<Spec> specList;
 		public final Optional<TimingMode> timingMode;
+		private final Expr initialExpr;
 		public final boolean isImpl;
 
 		/* reference to Xtext elm for gui update */
@@ -3793,7 +3794,7 @@ public class Nenola {
 		public NodeContract(String name, Map<String, Channel> channels, Map<String, NodeContract> subNodes,
 				Map<String, NodeGen> nodeGenMap, Map<String, LinearNodeGen> linearNodeGenMap,
 				List<Connection> connections, List<Spec> specList,
-				Optional<TimingMode> timingMode, boolean isImpl,
+				Optional<TimingMode> timingMode, Expr initialExpr, boolean isImpl,
 				NamedElement namedElement) {
 			this.name = name;
 			this.channels = new HashMap<>();
@@ -3811,6 +3812,7 @@ public class Nenola {
 			this.connections.addAll(connections);
 			this.specList = specList;
 			this.timingMode = timingMode;
+			this.initialExpr = initialExpr;
 			this.isImpl = isImpl;
 
 			this.namedElement = namedElement;
@@ -3948,12 +3950,10 @@ public class Nenola {
 
 			locals.addAll(this.toLustreVarsFromBiChans(state, isMonolithic));
 
-			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
 
 			String outputName = "__ASSERT";
 			List<VarDecl> outputs = new ArrayList<>();
 			outputs.add(new VarDecl(outputName, NamedType.BOOL));
-			equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
 
 			assertions.addAll(this.toLustreAssertionsFromConnections(state));
 
@@ -3969,64 +3969,90 @@ public class Nenola {
 				}
 			}
 			if (!isAsync) {
-				assertions.addAll(this.toLustreAssertionsFromConnections(state));
+				equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
+				equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
+
 			} else {
-//			builder.clearEquations();
-//
-//			builder.addInput(new AgreeVar(clockVarName, NamedType.BOOL, null));
-//			addTickedEq(builder);
-//			addInitEq(builder);
-//
-//			Expr holdExpr = new BoolExpr(true);
-//			// make clock hold exprs
-//			for (AgreeVar var : agreeNode.outputs) {
-//				Expr varId = new IdExpr(var.id);
-//				Expr preVar = new UnaryExpr(UnaryOp.PRE, varId);
-//				holdExpr = new BinaryExpr(holdExpr, BinaryOp.AND, new BinaryExpr(varId, BinaryOp.EQUAL, preVar));
-//			}
-//			holdExpr = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, holdExpr);
-//
-//			for (int i = 0; i < agreeNode.assumptions.size(); i++) {
-//				Expr varId = new IdExpr(LustreAstBuilder.assumeSuffix + i);
-//				Expr preVar = new UnaryExpr(UnaryOp.PRE, varId);
-//				preVar = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, preVar);
-//				holdExpr = new BinaryExpr(holdExpr, BinaryOp.AND, new BinaryExpr(varId, BinaryOp.EQUAL, preVar));
-//			}
-//
-//			holdExpr = expr("(not clk => holdExpr)", to("clk", clockVarName), to("holdExpr", holdExpr));
-//
-//			// make the constraint for the initial outputs
-//			Expr initConstr = expr("not ticked => initExpr", to("ticked", tickedVarName),
-//					to("initExpr", agreeNode.initialConstraint));
-//
-//			// re-write the old expression using the visitor
-//			for (Equation eq : node.equations) {
-//				if (eq.lhs.size() != 1) {
-//					throw new AgreeException("we expect that all eqs have a single lhs now");
-//				}
-//				IdExpr var = eq.lhs.get(0);
-//				boolean isLocal = false;
-//				for (VarDecl local : node.locals) {
-//					if (local.id.equals(var.id)) {
-//						isLocal = true;
-//						break;
-//					}
-//				}
-//				if (isLocal) {
-//					Expr newExpr = eq.expr.accept(visitor);
-//					newExpr = new IfThenElseExpr(new IdExpr(clockVarName), newExpr, new UnaryExpr(UnaryOp.PRE, var));
-//					builder.addEquation(new Equation(eq.lhs, newExpr));
-//				} else {
-//					// this is the only output
-//					Expr newExpr = eq.expr.accept(visitor);
-//					newExpr = new BinaryExpr(new IdExpr(clockVarName), BinaryOp.IMPLIES, newExpr);
-//					builder.addEquation(new Equation(eq.lhs,
-//							new BinaryExpr(initConstr, BinaryOp.AND, new BinaryExpr(holdExpr, BinaryOp.AND, newExpr))));
-//				}
-//			}
-//			// this var equations should be populated by the visitor call above
-//			builder.addEquations(visitor.stateVarEqs);
-//			builder.addLocals(visitor.stateVars);
+
+
+				inputs.add(new VarDecl(Lustre.clockVarName, NamedType.BOOL));
+				locals.add(new VarDecl(Lustre.tickedVarName, NamedType.BOOL));
+				equations.add(equation("ticked = clk -> clk or pre(ticked);", to("ticked", Lustre.tickedVarName),
+						to("clk", Lustre.clockVarName)));
+
+				locals.add(new VarDecl(Lustre.initVarName, NamedType.BOOL));
+				equations
+						.add(equation("initVar = clk and (true -> not pre(ticked));", to("initVar", Lustre.initVarName),
+								to("ticked", Lustre.tickedVarName), to("clk", Lustre.clockVarName)));
+
+				jkind.lustre.Expr holdExpr = new jkind.lustre.BoolExpr(true);
+				// make clock hold exprs
+				NodeContract parentNode = state.parentNodeOp.get();
+				for (Channel chan : parentNode.channels.values()) {
+					if (chan.direction instanceof Out) {
+						jkind.lustre.Expr varId = new jkind.lustre.IdExpr(chan.toLustreVar().id);
+						jkind.lustre.Expr preVar = new jkind.lustre.UnaryExpr(UnaryOp.PRE, varId);
+						holdExpr = new BinaryExpr(holdExpr, BinaryOp.AND,
+								new BinaryExpr(varId, BinaryOp.EQUAL, preVar));
+					}
+				}
+				holdExpr = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, holdExpr);
+
+				{
+					int i = 0;
+
+					for (Spec spec : this.specList) {
+						if (spec.specTag == SpecTag.Assume) {
+							jkind.lustre.Expr varId = new jkind.lustre.IdExpr("__" + SpecTag.Assume + "__" + i);
+							jkind.lustre.Expr preVar = new jkind.lustre.UnaryExpr(UnaryOp.PRE, varId);
+							preVar = new BinaryExpr(new BoolExpr(true), BinaryOp.ARROW, preVar);
+							holdExpr = new BinaryExpr(holdExpr, BinaryOp.AND,
+									new BinaryExpr(varId, BinaryOp.EQUAL, preVar));
+							i++;
+						}
+					}
+				}
+
+				holdExpr = expr("(not clk => holdExpr)", to("clk", Lustre.clockVarName), to("holdExpr", holdExpr));
+
+				// make the constraint for the initial outputs
+				jkind.lustre.Expr initConstr = expr("not ticked => initExpr", to("ticked", Lustre.tickedVarName),
+						to("initExpr", parentNode.initialExpr.toLustreExpr(state)));
+
+				// re-write the old expression using the visitor
+				for (Equation eq : equations) {
+					if (eq.lhs.size() != 1) {
+						throw new RuntimeException("we expect that all eqs have a single lhs now");
+					}
+					jkind.lustre.IdExpr var = eq.lhs.get(0);
+					boolean isLocal = false;
+					for (VarDecl local : locals) {
+						if (local.id.equals(var.id)) {
+							isLocal = true;
+							break;
+						}
+					}
+					if (isLocal) {
+						jkind.lustre.Expr newExpr = Lustre.toCondactExpr(eq.expr);
+						newExpr = new jkind.lustre.IfThenElseExpr(new jkind.lustre.IdExpr(Lustre.clockVarName), newExpr,
+								new jkind.lustre.UnaryExpr(UnaryOp.PRE, var));
+
+						equations.add(new Equation(eq.lhs, newExpr));
+
+						equations.addAll(Lustre.toCondactEquations(eq.expr));
+						locals.addAll(Lustre.toCondactLocals(eq.expr));
+					} else {
+						// this is the only output
+						jkind.lustre.Expr newExpr = Lustre.toCondactExpr(eq.expr);
+						newExpr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(Lustre.clockVarName),
+								BinaryOp.IMPLIES, newExpr);
+						equations.add(new Equation(eq.lhs, new BinaryExpr(initConstr, BinaryOp.AND,
+								new jkind.lustre.BinaryExpr(holdExpr, BinaryOp.AND, newExpr))));
+
+						equations.addAll(Lustre.toCondactEquations(eq.expr));
+						locals.addAll(Lustre.toCondactLocals(eq.expr));
+					}
+				}
 			}
 
 			NodeBuilder builder = new NodeBuilder(this.getName());

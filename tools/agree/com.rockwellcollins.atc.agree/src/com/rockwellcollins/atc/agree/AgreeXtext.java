@@ -106,6 +106,7 @@ import com.rockwellcollins.atc.agree.agree.GetPropertyExpr;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IndicesExpr;
+import com.rockwellcollins.atc.agree.agree.InitialStatement;
 import com.rockwellcollins.atc.agree.agree.InputStatement;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedExpr;
@@ -868,6 +869,7 @@ public class AgreeXtext {
 		List<Nenola.Spec> specs = new ArrayList<Nenola.Spec>();
 
 		Optional<Nenola.TimingMode> timingMode = extractTimingMode(c);
+		Nenola.Expr initialExpr = extractInitialExpr(c);
 
 		List<Nenola.Spec> localSpecs = extractSpecList(c);
 		specs.addAll(localSpecs);
@@ -908,8 +910,24 @@ public class AgreeXtext {
 		String name = c.getQualifiedName();
 
 		return new Nenola.NodeContract(name, channels, subNodes, nodeGenMap, linearNodeGenMap, connections, specs,
-				timingMode,
+				timingMode, initialExpr,
 				isImpl, c);
+	}
+
+	private static Nenola.Expr extractInitialExpr(ComponentClassifier c) {
+		AgreeContractSubclause annex = getAgreeAnnex(c);
+		if (annex != null) {
+			AgreeContract contract = (AgreeContract) annex.getContract();
+
+			for (SpecStatement spec : contract.getSpecs()) {
+				if (spec instanceof InitialStatement) {
+					return toExprFromExpr(((InitialStatement) spec).getExpr());
+				}
+
+			}
+
+		}
+		return new Nenola.BoolLit(true);
 	}
 
 	private static Map<String, PropVal> extractPropMapFromCompType(ComponentType ct) {

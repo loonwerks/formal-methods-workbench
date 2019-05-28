@@ -419,6 +419,7 @@ public class Lustre {
 	public final static String clockVarName = "_CLK";
 	public final static String initVarName = "_INIT";
 	public final static String clockedNodePrefix = "_CLOCKED_";
+	public final static String tickedVarName = "_TICKED";
 
 	public static Node removeProperties(Node node) {
 		NodeBuilder builder = new NodeBuilder(node.id);
@@ -430,5 +431,22 @@ public class Lustre {
 		return builder.build();
 	}
 
+	public static Expr toCondactExpr(Expr expr) {
+		// TODO Auto-generated method stub
+		// see LustreCondactNodeVisitor cases
+		return null;
+	}
+
+	public static List<Equation> toCondactEquations(Expr expr) {
+		// TODO Auto-generated method stub
+		// see LustreCondactNodeVisitor cases
+		return null;
+	}
+
+	public static List<VarDecl> toCondactLocals(Expr expr) {
+		// TODO Auto-generated method stub
+		// see LustreCondactNodeVisitor cases
+		return null;
+	}
 
 }
