@@ -142,7 +142,7 @@ public class LustreCondactNodeVisitor extends ExprMapVisitor {
 		Program program = new ProgramBuilder().addTypes(types).addNodes(agreeProgram.globalLustreNodes)
 				.setMain(agreeProgram.topNode.id).build();
 		globalLustreNodeNames
-		.addAll(agreeProgram.globalLustreNodes.stream().map(n -> n.id).collect(Collectors.toSet()));
+				.addAll(agreeProgram.globalLustreNodes.stream().map(n -> n.id).collect(Collectors.toSet()));
 		typeReconstructor = new TypeReconstructor(program);
 		typeReconstructor.setNodeContext(node);
 	}

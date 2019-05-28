@@ -3959,6 +3959,8 @@ public class Nenola {
 			builder.addEquations(equations);
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
+
+			// TODO : make sure Condact translation is done: see LustreCondactNodeVisitor.translate
 			return node;
 		}
 
@@ -4671,9 +4673,6 @@ public class Nenola {
 		}
 
 		public Node toLustreMainConsistencyNode(StaticState state, boolean isMonolithic, int consistDetph) {
-			// TODO Auto-generated method stub
-			// See LustreASTBuilder.getConsistencyLustreNode(agreeProgram.topNode, false);
-
 			final String stuffPrefix = "__STUFF";
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -4725,31 +4724,11 @@ public class Nenola {
 				}
 			}
 
-			// assertions: equations.addAll(agreeNode.localEquations);
 			for (Connection conn : this.connections) {
 				equations.add(conn.toLustreEquation(state));
 			}
-
-			// TODO should we include lemmas in the consistency check?
-			// for(AgreeStatement guarantee : agreeNode.lemmas){
-			// histConj = new BinaryExpr(histConj, BinaryOp.AND, guarantee.expr);
-			// }
-
 			{
 				int stuffAssertionIndex = 0;
-//			if (withAssertions) {
-//				for (AgreeStatement assertion : agreeNode.assertions) {
-//					AgreeVar stuffAssertionVar = new AgreeVar(stuffPrefix + assertSuffix + stuffAssertionIndex++,
-//							NamedType.BOOL, assertion.reference, null, null);
-//					locals.add(stuffAssertionVar);
-//					IdExpr stuffAssertionId = new IdExpr(stuffAssertionVar.id);
-//					equations.add(new Equation(stuffAssertionId, assertion.expr));
-//
-//					stuffConj = LustreExprFactory.makeANDExpr(stuffConj, stuffAssertionId);
-//				}
-//			} else {
-				// perhaps we should break out eq statements into implementation
-				// equations and type equations. That would clear this up.
 				for (Spec spec : this.specList) {
 					if (spec.specTag == SpecTag.Assert && spec.prop instanceof ExprProp) {
 						String assertSuffix = "__" + SpecTag.Assert.name() + "__";
@@ -4846,9 +4825,6 @@ public class Nenola {
 		}
 
 		public Node toLustreCompositionConsistencyNode(StaticState state, boolean isMonolithic, int consistDetph) {
-			// TODO Auto-generated method stub
-			// recursively flatten like toLustreSubNode()
-			// See LustreASTBuilder.getConsistencyLustreNode(agreeProgram.topNode, true);
 			final String stuffPrefix = "__STUFF";
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -4859,8 +4835,6 @@ public class Nenola {
 			List<String> ivcs = new ArrayList<>();
 
 			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
-
-			// TODO : switch spec gathering to recursively gathered specs
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
@@ -4889,11 +4863,6 @@ public class Nenola {
 
 
 			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
-
-			// TODO should we include lemmas in the consistency check?
-			// for(AgreeStatement guarantee : agreeNode.lemmas){
-			// histConj = new BinaryExpr(histConj, BinaryOp.AND, guarantee.expr);
-			// }
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
