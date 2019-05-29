@@ -626,13 +626,13 @@ val encI_def =
  Define 
   `encI w i =
      let k = IWIDTH i;
-        bytes = MAX w k;
+        width = MAX w k;
      in if 0 <= i then 
-           enc bytes (Num i)
+           enc width (Num i)
         else 
-          let bound = 256 ** bytes;
+          let bound = 256 ** width;
           in
-           enc bytes (bound - Num (ABS i))`
+           enc width (bound - Num (ABS i))`
 ;
 
 val decI_def =
@@ -644,13 +644,17 @@ val decI_def =
        in 
         if n < half then 
            int_of_num n
-        else -(int_of_num (bound - n))`
-
+        else -int_of_num (bound - n)`
+;
+ 
 (*
-g `!i w. decI (encI w i) = i`;
+Theorem decI_encI : 
+ !i w. decI (encI w i) = i
+Proof
 BasicProvers.NORM_TAC int_ss [decI_def, encI_def,MAX_DEF,LET_THM,IWIDTH_def, NWIDTH_def]
  >> full_simp_tac list_ss [dec_enc]
- >- intLib.ARITH_TAC
+ >> TRY intLib.ARITH_TAC
+ >> rw_tac bool_ss []
  >- intLib.ARITH_TAC;
 
  >- (`~(n < half)` by (UNABBREV_ALL_TAC >> metis_tac[])
@@ -663,6 +667,7 @@ BasicProvers.NORM_TAC int_ss [decI_def, encI_def,MAX_DEF,LET_THM,IWIDTH_def, NWI
      `w <= STRLEN (enc w (Num i))` by metis_tac [lower_enc]
  >- (full_simp_tac int_ss [dec_enc]
  >- (full_simp_tac int_ss [dec_enc]
+QED
 *)
 
 (*
