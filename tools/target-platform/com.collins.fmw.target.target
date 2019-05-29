@@ -30,21 +30,21 @@
       <unit id="org.eclipse.sirius.runtime.ide.ui.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.uml2.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.zest.feature.group" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/releases/2018-12"/>
+      <repository location="http://download.eclipse.org/releases/2019-03"/>
     </location>
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.eclipse.xtext.redist.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.xtext.junit4" version="0.0.0"/>
       <unit id="org.eclipse.xtext.testing" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.16.0/"/>
+      <repository location="http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.17.0/"/>
     </location>
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.eclipse.emf.mwe2.launcher.feature.group" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/modeling/emft/mwe/updates/releases/2.9.0/"/>
+      <repository location="http://download.eclipse.org/modeling/emft/mwe/updates/releases/2.10.0/"/>
     </location>
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.eclipse.xsemantics.runtime.feature.feature.group" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/xsemantics/milestones/1.16//"/>
+      <repository location="http://download.eclipse.org/xsemantics/milestones/1.17//"/>
     </location>
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.apache.commons.io" version="2.2.0.v201405211200"/>
@@ -53,7 +53,7 @@
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.eclipse.elk.feature.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.elk.algorithms.feature.feature.group" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/elk/updates/releases/0.4.1/"/>
+      <repository location="http://download.eclipse.org/elk/updates/releases/0.5.0/"/>
     </location>
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.eclipse.ease.feature.feature.group" version="0.0.0"/>
@@ -74,20 +74,15 @@
       <repository location="https://raw.githubusercontent.com/loonwerks/z3-plugin/master/com.collins.trustedsystems.z3.updates/target/repository"/>
     </location>
     <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-      <unit id="org.osate.alisa.workbench.sdk.feature.group" version="1.0.0.v20190301-2305"/>
+      <unit id="org.osate.alisa.workbench.sdk.feature.group" version="1.0.0.v20190507-1646"/>
       <unit id="org.osate.ba.feature.feature.group" version="1.0.0.v20181106-1533"/>
-      <unit id="org.osate.core.feature.feature.group" version="2.4.0.vfinal"/>
-      <unit id="org.osate.core.feature.source.feature.group" version="2.4.0.vfinal"/>
-      <unit id="org.osate.ge.feature.feature.group" version="2.4.0.vfinal"/>
-      <unit id="org.osate.ge.feature.source.feature.group" version="2.4.0.vfinal"/>
-      <unit id="org.osate.ocarina.feature.feature.group" version="0.0.1.v20190214-1652"/>
-      <unit id="org.osate.ocarina.feature.source.feature.group" version="0.0.1.v20190214-1652"/>
-      <unit id="org.osate.plugins.feature.feature.group" version="2.4.0.vfinal"/>
-      <unit id="org.osate.plugins.feature.source.feature.group" version="2.4.0.vfinal"/>
+      <unit id="org.osate.core.feature.feature.group" version="2.5.0.vfinal"/>
+      <unit id="org.osate.ge.feature.feature.group" version="2.5.0.vfinal"/>
+      <unit id="org.osate.ocarina.feature.feature.group" version="0.0.1.v20190417-1800"/>
+      <unit id="org.osate.plugins.feature.feature.group" version="2.5.0.vfinal"/>
       <unit id="org.osate.utils.feature.feature.group" version="1.0.0.v20181114-1614"/>
-      <unit id="org.osate.xtext.aadl2.errormodel.feature.feature.group" version="2.4.0.vfinal"/>
-      <unit id="org.osate.xtext.aadl2.errormodel.feature.source.feature.group" version="2.4.0.vfinal"/>
-      <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.4.0/updates/"/>
+      <unit id="org.osate.xtext.aadl2.errormodel.feature.feature.group" version="2.5.0.vfinal"/>
+      <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.5.0/updates/"/>
     </location>
   </locations>
 </target>
