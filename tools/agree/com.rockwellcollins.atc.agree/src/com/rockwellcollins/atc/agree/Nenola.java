@@ -3890,7 +3890,7 @@ public class Nenola {
 		}
 
 
-		private jkind.lustre.Node toLustreFlattenedNode(StaticState state, boolean isMonolithic) {
+		private jkind.lustre.Node toLustreFlattenedNode(StaticState state, boolean isMonolithic, boolean isAsync) {
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
@@ -3912,7 +3912,8 @@ public class Nenola {
 			}
 
 			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(state, isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(state, isMonolithic, isAsync)
+					.entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				locals.add(new VarDecl(inputName, NamedType.BOOL));
@@ -3957,24 +3958,20 @@ public class Nenola {
 
 			assertions.addAll(this.toLustreAssertionsFromConnections(state));
 
-			// TODO : make sure Condact translation is done: see LustreCondactNodeVisitor.translate
 
-			boolean isAsync = false;
-			if (state.parentNodeOp.isPresent()) {
 
-				NodeContract parentNode = state.parentNodeOp.get();
-				if (parentNode.timingMode.isPresent()) {
-					TimingMode tm = parentNode.timingMode.get();
-					isAsync = tm instanceof Nenola.AsyncMode || tm instanceof Nenola.LatchedMode;
-				}
-			}
-			if (!isAsync) {
-				equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
+			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic, isAsync));
+			locals.addAll(this.toLustreLocalVarsFromConnections(state, isMonolithic, isAsync));
+
+			if (isAsync) {
 				equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
-
 			} else {
+				// TODO
+				// equations.add ...
+				// locals.add ...
+			}
 
-
+			if (isAsync) {
 				inputs.add(new VarDecl(Lustre.clockVarName, NamedType.BOOL));
 				locals.add(new VarDecl(Lustre.tickedVarName, NamedType.BOOL));
 				equations.add(equation("ticked = clk -> clk or pre(ticked);", to("ticked", Lustre.tickedVarName),
@@ -3985,6 +3982,7 @@ public class Nenola {
 						.add(equation("initVar = clk and (true -> not pre(ticked));", to("initVar", Lustre.initVarName),
 								to("ticked", Lustre.tickedVarName), to("clk", Lustre.clockVarName)));
 
+				//////////////////////////////////////////////////
 				jkind.lustre.Expr holdExpr = new jkind.lustre.BoolExpr(true);
 				// make clock hold exprs
 				NodeContract parentNode = state.parentNodeOp.get();
@@ -4019,8 +4017,8 @@ public class Nenola {
 				jkind.lustre.Expr initConstr = expr("not ticked => initExpr", to("ticked", Lustre.tickedVarName),
 						to("initExpr", parentNode.initialExpr.toLustreExpr(state)));
 
-				// re-write the old expression using the visitor
-				for (Equation eq : equations) {
+				// re-write the old expression with clock tick implication
+				for (Equation eq : originalEqs) {
 					if (eq.lhs.size() != 1) {
 						throw new RuntimeException("we expect that all eqs have a single lhs now");
 					}
@@ -4053,6 +4051,7 @@ public class Nenola {
 						locals.addAll(Lustre.toCondactLocals(eq.expr));
 					}
 				}
+				//////////////////////////////////////////////
 			}
 
 			NodeBuilder builder = new NodeBuilder(this.getName());
@@ -4063,6 +4062,18 @@ public class Nenola {
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
 			return node;
+		}
+
+		private List<VarDecl> toLustreLocalVarsFromConnections(StaticState state, boolean isMonolithic,
+				boolean isAsync) {
+
+			List<VarDecl> acc = new ArrayList<>();
+			if (!isAsync) {
+				return acc;
+			} else {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		}
 
 		private List<jkind.lustre.Expr> toLustreAssertionsFromConnections(StaticState state) {
@@ -4125,7 +4136,7 @@ public class Nenola {
 			return acc;
 		}
 
-		private Node toLustreMainNode(StaticState state, boolean isMonolithic) {
+		private Node toLustreMainNode(StaticState state, boolean isMonolithic, boolean isAsync) {
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 			List<VarDecl> locals = new ArrayList<>();
 			List<VarDecl> inputs = new ArrayList<>();
@@ -4189,7 +4200,8 @@ public class Nenola {
 				properties.add(name);
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(state, isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(state, isMonolithic, isAsync)
+					.entrySet()) {
 				String name = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				locals.add(new VarDecl(name, NamedType.BOOL));
@@ -4206,7 +4218,7 @@ public class Nenola {
 
 
 
-			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
+			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic, isAsync));
 			assertions.add(Lustre.getTimeConstraint(this.toEventTimeVarList(state, isMonolithic)));
 
 			NodeBuilder builder = new NodeBuilder("main");
@@ -4268,9 +4280,11 @@ public class Nenola {
 		}
 
 
-		private List<Equation> toLustreEquationsFromConnections(StaticState state, boolean isMonolithic) {
+		private List<Equation> toLustreEquationsFromConnections(StaticState state, boolean isMonolithic,
+				boolean isAsync) {
 			List<Equation> equations = new ArrayList<>();
 
+			if (!isAsync) {
 			for (Connection conn : this.connections) {
 				equations.add(conn.toLustreEquation(state));
 			}
@@ -4288,6 +4302,10 @@ public class Nenola {
 
 			}
 			return equations;
+			} else {
+				// TODO
+				return null;
+			}
 		}
 
 		private List<VarDecl> toLustreVarsFromBiChans(StaticState state, boolean isMonolithic) {
@@ -4507,33 +4525,40 @@ public class Nenola {
 		}
 
 
-		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(StaticState state, boolean isMonolithic) {
+		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(StaticState state, boolean isMonolithic,
+				boolean isAsync) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
-			int suffix = 0;
-			for (Spec spec : this.specList) {
 
-				if (spec.specTag == SpecTag.Guarantee) {
-					String key = SpecTag.Guarantee.name() + "__" + suffix;
-					if (spec.prop instanceof PatternProp) {
-						Pattern pattern = ((PatternProp) spec.prop).pattern;
-						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
-								? pattern.toLustreExprProperty(state)
-								: pattern.toLustreExprConstraint(state);
-						exprMap.put(key, expr);
+			if (!isAsync) {
+				int suffix = 0;
+				for (Spec spec : this.specList) {
 
-					} else if (spec.prop instanceof ExprProp) {
-						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
-						exprMap.put(key, expr);
+					if (spec.specTag == SpecTag.Guarantee) {
+						String key = SpecTag.Guarantee.name() + "__" + suffix;
+						if (spec.prop instanceof PatternProp) {
+							Pattern pattern = ((PatternProp) spec.prop).pattern;
+							jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
+									? pattern.toLustreExprProperty(state)
+									: pattern.toLustreExprConstraint(state);
+							exprMap.put(key, expr);
 
+						} else if (spec.prop instanceof ExprProp) {
+							jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
+							exprMap.put(key, expr);
+
+						}
+
+						suffix = suffix + 1;
 					}
 
-					suffix = suffix + 1;
 				}
 
+				return exprMap;
+			} else {
+				// TODO
+				return exprMap;
 			}
-
-			return exprMap;
 		}
 
 
@@ -4597,12 +4622,12 @@ public class Nenola {
 			return exprMap;
 		}
 
-		public List<Node> toLustreFlattenedNodes(StaticState state, boolean isMonolithic) {
+		public List<Node> toLustreFlattenedNodes(StaticState state, boolean isMonolithic, boolean isAsync) {
 
 			List<Node> nodes = new ArrayList<>();
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.add(this.toLustreFlattenedNode(state, isMonolithic));
-				nodes.addAll(subNodeContract.toLustreFlattenedNodes(state, isMonolithic));
+				nodes.add(this.toLustreFlattenedNode(state, isMonolithic, isAsync));
+				nodes.addAll(subNodeContract.toLustreFlattenedNodes(state, isMonolithic, isAsync));
 			}
 
 			return nodes;
@@ -4906,7 +4931,8 @@ public class Nenola {
 			return node;
 		}
 
-		public Node toLustreCompositionConsistencyNode(StaticState state, boolean isMonolithic, int consistDetph) {
+		public Node toLustreCompositionConsistencyNode(StaticState state, boolean isMonolithic, int consistDetph,
+				boolean isAsync) {
 			final String stuffPrefix = "__STUFF";
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -4944,7 +4970,7 @@ public class Nenola {
 			}
 
 
-			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic));
+			equations.addAll(this.toLustreEquationsFromConnections(state, isMonolithic, isAsync));
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(state, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
@@ -5390,10 +5416,12 @@ public class Nenola {
 	}
 
 	private static List<Node> lustreNodesFromMain(StaticState state, NodeContract main, boolean isMonolithic) {
+
+		boolean isAsync = main.timingMode.isPresent() && main.timingMode.get() instanceof AsyncMode;
 		List<Node> nodes = new ArrayList<>();
-		Node mainNode = main.toLustreMainNode(state, isMonolithic);
+		Node mainNode = main.toLustreMainNode(state, isMonolithic, isAsync);
 		nodes.add(mainNode);
-		List<Node> subs = main.toLustreFlattenedNodes(state, isMonolithic);
+		List<Node> subs = main.toLustreFlattenedNodes(state, isMonolithic, isAsync);
 		nodes.addAll(subs);
 		return nodes;
 	}
@@ -5467,7 +5495,8 @@ public class Nenola {
 			return programs;
 		}
 
-		private Map<String, jkind.lustre.Program> toConsistencyPrograms(boolean isMonolithic, int depth) {
+		private Map<String, jkind.lustre.Program> toConsistencyPrograms(boolean isMonolithic, int depth,
+				boolean isAsync) {
 			StaticState state = new StaticState(this.nodeContractMap, this.types, this.nodeGenMap, new HashMap<>(),
 					new HashMap<>(), propMap, Optional.empty());
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
@@ -5495,7 +5524,7 @@ public class Nenola {
 
 				List<Node> nodes = new ArrayList<>();
 				Node subConsistNode = subNode.toLustreCompositionConsistencyNode(
-						state.newParentNodeOp(Optional.of(main)), isMonolithic, depth);
+						state.newParentNodeOp(Optional.of(main)), isMonolithic, depth, isAsync);
 				for (Node node : this.toLustreNodesFromNodeGens(state)) {
 					nodes.add(Lustre.removeProperties(node));
 				}
@@ -5513,7 +5542,8 @@ public class Nenola {
 			{
 				List<Node> nodes = new ArrayList<>();
 
-				Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode(state, isMonolithic, depth);
+				Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode(state, isMonolithic, depth,
+						isAsync);
 				for (Node node : this.toLustreNodesFromNodeGens(state)) {
 					nodes.add(Lustre.removeProperties(node));
 				}
@@ -5533,7 +5563,9 @@ public class Nenola {
 		}
 
 		public Map<String, jkind.lustre.Program> toMonolithicLustrePrograms(boolean usingKind2) {
-			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms(true, 4);
+
+			boolean isAsync = this.main.timingMode.isPresent() && this.main.timingMode.get() instanceof AsyncMode;
+			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms(true, 4, isAsync);
 
 			if (usingKind2) {
 				programMap.putAll(this.toAssumeGuaranteePrograms(this.main, true));
@@ -5546,7 +5578,8 @@ public class Nenola {
 
 		public Map<String, jkind.lustre.Program> toSingleLustrePrograms(NodeContract main,
 				int depth) {
-			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms(false, depth);
+			boolean isAsync = this.main.timingMode.isPresent() && this.main.timingMode.get() instanceof AsyncMode;
+			Map<String, jkind.lustre.Program> programMap = this.toConsistencyPrograms(false, depth, isAsync);
 			programMap.putAll(this.toAssumeGuaranteePrograms(main, false));
 			return programMap;
 		}

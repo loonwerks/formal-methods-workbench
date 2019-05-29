@@ -431,22 +431,4 @@ public class Lustre {
 		return builder.build();
 	}
 
-	public static Expr toCondactExpr(Expr expr) {
-		// TODO Auto-generated method stub
-		// see LustreCondactNodeVisitor cases
-		return null;
-	}
-
-	public static List<Equation> toCondactEquations(Expr expr) {
-		// TODO Auto-generated method stub
-		// see LustreCondactNodeVisitor cases
-		return null;
-	}
-
-	public static List<VarDecl> toCondactLocals(Expr expr) {
-		// TODO Auto-generated method stub
-		// see LustreCondactNodeVisitor cases
-		return null;
-	}
-
 }
