@@ -3,6 +3,7 @@ package com.collins.fmw.cyres.architecture.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.window.Window;
@@ -13,23 +14,28 @@ import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AbstractNamedValue;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
@@ -54,46 +60,51 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	static final String AM_IMPL_NAME = "AM";
 	static final String CONNECTION_IMPL_NAME = "c";
 
-	private String commDriverComponent;
 	private String implementationName;
 	private String implementationLanguage;
 	private String cacheTimeout;
 	private String cacheSize;
 	private String logSize;
-	private String attestationResoluteClause;
+	private String attestationRequirement;
 	private boolean propagateGuarantees;
 	private String attestationAgreeProperty;
 
 	@Override
 	protected void runCommand(URI uri) {
 
-		// Check if it is a subcomponent or component implementation
+		// Check if selection is a subcomponent
 		final EObject eObj = getEObject(uri);
-		ComponentImplementation ci = null;
-		String selectedSubcomponent = "";
+		Subcomponent selectedSubcomponent = null;
 		if (eObj instanceof Subcomponent) {
-			ci = ((Subcomponent) eObj).getContainingComponentImpl();
-			selectedSubcomponent = ((Subcomponent) eObj).getName();
-		} else if (eObj instanceof ComponentImplementation) {
-			ci = (ComponentImplementation) eObj;
+			selectedSubcomponent = (Subcomponent) eObj;
 		} else {
-			Dialog.showError("No component is selected",
-					"A communication driver subcomponent (or its containing implementation) must be selected to add an attestation manager.");
+			Dialog.showError("Add Attestation Manager",
+					"A communication driver subcomponent must be selected to add an attestation manager.");
+			return;
+		}
+
+		// Check if selected subcomponent is a comm driver
+		if (!isCompType(selectedSubcomponent, "COMM_DRIVER")) {
+			Dialog.showError("Add Attestation Manager",
+					"A communication driver subcomponent must be selected to add an attestation manager.");
+			return;
+		}
+
+		// Check if the selected subcomponent already has an attestation manager connected
+		if (hasAttestationManager(selectedSubcomponent)) {
+			Dialog.showError("Add Attestation Manager",
+					"Component " + selectedSubcomponent.getName() + " already has an associated attestation manager.");
 			return;
 		}
 
 		// Open wizard to enter filter info
 		final AddAttestationManagerDialog wizard = new AddAttestationManagerDialog(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		List<String> subcomponents = new ArrayList<>();
-		for (Subcomponent comp : ci.getAllSubcomponents()) {
-			subcomponents.add(comp.getName());
-		}
-		List<String> resoluteClauses = new ArrayList<>();
-		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> resoluteClauses.add(r.getId()));
-		wizard.create(selectedSubcomponent, subcomponents, resoluteClauses);
+
+		List<String> importedRequirements = new ArrayList<>();
+		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> importedRequirements.add(r.getId()));
+		wizard.create(selectedSubcomponent.getName(), importedRequirements);
 		if (wizard.open() == Window.OK) {
-			commDriverComponent = wizard.getCommDriverComponent();
 			implementationName = wizard.getImplementationName();
 			implementationLanguage = wizard.getImplementationLanguage();
 			cacheTimeout = wizard.getCacheTimeout();
@@ -108,7 +119,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			if (logSize.isEmpty()) {
 				logSize = "0";
 			}
-			attestationResoluteClause = wizard.getResoluteClause();
+			attestationRequirement = wizard.getRequirement();
 			propagateGuarantees = wizard.getPropagateGuarantees();
 			attestationAgreeProperty = wizard.getAgreeProperty();
 		} else {
@@ -116,7 +127,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		}
 
 		// Insert the attestation manager
-		insertAttestationManager(ci);
+		insertAttestationManager(uri);
 
 		return;
 
@@ -127,7 +138,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	 * the location of the selected connection
 	 * @param uri - The URI of the selected connection
 	 */
-	private void insertAttestationManager(ComponentImplementation ci) {
+	private void insertAttestationManager(URI uri) {
 
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
@@ -137,13 +148,11 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			@Override
 			public void process(final XtextResource resource) throws Exception {
 
-				Subcomponent commDriver = null;
-				for (Subcomponent comp : ci.getAllSubcomponents()) {
-					if (comp.getName().equalsIgnoreCase(commDriverComponent)) {
-						commDriver = comp;
-						break;
-					}
-				}
+				// Retrieve the model object to modify
+				Subcomponent commDriver = (Subcomponent) resource.getEObject(uri.fragment());
+
+				ComponentImplementation ci = commDriver.getContainingComponentImpl();
+
 				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
 				PackageSection pkgSection = null;
 				// Figure out if the comm driver is in the public or private section
@@ -185,7 +194,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					compCategory = ComponentCategory.THREAD;
 				}
 
-				// TODO: check to see if the comm driver already has an attestation manager?
 				// Create Attestation Manager component type
 				final ComponentType attestationManagerType = (ComponentType) pkgSection
 						.createOwnedClassifier(ComponentCreateHelper.getTypeClass(compCategory));
@@ -429,7 +437,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				}
 
 				// Add add_attestation claims to resolute prove statement, if applicable
-				if (!attestationResoluteClause.isEmpty()) {
+				if (!attestationRequirement.isEmpty()) {
 
 					NamedElement commDriverComp = null;
 					if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
@@ -440,7 +448,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						commDriverComp = commDriverType;
 					}
 
-					RequirementsManager.getInstance().modifyRequirement(attestationResoluteClause, resource,
+					RequirementsManager.getInstance().modifyRequirement(attestationRequirement, resource,
 							new AddAttestationManagerClaim(commDriverComp, attestationManagerImpl));
 
 				}
@@ -526,6 +534,53 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			}
 		});
 
+	}
+
+	private boolean isCompType(Subcomponent comp, String compType) {
+
+		EList<PropertyExpression> propVal = comp.getPropertyValues(CASE_PROPSET_NAME, "COMP_TYPE");
+		if (propVal != null) {
+			for (PropertyExpression expr : propVal) {
+				if (expr instanceof NamedValue) {
+					NamedValue namedVal = (NamedValue) expr;
+					AbstractNamedValue absVal = namedVal.getNamedValue();
+					if (absVal instanceof EnumerationLiteral) {
+						EnumerationLiteral enVal = (EnumerationLiteral) absVal;
+						if (enVal.getName().equalsIgnoreCase(compType)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean hasAttestationManager(Subcomponent comp) {
+
+		ComponentImplementation ci = comp.getContainingComponentImpl();
+
+		// Look at each connection in the subcomponent's containing implementation
+		for (Connection conn : ci.getAllConnections()) {
+
+			// Get the source component of the connection
+			NamedElement ne = conn.getAllSrcContextComponent();
+			// If source component is the specified subcomponent, get the destination component of the connection
+			if (ne instanceof Subcomponent && ne.getName().equalsIgnoreCase(comp.getName())) {
+				ne = conn.getAllDstContextComponent();
+				Subcomponent dst = null;
+				if (ne instanceof Subcomponent) {
+					dst = (Subcomponent) ne;
+					// Check if it's an attestation manager
+					if (isCompType(dst, "ATTESTATION")) {
+						return true;
+					}
+				}
+			}
+
+		}
+
+		return false;
 	}
 
 }

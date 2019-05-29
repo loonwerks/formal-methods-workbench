@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.ui.dialogs.Dialog;
 
 /**
  * This class creates the Add Attestation Manager wizard
@@ -25,26 +26,23 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private static int MAX_CACHE_SIZE = 6;
 	private static int DEFAULT_CACHE_SIZE = 4;
 
-	private Combo cboComponents;
 	private Text txtImplementationName;
 	private Text txtImplementationLanguage;
 	private Text txtCacheTimeout;
 	private Combo cboCacheSize;
 	private Text txtLogSize;
-	private Combo cboResoluteClause;
+	private Combo cboRequirement;
 	private Button btnPropagateGuarantees;
 	private Text txtAgreeProperty;
-	private String commDriverComponent;
 	private String implementationName;
 	private String implementationLanguage;
 	private String cacheTimeout;
 	private String cacheSize;
 	private String logSize;
-	private String resoluteClause;
+	private String requirement;
 	private boolean propagateGuarantees;
 	private String commDriver = "";
-	private List<String> components = new ArrayList<>();
-	private List<String> resoluteClauses = new ArrayList<>();
+	private List<String> requirements = new ArrayList<>();
 	private String agreeProperty;
 
 	public AddAttestationManagerDialog(Shell parentShell) {
@@ -68,12 +66,11 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return size;
 	}
 
-	public void create(String commDriver, List<String> components, List<String> resoluteClauses) {
+	public void create(String commDriver, List<String> requirements) {
 		this.commDriver = commDriver;
-		this.components = components;
-		this.resoluteClauses = resoluteClauses;
+		this.requirements = requirements;
 		if (commDriver == null || commDriver.isEmpty()) {
-			create();
+			Dialog.showError("Add Attestation Manager", "Unknown communication driver.");
 			return;
 		}
 		super.create();
@@ -92,37 +89,18 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		container.setLayout(layout);
 
 		// Add attestation manager information fields
-		createCommDriverField(container);
 		createImplementationNameField(container);
 		createImplementationLanguageField(container);
 		createCacheTimeoutField(container);
 		createCacheSizeField(container);
 		createLogSizeField(container);
-		createResoluteClauseField(container);
+		createRequirementField(container);
 		createPropagateGuaranteesField(container);
 		createAgreePropertyField(container);
 
 		return area;
 	}
 
-	private void createCommDriverField(Composite container) {
-
-		Label lblCommDriverField = new Label(container, SWT.NONE);
-		lblCommDriverField.setText("Communication Driver Component");
-
-		GridData dataInfoField = new GridData();
-		dataInfoField.grabExcessHorizontalSpace = true;
-		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboComponents = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-		cboComponents.setLayoutData(dataInfoField);
-		for (String component : components) {
-			cboComponents.add(component);
-		}
-		if (!commDriver.isEmpty()) {
-			cboComponents.setText(commDriver);
-		}
-
-	}
 
 	private void createImplementationNameField(Composite container) {
 
@@ -199,17 +177,17 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	 * the addition of this filter to the design
 	 * @param container
 	 */
-	private void createResoluteClauseField(Composite container) {
+	private void createRequirementField(Composite container) {
 		Label lblResoluteField = new Label(container, SWT.NONE);
-		lblResoluteField.setText("Resolute Clause");
+		lblResoluteField.setText("Requirement");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboResoluteClause = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-		cboResoluteClause.setLayoutData(dataInfoField);
-		for (String clause : resoluteClauses) {
-			cboResoluteClause.add(clause);
+		cboRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboRequirement.setLayoutData(dataInfoField);
+		for (String clause : requirements) {
+			cboRequirement.add(clause);
 		}
 	}
 
@@ -220,11 +198,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private void createPropagateGuaranteesField(Composite container) {
 
 		Label lblPropagateGuaranteesField = new Label(container, SWT.NONE);
-		if (commDriver.isEmpty()) {
-			lblPropagateGuaranteesField.setText("Preserve Guarantees from Comm Driver");
-		} else {
-			lblPropagateGuaranteesField.setText("Preserve Guarantees from " + commDriver);
-		}
+		lblPropagateGuaranteesField.setText("Preserve Guarantees from " + commDriver);
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -262,19 +236,14 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	 * @param container
 	 */
 	private void saveInput() {
-		commDriverComponent = cboComponents.getText();
 		implementationName = txtImplementationName.getText();
 		implementationLanguage = txtImplementationLanguage.getText();
 		cacheTimeout = txtCacheTimeout.getText();
 		cacheSize = cboCacheSize.getText();
 		logSize = txtLogSize.getText();
-		resoluteClause = cboResoluteClause.getText();
+		requirement = cboRequirement.getText();
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees = btnPropagateGuarantees.getSelection();
-	}
-
-	public String getCommDriverComponent() {
-		return commDriverComponent;
 	}
 
 	public String getImplementationName() {
@@ -301,8 +270,8 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return propagateGuarantees;
 	}
 
-	public String getResoluteClause() {
-		return resoluteClause;
+	public String getRequirement() {
+		return requirement;
 	}
 
 	public String getAgreeProperty() {
