@@ -3823,6 +3823,34 @@ public class Nenola {
 		}
 	}
 
+	public static class PropMapGlueProduct {
+
+		public final Map<String, jkind.lustre.Expr> propMap;
+		public final List<Equation> glueEquations;
+		public final List<VarDecl> glueVars;
+
+		public PropMapGlueProduct(Map<String, jkind.lustre.Expr> propMap, List<Equation> glueEquations,
+				List<VarDecl> glueVars) {
+			this.propMap = propMap;
+			this.glueEquations = glueEquations;
+			this.glueVars = glueVars;
+		}
+
+	}
+
+	public static class EquationsGlueProduct {
+		public final List<Equation> equations;
+		public final List<Equation> glueEquations;
+		public final List<VarDecl> glueVars;
+
+		public EquationsGlueProduct(List<Equation> equations, List<Equation> glueEquations, List<VarDecl> glueVars) {
+			this.equations = equations;
+			this.glueEquations = glueEquations;
+			this.glueVars = glueVars;
+		}
+
+	}
+
 	public static class NodeContract implements Contract {
 
 		private final String name;
@@ -3962,9 +3990,12 @@ public class Nenola {
 				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
 			}
 
+
+
+			PropMapGlueProduct gp = this.toLustreGuaranteeMap(globalEnv, isMonolithic, mainNode);
 			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(globalEnv, isMonolithic, mainNode)
-					.entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry :
+					gp.propMap.entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				locals.add(new VarDecl(inputName, NamedType.BOOL));
@@ -3973,6 +4004,8 @@ public class Nenola {
 				ivcs.add(inputName);
 				guarConjExpr = Lustre.makeANDExpr(guarId, guarConjExpr);
 			}
+			equations.addAll(gp.glueEquations);
+			locals.addAll(gp.glueVars);
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(globalEnv, isMonolithic).entrySet()) {
 				jkind.lustre.Expr expr = entry.getValue();
@@ -4011,9 +4044,10 @@ public class Nenola {
 			assertions.addAll(this.toLustreAssertionsFromConnections(globalEnv));
 
 
-
-			equations.addAll(this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode));
-			locals.addAll(this.toLustreLocalVarsFromConnections(isMonolithic, mainNode));
+			EquationsGlueProduct egp = this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode);
+			equations.addAll(egp.equations);
+			equations.addAll(egp.glueEquations);
+			locals.addAll(egp.glueVars);
 
 			if (mainNode.isAsync()) {
 				equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
@@ -4045,17 +4079,6 @@ public class Nenola {
 			builder.addIvcs(ivcs);
 			Node node = builder.build();
 			return node;
-		}
-
-		private List<VarDecl> toLustreLocalVarsFromConnections(boolean isMonolithic, NodeContract mainNode) {
-
-			List<VarDecl> acc = new ArrayList<>();
-			if (!mainNode.isAsync()) {
-				return acc;
-			} else {
-				// TODO Auto-generated method stub
-				return null;
-			}
 		}
 
 		private List<jkind.lustre.Expr> toLustreAssertionsFromConnections(GlobalEnv globalEnv) {
@@ -4184,8 +4207,8 @@ public class Nenola {
 				properties.add(name);
 			}
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(globalEnv, isMonolithic, this)
-					.entrySet()) {
+			PropMapGlueProduct gp = this.toLustreGuaranteeMap(globalEnv, isMonolithic, this);
+			for (Entry<String, jkind.lustre.Expr> entry : gp.propMap.entrySet()) {
 				String name = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				locals.add(new VarDecl(name, NamedType.BOOL));
@@ -4201,8 +4224,11 @@ public class Nenola {
 			}
 
 
+			EquationsGlueProduct egp = this.toLustreEquationsFromConnections(globalEnv, isMonolithic, this);
+			equations.addAll(egp.equations);
+			equations.addAll(egp.glueEquations);
+			locals.addAll(egp.glueVars);
 
-			equations.addAll(this.toLustreEquationsFromConnections(globalEnv, isMonolithic, this));
 			assertions.add(Lustre.getTimeConstraint(this.toEventTimeVarList(globalEnv, isMonolithic)));
 
 			NodeBuilder builder = new NodeBuilder("main");
@@ -4309,9 +4335,12 @@ public class Nenola {
 					to("initExpr", this.initialExpr.toLustreExpr(state)));
 		}
 
-		private List<Equation> toLustreEquationsFromConnections(GlobalEnv globalEnv, boolean isMonolithic,
+		private EquationsGlueProduct toLustreEquationsFromConnections(GlobalEnv globalEnv, boolean isMonolithic,
 				NodeContract mainNode) {
+
 			List<Equation> equations = new ArrayList<>();
+			List<Equation> glueEquations = new ArrayList<>(); // TODO populate
+			List<VarDecl> glueVars = new ArrayList<>(); // TODO populate
 
 			StaticState state = new StaticState(globalEnv, this);
 			for (Connection conn : this.connections) {
@@ -4331,7 +4360,7 @@ public class Nenola {
 				}
 
 			}
-			return equations;
+			return new EquationsGlueProduct(equations, glueEquations, glueVars);
 
 		}
 
@@ -4557,40 +4586,39 @@ public class Nenola {
 		}
 
 
-		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(GlobalEnv globalEnv, boolean isMonolithic,
+		private PropMapGlueProduct toLustreGuaranteeMap(GlobalEnv globalEnv, boolean isMonolithic,
 				NodeContract mainNode) {
 
-			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
+			Map<String, jkind.lustre.Expr> propMap = new HashMap<>();
+			List<Equation> glueEquations = new ArrayList<>(); // TODO populate
+			List<VarDecl> glueVars = new ArrayList<>(); // TODO populate
 			StaticState state = new StaticState(globalEnv, this);
-			if (!mainNode.isAsync()) {
-				int suffix = 0;
-				for (Spec spec : this.specList) {
 
-					if (spec.specTag == SpecTag.Guarantee) {
-						String key = SpecTag.Guarantee.name() + "__" + suffix;
-						if (spec.prop instanceof PatternProp) {
-							Pattern pattern = ((PatternProp) spec.prop).pattern;
-							jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
-									? pattern.toLustreExprProperty(state)
-									: pattern.toLustreExprConstraint(state);
-							exprMap.put(key, expr);
+			int suffix = 0;
+			for (Spec spec : this.specList) {
 
-						} else if (spec.prop instanceof ExprProp) {
-							jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
-							exprMap.put(key, expr);
+				if (spec.specTag == SpecTag.Guarantee) {
+					String key = SpecTag.Guarantee.name() + "__" + suffix;
+					if (spec.prop instanceof PatternProp) {
+						Pattern pattern = ((PatternProp) spec.prop).pattern;
+						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
+								? pattern.toLustreExprProperty(state)
+								: pattern.toLustreExprConstraint(state);
+						propMap.put(key, expr);
 
-						}
+					} else if (spec.prop instanceof ExprProp) {
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
+						propMap.put(key, expr);
 
-						suffix = suffix + 1;
 					}
 
+					suffix = suffix + 1;
 				}
 
-				return exprMap;
-			} else {
-				// TODO
-				return exprMap;
 			}
+
+			return new PropMapGlueProduct(propMap, glueEquations, glueVars);
+
 		}
 
 
@@ -5003,8 +5031,8 @@ public class Nenola {
 				stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
 			}
 
-
-			equations.addAll(this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode));
+			EquationsGlueProduct egp = this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode);
+			equations.addAll(egp.equations);
 
 			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
