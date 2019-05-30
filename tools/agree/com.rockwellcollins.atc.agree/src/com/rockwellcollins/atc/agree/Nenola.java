@@ -44,69 +44,77 @@ import jkind.lustre.parsing.LustreParseUtil;
 //Nenola = Nested Node Language
 public class Nenola {
 
-//	public static class StaticState {
-//
-//		public final Map<String, NodeContract> nodeContractMap;
-//		public final Map<String, DataContract> typeEnv;
-//		public final Map<String, NodeGen> globalNodeGenEnv;
-//		public final Map<String, DataContract> valueEnv;
-//		public final Map<String, NodeGen> localNodeGenEnv;
-//		public final Map<String, Map<String, PropVal>> props;
-//		public final Optional<NodeContract> parentNodeOp;
-//
-//		public StaticState(Map<String, NodeContract> nodeContractMap, Map<String, DataContract> types,
-//				Map<String, NodeGen> globalNodeGenEnv, Map<String, DataContract> values,
-//				Map<String, NodeGen> localNodeGenEnv, Map<String, Map<String, PropVal>> props,
-//				Optional<NodeContract> parentNodeOp) {
-//			this.nodeContractMap = new HashMap<>();
-//			this.nodeContractMap.putAll(nodeContractMap);
-//
-//			this.typeEnv = new HashMap<>();
-//			this.typeEnv.putAll(types);
-//
-//			this.globalNodeGenEnv = new HashMap<>();
-//			this.globalNodeGenEnv.putAll(globalNodeGenEnv);
-//
-//			this.valueEnv = new HashMap<>();
-//			this.valueEnv.putAll(values);
-//
-//			this.localNodeGenEnv = new HashMap<>();
-//			this.localNodeGenEnv.putAll(localNodeGenEnv);
-//
-//			this.props = new HashMap<>();
-//			this.props.putAll(props);
-//
-//			this.parentNodeOp = parentNodeOp;
-//
-//		}
-//
-//		public StaticState newTypes(Map<String, DataContract> types) {
-//			return new StaticState(nodeContractMap, types, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-//					parentNodeOp);
-//		}
-//
-//		public StaticState newValues(Map<String, DataContract> values) {
-//			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, values, localNodeGenEnv, props,
-//					parentNodeOp);
-//		}
-//
-//		public StaticState newLocalNodeGenEnv(Map<String, NodeGen> localNodeGenEnv) {
-//			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-//					parentNodeOp);
-//		}
-//
-//		public StaticState newProps(Map<String, Map<String, PropVal>> props) {
-//			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-//					parentNodeOp);
-//		}
-//
-//
-//		public StaticState newParentNodeOp(Optional<NodeContract> parentNodeOp) {
-//			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, valueEnv, localNodeGenEnv, props,
-//					parentNodeOp);
-//		}
-//
-//	}
+	public static class GlobalEnv {
+		public final Map<String, NodeContract> nodeContractMap;
+		public final Map<String, DataContract> typeEnv;
+		public final Map<String, NodeGen> globalNodeGenEnv;
+		public final Map<String, Map<String, PropVal>> props;
+
+		public GlobalEnv(Map<String, NodeContract> nodeContractMap, Map<String, DataContract> typeEnv,
+				Map<String, NodeGen> globalNodeGenEnv, Map<String, Map<String, PropVal>> props) {
+			this.nodeContractMap = new HashMap<>();
+			this.nodeContractMap.putAll(nodeContractMap);
+
+			this.typeEnv = new HashMap<>();
+			this.typeEnv.putAll(typeEnv);
+
+			this.globalNodeGenEnv = new HashMap<>();
+			this.globalNodeGenEnv.putAll(globalNodeGenEnv);
+
+			this.props = new HashMap<>();
+			this.props.putAll(props);
+
+		}
+
+	}
+
+	public static class StaticState {
+
+		public final Map<String, NodeContract> nodeContractMap;
+		public final Map<String, DataContract> typeEnv;
+		public final Map<String, NodeGen> globalNodeGenEnv;
+		public final Map<String, Map<String, PropVal>> props;
+		public final NodeContract currNodeContract;
+		public final Map<String, DataContract> valueEnv;
+
+
+		public StaticState(Map<String, NodeContract> nodeContractMap, Map<String, DataContract> typeEnv,
+				Map<String, NodeGen> globalNodeGenEnv, Map<String, Map<String, PropVal>> props,
+				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+			this.nodeContractMap = new HashMap<>();
+			this.nodeContractMap.putAll(nodeContractMap);
+
+			this.typeEnv = new HashMap<>();
+			this.typeEnv.putAll(typeEnv);
+
+			this.globalNodeGenEnv = new HashMap<>();
+			this.globalNodeGenEnv.putAll(globalNodeGenEnv);
+
+			this.props = new HashMap<>();
+			this.props.putAll(props);
+
+			this.currNodeContract = currNodeContract;
+
+			this.valueEnv = new HashMap<>();
+			this.valueEnv.putAll(valueEnv);
+
+		}
+
+		public StaticState(GlobalEnv globalEnv, NodeContract currNodeContract) {
+			this(globalEnv.nodeContractMap, globalEnv.typeEnv, globalEnv.globalNodeGenEnv,
+					globalEnv.props, currNodeContract, new HashMap<>());
+		}
+
+		public StaticState newCurrNodeContract(NodeContract currNodeContract) {
+			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, props, currNodeContract, valueEnv);
+		}
+
+		public StaticState newValueEnv(Map<String, DataContract> valueEnv) {
+			return new StaticState(nodeContractMap, typeEnv, globalNodeGenEnv, props, currNodeContract, valueEnv);
+		}
+
+
+	}
 
 	public static enum BinRator {
 		Equal, StreamCons, Implies, Equiv, Conj, Disj, NotEqual, LessThan, LessEq, GreatThan, GreatEq, Plus, Minus, Mult, Div, Mod;
@@ -189,22 +197,15 @@ public class Nenola {
 
 	public static interface Expr {
 
-		DataContract inferDataContract(Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv);
+		DataContract inferDataContract(StaticState state);
 
-		jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap, Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv);
+		jkind.lustre.Expr toLustreExpr(StaticState state);
 
-		jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv);
+		jkind.lustre.Expr toLustreClockedExpr(StaticState state);
 
-		List<jkind.lustre.VarDecl> toLustreClockedLocals();
+		List<jkind.lustre.VarDecl> toLustreClockedLocals(StaticState state);
 
-		List<jkind.lustre.Equation> toLustreClockedEquations();
+		List<jkind.lustre.Equation> toLustreClockedEquations(StaticState state);
 
 		Function<Double, Double> toDoubleFunction(String id);
 
@@ -223,9 +224,7 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 
 			switch (this.tag) {
 			case Clock:
@@ -241,27 +240,23 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			IdExpr base = (IdExpr) target;
 			return new jkind.lustre.IdExpr(base.name + "_" + this.tag.toLustreString());
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -285,33 +280,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return valueEnv.get(this.name);
+		public DataContract inferDataContract(StaticState state) {
+			return state.valueEnv.get(this.name);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IdExpr(this.name.replace("::", "__"));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -338,11 +327,9 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 
-			Contract targetContract = this.target.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+			Contract targetContract = this.target.inferDataContract(state);
 			if (targetContract instanceof RecordContract) {
 				return ((RecordContract) targetContract).fields.get(this.selection);
 			}
@@ -351,36 +338,34 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			if (this.target instanceof IdExpr) {
 				String base = ((IdExpr) this.target).name;
 
-				if (nodeContractMap.containsKey(base)) {
+				if (state.nodeContractMap.containsKey(base)) {
 					return new jkind.lustre.IdExpr(base + "__" + this.selection);
 				}
 
 			}
 
-			return new jkind.lustre.RecordAccessExpr(this.target.toLustreExpr(), this.selection);
+			return new jkind.lustre.RecordAccessExpr(
+					this.target.toLustreExpr(state),
+					this.selection);
 
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -413,15 +398,13 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 
 			switch (this.rator) {
 			case Equal:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			case StreamCons:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			case Implies:
 				return Nenola.Prim.BoolContract;
 			case Equiv:
@@ -441,15 +424,15 @@ public class Nenola {
 			case GreatEq:
 				return Nenola.Prim.BoolContract;
 			case Plus:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			case Minus:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			case Mult:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			case Div:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			case Mod:
-				return this.e1.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+				return this.e1.inferDataContract(state);
 			}
 
 			throw new RuntimeException();
@@ -457,39 +440,39 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return new jkind.lustre.BinaryExpr(this.e1.toLustreExpr(), this.rator.toLustreRator(),
-					this.e2.toLustreExpr());
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new jkind.lustre.BinaryExpr(
+					this.e1.toLustreExpr(state),
+					this.rator.toLustreRator(),
+					this.e2.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
 			if (this.rator == BinRator.StreamCons) {
 				return new jkind.lustre.IfThenElseExpr(new jkind.lustre.IdExpr(Lustre.initVarName),
-						this.e1.toLustreClockedExpr(), this.e2.toLustreClockedExpr());
+						this.e1.toLustreClockedExpr(state), this.e2.toLustreClockedExpr(state));
 			} else {
-				return new BinaryExpr(this.e1.toLustreClockedExpr(), rator.toLustreRator(),
-						this.e2.toLustreClockedExpr());
+				return new BinaryExpr(
+						this.e1.toLustreClockedExpr(state),
+						rator.toLustreRator(),
+						this.e2.toLustreClockedExpr(state));
 			}
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.e1.toLustreClockedLocals());
-			vars.addAll(this.e2.toLustreClockedLocals());
+			vars.addAll(this.e1.toLustreClockedLocals(state));
+			vars.addAll(this.e2.toLustreClockedLocals(state));
 			return vars;
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			List<Equation> eqs = new ArrayList<>();
-			eqs.addAll(this.e1.toLustreClockedEquations());
-			eqs.addAll(this.e2.toLustreClockedEquations());
+			eqs.addAll(this.e1.toLustreClockedEquations(state));
+			eqs.addAll(this.e2.toLustreClockedEquations(state));
 			return eqs;
 		}
 
@@ -547,34 +530,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.trueBody.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.trueBody.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return new jkind.lustre.IfThenElseExpr(condition.toLustreExpr(), trueBody.toLustreExpr(),
-					falseBody.toLustreExpr());
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new jkind.lustre.IfThenElseExpr(
+					condition.toLustreExpr(state), trueBody.toLustreExpr(state), falseBody.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -600,38 +577,35 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.init.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.init.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 
-			jkind.lustre.Expr preExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE, this.body.toLustreExpr());
+			jkind.lustre.Expr preExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE,
+					this.body.toLustreExpr(state));
 
-			jkind.lustre.Expr res = new BinaryExpr(this.init.toLustreExpr(), BinaryOp.ARROW, preExpr);
+			jkind.lustre.Expr res = new BinaryExpr(
+					this.init.toLustreExpr(state), BinaryOp.ARROW,
+					preExpr);
 
 			return res;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -655,37 +629,31 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			String nodeContractName = currNodeContract.name;
-			PropVal pv = props.get(nodeContractName).get(this.propName);
-			return pv.inferDataContract();
+		public DataContract inferDataContract(StaticState state) {
+			String nodeContractName = state.currNodeContract.name;
+			PropVal pv = state.props.get(nodeContractName).get(this.propName);
+			return pv.inferDataContract(state);
 
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			String nodeContractName = currNodeContract.name;
-			return props.get(nodeContractName).get(propName).toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			String nodeContractName = state.currNodeContract.name;
+			return state.props.get(nodeContractName).get(propName).toLustreExpr(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -711,33 +679,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return props.get(nodeName).get(propName).inferDataContract();
+		public DataContract inferDataContract(StaticState state) {
+			return state.props.get(nodeName).get(propName).inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return props.get(nodeName).get(propName).toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return state.props.get(nodeName).get(propName).toLustreExpr(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -761,33 +723,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.IntContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IntExpr(Integer.parseInt(val));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -811,34 +767,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.RealContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			BigDecimal bd = BigDecimal.valueOf(Double.parseDouble(val));
 			return new jkind.lustre.RealExpr(bd);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -862,33 +812,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.BoolContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.BoolExpr(val);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -912,33 +856,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.arg.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.arg.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return new CastExpr(NamedType.INT, arg.toLustreExpr());
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new CastExpr(NamedType.INT,
+					arg.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -962,33 +901,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.RealContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return new CastExpr(NamedType.INT, arg.toLustreExpr());
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new CastExpr(NamedType.INT,
+					arg.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1012,35 +946,29 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.arg.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.arg.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			jkind.lustre.IdExpr nestIdExpr = (jkind.lustre.IdExpr) arg.toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			jkind.lustre.IdExpr nestIdExpr = (jkind.lustre.IdExpr) arg.toLustreExpr(state);
 			String latchedStr = nestIdExpr.id + "__LATCHED_";
 			return new jkind.lustre.IdExpr(latchedStr);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1064,33 +992,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.arg.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.arg.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return new jkind.lustre.UnaryExpr(UnaryOp.PRE, arg.toLustreExpr());
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new jkind.lustre.UnaryExpr(UnaryOp.PRE,
+					arg.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1114,33 +1037,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.BoolContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IdExpr(arg + "___EVENT_");
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1164,33 +1081,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.RealContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IdExpr(Lustre.getTimeOfVar(arg).id);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1214,33 +1125,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.BoolContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IdExpr(Lustre.getTimeRiseVar(arg).id);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1264,33 +1169,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.RealContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IdExpr(Lustre.getTimeFallVar(arg).id);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1313,33 +1212,27 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.RealContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return Lustre.timeExpr;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1366,34 +1259,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return typeEnv.get(contractName);
+		public DataContract inferDataContract(StaticState state) {
+			return state.typeEnv.get(contractName);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			String typeStr = this.contractName.replace("::", "__").replace(".", "_");
 			return new jkind.lustre.IdExpr(typeStr + "_" + this.variantName);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1417,38 +1304,32 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return new Nenola.ArrayContract("",
-					elements.get(0).inferDataContract(typeEnv, props, currNodeContract, valueEnv), elements.size());
+					elements.get(0).inferDataContract(state), elements.size());
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			List<jkind.lustre.Expr> elems = new ArrayList<>();
 			for (Expr agreeElem : this.elements) {
-				elems.add(agreeElem.toLustreExpr());
+				elems.add(agreeElem.toLustreExpr(state));
 			}
 			return new ArrayExpr(elems);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1476,21 +1357,17 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return new Nenola.ArrayContract("",
-					elements.get(0).inferDataContract(typeEnv, props, currNodeContract, valueEnv), elements.size());
+					elements.get(0).inferDataContract(state), elements.size());
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			jkind.lustre.Expr arrayExpr = this.arrayExpr.toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			jkind.lustre.Expr arrayExpr = this.arrayExpr.toLustreExpr(state);
 			for (int i = 0; i < this.indices.size(); i++) {
-				jkind.lustre.Expr indexExpr = this.indices.get(i).toLustreExpr();
-				jkind.lustre.Expr newExpr = this.elements.get(i).toLustreExpr();
+				jkind.lustre.Expr indexExpr = this.indices.get(i).toLustreExpr(state);
+				jkind.lustre.Expr newExpr = this.elements.get(i).toLustreExpr(state);
 				arrayExpr = new jkind.lustre.ArrayUpdateExpr(arrayExpr, indexExpr, newExpr);
 
 			}
@@ -1498,19 +1375,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1536,20 +1411,16 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return typeEnv.get(contractName);
+		public DataContract inferDataContract(StaticState state) {
+			return state.typeEnv.get(contractName);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			Map<String, jkind.lustre.Expr> argExprMap = new HashMap<>();
 
 			for (Entry<String, Expr> entry : this.fields.entrySet()) {
-				jkind.lustre.Expr lustreExpr = entry.getValue().toLustreClockedExpr();
+				jkind.lustre.Expr lustreExpr = entry.getValue().toLustreClockedExpr(state);
 				String argName = entry.getKey();
 
 				argExprMap.put(argName, lustreExpr);
@@ -1561,19 +1432,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1601,33 +1470,28 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return record.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return record.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return new jkind.lustre.RecordUpdateExpr(record.toLustreExpr(), selector, element.toLustreExpr());
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			return new jkind.lustre.RecordUpdateExpr(
+					record.toLustreExpr(state), selector, element.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1653,28 +1517,24 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return Nenola.getNodeTypes(currNodeContract.nodeGenMap.get(fnName)).get(0);
+		public DataContract inferDataContract(StaticState state) {
+			return Nenola.getNodeTypes(state.currNodeContract.nodeGenMap.get(fnName)).get(0);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			List<jkind.lustre.Expr> argResults = new ArrayList<>();
 
 			for (Expr argExpr : this.args) {
-				argResults.add(argExpr.toLustreExpr());
+				argResults.add(argExpr.toLustreExpr(state));
 			}
 
 			String lustreName = null;
-			if (globalNodeGenEnv.containsKey(fnName)) {
+			if (state.globalNodeGenEnv.containsKey(fnName)) {
 				lustreName = fnName.replace("::", "__");
-			} else if (currNodeContract.nodeGenMap.containsKey(fnName)) {
+			} else if (state.currNodeContract.nodeGenMap.containsKey(fnName)) {
 
-				String nodeContractName = currNodeContract.name;
+				String nodeContractName = state.currNodeContract.name;
 				lustreName = nodeContractName.replace("::", "__") + "__" + fnName.replace("::", "__");
 			}
 
@@ -1682,19 +1542,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1720,25 +1578,20 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return rand.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return rand.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			assert (this.rator != UniRator.Pre);
 
-			return new jkind.lustre.UnaryExpr(this.rator.toLustreRator(), rand.toLustreExpr());
+			return new jkind.lustre.UnaryExpr(this.rator.toLustreRator(),
+					rand.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
 
 			if (this.rator == UniRator.Pre) {
 
@@ -1746,12 +1599,13 @@ public class Nenola {
 				jkind.lustre.IdExpr clockedExpr = new jkind.lustre.IdExpr(clockedId);
 				return clockedExpr;
 			} else {
-				return new jkind.lustre.UnaryExpr(UnaryOp.PRE, this.rand.toLustreClockedExpr());
+				return new jkind.lustre.UnaryExpr(UnaryOp.PRE,
+						this.rand.toLustreClockedExpr(state));
 			}
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 
 			if (this.rator == UniRator.Pre) {
 
@@ -1759,26 +1613,26 @@ public class Nenola {
 
 				String clockedId = Lustre.statVarPrefix + this.hashCode();
 				jkind.lustre.IdExpr clockedExpr = new jkind.lustre.IdExpr(clockedId);
-				DataContract dc = this.inferDataContract();
+				DataContract dc = this.inferDataContract(state);
 				vars.add(new VarDecl(clockedExpr.id, dc.toLustreType()));
 
 				return vars;
 			} else {
-				return this.rand.toLustreClockedLocals();
+				return this.rand.toLustreClockedLocals(state);
 
 			}
 
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 
 			if (this.rator == UniRator.Pre) {
 
 				List<Equation> eqs = new ArrayList<>();
 
 				jkind.lustre.Expr preExpr = new jkind.lustre.UnaryExpr(UnaryOp.PRE,
-						this.rand.toLustreClockedExpr());
+						this.rand.toLustreClockedExpr(state));
 
 				String clockedId = Lustre.statVarPrefix + this.hashCode();
 				jkind.lustre.IdExpr clockedExpr = new jkind.lustre.IdExpr(clockedId);
@@ -1790,7 +1644,7 @@ public class Nenola {
 				return eqs;
 
 			} else {
-				return this.rand.toLustreClockedEquations();
+				return this.rand.toLustreClockedEquations(state);
 
 			}
 
@@ -1826,36 +1680,30 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			ArrayContract ac = (ArrayContract) array.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			ArrayContract ac = (ArrayContract) array.inferDataContract(state);
 			return ac.stemContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			jkind.lustre.Expr index = this.index.toLustreExpr();
-			jkind.lustre.Expr array = this.array.toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			jkind.lustre.Expr index = this.index.toLustreExpr(state);
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
 			return new ArrayAccessExpr(array, index);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1879,18 +1727,14 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			ArrayContract ac = (ArrayContract) array.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			ArrayContract ac = (ArrayContract) array.inferDataContract(state);
 			return new Nenola.ArrayContract("", Nenola.Prim.IntContract, ac.size);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			Nenola.Contract arrayTypeDef = array.inferDataContract();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			Nenola.Contract arrayTypeDef = array.inferDataContract(state);
 
 			if (arrayTypeDef instanceof Nenola.ArrayContract) {
 				int size = ((Nenola.ArrayContract) arrayTypeDef).size;
@@ -1905,19 +1749,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -1946,18 +1788,14 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.BoolContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			jkind.lustre.Expr array = this.array.toLustreExpr();
-			Nenola.Contract agreeType = this.array.inferDataContract();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
 
 			int size = 0;
 			if (agreeType instanceof Nenola.ArrayContract) {
@@ -1969,7 +1807,9 @@ public class Nenola {
 
 			for (int i = 0; i < size; ++i) {
 				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
-				jkind.lustre.Expr body = Lustre.substitute(this.body.toLustreExpr(), binding, arrayAccess);
+				jkind.lustre.Expr body = Lustre.substitute(
+						this.body.toLustreExpr(state), binding,
+						arrayAccess);
 				final_expr = Lustre.makeANDExpr(final_expr, body);
 			}
 
@@ -1977,19 +1817,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -2018,19 +1856,15 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			return Nenola.Prim.BoolContract;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			jkind.lustre.Expr array = this.array.toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
 
-			Nenola.Contract agreeType = this.array.inferDataContract();
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
 			int size = 0;
 			if (agreeType instanceof Nenola.ArrayContract) {
 				size = ((Nenola.ArrayContract) agreeType).size;
@@ -2041,7 +1875,9 @@ public class Nenola {
 
 			for (int i = 0; i < size; ++i) {
 				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
-				jkind.lustre.Expr body = Lustre.substitute(this.body.toLustreExpr(), binding, arrayAccess);
+				jkind.lustre.Expr body = Lustre.substitute(
+						this.body.toLustreExpr(state), binding,
+						arrayAccess);
 				final_expr = Lustre.makeORExpr(final_expr, body);
 			}
 
@@ -2049,19 +1885,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -2090,35 +1924,33 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
+		public DataContract inferDataContract(StaticState state) {
 			Map<String, DataContract> newValues = new HashMap<>();
-			newValues.putAll(valueEnv);
-			ArrayContract ac = (ArrayContract) this.array.inferDataContract();
+			newValues.putAll(state.valueEnv);
+			ArrayContract ac = (ArrayContract) this.array.inferDataContract(state);
 			DataContract stemType = ac.stemContract;
 			newValues.put(binding, stemType);
-			return this.body.inferDataContract(newValues);
+			return this.body.inferDataContract(state.newValueEnv(newValues));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			Nenola.Contract agreeType = this.array.inferDataContract();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
 			int size = 0;
 			if (agreeType instanceof Nenola.ArrayContract) {
 				size = ((Nenola.ArrayContract) agreeType).size;
 			} else {
 				throw new RuntimeException("ERROR: caseFlatmapExpr");
 			}
-			jkind.lustre.Expr array = this.array.toLustreExpr();
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
 			List<jkind.lustre.Expr> elems = new ArrayList<>();
 			for (int i = 0; i < size; ++i) {
 				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
-				jkind.lustre.Expr body = Lustre.substitute(this.body.toLustreExpr(), binding, arrayAccess);
+				jkind.lustre.Expr body = Lustre.substitute(
+						this.body.toLustreExpr(state), binding,
+						arrayAccess);
 
-				Nenola.Contract innerArrType = this.body.inferDataContract();
+				Nenola.Contract innerArrType = this.body.inferDataContract(state);
 				if (innerArrType instanceof Nenola.ArrayContract) {
 					int innerSize = ((Nenola.ArrayContract) innerArrType).size;
 					for (int j = 0; j < innerSize; j++) {
@@ -2132,19 +1964,17 @@ public class Nenola {
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -2177,17 +2007,13 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.initial.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.initial.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			Nenola.Contract agreeType = this.array.inferDataContract();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
 
 			int size = 0;
 			if (agreeType instanceof Nenola.ArrayContract) {
@@ -2195,30 +2021,30 @@ public class Nenola {
 			} else {
 				throw new RuntimeException("ERROR: caseFoldLeftExpr");
 			}
-			jkind.lustre.Expr array = this.array.toLustreExpr();
-			jkind.lustre.Expr accExpr = this.initial.toLustreExpr();
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			jkind.lustre.Expr accExpr = this.initial.toLustreExpr(state);
 			for (int i = 0; i < size; i++) {
 				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
-				accExpr = Lustre.substitute(Lustre.substitute(this.update.toLustreExpr(), binding, arrayAccess),
+				accExpr = Lustre
+						.substitute(
+								Lustre.substitute(this.update.toLustreExpr(state), binding, arrayAccess),
 						this.acc, accExpr);
 			}
 			return accExpr;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -2251,17 +2077,13 @@ public class Nenola {
 		}
 
 		@Override
-		public DataContract inferDataContract(Map<String, DataContract> typeEnv,
-				Map<String, Map<String, PropVal>> props, NodeContract currNodeContract,
-				Map<String, DataContract> valueEnv) {
-			return this.initial.inferDataContract(typeEnv, props, currNodeContract, valueEnv);
+		public DataContract inferDataContract(StaticState state) {
+			return this.initial.inferDataContract(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			Nenola.Contract agreeType = this.array.inferDataContract();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			Nenola.Contract agreeType = this.array.inferDataContract(state);
 
 			int size = 0;
 			if (agreeType instanceof Nenola.ArrayContract) {
@@ -2269,30 +2091,30 @@ public class Nenola {
 			} else {
 				throw new RuntimeException("ERROR: caseFoldRightExpr");
 			}
-			jkind.lustre.Expr array = this.array.toLustreExpr();
-			jkind.lustre.Expr accExpr = this.initial.toLustreExpr();
+			jkind.lustre.Expr array = this.array.toLustreExpr(state);
+			jkind.lustre.Expr accExpr = this.initial.toLustreExpr(state);
 			for (int i = size - 1; i >= 0; i--) {
 				jkind.lustre.Expr arrayAccess = new ArrayAccessExpr(array, i);
-				accExpr = Lustre.substitute(Lustre.substitute(this.update.toLustreExpr(), binding, arrayAccess),
+				accExpr = Lustre.substitute(Lustre.substitute(
+						this.update.toLustreExpr(state), binding,
+						arrayAccess),
 						this.acc, accExpr);
 			}
 			return accExpr;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreClockedExpr(Map<String, NodeContract> nodeContractMap,
-				Map<String, DataContract> typeEnv, Map<String, Map<String, PropVal>> props,
-				NodeContract currNodeContract, Map<String, DataContract> valueEnv) {
-			return this.toLustreExpr();
+		public jkind.lustre.Expr toLustreClockedExpr(StaticState state) {
+			return this.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustreClockedLocals() {
+		public List<VarDecl> toLustreClockedLocals(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustreClockedEquations() {
+		public List<Equation> toLustreClockedEquations(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -2330,37 +2152,37 @@ public class Nenola {
 	}
 
 	public static interface Pattern {
-		public jkind.lustre.Expr toLustreExprProperty();
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state);
 
-		public jkind.lustre.Expr toLustreExprConstraint();
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state);
 
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap();
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state);
 
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap();
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state);
 
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList();
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state);
 
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList();
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternChanInPropertyList();
+		public List<jkind.lustre.VarDecl> toLustrePatternChanInPropertyList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternChanInConstraintList();
+		public List<jkind.lustre.VarDecl> toLustrePatternChanInConstraintList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternChanOutPropertyList();
+		public List<jkind.lustre.VarDecl> toLustrePatternChanOutPropertyList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternChanOutConstraintList();
+		public List<jkind.lustre.VarDecl> toLustrePatternChanOutConstraintList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternChanBiPropertyList();
+		public List<jkind.lustre.VarDecl> toLustrePatternChanBiPropertyList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternChanBiConstraintList();
+		public List<jkind.lustre.VarDecl> toLustrePatternChanBiConstraintList(StaticState state);
 
-		public List<jkind.lustre.Equation> toLustrePatternEquationPropertyList();
+		public List<jkind.lustre.Equation> toLustrePatternEquationPropertyList(StaticState state);
 
-		public List<jkind.lustre.Equation> toLustrePatternEquationConstraintList();
+		public List<jkind.lustre.Equation> toLustrePatternEquationConstraintList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternTimeEventPropertyList();
+		public List<jkind.lustre.VarDecl> toLustrePatternTimeEventPropertyList(StaticState state);
 
-		public List<jkind.lustre.VarDecl> toLustrePatternTimeEventConstraintList();
+		public List<jkind.lustre.VarDecl> toLustrePatternTimeEventConstraintList(StaticState state);
 
 	}
 
@@ -2373,82 +2195,82 @@ public class Nenola {
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInPropertyList() {
+		public List<VarDecl> toLustrePatternChanInPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInConstraintList() {
+		public List<VarDecl> toLustrePatternChanInConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+		public List<VarDecl> toLustrePatternChanOutConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+		public List<VarDecl> toLustrePatternChanBiPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+		public List<VarDecl> toLustrePatternChanBiConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationPropertyList() {
+		public List<Equation> toLustrePatternEquationPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationConstraintList() {
+		public List<Equation> toLustrePatternEquationConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprProperty() {
-			return this.expr.toLustreExpr();
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state) {
+			return this.expr.toLustreExpr(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprConstraint() {
-			return this.expr.toLustreExpr();
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
+			return this.expr.toLustreExpr(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+		public List<VarDecl> toLustrePatternTimeEventPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+		public List<VarDecl> toLustrePatternTimeEventConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
@@ -2486,27 +2308,27 @@ public class Nenola {
 
 		}
 
-		private WheneverOccursPattern toRefinementPattern() {
-			String causeConditionString = ((jkind.lustre.IdExpr) causeCondition.toLustreExpr()).id;
+		private WheneverOccursPattern toRefinementPattern(StaticState state) {
+			String causeConditionString = ((jkind.lustre.IdExpr) causeCondition.toLustreExpr(state)).id;
 			Expr causeEvent = new IdExpr(Lustre.getCauseHeldVar(causeConditionString).id);
 			return new WheneverOccursPattern(causeEvent, effectEvent, exclusive, effectInterval);
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
-			return toRefinementPattern().toLustrePatternPropertyMap();
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
+			return toRefinementPattern(state).toLustrePatternPropertyMap(state);
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
-			return toRefinementPattern().toLustrePatternConstraintMap();
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
+			return toRefinementPattern(state).toLustrePatternConstraintMap(state);
 		}
 
-		private List<jkind.lustre.Expr> toLustreCauseAssertList() {
+		private List<jkind.lustre.Expr> toLustreCauseAssertList(StaticState state) {
 
 			List<jkind.lustre.Expr> assertList = new ArrayList<>();
 
-			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state);
 
 			VarDecl causeRiseTimeVar = Lustre.getTimeRiseVar(lustreCauseCondition.id);
 			VarDecl causeFallTimeVar = Lustre.getTimeFallVar(lustreCauseCondition.id);
@@ -2522,7 +2344,7 @@ public class Nenola {
 			jkind.lustre.Expr cond = new jkind.lustre.BinaryExpr(posRise, BinaryOp.AND, gtFall);
 
 			jkind.lustre.Expr heldTime = new BinaryExpr(causeRiseTimeId, BinaryOp.PLUS,
-					this.causeInterval.high.toLustreExpr());
+					this.causeInterval.high.toLustreExpr(state));
 			jkind.lustre.Expr ifExpr = new IfThenElseExpr(cond, heldTime, new RealExpr(BigDecimal.valueOf(-1)));
 			assertList.add(new BinaryExpr(causeHeldTimeoutId, BinaryOp.EQUAL, ifExpr));
 
@@ -2558,49 +2380,49 @@ public class Nenola {
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
-			asserts.addAll(toLustreCauseAssertList());
-			asserts.addAll(toRefinementPattern().toLustrePatternAssertPropertyList());
+			asserts.addAll(toLustreCauseAssertList(state));
+			asserts.addAll(toRefinementPattern(state).toLustrePatternAssertPropertyList(state));
 			return asserts;
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state) {
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
-			asserts.addAll(toLustreCauseAssertList());
-			asserts.addAll(toRefinementPattern().toLustrePatternAssertConstraintList());
+			asserts.addAll(toLustreCauseAssertList(state));
+			asserts.addAll(toRefinementPattern(state).toLustrePatternAssertConstraintList(state));
 			return asserts;
 		}
 
-		private List<VarDecl> toLustreCauseChanInList() {
+		private List<VarDecl> toLustreCauseChanInList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state);
 			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
 			vars.add(causeHeldTimeoutVar);
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInPropertyList() {
+		public List<VarDecl> toLustrePatternChanInPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.toLustreCauseChanInList());
-			vars.addAll(this.toRefinementPattern().toLustrePatternChanInPropertyList());
+			vars.addAll(this.toLustreCauseChanInList(state));
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternChanInPropertyList(state));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInConstraintList() {
+		public List<VarDecl> toLustrePatternChanInConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.toLustreCauseChanInList());
-			vars.addAll(this.toRefinementPattern().toLustrePatternChanInConstraintList());
+			vars.addAll(this.toLustreCauseChanInList(state));
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternChanInConstraintList(state));
 			return vars;
 		}
 
-		private List<VarDecl> toLustreCauseChanOutList() {
+		private List<VarDecl> toLustreCauseChanOutList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 
-			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state);
 			{
 				VarDecl causeRiseTimeVar = Lustre.getTimeRiseVar(lustreCauseCondition.id);
 				vars.add(causeRiseTimeVar);
@@ -2613,49 +2435,49 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 
-			vars.addAll(this.toLustreCauseChanOutList());
-			vars.addAll(this.toRefinementPattern().toLustrePatternChanOutPropertyList());
+			vars.addAll(this.toLustreCauseChanOutList(state));
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternChanOutPropertyList(state));
 
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+		public List<VarDecl> toLustrePatternChanOutConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.toLustreCauseChanOutList());
-			vars.addAll(this.toRefinementPattern().toLustrePatternChanOutConstraintList());
+			vars.addAll(this.toLustreCauseChanOutList(state));
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternChanOutConstraintList(state));
 			return vars;
 		}
 
-		private List<VarDecl> toLustreCauseChanBiList() {
+		private List<VarDecl> toLustreCauseChanBiList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state);
 			vars.add(Lustre.getCauseHeldVar(lustreCauseCondition.id));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+		public List<VarDecl> toLustrePatternChanBiPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.toLustreCauseChanBiList());
-			vars.addAll(this.toRefinementPattern().toLustrePatternChanBiPropertyList());
+			vars.addAll(this.toLustreCauseChanBiList(state));
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternChanBiPropertyList(state));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+		public List<VarDecl> toLustrePatternChanBiConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.addAll(this.toLustreCauseChanBiList());
-			vars.addAll(this.toRefinementPattern().toLustrePatternChanBiConstraintList());
+			vars.addAll(this.toLustreCauseChanBiList(state));
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternChanBiConstraintList(state));
 			return vars;
 		}
 
-		private List<jkind.lustre.Equation> toLustreCauseEquationList() {
+		private List<jkind.lustre.Equation> toLustreCauseEquationList(StaticState state) {
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
-			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr();
+			jkind.lustre.IdExpr lustreCauseCondition = (jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state);
 
 			VarDecl causeHeldVar = Lustre.getCauseHeldVar(lustreCauseCondition.id);
 			VarDecl causeHeldTimeoutVar = Lustre.getCauseConditionTimeOutVar(lustreCauseCondition.id);
@@ -2670,47 +2492,47 @@ public class Nenola {
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationPropertyList() {
+		public List<Equation> toLustrePatternEquationPropertyList(StaticState state) {
 			List<Equation> equations = new ArrayList<>();
-			equations.addAll(this.toLustreCauseEquationList());
-			equations.addAll(this.toRefinementPattern().toLustrePatternEquationPropertyList());
+			equations.addAll(this.toLustreCauseEquationList(state));
+			equations.addAll(this.toRefinementPattern(state).toLustrePatternEquationPropertyList(state));
 			return equations;
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationConstraintList() {
+		public List<Equation> toLustrePatternEquationConstraintList(StaticState state) {
 			List<Equation> equations = new ArrayList<>();
-			equations.addAll(this.toLustreCauseEquationList());
-			equations.addAll(this.toRefinementPattern().toLustrePatternEquationConstraintList());
+			equations.addAll(this.toLustreCauseEquationList(state));
+			equations.addAll(this.toRefinementPattern(state).toLustrePatternEquationConstraintList(state));
 			return equations;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprProperty() {
-			return this.toRefinementPattern().toLustreExprProperty();
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state) {
+			return this.toRefinementPattern(state).toLustreExprProperty(state);
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprConstraint() {
-			return this.toRefinementPattern().toLustreExprConstraint();
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
+			return this.toRefinementPattern(state).toLustreExprConstraint(state);
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+		public List<VarDecl> toLustrePatternTimeEventPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl causeFallTimeVar = Lustre
-					.getTimeFallVar(((jkind.lustre.IdExpr) this.causeCondition.toLustreExpr()).id);
+					.getTimeFallVar(((jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state)).id);
 			vars.add(causeFallTimeVar);
-			vars.addAll(this.toRefinementPattern().toLustrePatternTimeEventPropertyList());
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternTimeEventPropertyList(state));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+		public List<VarDecl> toLustrePatternTimeEventConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl causeFallTimeVar = Lustre
-					.getTimeFallVar(((jkind.lustre.IdExpr) this.causeCondition.toLustreExpr()).id);
-			vars.addAll(this.toRefinementPattern().toLustrePatternTimeEventConstraintList());
+					.getTimeFallVar(((jkind.lustre.IdExpr) this.causeCondition.toLustreExpr(state)).id);
+			vars.addAll(this.toRefinementPattern(state).toLustrePatternTimeEventConstraintList(state));
 			vars.add(causeFallTimeVar);
 			return vars;
 		}
@@ -2732,39 +2554,39 @@ public class Nenola {
 		private String patternIndex = this.hashCode() + "";
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
 			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
 			asserts.addAll(Lustre.getTimeOfAsserts(recordVar.id));
 
 			jkind.lustre.Expr expr = expr("record => cause", to("record", recordVar),
-					to("cause", ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr()).id));
+					to("cause", ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state)).id));
 			asserts.add(expr);
 
 			return asserts;
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state) {
 
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
 
-			VarDecl timeCauseVar = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr()).id);
+			VarDecl timeCauseVar = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state)).id);
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 
 			jkind.lustre.Expr timeoutExpr = expr("timeout = if timeCause >= 0.0 then (timeCause + l) else -1.0",
 					to("timeout", timeoutVar), to("timeCause", timeCauseVar),
-					to("l", this.interval.low.toLustreExpr()));
+					to("l", this.interval.low.toLustreExpr(state)));
 
 			asserts.add(timeoutExpr);
 
@@ -2773,19 +2595,19 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInPropertyList() {
+		public List<VarDecl> toLustrePatternChanInPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getRecordVar(patternIndex));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInConstraintList() {
+		public List<VarDecl> toLustrePatternChanInConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
 			VarDecl timeCause = Lustre.getTimeOfVar(recordVar.id);
@@ -2794,7 +2616,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+		public List<VarDecl> toLustrePatternChanOutConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
@@ -2802,7 +2624,7 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+		public List<VarDecl> toLustrePatternChanBiPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl windowVar = Lustre.getWindowVar(patternIndex);
 			vars.add(windowVar);
@@ -2810,12 +2632,12 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+		public List<VarDecl> toLustrePatternChanBiConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationPropertyList() {
+		public List<Equation> toLustrePatternEquationPropertyList(StaticState state) {
 			List<Equation> equations = new ArrayList<>();
 
 			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
@@ -2829,32 +2651,32 @@ public class Nenola {
 					"in_window = (trecord <> -1.0) and " + "(l + trecord " + left + " time) and (time " + right
 							+ " h + trecord);",
 					to("in_window", windowVar), to("trecord", tRecord), to("time", Lustre.timeExpr),
-					to("l", this.interval.low.toLustreExpr()), to("h", this.interval.high.toLustreExpr()));
+					to("l", this.interval.low.toLustreExpr(state)), to("h", this.interval.high.toLustreExpr(state)));
 
 			equations.add(eq);
 			return equations;
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationConstraintList() {
+		public List<Equation> toLustrePatternEquationConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprProperty() {
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state) {
 			VarDecl windowVar = Lustre.getWindowVar(patternIndex);
 			return expr("in_window => effect", to("in_window", windowVar),
-					to("effect", this.effectCondition.toLustreExpr()));
+					to("effect", this.effectCondition.toLustreExpr(state)));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprConstraint() {
-			VarDecl timeCauseVar = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr()).id);
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
+			VarDecl timeCauseVar = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state)).id);
 
 			jkind.lustre.Expr intervalLeft = expr("timeCause + l", to("timeCause", timeCauseVar),
-					to("l", this.interval.low.toLustreExpr()));
+					to("l", this.interval.low.toLustreExpr(state)));
 			jkind.lustre.Expr intervalRight = expr("timeCause + h", to("timeCause", timeCauseVar),
-					to("h", this.interval.high.toLustreExpr()));
+					to("h", this.interval.high.toLustreExpr(state)));
 
 			jkind.lustre.BinaryOp left = this.interval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 			jkind.lustre.BinaryOp right = this.interval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
@@ -2872,18 +2694,18 @@ public class Nenola {
 			}
 
 			jkind.lustre.Expr expr = expr(constrString, to("timeCause", timeCauseVar), to("inInterval", inInterval),
-					to("effectTrue", this.effectCondition.toLustreExpr()));
+					to("effectTrue", this.effectCondition.toLustreExpr(state)));
 
 			return expr;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+		public List<VarDecl> toLustrePatternTimeEventPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+		public List<VarDecl> toLustrePatternTimeEventConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
@@ -2907,7 +2729,7 @@ public class Nenola {
 
 		public String patternIndex = this.hashCode() + "";
 
-		private jkind.lustre.Expr toTimeRangeConstraint() {
+		private jkind.lustre.Expr toTimeRangeConstraint(StaticState state) {
 			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
 			jkind.lustre.IdExpr timeRangeId = new jkind.lustre.IdExpr(effectTimeRangeVar.id);
 
@@ -2915,17 +2737,17 @@ public class Nenola {
 			jkind.lustre.BinaryOp left = this.effectInterval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 			jkind.lustre.BinaryOp right = this.effectInterval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 
-			jkind.lustre.Expr lower = new BinaryExpr(this.effectInterval.low.toLustreExpr(), left, occurs);
-			jkind.lustre.Expr higher = new BinaryExpr(occurs, right, this.effectInterval.high.toLustreExpr());
+			jkind.lustre.Expr lower = new BinaryExpr(this.effectInterval.low.toLustreExpr(state), left, occurs);
+			jkind.lustre.Expr higher = new BinaryExpr(occurs, right, this.effectInterval.high.toLustreExpr(state));
 			return new BinaryExpr(lower, BinaryOp.AND, higher);
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
 			String patternIndex = Integer.toString(this.hashCode());
 
-			jkind.lustre.IdExpr lustreCause = (jkind.lustre.IdExpr) causeEvent.toLustreExpr();
-			jkind.lustre.IdExpr lustreEffect = (jkind.lustre.IdExpr) effectEvent.toLustreExpr();
+			jkind.lustre.IdExpr lustreCause = (jkind.lustre.IdExpr) causeEvent.toLustreExpr(state);
+			jkind.lustre.IdExpr lustreEffect = (jkind.lustre.IdExpr) effectEvent.toLustreExpr(state);
 
 			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
 			VarDecl runVar = Lustre.getRunningVar(patternIndex);
@@ -2940,8 +2762,8 @@ public class Nenola {
 					+ "(timer = 0.0 or timer >= time - timeOfCause)", LustreParseUtil.to("timer", timerVar),
 					LustreParseUtil.to("timeOfCause", timeOfCause), LustreParseUtil.to("timeOfEffect", timeOfEffect),
 					LustreParseUtil.to("time", Lustre.timeExpr),
-					LustreParseUtil.to("low", this.effectInterval.low.toLustreExpr()),
-					LustreParseUtil.to("high", this.effectInterval.high.toLustreExpr()),
+					LustreParseUtil.to("low", this.effectInterval.low.toLustreExpr(state)),
+					LustreParseUtil.to("high", this.effectInterval.high.toLustreExpr(state)),
 					LustreParseUtil.to("run", runVar));
 
 			HashMap<String, jkind.lustre.Expr> result = new HashMap<>();
@@ -2951,16 +2773,16 @@ public class Nenola {
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 
-			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state));
 
 			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
 			VarDecl recordVar = Lustre.getRecordVar(patternIndex);
@@ -2981,9 +2803,9 @@ public class Nenola {
 					causeExpr = new jkind.lustre.IdExpr(causeEventExpr.id);
 				} else {
 					jkind.lustre.Expr eAndLZero = new jkind.lustre.BinaryExpr(
-							this.effectInterval.low.toLustreExpr(), BinaryOp.EQUAL,
+							this.effectInterval.low.toLustreExpr(state), BinaryOp.EQUAL,
 							new jkind.lustre.RealExpr(BigDecimal.ZERO));
-					eAndLZero = new BinaryExpr(this.effectEvent.toLustreExpr(), BinaryOp.AND, eAndLZero);
+					eAndLZero = new BinaryExpr(this.effectEvent.toLustreExpr(state), BinaryOp.AND, eAndLZero);
 					jkind.lustre.Expr notEAndLZero = new jkind.lustre.UnaryExpr(UnaryOp.NOT, eAndLZero);
 					causeExpr = new BinaryExpr(new jkind.lustre.IdExpr(causeEventExpr.id), BinaryOp.AND, notEAndLZero);
 				}
@@ -2995,11 +2817,11 @@ public class Nenola {
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state) {
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 
-			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state));
 
 			VarDecl effectTimeRangeVar = Lustre.getEffectTimeRangeVar(patternIndex);
 			jkind.lustre.IdExpr effectTimeRangeId = new jkind.lustre.IdExpr(effectTimeRangeVar.id);
@@ -3008,7 +2830,7 @@ public class Nenola {
 
 			jkind.lustre.IdExpr timeEffectId = new jkind.lustre.IdExpr(timeEffectVar.id);
 
-			jkind.lustre.Expr effectTimeRangeConstraint = this.toTimeRangeConstraint();
+			jkind.lustre.Expr effectTimeRangeConstraint = this.toTimeRangeConstraint(state);
 			assertions.add(effectTimeRangeConstraint);
 			// make a constraint that triggers when the event WILL happen
 
@@ -3022,20 +2844,20 @@ public class Nenola {
 			// a lemma that may be helpful
 
 			jkind.lustre.Expr lemma1 = expr("timeEffect <= time + intHigh", to("timeEffect", timeEffectVar),
-					to("time", Lustre.timeExpr), to("intHigh", this.effectInterval.high.toLustreExpr()));
+					to("time", Lustre.timeExpr), to("intHigh", this.effectInterval.high.toLustreExpr(state)));
 
 			assertions.add(lemma1);
 
 			jkind.lustre.Expr lemma2 = expr(
 					"timeWill <= causeTime + high and (causeTime >= 0.0 => causeTime + low <= timeWill)",
 					to("timeWill", timeEffectVar), to("causeTime", Lustre.getTimeOfVar(causeEventExpr.id)),
-					to("high", this.effectInterval.high.toLustreExpr()),
-					to("low", this.effectInterval.low.toLustreExpr()));
+					to("high", this.effectInterval.high.toLustreExpr(state)),
+					to("low", this.effectInterval.low.toLustreExpr(state)));
 
 			assertions.add(lemma2);
 			assertions.addAll(Lustre.getTimeOfAsserts(causeEventExpr.id));
 
-			jkind.lustre.IdExpr lustreEffect = (jkind.lustre.IdExpr) this.effectEvent.toLustreExpr();
+			jkind.lustre.IdExpr lustreEffect = (jkind.lustre.IdExpr) this.effectEvent.toLustreExpr(state);
 
 			jkind.lustre.Expr lemma3 = expr("timeWill <= time => timeWill <= timeEffect", to("timeWill", timeEffectVar),
 					to("timeEffect", Lustre.getTimeOfVar(lustreEffect.id)));
@@ -3048,50 +2870,50 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInPropertyList() {
+		public List<VarDecl> toLustrePatternChanInPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getRecordVar(patternIndex));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInConstraintList() {
+		public List<VarDecl> toLustrePatternChanInConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getEffectTimeRangeVar(patternIndex));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 
-			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state));
 			vars.add(Lustre.getTimeOfVar(causeEventExpr.id));
 
-			jkind.lustre.IdExpr effectEventExpr = ((jkind.lustre.IdExpr) this.effectEvent.toLustreExpr());
+			jkind.lustre.IdExpr effectEventExpr = ((jkind.lustre.IdExpr) this.effectEvent.toLustreExpr(state));
 			vars.add(Lustre.getTimeFallVar(effectEventExpr.id));
 
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+		public List<VarDecl> toLustrePatternChanOutConstraintList(StaticState state) {
 
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getTimeWillVar(patternIndex));
 
-			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr());
+			jkind.lustre.IdExpr causeEventExpr = ((jkind.lustre.IdExpr) this.causeEvent.toLustreExpr(state));
 
 			vars.add(Lustre.getTimeOfVar(causeEventExpr.id));
 
-			jkind.lustre.IdExpr effectEventExpr = ((jkind.lustre.IdExpr) this.effectEvent.toLustreExpr());
+			jkind.lustre.IdExpr effectEventExpr = ((jkind.lustre.IdExpr) this.effectEvent.toLustreExpr(state));
 			vars.add(Lustre.getTimeFallVar(effectEventExpr.id));
 
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+		public List<VarDecl> toLustrePatternChanBiPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getTimerVar(patternIndex));
 			vars.add(Lustre.getRunningVar(patternIndex));
@@ -3099,12 +2921,12 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+		public List<VarDecl> toLustrePatternChanBiConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationPropertyList() {
+		public List<Equation> toLustrePatternEquationPropertyList(StaticState state) {
 
 			List<Equation> equations = new ArrayList<>();
 
@@ -3121,10 +2943,10 @@ public class Nenola {
 				jkind.lustre.Expr if2 = new IfThenElseExpr(recordId, new BoolExpr(true), preRun);
 				jkind.lustre.BinaryOp left = this.effectInterval.lowOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
 				jkind.lustre.BinaryOp right = this.effectInterval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
-				jkind.lustre.Expr timerLow = new BinaryExpr(this.effectInterval.low.toLustreExpr(), left, timerId);
+				jkind.lustre.Expr timerLow = new BinaryExpr(this.effectInterval.low.toLustreExpr(state), left, timerId);
 				jkind.lustre.Expr timerHigh = new BinaryExpr(timerId, right,
-						this.effectInterval.high.toLustreExpr());
-				jkind.lustre.Expr cond1 = new BinaryExpr(preRun, BinaryOp.AND, this.effectEvent.toLustreExpr());
+						this.effectInterval.high.toLustreExpr(state));
+				jkind.lustre.Expr cond1 = new BinaryExpr(preRun, BinaryOp.AND, this.effectEvent.toLustreExpr(state));
 				cond1 = new BinaryExpr(cond1, BinaryOp.AND, timerLow);
 				cond1 = new BinaryExpr(cond1, BinaryOp.AND, timerHigh);
 				jkind.lustre.Expr if1 = new IfThenElseExpr(cond1, new BoolExpr(false), if2);
@@ -3151,39 +2973,39 @@ public class Nenola {
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationConstraintList() {
+		public List<Equation> toLustrePatternEquationConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprProperty() {
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state) {
 			VarDecl timerVar = Lustre.getTimerVar(patternIndex);
 			jkind.lustre.IdExpr timerId = new jkind.lustre.IdExpr(timerVar.id);
 
 			// timer <= h
 			jkind.lustre.BinaryOp right = this.effectInterval.highOpen ? BinaryOp.LESS : BinaryOp.LESSEQUAL;
-			return new jkind.lustre.BinaryExpr(timerId, right, this.effectInterval.high.toLustreExpr());
+			return new jkind.lustre.BinaryExpr(timerId, right, this.effectInterval.high.toLustreExpr(state));
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprConstraint() {
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
 			VarDecl timeEffectVar = Lustre.getTimeWillVar(patternIndex);
 			jkind.lustre.IdExpr timeEffectId = new jkind.lustre.IdExpr(timeEffectVar.id);
 			jkind.lustre.Expr timeEqualsEffectTime = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, timeEffectId);
 			// if the event is exclusive it only occurs when scheduled
 			jkind.lustre.BinaryOp effectOp = this.exclusive ? BinaryOp.EQUAL : BinaryOp.IMPLIES;
 			jkind.lustre.Expr impliesEffect = new BinaryExpr(timeEqualsEffectTime, effectOp,
-					this.effectEvent.toLustreExpr());
+					this.effectEvent.toLustreExpr(state));
 			return impliesEffect;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+		public List<VarDecl> toLustrePatternTimeEventPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+		public List<VarDecl> toLustrePatternTimeEventConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getTimeWillVar(patternIndex));
 			return vars;
@@ -3205,12 +3027,12 @@ public class Nenola {
 		public String patternIndex = this.hashCode() + "";
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
 
 			Map<String, jkind.lustre.Expr> localMap = new HashMap<>();
 
@@ -3221,19 +3043,19 @@ public class Nenola {
 
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
 			jkind.lustre.VarDecl timeofEvent = Lustre
-					.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
+					.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id);
 
-			jkind.lustre.Expr jitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+			jkind.lustre.Expr jitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr(state) : null;
 
 			jkind.lustre.Expr lemma1 = expr(
 					"(timeOfEvent >= 0.0 and timeOfEvent <> time => timeout - timeOfEvent >= p - j) and "
 							+ "(true -> (period <> pre(period) => period - pre(period) <= p + j)) and "
 							+ "(timeOfEvent >= 0.0 => timeout - timeOfEvent <= p + j)",
 					to("timeOfEvent", timeofEvent), to("time", Lustre.timeExpr), to("timeout", timeoutId),
-					to("p", this.period.toLustreExpr()), to("j", jitter), to("period", periodVar));
+					to("p", this.period.toLustreExpr(state)), to("j", jitter), to("period", periodVar));
 
 			jkind.lustre.Expr lemma2 = expr("true -> timeout <> pre(timeout) => timeout - pre(timeout) >= p - j",
-					to("timeout", timeoutId), to("p", this.period.toLustreExpr()), to("j", jitter));
+					to("timeout", timeoutId), to("p", this.period.toLustreExpr(state)), to("j", jitter));
 
 			localMap.put("__PATTERN_PERIODIC__1__" + patternIndex, lemma1);
 			localMap.put("__PATTERN_PERIODIC__2__" + patternIndex, lemma2);
@@ -3242,12 +3064,12 @@ public class Nenola {
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state) {
 
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
 
@@ -3261,7 +3083,7 @@ public class Nenola {
 			//
 
 //			// -j <= jitter <= j
-			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr(state) : null;
 			jkind.lustre.Expr jitterLow = new jkind.lustre.BinaryExpr(
 					new jkind.lustre.UnaryExpr(UnaryOp.NEGATIVE, lustreJitter), BinaryOp.LESSEQUAL, jitterId);
 			jkind.lustre.Expr jitterHigh = new jkind.lustre.BinaryExpr(jitterId, BinaryOp.LESSEQUAL, lustreJitter);
@@ -3269,16 +3091,17 @@ public class Nenola {
 
 			jkind.lustre.Expr expr = expr(
 					"(0.0 <= period) and (period < p) -> " + "(period = (pre period) + (if pre(e) then p else 0.0))",
-					to("period", periodVar), to("p", this.period.toLustreExpr()), to("e", this.event.toLustreExpr()));
+					to("period", periodVar), to("p", this.period.toLustreExpr(state)),
+					to("e", this.event.toLustreExpr(state)));
 
 			asserts.add(expr);
 
 			// helper assertion (should be true)
 			jkind.lustre.Expr lemma = expr("period - time < p - j and period >= time", to("period", periodVar),
-					to("p", this.period.toLustreExpr()), to("time", Lustre.timeExpr), to("j", lustreJitter));
+					to("p", this.period.toLustreExpr(state)), to("time", Lustre.timeExpr), to("j", lustreJitter));
 
 			asserts.add(lemma);
-			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id));
+			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id));
 
 			// timeout = pnext + jitter
 			jkind.lustre.Expr timeoutExpr = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
@@ -3289,22 +3112,22 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInPropertyList() {
+		public List<VarDecl> toLustrePatternChanInPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInConstraintList() {
+		public List<VarDecl> toLustrePatternChanInConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+		public List<VarDecl> toLustrePatternChanOutConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 
 			VarDecl jitterVar = Lustre.getJitterVar(patternIndex);
@@ -3314,25 +3137,25 @@ public class Nenola {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
 
-			VarDecl var = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
+			VarDecl var = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id);
 			vars.add(var);
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+		public List<VarDecl> toLustrePatternChanBiPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			vars.add(Lustre.getPeriodVar(patternIndex));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+		public List<VarDecl> toLustrePatternChanBiConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationPropertyList() {
+		public List<Equation> toLustrePatternEquationPropertyList(StaticState state) {
 
 			List<Equation> eqs = new ArrayList<>();
 
@@ -3340,8 +3163,8 @@ public class Nenola {
 
 			jkind.lustre.Equation eq = equation(
 					"period = if event then (if time <= P then time  else (0.0 -> pre period)) + P else (P -> pre period);",
-					to("event", this.event.toLustreExpr()), to("period", periodVar),
-					to("P", this.period.toLustreExpr()));
+					to("event", this.event.toLustreExpr(state)), to("period", periodVar),
+					to("P", this.period.toLustreExpr(state)));
 
 			eqs.add(eq);
 
@@ -3349,43 +3172,43 @@ public class Nenola {
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationConstraintList() {
+		public List<Equation> toLustrePatternEquationConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprProperty() {
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state) {
 			VarDecl periodVar = Lustre.getPeriodVar(patternIndex);
 
-			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr(state) : null;
 
 			jkind.lustre.Expr prop = expr(
 					"true -> (time >= P + j => event => (pre period) - j <= time and time <= (pre period) + j)",
-					to("time", Lustre.timeExpr), to("period", periodVar), to("P", this.period.toLustreExpr()),
-					to("j", lustreJitter), to("event", this.event.toLustreExpr()));
+					to("time", Lustre.timeExpr), to("period", periodVar), to("P", this.period.toLustreExpr(state)),
+					to("j", lustreJitter), to("event", this.event.toLustreExpr(state)));
 			return prop;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprConstraint() {
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
 
 			// event = (t = timeout)
 			jkind.lustre.Expr eventExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, timeoutId);
-			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
+			eventExpr = new BinaryExpr(this.event.toLustreExpr(state), BinaryOp.EQUAL, eventExpr);
 
 			return eventExpr;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+		public List<VarDecl> toLustrePatternTimeEventPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+		public List<VarDecl> toLustrePatternTimeEventConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
@@ -3407,24 +3230,24 @@ public class Nenola {
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternPropertyMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap() {
+		public Map<String, jkind.lustre.Expr> toLustrePatternConstraintMap(StaticState state) {
 			return new HashMap<>();
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertPropertyList(StaticState state) {
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
-			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id));
+			asserts.addAll(Lustre.getTimeOfAsserts(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id));
 			return asserts;
 		}
 
 		@Override
-		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList() {
+		public List<jkind.lustre.Expr> toLustrePatternAssertConstraintList(StaticState state) {
 
 			List<jkind.lustre.Expr> asserts = new ArrayList<>();
 
@@ -3436,7 +3259,7 @@ public class Nenola {
 			jkind.lustre.IdExpr periodId = new jkind.lustre.IdExpr(periodVar.id);
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
 
-			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr() : null;
+			jkind.lustre.Expr lustreJitter = this.jitterOp.isPresent() ? this.jitterOp.get().toLustreExpr(state) : null;
 
 			// -j <= jitter <= j
 			jkind.lustre.Expr jitterLow = new jkind.lustre.BinaryExpr(
@@ -3453,7 +3276,7 @@ public class Nenola {
 			jkind.lustre.Expr pNextCond = new BinaryExpr(periodId, BinaryOp.PLUS, jitterId);
 			pNextCond = new BinaryExpr(pNextCond, BinaryOp.EQUAL, Lustre.timeExpr);
 			pNextCond = new jkind.lustre.UnaryExpr(UnaryOp.PRE, pNextCond);
-			jkind.lustre.Expr pNextThen = new BinaryExpr(this.iat.toLustreExpr(), BinaryOp.PLUS, prePNext);
+			jkind.lustre.Expr pNextThen = new BinaryExpr(this.iat.toLustreExpr(state), BinaryOp.PLUS, prePNext);
 			pNextThen = new BinaryExpr(periodId, BinaryOp.GREATEREQUAL, pNextThen);
 			jkind.lustre.Expr pNextHold = new BinaryExpr(periodId, BinaryOp.EQUAL, prePNext);
 			jkind.lustre.Expr pNextIf = new IfThenElseExpr(pNextCond, pNextThen, pNextHold);
@@ -3470,24 +3293,24 @@ public class Nenola {
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInPropertyList() {
+		public List<VarDecl> toLustrePatternChanInPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanInConstraintList() {
+		public List<VarDecl> toLustrePatternChanInConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutPropertyList() {
+		public List<VarDecl> toLustrePatternChanOutPropertyList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
-			vars.add(Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id));
+			vars.add(Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id));
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanOutConstraintList() {
+		public List<VarDecl> toLustrePatternChanOutConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 
 			VarDecl jitterVar = Lustre.getJitterVar(patternIndex);
@@ -3497,61 +3320,61 @@ public class Nenola {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
 
-			VarDecl var = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
+			VarDecl var = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id);
 			vars.add(var);
 			return vars;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiPropertyList() {
+		public List<VarDecl> toLustrePatternChanBiPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternChanBiConstraintList() {
+		public List<VarDecl> toLustrePatternChanBiConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationPropertyList() {
+		public List<Equation> toLustrePatternEquationPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<Equation> toLustrePatternEquationConstraintList() {
+		public List<Equation> toLustrePatternEquationConstraintList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprProperty() {
-			VarDecl timeofEvent = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr()).id);
+		public jkind.lustre.Expr toLustreExprProperty(StaticState state) {
+			VarDecl timeofEvent = Lustre.getTimeOfVar(((jkind.lustre.IdExpr) this.event.toLustreExpr(state)).id);
 
 			jkind.lustre.Expr propExpr = expr(
 					"(true -> (not ((pre laste) = -1.0) => event => time - (pre laste) >= period))",
-					to("laste", timeofEvent), to("event", this.event.toLustreExpr()), to("time", Lustre.timeExpr),
-					to("period", this.iat.toLustreExpr()));
+					to("laste", timeofEvent), to("event", this.event.toLustreExpr(state)), to("time", Lustre.timeExpr),
+					to("period", this.iat.toLustreExpr(state)));
 
 			return propExpr;
 		}
 
 		@Override
-		public jkind.lustre.Expr toLustreExprConstraint() {
+		public jkind.lustre.Expr toLustreExprConstraint(StaticState state) {
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			jkind.lustre.IdExpr timeoutId = new jkind.lustre.IdExpr(timeoutVar.id);
 			// event = (t = timeout)
 			jkind.lustre.Expr eventExpr = new BinaryExpr(Lustre.timeExpr, BinaryOp.EQUAL, timeoutId);
-			eventExpr = new BinaryExpr(this.event.toLustreExpr(), BinaryOp.EQUAL, eventExpr);
+			eventExpr = new BinaryExpr(this.event.toLustreExpr(state), BinaryOp.EQUAL, eventExpr);
 
 			return eventExpr;
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventPropertyList() {
+		public List<VarDecl> toLustrePatternTimeEventPropertyList(StaticState state) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<VarDecl> toLustrePatternTimeEventConstraintList() {
+		public List<VarDecl> toLustrePatternTimeEventConstraintList(StaticState state) {
 			List<VarDecl> vars = new ArrayList<>();
 			VarDecl timeoutVar = Lustre.getTimeoutVar(patternIndex);
 			vars.add(timeoutVar);
@@ -3601,21 +3424,21 @@ public class Nenola {
 			this.exprOp = exprOp;
 		}
 
-		public List<Equation> toLustreEquations(NodeContract mainNode, boolean isAsync) {
+		public List<Equation> toLustreEquations(StaticState state, NodeContract mainNode) {
 			List<Equation> acc = new ArrayList<>();
 
-			jkind.lustre.IdExpr dstIdExpr = (jkind.lustre.IdExpr) this.dst.toLustreExpr();
-			if (isAsync) {
-				jkind.lustre.Expr newExpr = this.src.toLustreExpr();
+			jkind.lustre.IdExpr dstIdExpr = (jkind.lustre.IdExpr) this.dst.toLustreExpr(state);
+			if (mainNode.isAsync()) {
+				jkind.lustre.Expr newExpr = this.src.toLustreExpr(state);
 				newExpr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(Lustre.clockVarName), BinaryOp.IMPLIES,
 						newExpr);
 				acc.add(new Equation(dstIdExpr,
-						new jkind.lustre.BinaryExpr(mainNode.toLustreClockedInitialExpr(), BinaryOp.AND,
+						new jkind.lustre.BinaryExpr(mainNode.toLustreClockedInitialExpr(state), BinaryOp.AND,
 						new jkind.lustre.BinaryExpr(mainNode.toLustreHoldExpr(), BinaryOp.AND, newExpr))));
 
-				acc.addAll(this.src.toLustreClockedEquations());
+				acc.addAll(this.src.toLustreClockedEquations(state));
 			} else {
-				acc.add(new jkind.lustre.Equation(dstIdExpr, this.src.toLustreExpr()));
+				acc.add(new jkind.lustre.Equation(dstIdExpr, this.src.toLustreExpr(state)));
 			}
 
 			return acc;
@@ -3937,9 +3760,9 @@ public class Nenola {
 	}
 
 	public static interface PropVal {
-			DataContract inferDataContract();
+		DataContract inferDataContract(StaticState state);
 
-			jkind.lustre.Expr toLustreExpr();
+		jkind.lustre.Expr toLustreExpr(StaticState state);
 
 	}
 
@@ -3951,12 +3774,12 @@ public class Nenola {
 		}
 
 		@Override
-			public DataContract inferDataContract() {
+		public DataContract inferDataContract(StaticState state) {
 			return Prim.IntContract;
 		}
 
 		@Override
-			public jkind.lustre.Expr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.IntExpr(BigInteger.valueOf(this.val));
 		}
 	}
@@ -3969,12 +3792,12 @@ public class Nenola {
 		}
 
 		@Override
-			public DataContract inferDataContract() {
+		public DataContract inferDataContract(StaticState state) {
 			return Prim.RealContract;
 		}
 
 		@Override
-			public jkind.lustre.Expr toLustreExpr() {
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
 			return new jkind.lustre.RealExpr(BigDecimal.valueOf(this.val));
 		}
 	}
@@ -3989,14 +3812,14 @@ public class Nenola {
 		}
 
 		@Override
-			public DataContract inferDataContract(Map<String, Map<String, PropVal>> props) {
-				return props.get(packageName).get(name).inferDataContract();
+		public DataContract inferDataContract(StaticState state) {
+			return state.props.get(packageName).get(name).inferDataContract(state);
 		}
 
 		@Override
-			public jkind.lustre.Expr toLustreExpr(Map<String, Map<String, PropVal>> props) {
-				PropVal pv = props.get(packageName).get(name);
-				return pv.toLustreExpr();
+		public jkind.lustre.Expr toLustreExpr(StaticState state) {
+			PropVal pv = state.props.get(packageName).get(name);
+			return pv.toLustreExpr(state);
 		}
 	}
 
@@ -4045,6 +3868,11 @@ public class Nenola {
 
 		}
 
+		public boolean isAsync() {
+			return this.timingMode.isPresent()
+					&& (this.timingMode.get() instanceof AsyncMode || this.timingMode.get() instanceof LatchedMode);
+		}
+
 		@Override
 		public String getName() {
 			return name;
@@ -4071,15 +3899,15 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
-			private List<Node> toLustreClockedNodesFromNodeGens(Map<String, DataContract> valueEnv) {
+		private List<Node> toLustreClockedNodesFromNodeGens(StaticState state) {
 			Map<String, DataContract> values = new HashMap<>();
-				values.putAll(valueEnv);
+			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state.newValueEnv(values));
 				lustreNodes.add(lustreNode);
 
 			}
@@ -4087,15 +3915,15 @@ public class Nenola {
 			return lustreNodes;
 		}
 
-			private List<Node> toLustreNodesFromNodeGens(Map<String, DataContract> valueEnv) {
+		private List<Node> toLustreNodesFromNodeGens(StaticState state) {
 			Map<String, DataContract> values = new HashMap<>();
-				values.putAll(valueEnv);
+			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = nodeGen.toLustreNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreNode(state.newValueEnv(values));
 				lustreNodes.add(lustreNode);
 
 			}
@@ -4112,21 +3940,22 @@ public class Nenola {
 		}
 
 
-			private jkind.lustre.Node toLustreFlattenedNode(boolean isMonolithic, boolean isAsync) {
+		private jkind.lustre.Node toLustreFlattenedNode(GlobalEnv globalEnv, boolean isMonolithic,
+				NodeContract mainNode) {
 			List<jkind.lustre.VarDecl> inputs = new ArrayList<>();
 			List<jkind.lustre.VarDecl> locals = new ArrayList<>();
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
-				List<jkind.lustre.Expr> assertions = this.toLustreAssertionsFromAsserts(isMonolithic);
+			List<jkind.lustre.Expr> assertions = this.toLustreAssertionsFromAsserts(globalEnv, isMonolithic);
 			List<String> ivcs = new ArrayList<>();
 
-				for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
 				assertions.add(new BinaryExpr(new jkind.lustre.IdExpr(inputName), BinaryOp.EQUAL, expr));
 			}
 
-				for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(globalEnv, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				inputs.add(new VarDecl(inputName, NamedType.BOOL));
@@ -4134,7 +3963,7 @@ public class Nenola {
 			}
 
 			jkind.lustre.Expr guarConjExpr = new jkind.lustre.BoolExpr(true);
-				for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(isMonolithic, isAsync)
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(globalEnv, isMonolithic, mainNode)
 					.entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
@@ -4145,7 +3974,7 @@ public class Nenola {
 				guarConjExpr = Lustre.makeANDExpr(guarId, guarConjExpr);
 			}
 
-				for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(globalEnv, isMonolithic).entrySet()) {
 				jkind.lustre.Expr expr = entry.getValue();
 				guarConjExpr = Lustre.makeANDExpr(expr, guarConjExpr);
 			}
@@ -4159,7 +3988,8 @@ public class Nenola {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
-				for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap(globalEnv, isMonolithic)
+					.entrySet()) {
 				String patternVarName = entry.getKey();
 				inputs.add(new VarDecl(patternVarName, NamedType.BOOL));
 				jkind.lustre.Expr expr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(patternVarName),
@@ -4167,25 +3997,25 @@ public class Nenola {
 				assertExpr = Lustre.makeANDExpr(expr, assertExpr);
 			}
 
-				inputs.addAll(this.toLustreVarsFromInChans(isMonolithic));
+			inputs.addAll(this.toLustreVarsFromInChans(globalEnv, isMonolithic));
 
-				inputs.addAll(this.toLustreVarsFromOutChans(isMonolithic));
+			inputs.addAll(this.toLustreVarsFromOutChans(globalEnv, isMonolithic));
 
-				locals.addAll(this.toLustreVarsFromBiChans(isMonolithic));
+			locals.addAll(this.toLustreVarsFromBiChans(globalEnv, isMonolithic));
 
 
 			String outputName = "__ASSERT";
 			List<VarDecl> outputs = new ArrayList<>();
 			outputs.add(new VarDecl(outputName, NamedType.BOOL));
 
-			assertions.addAll(this.toLustreAssertionsFromConnections());
+			assertions.addAll(this.toLustreAssertionsFromConnections(globalEnv));
 
 
 
-				equations.addAll(this.toLustreEquationsFromConnections(isMonolithic, isAsync));
-				locals.addAll(this.toLustreLocalVarsFromConnections(isMonolithic, isAsync));
+			equations.addAll(this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode));
+			locals.addAll(this.toLustreLocalVarsFromConnections(isMonolithic, mainNode));
 
-			if (isAsync) {
+			if (mainNode.isAsync()) {
 				equations.add(new Equation(new jkind.lustre.IdExpr(outputName), assertExpr));
 			} else {
 				// TODO
@@ -4193,7 +4023,7 @@ public class Nenola {
 				// locals.add ...
 			}
 
-			if (isAsync) {
+			if (mainNode.isAsync()) {
 				inputs.add(new VarDecl(Lustre.clockVarName, NamedType.BOOL));
 				locals.add(new VarDecl(Lustre.tickedVarName, NamedType.BOOL));
 				equations.add(equation("ticked = clk -> clk or pre(ticked);", to("ticked", Lustre.tickedVarName),
@@ -4217,11 +4047,10 @@ public class Nenola {
 			return node;
 		}
 
-		private List<VarDecl> toLustreLocalVarsFromConnections(, boolean isMonolithic,
-				boolean isAsync) {
+		private List<VarDecl> toLustreLocalVarsFromConnections(boolean isMonolithic, NodeContract mainNode) {
 
 			List<VarDecl> acc = new ArrayList<>();
-			if (!isAsync) {
+			if (!mainNode.isAsync()) {
 				return acc;
 			} else {
 				// TODO Auto-generated method stub
@@ -4229,12 +4058,13 @@ public class Nenola {
 			}
 		}
 
-			private List<jkind.lustre.Expr> toLustreAssertionsFromConnections() {
+		private List<jkind.lustre.Expr> toLustreAssertionsFromConnections(GlobalEnv globalEnv) {
 
+			StaticState state = new StaticState(globalEnv, this);
 			List<jkind.lustre.Expr> acc = new ArrayList<>();
 			for (Connection conn : this.connections) {
 				if (conn.exprOp.isPresent()) {
-						acc.add(conn.exprOp.get().toLustreExpr());
+					acc.add(conn.exprOp.get().toLustreExpr(state));
 				} else {
 
 					String dstName = null;
@@ -4273,7 +4103,7 @@ public class Nenola {
 						// we can assume that the source and destination types are
 						// the same at this point
 
-							DataContract srcType = conn.src.inferDataContract();
+						DataContract srcType = conn.src.inferDataContract(state);
 						jkind.lustre.Expr initExpr = Lustre.getInitValueFromType(srcType.toLustreType());
 						jkind.lustre.Expr preSource = new jkind.lustre.UnaryExpr(UnaryOp.PRE,
 								new jkind.lustre.IdExpr(srcName));
@@ -4289,7 +4119,7 @@ public class Nenola {
 			return acc;
 		}
 
-		private Node toLustreMainNode(, boolean isMonolithic, boolean isAsync) {
+		private Node toLustreMainNode(GlobalEnv globalEnv, boolean isMonolithic) {
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 			List<VarDecl> locals = new ArrayList<>();
 			List<VarDecl> inputs = new ArrayList<>();
@@ -4298,7 +4128,7 @@ public class Nenola {
 			List<String> ivcs = new ArrayList<>();
 
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
 
 				String inputName = entry.getKey();
 				jkind.lustre.Expr assumeExpr = entry.getValue();
@@ -4309,16 +4139,16 @@ public class Nenola {
 				ivcs.add(inputName);
 			}
 
-			for (jkind.lustre.Expr assertion : this.toLustreAssertionsFromAsserts(isMonolithic)) {
+			for (jkind.lustre.Expr assertion : this.toLustreAssertionsFromAsserts(globalEnv, isMonolithic)) {
 				assertions.add(assertion);
 			}
 
 			// add assumption and monolithic lemmas first (helps with proving)
-			for (VarDecl var : this.toLustreVarsFromOutChans(isMonolithic)) {
+			for (VarDecl var : this.toLustreVarsFromOutChans(globalEnv, isMonolithic)) {
 				inputs.add(var);
 			}
 
-			for (String propStr : this.toLustreStringPropertyList(isMonolithic)) {
+			for (String propStr : this.toLustreStringPropertyList(globalEnv, isMonolithic)) {
 				properties.add(propStr);
 			}
 
@@ -4337,23 +4167,7 @@ public class Nenola {
 			properties.add(assumeHistVar.id);
 
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap(isMonolithic).entrySet()) {
-				String name = entry.getKey();
-				jkind.lustre.Expr expr = entry.getValue();
-				locals.add(new VarDecl(name, NamedType.BOOL));
-				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
-				properties.add(name);
-			}
-
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(isMonolithic).entrySet()) {
-				String name = entry.getKey();
-				jkind.lustre.Expr expr = entry.getValue();
-				locals.add(new VarDecl(name, NamedType.BOOL));
-				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
-				properties.add(name);
-			}
-
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(isMonolithic, isAsync)
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustrePatternPropMap(globalEnv, isMonolithic)
 					.entrySet()) {
 				String name = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
@@ -4362,17 +4176,34 @@ public class Nenola {
 				properties.add(name);
 			}
 
-			for (VarDecl var : this.toLustreVarsFromInChans(isMonolithic)) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreLemmaMap(globalEnv, isMonolithic).entrySet()) {
+				String name = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				locals.add(new VarDecl(name, NamedType.BOOL));
+				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
+				properties.add(name);
+			}
+
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(globalEnv, isMonolithic, this)
+					.entrySet()) {
+				String name = entry.getKey();
+				jkind.lustre.Expr expr = entry.getValue();
+				locals.add(new VarDecl(name, NamedType.BOOL));
+				equations.add(new Equation(new jkind.lustre.IdExpr(name), expr));
+				properties.add(name);
+			}
+
+			for (VarDecl var : this.toLustreVarsFromInChans(globalEnv, isMonolithic)) {
 				inputs.add(var);
 			}
-			for (VarDecl var : this.toLustreVarsFromBiChans(isMonolithic)) {
+			for (VarDecl var : this.toLustreVarsFromBiChans(globalEnv, isMonolithic)) {
 				locals.add(var);
 			}
 
 
 
-			equations.addAll(this.toLustreEquationsFromConnections(isMonolithic, isAsync));
-			assertions.add(Lustre.getTimeConstraint(this.toEventTimeVarList(isMonolithic)));
+			equations.addAll(this.toLustreEquationsFromConnections(globalEnv, isMonolithic, this));
+			assertions.add(Lustre.getTimeConstraint(this.toEventTimeVarList(globalEnv, isMonolithic)));
 
 			NodeBuilder builder = new NodeBuilder("main");
 			builder.addInputs(inputs);
@@ -4386,14 +4217,15 @@ public class Nenola {
 			return main;
 		}
 
-		private List<String> toLustreStringPropertyList(, boolean isMonolithic) {
+		private List<String> toLustreStringPropertyList(GlobalEnv globalEnv, boolean isMonolithic) {
 			List<String> strs = new ArrayList<>();
 
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
-					for (VarDecl var : pattern.toLustrePatternTimeEventPropertyList()) {
+					for (VarDecl var : pattern.toLustrePatternTimeEventPropertyList(state)) {
 						strs.add(var.id);
 					}
 				}
@@ -4403,17 +4235,17 @@ public class Nenola {
 			return strs;
 		}
 
-		private List<jkind.lustre.VarDecl> toEventTimeVarList(, boolean isMonolithic) {
+		private List<jkind.lustre.VarDecl> toEventTimeVarList(GlobalEnv globalEnv, boolean isMonolithic) {
 
 			List<jkind.lustre.VarDecl> vars = new ArrayList<>();
-
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternTimeEventPropertyList()
-							: pattern.toLustrePatternTimeEventConstraintList();
+							? pattern.toLustrePatternTimeEventPropertyList(state)
+							: pattern.toLustrePatternTimeEventConstraintList(state);
 
 					vars.addAll(localList);
 				}
@@ -4424,7 +4256,7 @@ public class Nenola {
 
 				String prefix = entry.getKey() + "__";
 				NodeContract nc = entry.getValue();
-				for (VarDecl subTimeVar : nc.toEventTimeVarList(isMonolithic)) {
+				for (VarDecl subTimeVar : nc.toEventTimeVarList(globalEnv, isMonolithic)) {
 					vars.add(new VarDecl(prefix + subTimeVar.id, subTimeVar.type));
 				}
 			}
@@ -4472,27 +4304,29 @@ public class Nenola {
 //			//////////////////////////////////////////////
 //		}
 
-			private jkind.lustre.Expr toLustreClockedInitialExpr() {
+		private jkind.lustre.Expr toLustreClockedInitialExpr(StaticState state) {
 			return expr("not ticked => initExpr", to("ticked", Lustre.tickedVarName),
-						to("initExpr", this.initialExpr.toLustreExpr()));
+					to("initExpr", this.initialExpr.toLustreExpr(state)));
 		}
 
-		private List<Equation> toLustreEquationsFromConnections(, boolean isMonolithic,
-				boolean isAsync, NodeContract mainNode) {
+		private List<Equation> toLustreEquationsFromConnections(GlobalEnv globalEnv, boolean isMonolithic,
+				NodeContract mainNode) {
 			List<Equation> equations = new ArrayList<>();
 
+			StaticState state = new StaticState(globalEnv, this);
 			for (Connection conn : this.connections) {
-				equations.addAll(conn.toLustreEquations(isAsync));
+				equations.addAll(conn.toLustreEquations(state, mainNode));
 			}
 
+			// TODO update equations with clock implication versions
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 					List<jkind.lustre.Equation> localList = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternEquationPropertyList(isAsync)
-							: pattern.toLustrePatternEquationConstraintList(isAsync);
+							? pattern.toLustrePatternEquationPropertyList(state)
+							: pattern.toLustrePatternEquationConstraintList(state);
 					equations.addAll(localList);
 				}
 
@@ -4501,7 +4335,7 @@ public class Nenola {
 
 		}
 
-		private List<VarDecl> toLustreVarsFromBiChans(, boolean isMonolithic) {
+		private List<VarDecl> toLustreVarsFromBiChans(GlobalEnv globalEnv, boolean isMonolithic) {
 
 			List<VarDecl> vars = new ArrayList<>();
 
@@ -4511,14 +4345,15 @@ public class Nenola {
 				}
 			}
 
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternChanBiPropertyList()
-							: pattern.toLustrePatternChanBiConstraintList();
+							? pattern.toLustrePatternChanBiPropertyList(state)
+							: pattern.toLustrePatternChanBiConstraintList(state);
 					vars.addAll(localList);
 				}
 
@@ -4528,7 +4363,7 @@ public class Nenola {
 		}
 
 
-		private List<VarDecl> toLustreVarsFromOutChans(, boolean isMonolithic) {
+		private List<VarDecl> toLustreVarsFromOutChans(GlobalEnv globalEnv, boolean isMonolithic) {
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
 				if (chan.direction instanceof Out) {
@@ -4536,14 +4371,15 @@ public class Nenola {
 				}
 			}
 
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternChanOutPropertyList()
-							: pattern.toLustrePatternChanOutConstraintList();
+							? pattern.toLustrePatternChanOutPropertyList(state)
+							: pattern.toLustrePatternChanOutConstraintList(state);
 					vars.addAll(localList);
 				}
 
@@ -4553,23 +4389,23 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (VarDecl nestedVar : nc.toLustreVarsFromOutChans(isMonolithic)) {
+				for (VarDecl nestedVar : nc.toLustreVarsFromOutChans(globalEnv, isMonolithic)) {
 					String id = prefix + "__" + nestedVar.id;
 					jkind.lustre.Type type = nestedVar.type;
 					vars.add(new VarDecl(id, type));
 				}
 
-				for (String assumeKey : nc.toLustreAssumeMap(isMonolithic).keySet()) {
+				for (String assumeKey : nc.toLustreAssumeMap(globalEnv, isMonolithic).keySet()) {
 					String id = prefix + "__" + assumeKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustreLemmaMap(isMonolithic).keySet()) {
+				for (String propKey : nc.toLustreLemmaMap(globalEnv, isMonolithic).keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
 
-				for (String propKey : nc.toLustrePatternPropMap(isMonolithic).keySet()) {
+				for (String propKey : nc.toLustrePatternPropMap(globalEnv, isMonolithic).keySet()) {
 					String id = prefix + "__" + propKey;
 					vars.add(new VarDecl(id, NamedType.BOOL));
 				}
@@ -4581,7 +4417,8 @@ public class Nenola {
 			return vars;
 		}
 
-		private List<VarDecl> toLustreVarsFromInChans(, boolean isMonolithic) {
+		private List<VarDecl> toLustreVarsFromInChans(GlobalEnv globalEnv, boolean isMonolithic) {
+
 
 			List<VarDecl> vars = new ArrayList<>();
 			for (Channel chan : this.channels.values()) {
@@ -4590,14 +4427,15 @@ public class Nenola {
 				}
 			}
 
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 					List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternChanInPropertyList()
-							: pattern.toLustrePatternChanInConstraintList();
+							? pattern.toLustrePatternChanInPropertyList(state)
+							: pattern.toLustrePatternChanInConstraintList(state);
 					vars.addAll(localList);
 				}
 
@@ -4606,7 +4444,7 @@ public class Nenola {
 			for (Entry<String, NodeContract> entry : this.subNodes.entrySet()) {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
-				for (VarDecl nestedVar : nc.toLustreVarsFromInChans(isMonolithic)) {
+				for (VarDecl nestedVar : nc.toLustreVarsFromInChans(globalEnv, isMonolithic)) {
 					String id = prefix + "__" + nestedVar.id;
 					jkind.lustre.Type type = nestedVar.type;
 					vars.add(new VarDecl(id, type));
@@ -4634,17 +4472,18 @@ public class Nenola {
 		}
 
 
-		private Map<String, jkind.lustre.Expr> toLustrePatternPropMap(, boolean isMonolithic) {
+		private Map<String, jkind.lustre.Expr> toLustrePatternPropMap(GlobalEnv globalEnv, boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> props = new HashMap<>();
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.prop instanceof PatternProp) {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 					Map<String, jkind.lustre.Expr> localMap = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternPropertyMap()
-							: pattern.toLustrePatternConstraintMap();
+							? pattern.toLustrePatternPropertyMap(state)
+							: pattern.toLustrePatternConstraintMap(state);
 					props.putAll(localMap);
 				}
 			}
@@ -4653,7 +4492,7 @@ public class Nenola {
 				String prefix = entry.getKey();
 				NodeContract nc = entry.getValue();
 
-				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternPropMap(isMonolithic)
+				for (Entry<String, jkind.lustre.Expr> nestedEntry : nc.toLustrePatternPropMap(globalEnv, isMonolithic)
 						.entrySet()) {
 					String key = prefix + "__" + nestedEntry.getKey();
 					jkind.lustre.Expr expr = nestedEntry.getValue();
@@ -4665,10 +4504,10 @@ public class Nenola {
 			return props;
 		}
 
-		private List<jkind.lustre.Expr> toLustreAssertionsFromAsserts(, boolean isMonolithic) {
+		private List<jkind.lustre.Expr> toLustreAssertionsFromAsserts(GlobalEnv globalEnv, boolean isMonolithic) {
 
 			List<jkind.lustre.Expr> exprs = new ArrayList<>();
-
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 				if (spec.specTag == SpecTag.Assert) {
 
@@ -4677,11 +4516,11 @@ public class Nenola {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
-								? pattern.toLustreExprProperty()
-								: pattern.toLustreExprConstraint();
+								? pattern.toLustreExprProperty(state)
+								: pattern.toLustreExprConstraint(state);
 						exprs.add(expr);
 					} else if (spec.prop instanceof ExprProp) {
-						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 						exprs.add(expr);
 					}
 				}
@@ -4690,8 +4529,8 @@ public class Nenola {
 					Pattern pattern = ((PatternProp) spec.prop).pattern;
 
 					List<jkind.lustre.Expr> localList = this.isProperty(isMonolithic, spec.specTag)
-							? pattern.toLustrePatternAssertPropertyList()
-							: pattern.toLustrePatternAssertConstraintList();
+							? pattern.toLustrePatternAssertPropertyList(state)
+							: pattern.toLustrePatternAssertConstraintList(state);
 					exprs.addAll(localList);
 				}
 
@@ -4701,7 +4540,7 @@ public class Nenola {
 
 				NodeContract nc = entry.getValue();
 
-				for (jkind.lustre.Expr subAssert : nc.toLustreAssertionsFromAsserts(isMonolithic)) {
+				for (jkind.lustre.Expr subAssert : nc.toLustreAssertionsFromAsserts(globalEnv, isMonolithic)) {
 					exprs.add(subAssert);
 				}
 
@@ -4718,12 +4557,12 @@ public class Nenola {
 		}
 
 
-		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(, boolean isMonolithic,
-				boolean isAsync) {
+		private Map<String, jkind.lustre.Expr> toLustreGuaranteeMap(GlobalEnv globalEnv, boolean isMonolithic,
+				NodeContract mainNode) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
-
-			if (!isAsync) {
+			StaticState state = new StaticState(globalEnv, this);
+			if (!mainNode.isAsync()) {
 				int suffix = 0;
 				for (Spec spec : this.specList) {
 
@@ -4732,12 +4571,12 @@ public class Nenola {
 						if (spec.prop instanceof PatternProp) {
 							Pattern pattern = ((PatternProp) spec.prop).pattern;
 							jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
-									? pattern.toLustreExprProperty()
-									: pattern.toLustreExprConstraint();
+									? pattern.toLustreExprProperty(state)
+									: pattern.toLustreExprConstraint(state);
 							exprMap.put(key, expr);
 
 						} else if (spec.prop instanceof ExprProp) {
-							jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+							jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 							exprMap.put(key, expr);
 
 						}
@@ -4755,10 +4594,11 @@ public class Nenola {
 		}
 
 
-		private Map<String, jkind.lustre.Expr> toLustreLemmaMap(, boolean isMonolithic) {
+		private Map<String, jkind.lustre.Expr> toLustreLemmaMap(GlobalEnv globalEnv, boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
 			int suffix = 0;
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.specTag == SpecTag.Lemma) {
@@ -4767,12 +4607,12 @@ public class Nenola {
 					if (spec.prop instanceof PatternProp) {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
 						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
-								? pattern.toLustreExprProperty()
-								: pattern.toLustreExprConstraint();
+								? pattern.toLustreExprProperty(state)
+								: pattern.toLustreExprConstraint(state);
 						exprMap.put(key, expr);
 
 					} else if (spec.prop instanceof ExprProp) {
-						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 						exprMap.put(key, expr);
 
 					}
@@ -4786,10 +4626,11 @@ public class Nenola {
 		}
 
 
-		private Map<String, jkind.lustre.Expr> toLustreAssumeMap(, boolean isMonolithic) {
+		private Map<String, jkind.lustre.Expr> toLustreAssumeMap(GlobalEnv globalEnv, boolean isMonolithic) {
 
 			Map<String, jkind.lustre.Expr> exprMap = new HashMap<>();
 			int suffix = 0;
+			StaticState state = new StaticState(globalEnv, this);
 			for (Spec spec : this.specList) {
 
 				if (spec.specTag == SpecTag.Assume) {
@@ -4797,12 +4638,12 @@ public class Nenola {
 					if (spec.prop instanceof PatternProp) {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
 						jkind.lustre.Expr expr = this.isProperty(isMonolithic, spec.specTag)
-								? pattern.toLustreExprProperty()
-								: pattern.toLustreExprConstraint();
+								? pattern.toLustreExprProperty(state)
+								: pattern.toLustreExprConstraint(state);
 						exprMap.put(key, expr);
 
 					} else if (spec.prop instanceof ExprProp) {
-						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 						exprMap.put(key, expr);
 
 					}
@@ -4815,26 +4656,26 @@ public class Nenola {
 			return exprMap;
 		}
 
-		public List<Node> toLustreFlattenedNodes(, boolean isMonolithic, boolean isAsync) {
+		public List<Node> toLustreFlattenedNodes(GlobalEnv globalEnv, boolean isMonolithic, NodeContract mainNode) {
 
 			List<Node> nodes = new ArrayList<>();
 			for (NodeContract subNodeContract : this.subNodes.values()) {
-				nodes.add(this.toLustreFlattenedNode(isMonolithic, isAsync));
-				nodes.addAll(subNodeContract.toLustreFlattenedNodes(isMonolithic, isAsync));
+				nodes.add(this.toLustreFlattenedNode(globalEnv, isMonolithic, mainNode));
+				nodes.addAll(subNodeContract.toLustreFlattenedNodes(globalEnv, isMonolithic, mainNode));
 			}
 
 			return nodes;
 
 		}
 
-			public List<Node> toLustreNodesFromLinearNodeGens(Map<String, DataContract> valueEnv) {
+		public List<Node> toLustreNodesFromLinearNodeGens(StaticState state) {
 			Map<String, DataContract> values = new HashMap<>();
-				values.putAll(valueEnv);
+			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (LinearNodeGen linearNodeGen : this.linearNodeGenMap.values()) {
-					jkind.lustre.Node lustreNode = linearNodeGen.toLustreNode();
+				jkind.lustre.Node lustreNode = linearNodeGen.toLustreNode(state.newValueEnv(values));
 				lustreNodes.add(lustreNode);
 
 			}
@@ -4842,14 +4683,16 @@ public class Nenola {
 			return lustreNodes;
 		}
 
-			public List<Node> toLustreClockedNodesFromLinearNodeGens(Map<String, DataContract> valueEnv) {
+
+
+		public List<Node> toLustreClockedNodesFromLinearNodeGens(StaticState state) {
 			Map<String, DataContract> values = new HashMap<>();
-				values.putAll(valueEnv);
+			values.putAll(state.valueEnv);
 			values.putAll(this.getValueTypes());
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (LinearNodeGen linearNodeGen : this.linearNodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = linearNodeGen.toLustreClockedNode();
+				jkind.lustre.Node lustreNode = linearNodeGen.toLustreClockedNode(state.newValueEnv(values));
 				lustreNodes.add(lustreNode);
 
 			}
@@ -4857,7 +4700,7 @@ public class Nenola {
 			return lustreNodes;
 		}
 
-			public Node toLustreRealizabilityNode() {
+		public Node toLustreRealizabilityNode(GlobalEnv globalEnv) {
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
 			List<VarDecl> locals = new ArrayList<>();
@@ -4865,11 +4708,12 @@ public class Nenola {
 			List<jkind.lustre.Equation> equations = new ArrayList<>();
 			List<String> properties = new ArrayList<>();
 
+			StaticState state = new StaticState(globalEnv, this);
 			for (Nenola.Spec spec : this.specList) {
 
 				if (spec.specTag == SpecTag.Assume && spec.prop instanceof ExprProp) {
 					Expr e = ((ExprProp) spec.prop).expr;
-						assertions.add(e.toLustreExpr());
+					assertions.add(e.toLustreExpr(state));
 
 				}
 			}
@@ -4880,7 +4724,7 @@ public class Nenola {
 
 					if (spec.specTag == SpecTag.Guarantee && spec.prop instanceof ExprProp) {
 						String guarName = SpecTag.Guarantee.name() + "__" + suffix;
-							jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 						locals.add(new VarDecl(guarName, NamedType.BOOL));
 
 						equations.add(new Equation(new jkind.lustre.IdExpr(guarName), expr));
@@ -4923,7 +4767,7 @@ public class Nenola {
 					jkind.lustre.BinaryExpr binExpr;
 					jkind.lustre.IdExpr varId;
 
-						jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr();
+					jkind.lustre.Expr expr = ((ExprProp) spec.prop).expr.toLustreExpr(state);
 					try {
 						binExpr = (BinaryExpr) expr;
 						varId = (jkind.lustre.IdExpr) binExpr.left;
@@ -4967,7 +4811,7 @@ public class Nenola {
 			return node;
 		}
 
-		public Node toLustreMainConsistencyNode(, boolean isMonolithic, int consistDetph) {
+		public Node toLustreMainConsistencyNode(GlobalEnv globalEnv, boolean isMonolithic, int consistDetph) {
 			final String stuffPrefix = "__STUFF";
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -4976,6 +4820,8 @@ public class Nenola {
 			List<Equation> equations = new ArrayList<>();
 			List<String> properties = new ArrayList<>();
 			List<String> ivcs = new ArrayList<>();
+
+			StaticState state = new StaticState(globalEnv, this);
 
 			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
 
@@ -4991,7 +4837,7 @@ public class Nenola {
 						jkind.lustre.IdExpr stuffAssumptionId = new jkind.lustre.IdExpr(stuffAssumptionVar.id);
 
 						Expr e = ((ExprProp) spec.prop).expr;
-						equations.add(new Equation(stuffAssumptionId, e.toLustreExpr()));
+						equations.add(new Equation(stuffAssumptionId, e.toLustreExpr(state)));
 
 						stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssumptionId);
 						stuffAssumptionIndex++;
@@ -5011,7 +4857,7 @@ public class Nenola {
 						jkind.lustre.IdExpr stuffGuaranteeId = new jkind.lustre.IdExpr(stuffGuaranteeVar.id);
 
 						Expr e = ((ExprProp) spec.prop).expr;
-						equations.add(new Equation(stuffGuaranteeId, e.toLustreExpr()));
+						equations.add(new Equation(stuffGuaranteeId, e.toLustreExpr(state)));
 
 						stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
 						stuffGuaranteeIndex++;
@@ -5020,7 +4866,7 @@ public class Nenola {
 			}
 
 			for (Connection conn : this.connections) {
-				equations.add(conn.toLustreEquation());
+				equations.addAll(conn.toLustreEquations(state, this));
 			}
 			{
 				int stuffAssertionIndex = 0;
@@ -5034,7 +4880,7 @@ public class Nenola {
 
 						Expr e = ((ExprProp) spec.prop).expr;
 
-						equations.add(new Equation(stuffAssertionId, e.toLustreExpr()));
+						equations.add(new Equation(stuffAssertionId, e.toLustreExpr(state)));
 
 						stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssertionId);
 
@@ -5050,8 +4896,8 @@ public class Nenola {
 					if (spec.prop instanceof PatternProp) {
 						Pattern pattern = ((PatternProp) spec.prop).pattern;
 						List<jkind.lustre.VarDecl> localList = this.isProperty(isMonolithic, spec.specTag)
-								? pattern.toLustrePatternTimeEventPropertyList()
-								: pattern.toLustrePatternTimeEventConstraintList();
+								? pattern.toLustrePatternTimeEventPropertyList(state)
+								: pattern.toLustrePatternTimeEventConstraintList(state);
 
 						eventTimes.addAll(localList);
 					}
@@ -5119,8 +4965,8 @@ public class Nenola {
 			return node;
 		}
 
-		public Node toLustreCompositionConsistencyNode(, boolean isMonolithic, int consistDetph,
-				boolean isAsync) {
+		public Node toLustreCompositionConsistencyNode(GlobalEnv globalEnv, boolean isMonolithic, int consistDetph,
+				NodeContract mainNode) {
 			final String stuffPrefix = "__STUFF";
 
 			List<jkind.lustre.Expr> assertions = new ArrayList<>();
@@ -5132,7 +4978,7 @@ public class Nenola {
 
 			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				VarDecl stuffAssumptionVar = new VarDecl(inputName, NamedType.BOOL);
@@ -5146,7 +4992,7 @@ public class Nenola {
 			}
 
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				VarDecl stuffGuaranteeVar = new VarDecl(inputName, NamedType.BOOL);
@@ -5158,9 +5004,9 @@ public class Nenola {
 			}
 
 
-			equations.addAll(this.toLustreEquationsFromConnections(isMonolithic, isAsync));
+			equations.addAll(this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode));
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(isMonolithic).entrySet()) {
+			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 
@@ -5175,15 +5021,15 @@ public class Nenola {
 
 			// add realtime constraints
 			Set<VarDecl> eventTimes = new HashSet<>();
-			for (VarDecl eventVar : this.toEventTimeVarList(isMonolithic)) {
+			for (VarDecl eventVar : this.toEventTimeVarList(globalEnv, isMonolithic)) {
 				eventTimes.add(eventVar);
 			}
 
 			assertions.add(Lustre.getTimeConstraint(eventTimes));
 
-			inputs.addAll(this.toLustreVarsFromInChans(isMonolithic));
-			inputs.addAll(this.toLustreVarsFromOutChans(isMonolithic));
-			locals.addAll(this.toLustreVarsFromBiChans(isMonolithic));
+			inputs.addAll(this.toLustreVarsFromInChans(globalEnv, isMonolithic));
+			inputs.addAll(this.toLustreVarsFromOutChans(globalEnv, isMonolithic));
+			locals.addAll(this.toLustreVarsFromBiChans(globalEnv, isMonolithic));
 
 //			EObject classifier = agreeNode.compInst.getComponentClassifier();
 
@@ -5287,9 +5133,9 @@ public class Nenola {
 			this.src = src;
 		}
 
-			public Equation toLustreEquation() {
+		public Equation toLustreEquation(StaticState state) {
 
-				jkind.lustre.Expr expr = src.toLustreExpr();
+			jkind.lustre.Expr expr = src.toLustreExpr(state);
 			List<jkind.lustre.IdExpr> ids = new ArrayList<>();
 			for (String tgt : tgts) {
 				ids.add(new jkind.lustre.IdExpr(tgt));
@@ -5312,12 +5158,12 @@ public class Nenola {
 			this.properties = properties;
 		}
 
-			public Node toLustreNode() {
+		public Node toLustreNode(StaticState state) {
 
 			List<VarDecl> inputs = this.toLustreInputlList();
 			List<VarDecl> outputs = this.toLustreOutputlList();
 			List<VarDecl> internals = this.toLustreLocallList();
-				List<Equation> eqs = this.toLustreEquations();
+			List<Equation> eqs = this.toLustreEquations(state);
 			List<String> props = this.properties;
 
 			NodeBuilder builder = new NodeBuilder(this.name);
@@ -5331,10 +5177,10 @@ public class Nenola {
 		}
 
 
-			private List<Equation> toLustreEquations() {
+		private List<Equation> toLustreEquations(StaticState state) {
 			List<Equation> equations = new ArrayList<>();
 			for (DataFlow df : this.dataFlows) {
-					equations.add(df.toLustreEquation());
+				equations.add(df.toLustreEquation(state));
 			}
 			return equations;
 		}
@@ -5377,21 +5223,21 @@ public class Nenola {
 
 		private Optional<Node> clockedNodeMap = Optional.empty();
 
-			public Node toLustreClockedNode() {
+		public Node toLustreClockedNode(StaticState state) {
 			if (!clockedNodeMap.isPresent()) {
 
-					NodeBuilder builder = new NodeBuilder(this.toLustreNode());
-					builder.setId(Lustre.clockedNodePrefix + this.toLustreNode().id);
+				NodeBuilder builder = new NodeBuilder(this.toLustreNode(state));
+				builder.setId(Lustre.clockedNodePrefix + this.toLustreNode(state).id);
 				builder.clearEquations();
 				builder.clearInputs();
 				builder.addInput(new VarDecl(Lustre.clockVarName, NamedType.BOOL));
 				builder.addInput(new VarDecl(Lustre.initVarName, NamedType.BOOL));
-					builder.addInputs(this.toLustreNode().inputs);
+				builder.addInputs(this.toLustreNode(state).inputs);
 
 
 				for (DataFlow df : this.dataFlows) {
 //
-						jkind.lustre.Expr clockedExpr = df.src.toLustreClockedExpr();
+					jkind.lustre.Expr clockedExpr = df.src.toLustreClockedExpr(state);
 					List<jkind.lustre.IdExpr> idExprs = new ArrayList<>();
 					for (String id : df.tgts) {
 						idExprs.add(new jkind.lustre.IdExpr(id));
@@ -5402,8 +5248,8 @@ public class Nenola {
 							new jkind.lustre.IdExpr(Lustre.clockVarName), clockedExpr,
 							new jkind.lustre.UnaryExpr(UnaryOp.PRE, idExprs.get(0)));
 					builder.addEquation(new Equation(idExprs, lustreExpr));
-						builder.addLocals(df.src.toLustreClockedLocals());
-						builder.addEquations(df.src.toLustreClockedEquations());
+					builder.addLocals(df.src.toLustreClockedLocals(state));
+					builder.addEquations(df.src.toLustreClockedEquations(state));
 
 				}
 				return builder.build();
@@ -5629,23 +5475,23 @@ public class Nenola {
 
 		}
 
-			private jkind.lustre.Node toLustreNode() {
-				return this.toNodeGen().toLustreNode();
+		private jkind.lustre.Node toLustreNode(StaticState state) {
+			return this.toNodeGen().toLustreNode(state);
 		}
 
-			private jkind.lustre.Node toLustreClockedNode() {
-				return this.toNodeGen().toLustreClockedNode();
+		private jkind.lustre.Node toLustreClockedNode(StaticState state) {
+			return this.toNodeGen().toLustreClockedNode(state);
 		}
 
 	}
 
-	private static List<Node> lustreNodesFromMain(, NodeContract main, boolean isMonolithic) {
+	private static List<Node> lustreNodesFromMain(GlobalEnv globalEnv, NodeContract main, boolean isMonolithic) {
 
 		boolean isAsync = main.timingMode.isPresent() && main.timingMode.get() instanceof AsyncMode;
 		List<Node> nodes = new ArrayList<>();
-		Node mainNode = main.toLustreMainNode(isMonolithic, isAsync);
+		Node mainNode = main.toLustreMainNode(globalEnv, isMonolithic);
 		nodes.add(mainNode);
-		List<Node> subs = main.toLustreFlattenedNodes(isMonolithic, isAsync);
+		List<Node> subs = main.toLustreFlattenedNodes(globalEnv, isMonolithic, main);
 		nodes.addAll(subs);
 		return nodes;
 	}
@@ -5699,6 +5545,7 @@ public class Nenola {
 		}
 
 		public Map<String, jkind.lustre.Program> toRealizabilityLustrePrograms() {
+
 			List<jkind.lustre.TypeDef> lustreTypes = this.lustreTypesFromDataContracts();
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			lustreNodes.addAll(this.toLustreNodesFromNodeGens());
@@ -5706,7 +5553,9 @@ public class Nenola {
 			lustreNodes.addAll(this.toLustreNodesFromLinearNodeGens());
 			lustreNodes.addAll(this.toLustreClockedNodesFromLinearNodeGens());
 
-			lustreNodes.add(main.toLustreRealizabilityNode());
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+
+			lustreNodes.add(main.toLustreRealizabilityNode(globalEnv));
 
 			lustreNodes.add(Lustre.getHistNode());
 			lustreNodes.addAll(Lustre.getRealTimeNodes());
@@ -5722,10 +5571,13 @@ public class Nenola {
 			Map<String, jkind.lustre.Program> programs = new HashMap<>();
 			List<TypeDef> types = this.lustreTypesFromDataContracts();
 
+
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+
 			{
 				List<Node> nodes = new ArrayList<>();
 
-					Node topConsist = this.main.toLustreMainConsistencyNode(isMonolithic, depth);
+				Node topConsist = this.main.toLustreMainConsistencyNode(globalEnv, isMonolithic, depth);
 
 				// we don't want node lemmas to show up in the consistency check
 				for (Node node : this.toLustreNodesFromNodeGens()) {
@@ -5743,7 +5595,8 @@ public class Nenola {
 			for (NodeContract subNode : this.main.subNodes.values()) {
 
 				List<Node> nodes = new ArrayList<>();
-				Node subConsistNode = subNode.toLustreCompositionConsistencyNode(isMonolithic, depth, isAsync);
+				Node subConsistNode = subNode.toLustreCompositionConsistencyNode(globalEnv, isMonolithic, depth,
+						this.main);
 				for (Node node : this.toLustreNodesFromNodeGens()) {
 					nodes.add(Lustre.removeProperties(node));
 				}
@@ -5761,8 +5614,8 @@ public class Nenola {
 			{
 				List<Node> nodes = new ArrayList<>();
 
-					Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode(isMonolithic, depth,
-						isAsync);
+				Node topCompositionConsist = this.main.toLustreCompositionConsistencyNode(globalEnv, isMonolithic,
+						depth, this.main);
 				for (Node node : this.toLustreNodesFromNodeGens()) {
 					nodes.add(Lustre.removeProperties(node));
 				}
@@ -5812,7 +5665,8 @@ public class Nenola {
 			lustreNodes.addAll(this.toLustreNodesFromLinearNodeGens());
 			lustreNodes.addAll(this.toLustreClockedNodesFromLinearNodeGens());
 
-			lustreNodes.addAll(Nenola.lustreNodesFromMain(main, isMonolithic));
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+			lustreNodes.addAll(Nenola.lustreNodesFromMain(globalEnv, this.main, isMonolithic));
 
 			lustreNodes.add(Lustre.getHistNode());
 			lustreNodes.addAll(Lustre.getRealTimeNodes());
@@ -5825,11 +5679,14 @@ public class Nenola {
 
 
 
-			private List<Node> toLustreClockedNodesFromLinearNodeGens() {
+		private List<Node> toLustreClockedNodesFromLinearNodeGens() {
+
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+			StaticState state = new StaticState(globalEnv, null);
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
 			for (LinearNodeGen nodeGen : this.linearNodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state);
 				lustreNodes.add(lustreNode);
 
 			}
@@ -5838,18 +5695,22 @@ public class Nenola {
 
 				NodeContract nc = entry.getValue();
 
-					lustreNodes.addAll(nc.toLustreClockedNodesFromLinearNodeGens());
+				lustreNodes.addAll(nc.toLustreClockedNodesFromLinearNodeGens(state));
 
 			}
 
 			return lustreNodes;
 		}
 
-			private List<Node> toLustreNodesFromLinearNodeGens() {
+		private List<Node> toLustreNodesFromLinearNodeGens() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+			StaticState state = new StaticState(globalEnv, null);
+
 			for (LinearNodeGen nodeGen : this.linearNodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = nodeGen.toLustreNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreNode(state);
 				lustreNodes.add(lustreNode);
 
 			}
@@ -5858,18 +5719,21 @@ public class Nenola {
 
 				NodeContract nc = entry.getValue();
 
-					lustreNodes.addAll(nc.toLustreNodesFromLinearNodeGens());
+				lustreNodes.addAll(nc.toLustreNodesFromLinearNodeGens(state));
 
 			}
 
 			return lustreNodes;
 		}
 
-			private List<Node> toLustreClockedNodesFromNodeGens() {
+		private List<Node> toLustreClockedNodesFromNodeGens() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+			StaticState state = new StaticState(globalEnv, null);
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreClockedNode(state);
 				lustreNodes.add(lustreNode);
 
 			}
@@ -5878,18 +5742,22 @@ public class Nenola {
 
 				NodeContract nc = entry.getValue();
 
-					lustreNodes.addAll(nc.toLustreClockedNodesFromNodeGens());
+				lustreNodes.addAll(nc.toLustreClockedNodesFromNodeGens(state));
 
 			}
 
 			return lustreNodes;
 		}
 
-			private List<Node> toLustreNodesFromNodeGens() {
+		private List<Node> toLustreNodesFromNodeGens() {
 			List<jkind.lustre.Node> lustreNodes = new ArrayList<>();
+
+			GlobalEnv globalEnv = new GlobalEnv(this.nodeContractMap, this.types, this.nodeGenMap, this.propMap);
+			StaticState state = new StaticState(globalEnv, null);
+
 			for (NodeGen nodeGen : this.nodeGenMap.values()) {
 
-					jkind.lustre.Node lustreNode = nodeGen.toLustreNode();
+				jkind.lustre.Node lustreNode = nodeGen.toLustreNode(state);
 				lustreNodes.add(lustreNode);
 
 			}
@@ -5898,7 +5766,7 @@ public class Nenola {
 
 				NodeContract nc = entry.getValue();
 
-					lustreNodes.addAll(nc.toLustreNodesFromNodeGens());
+				lustreNodes.addAll(nc.toLustreNodesFromNodeGens(state));
 
 			}
 
