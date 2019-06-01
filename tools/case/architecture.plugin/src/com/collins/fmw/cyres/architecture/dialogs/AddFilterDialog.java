@@ -6,15 +6,19 @@ import java.util.List;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.aadl2.PortCategory;
 
 /**
  * This class creates the Add Filter wizard
@@ -23,17 +27,19 @@ public class AddFilterDialog extends TitleAreaDialog {
 
 	private Text txtFilterImplementationName;
 	private Text txtFilterImplementationLanguage;
-	private Combo cboFilterResoluteClause;
+	private List<Button> btnLogPortType = new ArrayList<>();
+	private Combo cboFilterRequirement;
 	private Text txtAgreeProperty;
 	private List<Button> btnPropagateGuarantees = new ArrayList<>();
-	private String strFilterImplementationLanguage = "";
-	private String strFilterImplementationName = "";
-	private String strFilterResoluteClause = "";
-	private String strAgreeProperty = "";
-	private String strSourceName = "";
-	private List<String> strSourceGuarantees = new ArrayList<>();
-	private List<String> strPropagateGuarantees = new ArrayList<>();
-	private List<String> strResoluteClauses = new ArrayList<>();
+	private String filterImplementationLanguage = "";
+	private String filterImplementationName = "";
+	private PortCategory logPortType = null;
+	private String filterRequirement = "";
+	private String agreeProperty = "";
+	private String sourceName = "";
+	private List<String> sourceGuarantees = new ArrayList<>();
+	private List<String> propagateGuarantees = new ArrayList<>();
+	private List<String> requirements = new ArrayList<>();
 
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
@@ -50,6 +56,13 @@ public class AddFilterDialog extends TitleAreaDialog {
 	}
 
 	@Override
+	protected Point getInitialSize() {
+		final Point size = super.getInitialSize();
+		size.y += convertHeightInCharsToPixels(1);
+		return size;
+	}
+
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);
@@ -60,7 +73,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 		// Add filter information fields
 		createFilterImplementationNameField(container);
 		createImplementationLanguageField(container);
-		createResoluteField(container);
+		createLogPortField(container);
+		createRequirementField(container);
 		createGuaranteeSelectionField(container);
 		createAgreeField(container);
 
@@ -98,23 +112,62 @@ public class AddFilterDialog extends TitleAreaDialog {
 		txtFilterImplementationLanguage.setLayoutData(dataInfoField);
 	}
 
+	/**
+	 * Creates the input field for specifying if the filter should contain
+	 * a port for logging messages
+	 * @param container
+	 */
+	private void createLogPortField(Composite container) {
+		Label lblLogField = new Label(container, SWT.NONE);
+		lblLogField.setText("Create log port");
+		lblLogField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+		// Create a group to contain the log port options
+		Group logGroup = new Group(container, SWT.NONE);
+		logGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		logGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		btnLogPortType.clear();
+
+		Button btnNoLogPort = new Button(logGroup, SWT.RADIO);
+		btnNoLogPort.setText("None");
+		btnNoLogPort.setSelection(true);
+
+		Button btnEventLogPort = new Button(logGroup, SWT.RADIO);
+		btnEventLogPort.setText("Event");
+		btnEventLogPort.setSelection(false);
+
+		Button btnDataLogPort = new Button(logGroup, SWT.RADIO);
+		btnDataLogPort.setText("Data");
+		btnDataLogPort.setSelection(false);
+
+		Button btnEventDataLogPort = new Button(logGroup, SWT.RADIO);
+		btnEventDataLogPort.setText("Event Data");
+		btnEventDataLogPort.setSelection(false);
+
+		btnLogPortType.add(btnDataLogPort);
+		btnLogPortType.add(btnEventLogPort);
+		btnLogPortType.add(btnEventDataLogPort);
+		btnLogPortType.add(btnNoLogPort);
+
+	}
 
 	/**
 	 * Creates the input field for selecting the resolute clause that drives
 	 * the addition of this filter to the design
 	 * @param container
 	 */
-	private void createResoluteField(Composite container) {
+	private void createRequirementField(Composite container) {
 		Label lblResoluteField = new Label(container, SWT.NONE);
-		lblResoluteField.setText("Resolute Clause");
+		lblResoluteField.setText("Requirement");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboFilterResoluteClause = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-		cboFilterResoluteClause.setLayoutData(dataInfoField);
-		for (String clause : strResoluteClauses) {
-			cboFilterResoluteClause.add(clause);
+		cboFilterRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboFilterRequirement.setLayoutData(dataInfoField);
+		for (String clause : requirements) {
+			cboFilterRequirement.add(clause);
 		}
 	}
 
@@ -140,10 +193,10 @@ public class AddFilterDialog extends TitleAreaDialog {
 
 		// Only create this field if there are guarantees in the source
 		// component to propagate
-		if (strSourceGuarantees.size() > 0) {
+		if (sourceGuarantees.size() > 0) {
 
 			Label lblSelectionField = new Label(container, SWT.NONE);
-			lblSelectionField.setText("Preserve Guarantees from " + strSourceName);
+			lblSelectionField.setText("Preserve Guarantees from " + sourceName);
 			lblSelectionField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 			GridData selectionFieldLayoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -154,7 +207,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 			selectionField.setLayoutData(selectionFieldLayoutData);
 
 			btnPropagateGuarantees.clear();
-			for (String guarantee : strSourceGuarantees) {
+			for (String guarantee : sourceGuarantees) {
 				Button selectGuarantee = new Button(selectionField, SWT.CHECK);
 				String formattedGuarantee = guarantee.trim();
 				formattedGuarantee = formattedGuarantee
@@ -175,11 +228,18 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 * @param container
 	 */
 	private void saveInput() {
-		strFilterImplementationLanguage = txtFilterImplementationLanguage.getText();
-		strFilterImplementationName = txtFilterImplementationName.getText();
-		strFilterResoluteClause = cboFilterResoluteClause.getText();
-		strAgreeProperty = txtAgreeProperty.getText();
-		strPropagateGuarantees.clear();
+		filterImplementationLanguage = txtFilterImplementationLanguage.getText();
+		filterImplementationName = txtFilterImplementationName.getText();
+		logPortType = null;
+		for (int i = 0; i < btnLogPortType.size(); i++) {
+			if (btnLogPortType.get(i).getSelection()) {
+				logPortType = PortCategory.get(i);
+				break;
+			}
+		}
+		filterRequirement = cboFilterRequirement.getText();
+		agreeProperty = txtAgreeProperty.getText();
+		propagateGuarantees.clear();
 		for (int i = 0; i < btnPropagateGuarantees.size(); i++) {
 			if (btnPropagateGuarantees.get(i).getSelection()) {
 
@@ -191,7 +251,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 //				String desc = nss.getStr().trim();
 //				String id = nss.getName();
 				// Parse the guarantee (for now do it the old fashioned way)
-				String guarantee = strSourceGuarantees.get(i);
+				String guarantee = sourceGuarantees.get(i);
 				String expr = guarantee.substring(guarantee.lastIndexOf(":") + 1, guarantee.lastIndexOf(";")).trim();
 				String desc = guarantee.substring(guarantee.indexOf("\""), guarantee.lastIndexOf("\"") + 1).trim();
 				String id = guarantee.substring(guarantee.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
@@ -204,7 +264,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 					id = "Filter";
 				}
 				guarantee = "guarantee " + id + " " + desc + " : " + expr + ";";
-				strPropagateGuarantees.add(guarantee);
+				propagateGuarantees.add(guarantee);
 			}
 		}
 	}
@@ -216,32 +276,36 @@ public class AddFilterDialog extends TitleAreaDialog {
 	}
 
 	public String getFilterImplementationName() {
-		return strFilterImplementationName;
+		return filterImplementationName;
 	}
 
 	public String getFilterImplementationLanguage() {
-		return strFilterImplementationLanguage;
+		return filterImplementationLanguage;
+	}
+
+	public PortCategory getLogPortType() {
+		return logPortType;
 	}
 
 	public String getAgreeProperty() {
-		return strAgreeProperty;
+		return agreeProperty;
 	}
 
 	public List<String> getGuaranteeList() {
-		return strPropagateGuarantees;
+		return propagateGuarantees;
 	}
 
-	public String getResoluteClause() {
-		return strFilterResoluteClause;
+	public String getRequirement() {
+		return filterRequirement;
 	}
 
 	public void setGuaranteeList(String sourceName, List<String> guarantees) {
-		strSourceName = sourceName;
-		strSourceGuarantees = guarantees;
+		this.sourceName = sourceName;
+		this.sourceGuarantees = guarantees;
 	}
 
-	public void setResoluteClauses(List<String> clauses) {
-		strResoluteClauses = clauses;
+	public void setRequirements(List<String> requirements) {
+		this.requirements = requirements;
 	}
 
 }

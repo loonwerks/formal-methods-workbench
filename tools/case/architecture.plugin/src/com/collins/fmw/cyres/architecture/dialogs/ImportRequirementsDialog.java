@@ -175,8 +175,9 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 		omittedRequirements.clear();
 		for (int i = 0; i < btnReqs.size(); i++) {
 
-			Classifier contextClassifier = CyberRequirement.getClassifier(lblComponents.get(i));
-			if (contextClassifier == null) {
+			// Find the context (component, connection, etc) in the model
+			Classifier contextClassifier = CyberRequirement.getImplementationClassifier(lblComponents.get(i));
+			if (contextClassifier == null && btnReqs.get(i).getSelection()) {
 				Dialog.showError("Unknown context for " + btnReqs.get(i).getText(), lblComponents.get(i)
 						+ " could not be found in any AADL file in the project. A requirement context must be valid in order to import requirements into model.  This requirement will be de-selected.");
 				// Uncheck this requirement
@@ -193,11 +194,11 @@ public class ImportRequirementsDialog extends TitleAreaDialog {
 				}
 
 				importedRequirements.add(new CyberRequirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(),
-						lblReqTexts.get(i), contextClassifier, btnAgreeProps.get(i).getSelection(), ""));
+						lblReqTexts.get(i), lblComponents.get(i), btnAgreeProps.get(i).getSelection(), ""));
 			} else {
 				omittedRequirements
 						.add(new CyberRequirement(btnReqs.get(i).getText(), txtIDs.get(i).getText(), lblReqTexts.get(i),
-								contextClassifier, btnAgreeProps.get(i).getSelection(),
+								lblComponents.get(i), btnAgreeProps.get(i).getSelection(),
 								txtRationales.get(i).getText()));
 			}
 		}

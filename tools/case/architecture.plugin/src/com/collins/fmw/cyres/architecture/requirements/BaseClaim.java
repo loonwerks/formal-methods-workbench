@@ -15,27 +15,29 @@ public class BaseClaim extends BuiltInClaim {
 	private final String reqId;
 	private final String reqType;
 	private final String reqText;
+	private final String reqContext;
 
 	private FunctionDefinition claimDef = null;
 
-	public BaseClaim(String reqId, String reqType, String reqText) {
+	public BaseClaim(CyberRequirement requirement) {
 		super(BASE_CLAIM);
-		this.reqId = reqId;
-		this.reqType = reqType;
-		this.reqText = reqText;
+		this.reqId = requirement.getId();
+		this.reqType = requirement.getType();
+		this.reqText = requirement.getText();
+		this.reqContext = requirement.getContext();
 	}
 
 	@Override
 	public List<Expr> getCallArgs() {
 		List<Expr> callArgs = new ArrayList<>();
-		callArgs.add(Create.THIS());
+		callArgs.add(Create.THIS(this.reqContext));
 		return callArgs;
 	}
 
 	@Override
 	public List<Arg> getDefinitionParams() {
 		List<Arg> defParams = new ArrayList<>();
-		defParams.add(Create.arg("c", Create.baseType("component")));
+		defParams.add(Create.arg("context", Create.baseType("component")));
 		return defParams;
 	}
 

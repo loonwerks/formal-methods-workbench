@@ -44,50 +44,49 @@ import com.rockwellcollins.atc.resolute.services.ResoluteGrammarAccess
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.osate.xtext.aadl2.properties.formatting2.PropertiesFormatter
 import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement
+import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
+import java.util.List
 
 class ResoluteFormatter extends PropertiesFormatter {
 	
 	@Inject extension ResoluteGrammarAccess
 
 	def dispatch void format(ResoluteLibrary resolutelibrary, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		
-		resolutelibrary.surround[noSpace]
-
+		resolutelibrary.surround[noSpace];
 		for (Definition definitions : resolutelibrary.getDefinitions()) {
 			format(definitions, document);
 		}
 	}
 
 	def dispatch void format(ListType listtype, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		listtype.regionFor.keyword("[").append[noSpace];
+		listtype.regionFor.keyword("]").prepend[noSpace];
 		format(listtype.getType(), document);
 	}
 
 	def dispatch void format(SetType settype, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		settype.regionFor.keyword("{").append[noSpace];
+		settype.regionFor.keyword("}").prepend[noSpace];
 		format(settype.getType(), document);
 	}
 
 	def dispatch void format(BaseType basetype, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		basetype.regionFor.keyword("<").append[noSpace];
+		basetype.regionFor.keyword(">").prepend[noSpace];
 		format(basetype.getParamType(), document);
 	}
 
-	def dispatch void format(Arg arg, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+	def dispatch void format(Arg arg, extension IFormattableDocument document) { 
 		format(arg.getType(), document);
 	}
 
 	def dispatch void format(QuantArg quantarg, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		format(quantarg.getExpr(), document);
+		formatExpr(quantarg.getExpr(), document);
 	}
 
 	def dispatch void format(ConstantDefinition constantdefinition, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(constantdefinition.getType(), document);
-		format(constantdefinition.getExpr(), document);
+		formatExpr(constantdefinition.getExpr(), document);
 	}
 
 	def dispatch void format(FunctionDefinition functiondefinition, extension IFormattableDocument document) {
@@ -95,61 +94,59 @@ class ResoluteFormatter extends PropertiesFormatter {
 		functiondefinition.regionFor.keyword("(").surround[noSpace];
 		functiondefinition.regionFor.keyword(")").prepend[noSpace];
 		functiondefinition.regionFor.keywords(",").forEach[prepend[noSpace]];
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		for (Arg args : functiondefinition.getArgs()) {
 			format(args, document);
 		}
 		format(functiondefinition.getBody(), document);
-		functiondefinition.append[newLines=2]
+		functiondefinition.append[newLines=2];
 	}
 
 	def dispatch void format(FunctionBody functionbody, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		functionbody.regionFor.keyword("=").prepend[oneSpace].append[newLines = 1];
+		functionbody.getExpr().surround[indent];
 		format(functionbody.getType(), document);
-		format(functionbody.getExpr(), document);
+		formatExpr(functionbody.getExpr(), document);
+		
 	}
 
 	def dispatch void format(ClaimBody claimbody, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		claimbody.regionFor.keyword("<=").prepend[oneSpace].append[newLines = 1]
+		claimbody.regionFor.keyword("<=").prepend[oneSpace].append[newLines = 1];
+		
+		claimbody.regionFor.keyword("**").surround[indent];
+		
 		for (ClaimText claim : claimbody.getClaim()) {
 			format(claim, document);
 		}
 		
-		claimbody.getExpr().prepend[newLines = 1]
-		format(claimbody.getExpr(), document);
+		claimbody.getExpr().prepend[newLines = 1].surround[indent];
+		formatExpr(claimbody.getExpr(), document);
 	}
 
 	def dispatch void format(BinaryExpr binaryexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		format(binaryexpr.getRight(), document);
-		format(binaryexpr.getLeft(), document);
+		formatExpr(binaryexpr.getRight(), document);
+		formatExpr(binaryexpr.getLeft(), document);
 	}
 
 	def dispatch void format(InstanceOfExpr instanceofexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(instanceofexpr.getType(), document);
-		format(instanceofexpr.getExpr(), document);
+		formatExpr(instanceofexpr.getExpr(), document);
 	}
 
 	def dispatch void format(UnaryExpr unaryexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		format(unaryexpr.getExpr(), document);
+		formatExpr(unaryexpr.getExpr(), document);
 	}
 
 	def dispatch void format(CastExpr castexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(castexpr.getType(), document);
-		format(castexpr.getExpr(), document);
+		formatExpr(castexpr.getExpr(), document);
 	}
 
 	def dispatch void format(ThisExpr thisexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		thisexpr.regionFor.keyword(".").surround[noSpace];
 		format(thisexpr.getSub(), document);
 	}
 
 	def dispatch void format(FailExpr failexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(failexpr.getVal(), document);
 		for (ClaimText failmsg : failexpr.getFailmsg()) {
 			format(failmsg, document);
@@ -157,107 +154,113 @@ class ResoluteFormatter extends PropertiesFormatter {
 	}
 
 	def dispatch void format(IntExpr intexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(intexpr.getVal(), document);
 	}
 
 	def dispatch void format(RealExpr realexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(realexpr.getVal(), document);
 	}
 
 	def dispatch void format(BoolExpr boolexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(boolexpr.getVal(), document);
 	}
 
 	def dispatch void format(StringExpr stringexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(stringexpr.getVal(), document);
 	}
 
 	def dispatch void format(IfThenElseExpr ifthenelseexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		format(ifthenelseexpr.getCond(), document);
-		format(ifthenelseexpr.getThen(), document);
-		format(ifthenelseexpr.getElse(), document);
+		ifthenelseexpr.regionFor.keyword("then").append[newLines=1];
+		ifthenelseexpr.regionFor.keyword("else").prepend[newLines=1].append[newLines=1];
+		ifthenelseexpr.getThen().surround[indent];
+		ifthenelseexpr.getElse().surround[indent];
+		
+		formatExpr(ifthenelseexpr.getCond(), document);
+		formatExpr(ifthenelseexpr.getThen(), document);
+		formatExpr(ifthenelseexpr.getElse(), document);
 	}
 
 	def dispatch void format(QuantifiedExpr quantifiedexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		for (Arg args : quantifiedexpr.getArgs()) {
 			format(args, document);
 		}
-		format(quantifiedexpr.getExpr(), document);
+		formatExpr(quantifiedexpr.getExpr(), document);
 	}
 
 	def dispatch void format(BuiltInFnCallExpr builtinfncallexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		builtinfncallexpr.regionFor.keyword("(").surround[noSpace];
+		builtinfncallexpr.regionFor.keyword(")").prepend[noSpace];
+		builtinfncallexpr.regionFor.keywords(",").forEach[prepend[noSpace]];
 		for (Expr args : builtinfncallexpr.getArgs()) {
-			format(args, document);
+			formatExpr(args, document);
 		}
 	}
 
 	def dispatch void format(FnCallExpr fncallexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		
-		fncallexpr.regionFor.keyword("(").surround[noSpace]
-		fncallexpr.regionFor.keyword(")").prepend[noSpace]
-		fncallexpr.regionFor.keywords(",").forEach[prepend[noSpace]]
+		fncallexpr.regionFor.keyword("(").surround[noSpace];
+		fncallexpr.regionFor.keyword(")").prepend[noSpace];
+		fncallexpr.regionFor.keywords(",").forEach[prepend[noSpace]];
 		
 		for (Expr args : fncallexpr.getArgs()) {
-			format(args, document);
+			formatExpr(args, document);
 		}
 	}
 
 	def dispatch void format(ListFilterMapExpr listfiltermapexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		listfiltermapexpr.regionFor.keyword("for").surround[oneSpace];
+		listfiltermapexpr.regionFor.keywords("(").forEach[append[noSpace]];
+		listfiltermapexpr.regionFor.keywords(")").forEach[prepend[noSpace]];
 		for (Arg args : listfiltermapexpr.getArgs()) {
 			format(args, document);
 		}
-		format(listfiltermapexpr.getFilter(), document);
-		format(listfiltermapexpr.getMap(), document);
+		
+		formatExpr(listfiltermapexpr.getFilter(), document);
+		formatExpr(listfiltermapexpr.getMap(), document);
 	}
 
 	def dispatch void format(ListExpr listexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		listexpr.regionFor.keyword("[").append[noSpace];
+		listexpr.regionFor.keyword("]").prepend[noSpace];
 		for (Expr exprs : listexpr.getExprs()) {
-			format(exprs, document);
+			formatExpr(exprs, document);
 		}
 	}
 
 	def dispatch void format(SetFilterMapExpr setfiltermapexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		setfiltermapexpr.regionFor.keyword("for").surround[oneSpace];
+		setfiltermapexpr.regionFor.keywords("(").forEach[append[noSpace]];
+		setfiltermapexpr.regionFor.keywords(")").forEach[prepend[noSpace]];
 		for (Arg args : setfiltermapexpr.getArgs()) {
 			format(args, document);
 		}
-		format(setfiltermapexpr.getFilter(), document);
-		format(setfiltermapexpr.getMap(), document);
+
+		formatExpr(setfiltermapexpr.getFilter(), document);
+		formatExpr(setfiltermapexpr.getMap(), document);
 	}
 
 	def dispatch void format(SetExpr setexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		setexpr.regionFor.keyword("{").append[noSpace];
+		setexpr.regionFor.keyword("}").prepend[noSpace];
 		for (Expr exprs : setexpr.getExprs()) {
-			format(exprs, document);
+			formatExpr(exprs, document);
 		}
 	}
 
 	def dispatch void format(LetExpr letexpr, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		letexpr.regionFor.keyword(";").prepend[noSpace].append[newLines=1];
 		format(letexpr.getBinding(), document);
-		format(letexpr.getExpr(), document);
+		formatExpr(letexpr.getExpr(), document);
 	}
 
 	def dispatch void format(LetBinding letbinding, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(letbinding.getType(), document);
-		format(letbinding.getExpr(), document);
+		formatExpr(letbinding.getExpr(), document);
 	}
 
 	def dispatch void format(ResoluteSubclause resolutesubclause, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		
-		resolutesubclause.surround[noSpace]
+		resolutesubclause.surround[noSpace];
 		
 		for (AnalysisStatement proves : resolutesubclause.getProves()) {
 			format(proves, document);
@@ -265,13 +268,27 @@ class ResoluteFormatter extends PropertiesFormatter {
 	}
 
 	def dispatch void format(NestedDotID nesteddotid, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
 		format(nesteddotid.getSub(), document);
 	}
 
 	def dispatch void format(ProveStatement provestatement, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		provestatement.append[newLines=1]
-		format(provestatement.getExpr(), document);
+		provestatement.append[newLines=1];
+		formatExpr(provestatement.getExpr(), document);
+	}
+	
+	def private void formatExpr(Expr expr, extension IFormattableDocument document) {
+		// ( )
+		expr.regionFor.keyword("(").append[noSpace];
+		expr.regionFor.keyword(")").prepend[noSpace];
+		
+		// [ ]
+		expr.regionFor.keyword("[").append[noSpace];
+		expr.regionFor.keyword("]").prepend[noSpace];
+		
+		// { }
+		expr.regionFor.keyword("{").append[noSpace];
+		expr.regionFor.keyword("}").prepend[noSpace];
+		
+		format(expr, document);
 	}
 }

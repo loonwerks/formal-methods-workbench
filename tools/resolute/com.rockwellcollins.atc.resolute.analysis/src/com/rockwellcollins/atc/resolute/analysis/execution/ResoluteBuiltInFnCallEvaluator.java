@@ -141,7 +141,13 @@ public class ResoluteBuiltInFnCallEvaluator {
 		}
 
 		case "name": {
-			return new StringValue(args.get(0).getNamedElement().getName());
+			if (args.get(0).getNamedElement() instanceof ConnectionInstance) {
+				ConnectionInstance connInst = (ConnectionInstance) args.get(0).getNamedElement();
+				ConnectionReference connRef = connInst.getConnectionReferences().get(0);
+				return new StringValue(connRef.getConnection().getName());
+			} else {
+				return new StringValue(args.get(0).getNamedElement().getName());
+			}
 		}
 
 		case "type": {

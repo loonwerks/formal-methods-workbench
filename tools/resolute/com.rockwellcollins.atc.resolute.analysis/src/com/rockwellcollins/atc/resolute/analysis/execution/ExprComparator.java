@@ -1,6 +1,7 @@
 package com.rockwellcollins.atc.resolute.analysis.execution;
 
 import org.eclipse.emf.common.util.EList;
+import org.osate.aadl2.NamedElement;
 
 import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
@@ -12,6 +13,7 @@ import com.rockwellcollins.atc.resolute.resolute.IdExpr;
 import com.rockwellcollins.atc.resolute.resolute.IfThenElseExpr;
 import com.rockwellcollins.atc.resolute.resolute.IntExpr;
 import com.rockwellcollins.atc.resolute.resolute.LibraryFnCallExpr;
+import com.rockwellcollins.atc.resolute.resolute.NestedDotID;
 import com.rockwellcollins.atc.resolute.resolute.QuantifiedExpr;
 import com.rockwellcollins.atc.resolute.resolute.RealExpr;
 import com.rockwellcollins.atc.resolute.resolute.StringExpr;
@@ -46,7 +48,24 @@ public class ExprComparator {
 				ThisExpr e0 = (ThisExpr) expr0;
 				ThisExpr e1 = (ThisExpr) expr1;
 				if (e0.getSub() != null || e1.getSub() != null) {
-					return e0.getSub().equals(e1.getSub());
+					if (e0.getSub() != null && e1.getSub() != null) {
+						NestedDotID sub0 = e0.getSub();
+						NestedDotID sub1 = e1.getSub();
+						while (sub0.getSub() != null) {
+							sub0 = sub0.getSub();
+						}
+						while (sub1.getSub() != null) {
+							sub1 = sub1.getSub();
+						}
+						if (sub0.getBase() instanceof NamedElement && sub1.getBase() instanceof NamedElement) {
+							return sub0.getBase().getQualifiedName()
+									.equalsIgnoreCase(sub1.getBase().getQualifiedName());
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
 				} else {
 					return true;
 				}

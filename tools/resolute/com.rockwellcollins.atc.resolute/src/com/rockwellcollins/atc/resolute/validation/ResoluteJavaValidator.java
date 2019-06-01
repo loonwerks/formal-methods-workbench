@@ -1084,6 +1084,21 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 			}
 
 			if (expr instanceof ThisExpr) {
+
+				NestedDotID subExpr = ((ThisExpr) expr).getSub();
+				if (subExpr != null) {
+					while (subExpr.getSub() != null) {
+						subExpr = subExpr.getSub();
+					}
+					if (subExpr.getBase() instanceof Subcomponent) {
+						Subcomponent subComp = (Subcomponent) subExpr.getBase();
+						ResoluteType type = getComponentType(subComp.getComponentType());
+						if (type != null) {
+							return type;
+						}
+					}
+				}
+
 				Classifier parent = expr.getContainingClassifier();
 				// A 'this' expression should always have a containing
 				// classifier that is of component type. This may not
@@ -1091,6 +1106,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 				// rather than a ResoluteSubclause. In this case an error
 				// will be thrown by the type checking function for 'this'
 				// statements above
+
 				if (parent instanceof ComponentImplementation) {
 					ComponentImplementation ci = (ComponentImplementation) parent;
 					ResoluteType type = getComponentType(ci.getType());

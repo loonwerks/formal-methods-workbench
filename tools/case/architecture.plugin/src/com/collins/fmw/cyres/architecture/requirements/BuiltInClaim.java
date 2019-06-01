@@ -74,9 +74,10 @@ public abstract class BuiltInClaim {
 
 	protected ProveStatement buildClaimCall(ProveStatement prove) {
 
-		// Get current claim call for the requirement
+		// Get current claim call for the requirement (could be null if there isn't one)
 		FnCallExpr expr = (FnCallExpr) prove.getExpr();
 
+		// Get the required call arguments from the built-in claim
 		List<Expr> callArgs = getCallArgs();
 
 		ClaimCallBuilder builder = new ClaimCallBuilder(prove);

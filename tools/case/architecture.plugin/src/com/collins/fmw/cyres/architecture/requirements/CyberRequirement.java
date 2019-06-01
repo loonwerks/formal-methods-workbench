@@ -15,7 +15,9 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PrivatePackageSection;
+import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.aadl2.util.Aadl2Util;
 import org.osate.ui.dialogs.Dialog;
@@ -60,15 +62,15 @@ public class CyberRequirement {
 		this.rationale = rationale;
 	}
 
-	public CyberRequirement(String type, String id, String text, Classifier contextClassifier, boolean agree,
-			String rationale) {
-		this.type = type;
-		this.id = id;
-		this.text = text;
-		this.context = contextClassifier.getQualifiedName();
-		this.agree = agree;
-		this.rationale = rationale;
-	}
+//	public CyberRequirement(String type, String id, String text, Classifier contextClassifier, boolean agree,
+//			String rationale) {
+//		this.type = type;
+//		this.id = id;
+//		this.text = text;
+//		this.context = contextClassifier.getQualifiedName();
+//		this.agree = agree;
+//		this.rationale = rationale;
+//	}
 
 	public String getType() {
 		return this.type;
@@ -101,7 +103,11 @@ public class CyberRequirement {
 		}
 
 		// Get modification context
-		Classifier modificationContext = getModificationContext(resource);
+		Classifier implementationContext = getImplementationClassifier(this.context);
+		if (implementationContext == null) {
+			throw new RuntimeException("Unable to determine requirement context.");
+		}
+		Classifier modificationContext = getModificationContext(implementationContext.getQualifiedName(), resource);
 		if (modificationContext == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
@@ -286,7 +292,7 @@ public class CyberRequirement {
 
 	public void insertAgree(Resource resource) {
 
-		Classifier modificationContext = getModificationContext(resource);
+		Classifier modificationContext = getModificationContext(this.context, resource);
 		if (modificationContext == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
@@ -334,16 +340,25 @@ public class CyberRequirement {
 		subclause.setParsedAnnexSubclause(agreeSubclause);
 	}
 
-	private Classifier getModificationContext(Resource resource) {
+	private Classifier getModificationContext(String qualifiedName, Resource resource) {
 		// Get modification context
 		Classifier modificationContext = null;
+//		Classifier implementationContext = getImplementationClassifier(this.context);
 		TreeIterator<EObject> x = EcoreUtil.getAllContents(resource, true);
 		while (x.hasNext()) {
 			EObject next = x.next();
-			if (next instanceof Classifier) {
-				Classifier nextClass = (Classifier) next;
-				if (nextClass.getQualifiedName().equalsIgnoreCase(this.context)) {
-					modificationContext = nextClass;
+			if (next instanceof NamedElement) {
+				NamedElement nextElement = (NamedElement) next;
+				if (nextElement.getQualifiedName() != null
+						&& nextElement.getQualifiedName().equalsIgnoreCase(qualifiedName)) {
+					if (nextElement instanceof Subcomponent) {
+						Subcomponent sub = (Subcomponent) nextElement;
+						modificationContext = sub.getComponentType();
+					} else {
+//				if (nextClass.getQualifiedName().equalsIgnoreCase(this.context)) {
+//				if (nextClass.getQualifiedName().equalsIgnoreCase(implementationContext.getQualifiedName())) {
+						modificationContext = (Classifier) nextElement;
+					}
 					break;
 				}
 			}
@@ -351,17 +366,33 @@ public class CyberRequirement {
 		return modificationContext;
 	}
 
-	public static Classifier getClassifier(String qualifiedName) {
+	/**
+	 * Return the component implementation referred to by the qualified name
+	 * @param qualifiedName
+	 * @return
+	 */
+	public static Classifier getImplementationClassifier(String qualifiedName) {
 		Classifier classifier = null;
 		if (!qualifiedName.contains("::")) {
 			return null;
 		}
 		String pkgName = Aadl2Util.getPackageName(qualifiedName);
 
+		// The qualified name should either refer to a component implementation
+		// or a component implementation's subcomponent or connection
+		// A component implementation qualified name will appear as <Package>::<Component Implementation>
+		// A subcomponent/connection qualified name will appear as <Package>::<Component Implementation>.<Subcomponent/Connection>
+		// Since we want to return the component implementation, we want to truncate the subcomponent from the qualified name
+		String[] parts = qualifiedName.split("\\.");
+		String compImplName = "";
+		if (parts.length > 0) {
+			compImplName = parts[0] + "." + parts[1];
+		}
+
 		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
 			if (pkg.getName().equalsIgnoreCase(pkgName)) {
 				for (Classifier c : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {
-					if (c.getQualifiedName().equalsIgnoreCase(qualifiedName)) {
+					if (c.getQualifiedName().equalsIgnoreCase(compImplName)) {
 						classifier = c;
 						break;
 					}
@@ -374,7 +405,7 @@ public class CyberRequirement {
 	}
 
 	public IFile getContainingFile() {
-		Classifier modificationContext = getClassifier(this.context);
+		Classifier modificationContext = getImplementationClassifier(this.context);
 		if (modificationContext == null) {
 			return null;
 		}

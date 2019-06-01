@@ -2,8 +2,10 @@ package com.collins.fmw.cyres.architecture.requirements;
 
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.BooleanLiteral;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.StringLiteral;
+import org.osate.aadl2.Subcomponent;
 
 import com.rockwellcollins.atc.resolute.resolute.Arg;
 import com.rockwellcollins.atc.resolute.resolute.BaseType;
@@ -13,6 +15,7 @@ import com.rockwellcollins.atc.resolute.resolute.Expr;
 import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 import com.rockwellcollins.atc.resolute.resolute.IdExpr;
+import com.rockwellcollins.atc.resolute.resolute.NestedDotID;
 import com.rockwellcollins.atc.resolute.resolute.ResoluteFactory;
 import com.rockwellcollins.atc.resolute.resolute.StringExpr;
 import com.rockwellcollins.atc.resolute.resolute.ThisExpr;
@@ -82,6 +85,32 @@ public class Create {
 
 	public static ThisExpr THIS() {
 		return factory.createThisExpr();
+	}
+
+	public static ThisExpr THIS(String qualifiedName) {
+		ThisExpr thisExpr = factory.createThisExpr();
+		Classifier classifier = CyberRequirement.getImplementationClassifier(qualifiedName);
+		if (classifier != null) {
+			for (NamedElement subComp : classifier.getOwnedMembers()) {
+				if (subComp.getQualifiedName().equalsIgnoreCase(qualifiedName)) {
+					NestedDotID id = factory.createNestedDotID();
+					id.setBase(subComp);
+					thisExpr.setSub(id);
+					break;
+				}
+			}
+		}
+		return thisExpr;
+	}
+
+	public static ThisExpr THIS(Subcomponent comp) {
+		ThisExpr thisExpr = factory.createThisExpr();
+		if (comp != null) {
+			NestedDotID id = factory.createNestedDotID();
+			id.setBase(comp);
+			thisExpr.setSub(id);
+		}
+		return thisExpr;
 	}
 
 	public static BoolExpr TRUE() {

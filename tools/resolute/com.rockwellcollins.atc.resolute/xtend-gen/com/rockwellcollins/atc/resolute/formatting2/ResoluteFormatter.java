@@ -85,14 +85,38 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final ListType listtype, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(listtype).keyword("["), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(listtype).keyword("]"), _function_1);
     this.format(listtype.getType(), document);
   }
   
   protected void _format(final SetType settype, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(settype).keyword("{"), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(settype).keyword("}"), _function_1);
     this.format(settype.getType(), document);
   }
   
   protected void _format(final BaseType basetype, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(basetype).keyword("<"), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(basetype).keyword(">"), _function_1);
     this.format(basetype.getParamType(), document);
   }
   
@@ -101,12 +125,12 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final QuantArg quantarg, @Extension final IFormattableDocument document) {
-    this.format(quantarg.getExpr(), document);
+    this.formatExpr(quantarg.getExpr(), document);
   }
   
   protected void _format(final ConstantDefinition constantdefinition, @Extension final IFormattableDocument document) {
     this.format(constantdefinition.getType(), document);
-    this.format(constantdefinition.getExpr(), document);
+    this.formatExpr(constantdefinition.getExpr(), document);
   }
   
   protected void _format(final FunctionDefinition functiondefinition, @Extension final IFormattableDocument document) {
@@ -137,8 +161,19 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final FunctionBody functionbody, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.oneSpace();
+    };
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    document.append(document.prepend(this.textRegionExtensions.regionFor(functionbody).keyword("="), _function), _function_1);
+    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
+      it.indent();
+    };
+    document.<Expr>surround(functionbody.getExpr(), _function_2);
     this.format(functionbody.getType(), document);
-    this.format(functionbody.getExpr(), document);
+    this.formatExpr(functionbody.getExpr(), document);
   }
   
   protected void _format(final ClaimBody claimbody, @Extension final IFormattableDocument document) {
@@ -149,37 +184,48 @@ public class ResoluteFormatter extends PropertiesFormatter {
       it.setNewLines(1);
     };
     document.append(document.prepend(this.textRegionExtensions.regionFor(claimbody).keyword("<="), _function), _function_1);
+    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
+      it.indent();
+    };
+    document.surround(this.textRegionExtensions.regionFor(claimbody).keyword("**"), _function_2);
     EList<ClaimText> _claim = claimbody.getClaim();
     for (final ClaimText claim : _claim) {
       this.format(claim, document);
     }
-    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
+    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
       it.setNewLines(1);
     };
-    document.<Expr>prepend(claimbody.getExpr(), _function_2);
-    this.format(claimbody.getExpr(), document);
+    final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+      it.indent();
+    };
+    document.<Expr>surround(document.<Expr>prepend(claimbody.getExpr(), _function_3), _function_4);
+    this.formatExpr(claimbody.getExpr(), document);
   }
   
   protected void _format(final BinaryExpr binaryexpr, @Extension final IFormattableDocument document) {
-    this.format(binaryexpr.getRight(), document);
-    this.format(binaryexpr.getLeft(), document);
+    this.formatExpr(binaryexpr.getRight(), document);
+    this.formatExpr(binaryexpr.getLeft(), document);
   }
   
   protected void _format(final InstanceOfExpr instanceofexpr, @Extension final IFormattableDocument document) {
     this.format(instanceofexpr.getType(), document);
-    this.format(instanceofexpr.getExpr(), document);
+    this.formatExpr(instanceofexpr.getExpr(), document);
   }
   
   protected void _format(final UnaryExpr unaryexpr, @Extension final IFormattableDocument document) {
-    this.format(unaryexpr.getExpr(), document);
+    this.formatExpr(unaryexpr.getExpr(), document);
   }
   
   protected void _format(final CastExpr castexpr, @Extension final IFormattableDocument document) {
     this.format(castexpr.getType(), document);
-    this.format(castexpr.getExpr(), document);
+    this.formatExpr(castexpr.getExpr(), document);
   }
   
   protected void _format(final ThisExpr thisexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.surround(this.textRegionExtensions.regionFor(thisexpr).keyword("."), _function);
     this.format(thisexpr.getSub(), document);
   }
   
@@ -208,9 +254,28 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final IfThenElseExpr ifthenelseexpr, @Extension final IFormattableDocument document) {
-    this.format(ifthenelseexpr.getCond(), document);
-    this.format(ifthenelseexpr.getThen(), document);
-    this.format(ifthenelseexpr.getElse(), document);
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    document.append(this.textRegionExtensions.regionFor(ifthenelseexpr).keyword("then"), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    document.append(document.prepend(this.textRegionExtensions.regionFor(ifthenelseexpr).keyword("else"), _function_1), _function_2);
+    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+      it.indent();
+    };
+    document.<Expr>surround(ifthenelseexpr.getThen(), _function_3);
+    final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+      it.indent();
+    };
+    document.<Expr>surround(ifthenelseexpr.getElse(), _function_4);
+    this.formatExpr(ifthenelseexpr.getCond(), document);
+    this.formatExpr(ifthenelseexpr.getThen(), document);
+    this.formatExpr(ifthenelseexpr.getElse(), document);
   }
   
   protected void _format(final QuantifiedExpr quantifiedexpr, @Extension final IFormattableDocument document) {
@@ -218,13 +283,28 @@ public class ResoluteFormatter extends PropertiesFormatter {
     for (final Arg args : _args) {
       this.format(args, document);
     }
-    this.format(quantifiedexpr.getExpr(), document);
+    this.formatExpr(quantifiedexpr.getExpr(), document);
   }
   
   protected void _format(final BuiltInFnCallExpr builtinfncallexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.surround(this.textRegionExtensions.regionFor(builtinfncallexpr).keyword("("), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(builtinfncallexpr).keyword(")"), _function_1);
+    final Consumer<ISemanticRegion> _function_2 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_3);
+    };
+    this.textRegionExtensions.regionFor(builtinfncallexpr).keywords(",").forEach(_function_2);
     EList<Expr> _args = builtinfncallexpr.getArgs();
     for (final Expr args : _args) {
-      this.format(args, document);
+      this.formatExpr(args, document);
     }
   }
   
@@ -246,50 +326,109 @@ public class ResoluteFormatter extends PropertiesFormatter {
     this.textRegionExtensions.regionFor(fncallexpr).keywords(",").forEach(_function_2);
     EList<Expr> _args = fncallexpr.getArgs();
     for (final Expr args : _args) {
-      this.format(args, document);
+      this.formatExpr(args, document);
     }
   }
   
   protected void _format(final ListFilterMapExpr listfiltermapexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.oneSpace();
+    };
+    document.surround(this.textRegionExtensions.regionFor(listfiltermapexpr).keyword("for"), _function);
+    final Consumer<ISemanticRegion> _function_1 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.append(it, _function_2);
+    };
+    this.textRegionExtensions.regionFor(listfiltermapexpr).keywords("(").forEach(_function_1);
+    final Consumer<ISemanticRegion> _function_2 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_3);
+    };
+    this.textRegionExtensions.regionFor(listfiltermapexpr).keywords(")").forEach(_function_2);
     EList<Arg> _args = listfiltermapexpr.getArgs();
     for (final Arg args : _args) {
       this.format(args, document);
     }
-    this.format(listfiltermapexpr.getFilter(), document);
-    this.format(listfiltermapexpr.getMap(), document);
+    this.formatExpr(listfiltermapexpr.getFilter(), document);
+    this.formatExpr(listfiltermapexpr.getMap(), document);
   }
   
   protected void _format(final ListExpr listexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(listexpr).keyword("["), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(listexpr).keyword("]"), _function_1);
     EList<Expr> _exprs = listexpr.getExprs();
     for (final Expr exprs : _exprs) {
-      this.format(exprs, document);
+      this.formatExpr(exprs, document);
     }
   }
   
   protected void _format(final SetFilterMapExpr setfiltermapexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.oneSpace();
+    };
+    document.surround(this.textRegionExtensions.regionFor(setfiltermapexpr).keyword("for"), _function);
+    final Consumer<ISemanticRegion> _function_1 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.append(it, _function_2);
+    };
+    this.textRegionExtensions.regionFor(setfiltermapexpr).keywords("(").forEach(_function_1);
+    final Consumer<ISemanticRegion> _function_2 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_3);
+    };
+    this.textRegionExtensions.regionFor(setfiltermapexpr).keywords(")").forEach(_function_2);
     EList<Arg> _args = setfiltermapexpr.getArgs();
     for (final Arg args : _args) {
       this.format(args, document);
     }
-    this.format(setfiltermapexpr.getFilter(), document);
-    this.format(setfiltermapexpr.getMap(), document);
+    this.formatExpr(setfiltermapexpr.getFilter(), document);
+    this.formatExpr(setfiltermapexpr.getMap(), document);
   }
   
   protected void _format(final SetExpr setexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(setexpr).keyword("{"), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(setexpr).keyword("}"), _function_1);
     EList<Expr> _exprs = setexpr.getExprs();
     for (final Expr exprs : _exprs) {
-      this.format(exprs, document);
+      this.formatExpr(exprs, document);
     }
   }
   
   protected void _format(final LetExpr letexpr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    document.append(document.prepend(this.textRegionExtensions.regionFor(letexpr).keyword(";"), _function), _function_1);
     this.format(letexpr.getBinding(), document);
-    this.format(letexpr.getExpr(), document);
+    this.formatExpr(letexpr.getExpr(), document);
   }
   
   protected void _format(final LetBinding letbinding, @Extension final IFormattableDocument document) {
     this.format(letbinding.getType(), document);
-    this.format(letbinding.getExpr(), document);
+    this.formatExpr(letbinding.getExpr(), document);
   }
   
   protected void _format(final ResoluteSubclause resolutesubclause, @Extension final IFormattableDocument document) {
@@ -312,7 +451,35 @@ public class ResoluteFormatter extends PropertiesFormatter {
       it.setNewLines(1);
     };
     document.<ProveStatement>append(provestatement, _function);
-    this.format(provestatement.getExpr(), document);
+    this.formatExpr(provestatement.getExpr(), document);
+  }
+  
+  private void formatExpr(final Expr expr, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(expr).keyword("("), _function);
+    final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(expr).keyword(")"), _function_1);
+    final Procedure1<IHiddenRegionFormatter> _function_2 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(expr).keyword("["), _function_2);
+    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(expr).keyword("]"), _function_3);
+    final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.append(this.textRegionExtensions.regionFor(expr).keyword("{"), _function_4);
+    final Procedure1<IHiddenRegionFormatter> _function_5 = (IHiddenRegionFormatter it) -> {
+      it.noSpace();
+    };
+    document.prepend(this.textRegionExtensions.regionFor(expr).keyword("}"), _function_5);
+    this.format(expr, document);
   }
   
   public void format(final Object resolutesubclause, final IFormattableDocument document) {

@@ -33,6 +33,7 @@ import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
+import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.PropertyExpression;
@@ -55,6 +56,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	static final String AM_REQUEST_MSG_NAME = "CASE_AttestationRequestMsg";
 	static final String AM_RESPONSE_MSG_NAME = "CASE_AttestationResponseMsg";
 	static final String AM_COMP_TYPE_NAME = "CASE_AttestationManager";
+	static final String AM_LOG_PORT_NAME = "message_log";
 	static final String AM_PORT_ATTESTATION_REQUEST_NAME = "am_request";
 	static final String AM_PORT_ATTESTATION_RESPONSE_NAME = "am_response";
 	static final String AM_IMPL_NAME = "AM";
@@ -64,7 +66,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	private String implementationLanguage;
 	private String cacheTimeout;
 	private String cacheSize;
-	private String logSize;
+	private PortCategory logPortType;
 	private String attestationRequirement;
 	private boolean propagateGuarantees;
 	private String attestationAgreeProperty;
@@ -115,10 +117,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			if (cacheSize.isEmpty()) {
 				cacheSize = "0";
 			}
-			logSize = wizard.getLogSize();
-			if (logSize.isEmpty()) {
-				logSize = "0";
-			}
+			logPortType = wizard.getLogPortType();
 			attestationRequirement = wizard.getRequirement();
 			propagateGuarantees = wizard.getPropagateGuarantees();
 			attestationAgreeProperty = wizard.getAgreeProperty();
@@ -265,6 +264,20 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				amRes.setName(AM_PORT_ATTESTATION_RESPONSE_NAME);
 				amRes.setIn(true);
 
+				// Create log port, if necessary
+				if (logPortType != null) {
+					Port logPort = null;
+					if (logPortType == PortCategory.EVENT) {
+						logPort = ComponentCreateHelper.createOwnedEventPort(attestationManagerType);
+					} else if (logPortType == PortCategory.DATA) {
+						logPort = ComponentCreateHelper.createOwnedDataPort(attestationManagerType);
+					} else {
+						logPort = ComponentCreateHelper.createOwnedEventDataPort(attestationManagerType);
+					}
+					logPort.setOut(true);
+					logPort.setName(AM_LOG_PORT_NAME);
+				}
+
 				// Add attestation request/response ports on comm driver (or create new comm driver component?)
 				final ComponentType commDriverType = commDriver.getComponentType();
 				final EventDataPort commReq = (EventDataPort) ComponentCreateHelper
@@ -294,10 +307,16 @@ public class AddAttestationManagerHandler extends AadlHandler {
 							attestationAgreeProperty.toLowerCase().indexOf("guarantee ") + "guarantee ".length(),
 							attestationAgreeProperty.indexOf("\"")).trim();
 				} catch (IndexOutOfBoundsException e) {
-					// agree property is malformed, so leave blank
+					if (!attestationAgreeProperty.isEmpty()) {
+						// agree property is malformed, so leave blank
+						Dialog.showWarning("Add Attestation Manager",
+								"Attestation Manager AGREE statement is malformed.");
+					}
 				}
-				if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType, casePropSet)) {
-//					return;
+				if (!attestationPropId.isEmpty()) {
+					if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType, casePropSet)) {
+//						return;
+					}
 				}
 
 				// Put Attestation Manager in proper location (just after the comm driver)
@@ -325,24 +344,25 @@ public class AddAttestationManagerHandler extends AadlHandler {
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// CASE_Properties::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerImpl,
+				if (!implementationLanguage.isEmpty()) {
+					if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerImpl,
 						casePropSet)) {
-//					return;
+//						return;
+					}
 				}
 
 				// CASE_Properties::CACHE_TIMEOUT property
-				if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
-//					return;
+				if (!cacheTimeout.isEmpty()) {
+					if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
+//						return;
+					}
 				}
 
 				// CASE_Properties::CACHE_SIZE property
-				if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerImpl, casePropSet)) {
-//					return;
-				}
-
-				// CASE_Properties::LOG_SIZE property
-				if (!addPropertyAssociation("LOG_SIZE", logSize, attestationManagerImpl, casePropSet)) {
-//					return;
+				if (!cacheSize.isEmpty()) {
+					if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerImpl, casePropSet)) {
+//						return;
+					}
 				}
 
 				// Get the parent component implementation
@@ -439,17 +459,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Add add_attestation claims to resolute prove statement, if applicable
 				if (!attestationRequirement.isEmpty()) {
 
-					NamedElement commDriverComp = null;
-					if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
-						// Get the component implementation
-						commDriverComp = commDriver.getComponentImplementation();
-					} else {
-						// Get the component type
-						commDriverComp = commDriverType;
-					}
-
 					RequirementsManager.getInstance().modifyRequirement(attestationRequirement, resource,
-							new AddAttestationManagerClaim(commDriverComp, attestationManagerImpl));
+							new AddAttestationManagerClaim(commDriver, attestationManagerSubcomp));
 
 				}
 

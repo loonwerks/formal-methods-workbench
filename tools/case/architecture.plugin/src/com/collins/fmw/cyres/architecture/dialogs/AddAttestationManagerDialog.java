@@ -9,13 +9,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.aadl2.PortCategory;
 import org.osate.ui.dialogs.Dialog;
 
 /**
@@ -30,7 +33,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private Text txtImplementationLanguage;
 	private Text txtCacheTimeout;
 	private Combo cboCacheSize;
-	private Text txtLogSize;
+	private List<Button> btnLogPortType = new ArrayList<>();
 	private Combo cboRequirement;
 	private Button btnPropagateGuarantees;
 	private Text txtAgreeProperty;
@@ -38,7 +41,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private String implementationLanguage;
 	private String cacheTimeout;
 	private String cacheSize;
-	private String logSize;
+	private PortCategory logPortType = null;
 	private String requirement;
 	private boolean propagateGuarantees;
 	private String commDriver = "";
@@ -93,7 +96,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		createImplementationLanguageField(container);
 		createCacheTimeoutField(container);
 		createCacheSizeField(container);
-		createLogSizeField(container);
+		createLogPortField(container);
 		createRequirementField(container);
 		createPropagateGuaranteesField(container);
 		createAgreePropertyField(container);
@@ -159,16 +162,44 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 
 	}
 
-	private void createLogSizeField(Composite container) {
 
-		Label lblLogSizeField = new Label(container, SWT.NONE);
-		lblLogSizeField.setText("Log Size");
+	/**
+	 * Creates the input field for specifying if the attestation manager should contain
+	 * a port for logging messages
+	 * @param container
+	 */
+	private void createLogPortField(Composite container) {
+		Label lblLogField = new Label(container, SWT.NONE);
+		lblLogField.setText("Create log port");
+		lblLogField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-		GridData dataInfoField = new GridData();
-		dataInfoField.grabExcessHorizontalSpace = true;
-		dataInfoField.horizontalAlignment = SWT.FILL;
-		txtLogSize = new Text(container, SWT.BORDER);
-		txtLogSize.setLayoutData(dataInfoField);
+		// Create a group to contain the log port options
+		Group logGroup = new Group(container, SWT.NONE);
+		logGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		logGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		btnLogPortType.clear();
+
+		Button btnNoLogPort = new Button(logGroup, SWT.RADIO);
+		btnNoLogPort.setText("None");
+		btnNoLogPort.setSelection(true);
+
+		Button btnEventLogPort = new Button(logGroup, SWT.RADIO);
+		btnEventLogPort.setText("Event");
+		btnEventLogPort.setSelection(false);
+
+		Button btnDataLogPort = new Button(logGroup, SWT.RADIO);
+		btnDataLogPort.setText("Data");
+		btnDataLogPort.setSelection(false);
+
+		Button btnEventDataLogPort = new Button(logGroup, SWT.RADIO);
+		btnEventDataLogPort.setText("Event Data");
+		btnEventDataLogPort.setSelection(false);
+
+		btnLogPortType.add(btnDataLogPort);
+		btnLogPortType.add(btnEventLogPort);
+		btnLogPortType.add(btnEventDataLogPort);
+		btnLogPortType.add(btnNoLogPort);
 
 	}
 
@@ -240,7 +271,13 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		implementationLanguage = txtImplementationLanguage.getText();
 		cacheTimeout = txtCacheTimeout.getText();
 		cacheSize = cboCacheSize.getText();
-		logSize = txtLogSize.getText();
+		logPortType = null;
+		for (int i = 0; i < btnLogPortType.size(); i++) {
+			if (btnLogPortType.get(i).getSelection()) {
+				logPortType = PortCategory.get(i);
+				break;
+			}
+		}
 		requirement = cboRequirement.getText();
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees = btnPropagateGuarantees.getSelection();
@@ -262,8 +299,8 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return cacheSize;
 	}
 
-	public String getLogSize() {
-		return logSize;
+	public PortCategory getLogPortType() {
+		return logPortType;
 	}
 
 	public boolean getPropagateGuarantees() {

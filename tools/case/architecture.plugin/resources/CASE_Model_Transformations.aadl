@@ -320,9 +320,9 @@ public
 		---------------------------
 		
 		-- Top-level claim for proper insertion of a filter
-		add_filter(c : component, message_type : data) <=
-			** "Filter inserted before " c **
-			filter_exists(c) and filter_not_bypassed(c, message_type) and filter_prop_checked()
+		add_filter(context : component, filter : component, conn_name : string, msg_type : data) <=
+			** "Filter " filter " is properly added to component " context **
+			filter_exists(filter, context, conn_name) and filter_not_bypassed(filter, context, msg_type) and filter_prop_checked()
 			
 		-- Top-level claim for proper insertion of attestation manager
 		add_attestation_manager(comm_driver : component, attestation_manager : component) <=
@@ -365,32 +365,56 @@ public
 			** "AGREE properties passed" **
 			AgreeLib.hasAgreeProperty(c, property_id) and analysis("AgreeCheck")	
 		
-		-- Ideally, we want to check that there's a filter anywhere between
-		-- pairs of components (such as the ground station and flight planner).
-		-- However, there's a bug in Resolute that prevents us from doing that.
-		-- So for now, we just check to see if there is a filter immediately before 
+		-- Check to see if there is a filter immediately before 
 		-- the component on the communication pathway.
-		filter_exists(c : component) <=
-			** "A filter exists on the communication pathway immediately before " c **
-			-- get incoming connections
-			let in_conns : {connection} = {conn for (conn : connections(c)) | destination_component(conn) = c};
-			exists(conn : in_conns). is_filter(source_component(conn))
+		filter_exists(filter : component, context : component, conn_name : string) <=
+			** "Filter " filter " is connected to component " context " by connection " conn_name **
+			let conns : {connection} = {c for (c : connections(context)) | destination_component(c) = context and source_component(c) = filter};
+			is_filter(filter) and exists(c : conns) . name(c) = conn_name
 	
 		-- Make sure there is no communication pathway that avoids the filter
-	    filter_not_bypassed(c : component, message_type : data) <=
-		    ** "Filter cannot be bypassed" **
-			-- get incoming connections of type Command
-			let cmd_conns : {connection} = {conn for (conn : connections(c)) | 
-											destination_component(conn) = c and has_type(conn) and type(conn) = message_type};
-			-- show that all of these connections come from a filter
-			forall(conn : cmd_conns). is_filter(source_component(conn))
+		filter_not_bypassed(filter : component, context : component, msg_type : data) <=
+			** "Filter " filter " cannot be bypassed" **
+			let filter_srcs : {component} = get_filter_sources(context, filter, msg_type); 
+			let non_filter_srcs : {component} = get_non_filter_sources(context, filter, msg_type); 
+			length(intersect(filter_srcs, non_filter_srcs)) = 0
+		
+		get_non_filter_sources(target : component, filter : component, msg_type : data) : {component} = 
+			let srcs : {component} = {c for (conn : connections (target)) (c : source_component(conn)) | has_type(conn) and type(conn) = msg_type and not (name(source_component(conn)) = name (filter))}; 
+			recursive_backwards_reach(srcs)
+		
+		get_filter_sources(target : component, filter : component, msg_type : data) : {component} = 
+			let srcs : {component} = { c for (conn : connections(target)) (c : source_component(conn)) | has_type(conn) and type(conn) = msg_type and name(source_component(conn)) = name(filter)};
+			prev_reach(srcs)
+		
+		recursive_backwards_reach(curr : {component}) : {component} = 
+			let prev : {component} = union(curr, prev_reach(curr)); 
+			if prev = curr then 
+				curr
+			else 
+				recursive_backwards_reach(prev)
+		
+		prev_reach(curr : {component}) : {component} = 
+			{y for (x : curr) (y : backwards_reachable_components(x))}
+		
+		backwards_reachable_components(comp : component) : {component} = 
+			{c for (conn : connections (comp)) (c : backwards_reachable_components_via_connection(comp, conn))}
+		
+		backwards_reachable_components_via_connection(comp : component, conn : connection) : {component} = 
+			if is_port_connection(conn) then 
+				if destination_component(conn) = comp then 
+					{source_component(conn)} 
+				else 
+					{} 
+			else 
+				{}
 	
 	    -- This should connect to some evidence that the filter was correctly generated
 	    -- and that the proof was emitted and checked.
 	    -- However, this funcionality has not yet been implemented
 	    filter_prop_checked() <=
 		    ** "Filter property implemented by CakeML" **
-		    forall (c : component). is_filter(c)
+		    forall (c : component) . is_filter(c)
 		       => has_property(c, CASE_Properties::COMP_IMPL) and property(c, CASE_Properties::COMP_IMPL) = "CAKEML"
 		       and filter_proof_checked()
 		       
@@ -403,28 +427,23 @@ public
 		filter_proof_checked() <=
 			** "Filter proof checked" **
 			analysis("ToolCheck", "SPLAT")
-			
+						
 		-- Evidence that an attestation manager component exists for a given communication driver
 		attestation_manager_exists(comm_driver : component, attestation_manager : component) <=
 			** "An attestation manager on " comm_driver " exists" **
 			-- check that the attestation manager only has attestation request/response connections to the comm driver
-			let am : component = instance(attestation_manager);
-			let cd : component = instance(comm_driver);
-			let attestation_conns : {connection} = {conn for (conn : connections(am))};
-			is_comm_driver(cd) and is_attestation_manager(am) and
-			forall (conn : attestation_conns). 
-					(has_type(conn) and name(type(conn)) = "CASE_AttestationRequestMsg.Impl") => destination_component(conn) = cd and
-					(has_type(conn) and name(type(conn)) = "CASE_AttestationResponseMsg.Impl") => source_component(conn) = cd
+			is_comm_driver(comm_driver) and is_attestation_manager(attestation_manager) and
+			forall (conn : connections(attestation_manager)) . 
+					(has_type(conn) and name(type(conn)) = "CASE_AttestationRequestMsg.Impl") => destination_component(conn) = comm_driver and
+					(has_type(conn) and name(type(conn)) = "CASE_AttestationResponseMsg.Impl") => source_component(conn) = comm_driver
 			
 		-- Evidence that communication from the comm driver cannot bypass attestation manager
 		attestation_manager_not_bypassed(comm_driver : component, attestation_manager : component) <=
 			** "Attestation Manager cannot be bypassed" **
 			-- all outgoing connections from the comm driver to components inside the 
-			-- parent of the comm driver all lead to the attestation manager
-			let am : component = instance(attestation_manager);
-			let cd : component = instance(comm_driver);
-			let out_conns : {connection} = {conn for (conn : connections(cd)) | source_component(conn) = cd and not (destination_component(conn) = parent(cd))};
-			forall(conn : out_conns). destination_component(conn) = am 
+			-- parent of the comm driver connect to the attestation manager
+			let out_conns : {connection} = {conn for (conn : connections(comm_driver)) | source_component(conn) = comm_driver and not (destination_component(conn) = parent(comm_driver))};
+			forall(conn : out_conns) . destination_component(conn) = attestation_manager		
 			
 		-- This should connect to some evidence that the attestation manager was correctly generated
 	    -- and that the proof was emitted and checked.
