@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.window.Window;
@@ -19,19 +18,18 @@ import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.ModalPropertyValue;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.ModelAnnotationsDialog;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 public class ModelAnnotationsHandler extends AadlHandler {
 
@@ -70,7 +68,7 @@ public class ModelAnnotationsHandler extends AadlHandler {
 		} else if (eObj instanceof ComponentType) {
 			component = (ComponentType) eObj;
 		} else {
-			Dialog.showError("No component is selected", "A component must be selected to annotate.");
+			Dialog.showError("Model Annotations", "A component must be selected to annotate.");
 			return;
 		}
 
@@ -154,67 +152,48 @@ public class ModelAnnotationsHandler extends AadlHandler {
 
 					if (pkgSection == null) {
 						// Something went wrong
-						Dialog.showError("No package section found", "No public or private package sections found.");
+						Dialog.showError("Model Annotations", "No public or private package sections found.");
 						return;
 					}
 
-					// CASE Property file
-					// First check if CASE Property file has already been imported in the model
-					final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-					PropertySet casePropSet = null;
-					for (ModelUnit modelUnit : importedUnits) {
-						if (modelUnit instanceof PropertySet) {
-							if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
-								casePropSet = (PropertySet) modelUnit;
-								break;
-							}
-						}
-					}
-
-					if (casePropSet == null) {
-						// Try importing the resource
-						casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-						if (casePropSet == null) {
-							Dialog.showError("Could not import " + CASE_PROPSET_NAME,
-									"Property set " + CASE_PROPSET_NAME + " could not be found.");
-							return;
-						}
-						// Add as "importedUnit" to package section
-						pkgSection.getImportedUnits().add(casePropSet);
+					// Import CASE_Properties file
+					if (!CaseUtils.addCasePropertyImport(pkgSection)) {
+						return;
 					}
 
 					if (addConfidentiality) {
-						if (!addPropertyAssociation("CONFIDENTIALITY", confidentiality.toString(), component,
-								casePropSet)) {
-							Dialog.showError("Could not set Confidentiality",
+						if (!CaseUtils.addCasePropertyAssociation("CONFIDENTIALITY", confidentiality.toString(),
+								component)) {
+							Dialog.showError("Model Annotations",
 									"Unable to set the CONFIDENTIALITY property for " + component.getName() + ".");
 //							return;
 						}
 					}
 					if (addIntegrity) {
-						if (!addPropertyAssociation("INTEGRITY", integrity.toString(), component, casePropSet)) {
-							Dialog.showError("Could not set Integrity",
+						if (!CaseUtils.addCasePropertyAssociation("INTEGRITY", integrity.toString(), component)) {
+							Dialog.showError("Model Annotations",
 									"Unable to set the INTEGRITY property for " + component.getName() + ".");
 //							return;
 						}
 					}
 					if (addAvailability) {
-						if (!addPropertyAssociation("AVAILABILITY", availability.toString(), component, casePropSet)) {
-							Dialog.showError("Could not set Availability",
+						if (!CaseUtils.addCasePropertyAssociation("AVAILABILITY", availability.toString(), component)) {
+							Dialog.showError("Model Annotations",
 									"Unable to set the AVAILABILITY property for " + component.getName() + ".");
 //							return;
 						}
 					}
 					if (addCompType) {
-						if (!addPropertyAssociation("COMP_TYPE", compType.toString(), component, casePropSet)) {
-							Dialog.showError("Could not set Component Type",
+						if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", compType.toString(), component)) {
+							Dialog.showError("Model Annotations",
 									"Unable to set the COMP_TYPE property for " + component.getName() + ".");
 //							return;
 						}
 					}
 					if (addCommModality) {
-						if (!addPropertyAssociation("COMM_MODALITY", commModality.toString(), component, casePropSet)) {
-							Dialog.showError("Could not set Communication Modality",
+						if (!CaseUtils.addCasePropertyAssociation("COMM_MODALITY", commModality.toString(),
+								component)) {
+							Dialog.showError("Model Annotations",
 									"Unable to set the COMM_MODALITY property for " + component.getName() + ".");
 //							return;
 						}
@@ -225,8 +204,8 @@ public class ModelAnnotationsHandler extends AadlHandler {
 							bString = bString + b.toString() + ",";
 						}
 						bString = bString.substring(0, bString.length() - 1);
-						if (!addPropertyAssociation("BOUNDARY", bString, component, casePropSet)) {
-							Dialog.showError("Could not set Boundary",
+						if (!CaseUtils.addCasePropertyAssociation("BOUNDARY", bString, component)) {
+							Dialog.showError("Model Annotations",
 									"Unable to set the BOUNDARY property for " + component.getName() + ".");
 //							return;
 						}

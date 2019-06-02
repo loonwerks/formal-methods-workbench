@@ -116,14 +116,11 @@ public abstract class BuiltInClaim {
 			priv8 = contextPkg.createOwnedPrivateSection();
 		}
 
-		AadlPackage pkg = null;
-		try {
-			pkg = CaseUtils.addCaseModelTransformationsImport(priv8, false);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+		if (!CaseUtils.addCaseModelTransformationsImport(priv8, false)) {
+			throw new RuntimeException("Could not import CASE_Model_Transformations package.");
 		}
 
-		return pkg;
+		return CaseUtils.getCaseModelTransformationsPackage();
 
 	}
 

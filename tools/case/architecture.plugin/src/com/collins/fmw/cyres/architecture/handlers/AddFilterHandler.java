@@ -35,7 +35,6 @@ import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.StringLiteral;
@@ -46,6 +45,7 @@ import com.collins.fmw.cyres.architecture.dialogs.AddFilterDialog;
 import com.collins.fmw.cyres.architecture.requirements.AddFilterClaim;
 import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -189,11 +189,11 @@ public class AddFilterHandler extends AadlHandler {
 				}
 
 				// Import CASE_Properties file
-				if (!addCasePropertyImport(pkgSection)) {
+				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
 					return;
 				}
 				// Import CASE_Model_Transformations file
-				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
 					return;
 				}
 
@@ -263,10 +263,8 @@ public class AddFilterHandler extends AadlHandler {
 				}
 
 				// Add filter properties
-				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
-						resource.getResourceSet());
 				// CASE::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "FILTER", filterType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "FILTER", filterType)) {
 //					return;
 				}
 
@@ -288,7 +286,7 @@ public class AddFilterHandler extends AadlHandler {
 				}
 
 				if (!filterPropId.isEmpty()) {
-					if (!addPropertyAssociation("COMP_SPEC", filterPropId, filterType, casePropSet)) {
+					if (!CaseUtils.addCasePropertyAssociation("COMP_SPEC", filterPropId, filterType)) {
 //						return;
 					}
 				}
@@ -320,7 +318,7 @@ public class AddFilterHandler extends AadlHandler {
 
 				// CASE::COMP_IMPL property
 				if (!filterImplementationLanguage.isEmpty()) {
-					if (!addPropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl, casePropSet)) {
+					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl)) {
 //						return;
 					}
 				}
@@ -461,7 +459,7 @@ public class AddFilterHandler extends AadlHandler {
 	 * @param comp
 	 */
 	private boolean isFilter(ComponentType comp) {
-		EList<PropertyExpression> propVal = comp.getPropertyValues(CASE_PROPSET_NAME, "COMP_TYPE");
+		EList<PropertyExpression> propVal = comp.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_TYPE");
 		if (propVal != null) {
 			for (PropertyExpression expr : propVal) {
 				if (expr instanceof NamedValue) {
@@ -545,7 +543,7 @@ public class AddFilterHandler extends AadlHandler {
 				// Add AGREE spec ID to COMP_SPEC property
 				// Get current property value
 				String propVal = "";
-				EList<PropertyExpression> propVals = filter.getPropertyValues(CASE_PROPSET_NAME, "COMP_SPEC");
+				EList<PropertyExpression> propVals = filter.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_SPEC");
 				if (propVals != null) {
 					for (PropertyExpression expr : propVals) {
 						if (expr instanceof StringLiteral) {
@@ -558,9 +556,7 @@ public class AddFilterHandler extends AadlHandler {
 				propVal += filterPropId;
 
 				// Write property to filter component
-				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
-						resource.getResourceSet());
-				if (!addPropertyAssociation("COMP_SPEC", propVal, filter, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_SPEC", propVal, filter)) {
 //						return;
 				}
 			}

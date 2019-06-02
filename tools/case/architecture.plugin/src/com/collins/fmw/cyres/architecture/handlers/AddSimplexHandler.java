@@ -16,7 +16,6 @@ import org.osate.aadl2.Feature;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.Subcomponent;
@@ -24,6 +23,8 @@ import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 public class AddSimplexHandler extends AadlHandler {
 
@@ -68,17 +69,13 @@ public class AddSimplexHandler extends AadlHandler {
 				final PublicPackageSection pkgSection = aadlPkg.getOwnedPublicSection();
 
 				// Import CASE_Properties file
-				if (!addCasePropertyImport(pkgSection)) {
+				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
 					return;
 				}
 				// Import CASE_Model_Transformations file
-				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
 					return;
 				}
-
-				// Get the CASE property set
-				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
-						resource.getResourceSet());
 
 				// Get inputs and outputs
 //				int numInputs = 0;
@@ -151,7 +148,7 @@ public class AddSimplexHandler extends AadlHandler {
 				monitorPortOut.setName("Alert");
 
 				// Add Monitor properties
-				if (!addPropertyAssociation("COMP_TYPE", "MONITOR", monitorThreadType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "MONITOR", monitorThreadType)) {
 //					return;
 				}
 
@@ -202,7 +199,7 @@ public class AddSimplexHandler extends AadlHandler {
 
 				// Add Safety Controller properties
 				// AAHAA::Component_Type Property
-				if (!addPropertyAssociation("COMP_TYPE", "SAFETY_CONTROLLER", safetyThreadType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "SAFETY_CONTROLLER", safetyThreadType)) {
 //					return;
 				}
 
@@ -270,7 +267,7 @@ public class AddSimplexHandler extends AadlHandler {
 
 				// Add Controller properties
 				// AAHAA::Component_Type Property
-				if (!addPropertyAssociation("COMP_TYPE", "SWITCH", switchThreadType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "SWITCH", switchThreadType)) {
 //					return;
 				}
 

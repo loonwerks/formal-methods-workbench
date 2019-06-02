@@ -37,7 +37,6 @@ import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.Subcomponent;
@@ -46,6 +45,7 @@ import org.osate.ui.dialogs.Dialog;
 import com.collins.fmw.cyres.architecture.dialogs.AddAttestationManagerDialog;
 import com.collins.fmw.cyres.architecture.requirements.AddAttestationManagerClaim;
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
@@ -175,11 +175,11 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				}
 
 				// Import CASE_Properties file
-				if (!addCasePropertyImport(pkgSection)) {
+				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
 					return;
 				}
 				// Import CASE_Model_Transformations file
-				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
 					return;
 				}
 
@@ -240,8 +240,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Get the request and response message types from the CASE_Model_Transformations package
 				DataImplementation requestMsgImpl = null;
 				DataImplementation responseMsgImpl = null;
-				AadlPackage caseModelTransformationsPkg = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME,
-						CASE_MODEL_TRANSFORMATIONS_FILE, resource.getResourceSet());
+				AadlPackage caseModelTransformationsPkg = CaseUtils.getCaseModelTransformationsPackage();
 				for (Classifier classifier : caseModelTransformationsPkg.getOwnedPublicSection()
 						.getOwnedClassifiers()) {
 					if (classifier.getName().equalsIgnoreCase("CASE_AttestationRequestMsg.Impl")) {
@@ -292,10 +291,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				commRes.setOut(true);
 
 				// Add Attestation Manager properties
-				PropertySet casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE,
-						resource.getResourceSet());
 				// CASE_Properties::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "ATTESTATION", attestationManagerType)) {
 //					return;
 				}
 
@@ -314,7 +311,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 				}
 				if (!attestationPropId.isEmpty()) {
-					if (!addPropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType, casePropSet)) {
+					if (!CaseUtils.addCasePropertyAssociation("COMP_SPEC", attestationPropId, attestationManagerType)) {
 //						return;
 					}
 				}
@@ -345,22 +342,22 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				// CASE_Properties::COMP_IMPL property
 				if (!implementationLanguage.isEmpty()) {
-					if (!addPropertyAssociation("COMP_IMPL", implementationLanguage, attestationManagerImpl,
-						casePropSet)) {
+					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", implementationLanguage,
+							attestationManagerImpl)) {
 //						return;
 					}
 				}
 
 				// CASE_Properties::CACHE_TIMEOUT property
 				if (!cacheTimeout.isEmpty()) {
-					if (!addPropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl, casePropSet)) {
+					if (!CaseUtils.addCasePropertyAssociation("CACHE_TIMEOUT", cacheTimeout, attestationManagerImpl)) {
 //						return;
 					}
 				}
 
 				// CASE_Properties::CACHE_SIZE property
 				if (!cacheSize.isEmpty()) {
-					if (!addPropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerImpl, casePropSet)) {
+					if (!CaseUtils.addCasePropertyAssociation("CACHE_SIZE", cacheSize, attestationManagerImpl)) {
 //						return;
 					}
 				}
@@ -549,7 +546,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 	private boolean isCompType(Subcomponent comp, String compType) {
 
-		EList<PropertyExpression> propVal = comp.getPropertyValues(CASE_PROPSET_NAME, "COMP_TYPE");
+		EList<PropertyExpression> propVal = comp.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_TYPE");
 		if (propVal != null) {
 			for (PropertyExpression expr : propVal) {
 				if (expr instanceof NamedValue) {

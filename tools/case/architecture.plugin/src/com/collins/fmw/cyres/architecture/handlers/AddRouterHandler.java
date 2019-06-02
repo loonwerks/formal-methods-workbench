@@ -1,6 +1,5 @@
 package com.collins.fmw.cyres.architecture.handlers;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.resource.XtextResource;
@@ -11,11 +10,9 @@ import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Context;
 import org.osate.aadl2.EventDataPort;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
@@ -24,6 +21,8 @@ import org.osate.aadl2.impl.EventDataPortImpl;
 import org.osate.aadl2.impl.ProcessImplementationImpl;
 import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 public class AddRouterHandler extends AadlHandler {
 
@@ -115,30 +114,16 @@ public class AddRouterHandler extends AadlHandler {
 					return;
 				}
 
-				// CASE Property file
-				// First check if CASE Property file has already been imported in the model
-				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySet casePropSet = null;
-				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySet) {
-						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySet) modelUnit;
-							break;
-						}
-					}
+				// Import CASE_Properties file
+				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
+					return;
+				}
+				// Import CASE_Model_Transformations file
+				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
+					return;
 				}
 
-				if (casePropSet == null) {
-					// Try importing the resource
-					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-					if (casePropSet == null) {
-						return;
-					}
-					// Add as "importedUnit" to package section
-					pkgSection.getImportedUnits().add(casePropSet);
-				}
-
-				// Create Filter thread type
+				// Create Router thread type
 				final ThreadType routerThreadType = (ThreadType) pkgSection
 						.createOwnedClassifier(Aadl2Package.eINSTANCE.getThreadType());
 				// Give it a unique name
@@ -162,17 +147,14 @@ public class AddRouterHandler extends AadlHandler {
 
 				// Add filter properties
 				// CASE::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "ROUTER", routerThreadType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "ROUTER", routerThreadType)) {
 //					return;
 				}
 				// CASE::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", routerImplementationLanguage, routerThreadType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", routerImplementationLanguage,
+						routerThreadType)) {
 //					return;
 				}
-				// CASE::COMP_SPEC property
-//				if (!addPropertyAssociation("COMP_SPEC", routerRegularExpression, routerThreadType, casePropSet)) {
-////					return;
-//				}
 
 				// Move router to proper location
 				// (just before component it connects to on communication pathway)

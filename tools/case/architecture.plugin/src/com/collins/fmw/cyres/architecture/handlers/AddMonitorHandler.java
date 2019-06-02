@@ -1,6 +1,5 @@
 package com.collins.fmw.cyres.architecture.handlers;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.window.Window;
@@ -15,12 +14,10 @@ import org.osate.aadl2.Context;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
-import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
@@ -31,6 +28,7 @@ import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddMonitorDialog;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 public class AddMonitorHandler extends AadlHandler {
 
@@ -122,27 +120,13 @@ public class AddMonitorHandler extends AadlHandler {
 					return;
 				}
 
-				// CASE Property file
-				// First check if CASE Property file has already been imported in the model
-				final EList<ModelUnit> importedUnits = pkgSection.getImportedUnits();
-				PropertySet casePropSet = null;
-				for (ModelUnit modelUnit : importedUnits) {
-					if (modelUnit instanceof PropertySet) {
-						if (modelUnit.getName().equals(CASE_PROPSET_NAME)) {
-							casePropSet = (PropertySet) modelUnit;
-							break;
-						}
-					}
+				// Import CASE_Properties file
+				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
+					return;
 				}
-
-				if (casePropSet == null) {
-					// Try importing the resource
-					casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE, resource.getResourceSet());
-					if (casePropSet == null) {
-						return;
-					}
-					// Add as "importedUnit" to package section
-					pkgSection.getImportedUnits().add(casePropSet);
+				// Import CASE_Model_Transformations file
+				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
+					return;
 				}
 
 				// Create Monitor thread type
@@ -200,12 +184,12 @@ public class AddMonitorHandler extends AadlHandler {
 
 				// Add monitor properties
 				// CASE::COMP_TYPE Property
-				if (!addPropertyAssociation("COMP_TYPE", "MONITOR", monitorThreadType, casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "MONITOR", monitorThreadType)) {
 //					return;
 				}
 				// CASE::COMP_IMPL property
-				if (!addPropertyAssociation("COMP_IMPL", monitorImplementationLanguage, monitorThreadType,
-						casePropSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", monitorImplementationLanguage,
+						monitorThreadType)) {
 //					return;
 				}
 				// CASE::COMP_SPEC property

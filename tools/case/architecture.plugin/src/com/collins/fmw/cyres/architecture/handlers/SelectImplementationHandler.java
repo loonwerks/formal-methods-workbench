@@ -17,11 +17,11 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.PrivatePackageSection;
-import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.SelectImplementationDialog;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 public class SelectImplementationHandler extends AadlHandler {
 
@@ -109,26 +109,20 @@ public class SelectImplementationHandler extends AadlHandler {
 				}
 
 				// Import CASE_Properties file
-				if (!addCasePropertyImport(pkgSection)) {
+				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
 					return;
 				}
 				// Import CASE_Model_Transformations file
-				if (!addCaseModelTransformationsImport(pkgSection, true)) {
+				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
 					return;
 				}
 
-				PropertySet propSet = getPropertySet("Programming_Properties", "Programming_Properties.aadl",
-						resource.getResourceSet());
-				if (propSet == null) {
-					return;
-				}
-				if (!addPropertyAssociation("Source_Text", legacyComponentImplementationLocation, selectedComponent,
-						propSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("Source_Text", legacyComponentImplementationLocation,
+						selectedComponent)) {
 //					return;
 				}
-				if (!addPropertyAssociation("Compute_Entrypoint_Source_Text",
-						legacyComponentImplementationEntryFunction,
-						selectedComponent, propSet)) {
+				if (!CaseUtils.addCasePropertyAssociation("Compute_Entrypoint_Source_Text",
+						legacyComponentImplementationEntryFunction, selectedComponent)) {
 //					return;
 				}
 
@@ -173,14 +167,13 @@ public class SelectImplementationHandler extends AadlHandler {
 		String formattedClause = "";
 
 		if (clause.isEmpty()) {
-			formattedClause = "{**" + System.lineSeparator() + "\t\t\t" + RESOLUTE_CLAUSE + System.lineSeparator()
-					+ "\t\t**}";
+			formattedClause = "{**" + System.lineSeparator() + RESOLUTE_CLAUSE + System.lineSeparator() + "**}";
 		} else if (clause.contains(RESOLUTE_CLAUSE)) {
 			// If RESOLUTE_CLAUSE is already present, no need to add it again
 			formattedClause = clause;
 		} else {
 			// Remove '**}' from clause, add the clause, a newline, then add back '**}'
-			formattedClause = clause.replace("**}", "") + "\t" + RESOLUTE_CLAUSE + System.lineSeparator() + "\t\t**}";
+			formattedClause = clause.replace("**}", "") + RESOLUTE_CLAUSE + System.lineSeparator() + "**}";
 		}
 
 		return formattedClause;
