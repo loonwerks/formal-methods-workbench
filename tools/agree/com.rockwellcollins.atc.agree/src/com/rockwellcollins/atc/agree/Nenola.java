@@ -5029,7 +5029,8 @@ public class Nenola {
 
 			jkind.lustre.Expr stuffConj = new jkind.lustre.BoolExpr(true);
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssumeMap(globalEnv, isMonolithic).entrySet()) {
+			PropMapGlueProduct assumeGp = this.toLustreAssumeMap(globalEnv, isMonolithic);
+			for (Entry<String, jkind.lustre.Expr> entry : assumeGp.propMap.entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				VarDecl stuffAssumptionVar = new VarDecl(inputName, NamedType.BOOL);
@@ -5041,10 +5042,11 @@ public class Nenola {
 
 				stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssumptionId);
 			}
+			equations.addAll(assumeGp.glueEquations);
+			locals.addAll(assumeGp.glueVars);
 
-
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreGuaranteeMap(globalEnv, isMonolithic, mainNode)
-					.entrySet()) {
+			PropMapGlueProduct guarGp = this.toLustreGuaranteeMap(globalEnv, isMonolithic, mainNode);
+			for (Entry<String, jkind.lustre.Expr> entry : guarGp.propMap.entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 				VarDecl stuffGuaranteeVar = new VarDecl(inputName, NamedType.BOOL);
@@ -5054,12 +5056,12 @@ public class Nenola {
 				equations.add(new Equation(stuffGuaranteeId, expr));
 				stuffConj = Lustre.makeANDExpr(stuffConj, stuffGuaranteeId);
 			}
+			equations.addAll(guarGp.glueEquations);
+			locals.addAll(guarGp.glueVars);
 
-			EquationsGlueProduct egp = this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode);
-			equations.addAll(egp.equations);
 
-			for (Entry<String, jkind.lustre.Expr> entry : this.toLustreAssertMap(globalEnv, isMonolithic)
-					.entrySet()) {
+			PropMapGlueProduct assertGp = this.toLustreAssertMap(globalEnv, isMonolithic);
+			for (Entry<String, jkind.lustre.Expr> entry : assertGp.propMap.entrySet()) {
 				String inputName = entry.getKey();
 				jkind.lustre.Expr expr = entry.getValue();
 
@@ -5070,7 +5072,11 @@ public class Nenola {
 
 				stuffConj = Lustre.makeANDExpr(stuffConj, stuffAssertionId);
 			}
+			equations.addAll(assertGp.glueEquations);
+			locals.addAll(assertGp.glueVars);
 
+			EquationsGlueProduct egp = this.toLustreEquationsFromConnections(globalEnv, isMonolithic, mainNode);
+			equations.addAll(egp.equations);
 
 			// add realtime constraints
 			Set<VarDecl> eventTimes = new HashSet<>();
