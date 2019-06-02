@@ -10,5 +10,6 @@ Require-Bundle: org.osate.aadl2,
  org.eclipse.ui.console
 Import-Package: com.collins.fmw.cyres.json.plugin,
  org.eclipse.ui,
- org.eclipse.ui.console
+ org.eclipse.ui.console,
+ org.osate.ui.dialogs
 Bundle-ClassPath: .

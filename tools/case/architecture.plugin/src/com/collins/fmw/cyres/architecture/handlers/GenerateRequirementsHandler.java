@@ -1,27 +1,57 @@
 package com.collins.fmw.cyres.architecture.handlers;
 
-import java.io.IOException;
-
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.osate.aadl2.ComponentImplementation;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.json.plugin.Aadl2Json;
+import com.collins.fmw.cyres.util.plugin.ModelHashcode;
+import com.collins.fmw.cyres.util.plugin.TraverseProject;
+import com.google.gson.JsonObject;
 
-public class GenerateRequirementsHandler extends AbstractHandler {
+public class GenerateRequirementsHandler extends AadlHandler {
+
+	private final static String GENERATE_REQUIREMENTS_TOOL_COMMAND = "com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool";
 
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	protected void runCommand(URI uri) {
 
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
+		// Check if a component implementation is selected
+		final EObject eObj = getEObject(uri);
+		if (!(eObj instanceof ComponentImplementation)) {
+			Dialog.showError("Generate Cyber Requirements", "Select the top-level system implementation for analysis.");
+			return;
+		}
 
-		String tool = event.getParameter("com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool");
+		final ComponentImplementation ci = (ComponentImplementation) eObj;
+
+		IProject project = TraverseProject.getCurrentProject();
+		if (project == null) {
+			Dialog.showError("Generate Cyber Requirements",
+					"Unable to determine current AADL project name.  Make sure the top-level system implementation is open in the text editor.");
+			return;
+		}
+
+		String hashcode = "";
+		try {
+			hashcode = ModelHashcode.getHashcode(ci);
+		} catch (Exception e) {
+			Dialog.showError("Generate Cyber Requirements", e.getMessage());
+			return;
+		}
+
+		JsonObject header = new JsonObject();
+		header.addProperty("project", project.getName());
+		header.addProperty("implementation", ci.getQualifiedName());
+		header.addProperty("date", System.currentTimeMillis());
+		header.addProperty("hash", hashcode);
+
+		String tool = this.executionEvent.getParameter(GENERATE_REQUIREMENTS_TOOL_COMMAND);
 		switch (tool.toLowerCase()) {
 
 		case "gearcase": // CRA
@@ -32,31 +62,28 @@ public class GenerateRequirementsHandler extends AbstractHandler {
 
 			try {
 				// Generate json
-				URI jsonURI = Aadl2Json.createJson(event);
-			} catch (CoreException | IOException e) {
-				Dialog.showError("Model Export", "Unable to export model to JSON format.");
-				e.printStackTrace();
-				return null;
+				URI jsonURI = Aadl2Json.createJson(header);
+			} catch (Exception e) {
+				Dialog.showError("Generate Cyber Requirements", "Unable to export model to JSON format.");
+				return;
 			}
 
 			// TODO: Call tool
-			IHandlerService handlerService = window.getService(IHandlerService.class);
 			try {
+				IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(this.executionEvent);
+				IHandlerService handlerService = window.getService(IHandlerService.class);
 				handlerService.executeCommand("com.collins.fmw.cyres.architecture.commands.ImportRequirements", null);
-			} catch (Exception ex) {
-				throw new RuntimeException("Command not found");
-				// Give message
-
+			} catch (Exception e) {
+				Dialog.showError("Generate Cyber Requirements", e.getMessage());
+				return;
 			}
 
 			break;
 
 		default:
-			Dialog.showError("Unknown tool", tool + " is not a recognized cyber requirements tool.");
-			return null;
-
+			Dialog.showError("Generate Cyber Requirements", tool + " is not a recognized cyber requirements tool.");
+			return;
 		}
 
-		return null;
 	}
 }

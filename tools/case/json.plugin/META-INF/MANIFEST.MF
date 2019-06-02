@@ -21,4 +21,5 @@ Import-Package: com.collins.fmw.cyres.util.plugin,
  org.osate.ge
 Bundle-ClassPath: .,
  lib/gson-2.8.5.jar
-Export-Package: com.collins.fmw.cyres.json.plugin
+Export-Package: com.collins.fmw.cyres.json.plugin,
+ com.google.gson

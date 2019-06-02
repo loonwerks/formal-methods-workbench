@@ -7,14 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
@@ -121,19 +117,26 @@ public class Aadl2Json {
 		Filesystem.writeFile(print, whatToPrint.getBytes());
 	}
 
-	static public URI createJson(ExecutionEvent event) throws CoreException, IOException {
+	static public URI createJson() throws Exception {
+		return createJson(null);
+	}
+
+	static public URI createJson(JsonObject header) throws Exception {
+
 		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-
 		if (xtextEditor == null) {
-			MessageDialog.openError(window.getShell(), "No AADL editor is active",
-					"An AADL editor must be active in order to generate JSON.");
+			throw new Exception("An AADL editor must be active in order to generate JSON.");
 		}
 
 		EObject original = xtextEditor.getDocument().readOnly(resource -> resource.getContents().get(0));
 
 		JsonElement je = toJson(original);
+
+		if (header != null) {
+			header.add("modelUnits", je);
+			je = header;
+		}
 
 		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -188,12 +191,6 @@ public class Aadl2Json {
 				}
 
 			}
-
-//			JsonObject jo = new JsonObject();
-//			jo.add("rootPackageName", new JsonPrimitive(model.getQualifiedName()));
-//			jo.add("timestamp", new JsonPrimitive(System.currentTimeMillis()));
-//			jo.add("packages", modelBuilder);
-//			return jo;
 
 			return modelsJson;
 

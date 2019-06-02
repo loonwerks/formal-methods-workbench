@@ -1,7 +1,6 @@
 package com.collins.fmw.cyres.splat.plugin;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -9,12 +8,10 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -24,9 +21,9 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.ui.dialogs.Dialog;
 import org.osgi.framework.Bundle;
 
 import com.collins.fmw.cyres.json.plugin.Aadl2Json;
@@ -55,17 +52,15 @@ public class SplatHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 
 		if (xtextEditor == null) {
-			MessageDialog.openError(window.getShell(), "No AADL editor is active",
-					"An AADL editor must be active in order to generate JSON.");
+			Dialog.showError("SPLAT", "An AADL editor must be active in order to generate JSON.");
 			return null;
 		}
 
 		try {
 
-			URI jsonURI = Aadl2Json.createJson(event);
+			URI jsonURI = Aadl2Json.createJson();
 
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
 			String fullpath = file.getRawLocation().toOSString();
@@ -99,9 +94,9 @@ public class SplatHandler extends AbstractHandler {
 			}
 			out.println("Done with HOL proof of filter properties.");
 
-		} catch (CoreException | IOException e) {
-			System.err.println("Trouble in Filter Verification");
-			e.printStackTrace();
+		} catch (Exception e) {
+			Dialog.showError("SPLAT", "SPLAT has encountered an error and was unable to complete.");
+			return null;
 		}
 
 		return null;
