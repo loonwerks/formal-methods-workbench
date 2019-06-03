@@ -4,6 +4,7 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
+            allPopups="false"
             locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
          <menu
                id="com.collins.fmw.cyres.menus.outline.main"
@@ -12,11 +13,11 @@
                   id="com.collins.fmw.cyres.menus.outline.requirements"
                   label="Cyber Requirements">
                <menu
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
+                     id="com.collins.fmw.cyres.menus.outline.requirements.generate"
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
+                        id="com.collins.fmw.cyres.menus.outline.requirements.generate.gearcase"
                         label="GearCase"
                         style="push">
                      <parameter
@@ -26,7 +27,7 @@
                   </command>
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
+                        id="com.collins.fmw.cyres.menus.outline.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
                      <parameter
@@ -37,7 +38,7 @@
                </menu>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.import"
+                     id="com.collins.fmw.cyres.menus.outline.requirements.import"
                      label="Import Requirements..."
                      style="push">
                </command>
@@ -47,7 +48,7 @@
                </separator>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.formalize"
+                     id="com.collins.fmw.cyres.menus.outline.requirements.formalize"
                      label="Formalize Requirement"
                      style="push">
                </command>
@@ -57,7 +58,7 @@
                   label="Cyber Resiliency">
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
-                     id="com.collins.fmw.cyres.architecture.menus.ModelAnnotations"
+                     id="com.collins.fmw.cyres.architecture.menus.outline.ModelAnnotations"
                      label="Model Annotations..."
                      style="push">
                </command>
@@ -65,33 +66,15 @@
                      id="com.collins.fmw.cyres.menus.outline.resiliency.staircase.transformations"
                      label="Model Transformations">
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
-                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
-                        label="Add Attestation Manager..."
-                        style="push">
-                  </command>
-                  <command
                         commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
-                        id="com.collins.fmw.cyres.architecture.menus.AddFilter"
+                        id="com.collins.fmw.cyres.architecture.menus.outline.AddFilter"
                         label="Add Filter..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-                        id="com.collins.fmw.cyres.architecture.menus.AddIsolator"
-                        label="Add Isolator..."
-                        style="push">
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
-                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
-                        label="Add Monitor..."
-                        style="push">
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
-                        id="com.collins.fmw.cyres.architecture.menus.AddRouter"
-                        label="Add Router..."
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+                        id="com.collins.fmw.cyres.architecture.menus.outline.AddAttestationManager"
+                        label="Add Attestation Manger..."
                         style="push">
                   </command>
                   <command
@@ -100,9 +83,15 @@
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.seL4Transform"
-                        id="com.collins.fmw.cyres.architecture.menus.seL4Transform"
-                        label="Transform for seL4 build"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
+                        id="com.collins.fmw.cyres.architecture.menus.outline.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                        id="com.collins.fmw.cyres.architecture.menus.outline.AddMonitor"
+                        label="Add Monitor..."
                         style="push">
                   </command>
                </menu>
@@ -116,19 +105,19 @@
                   label="Component Analysis">
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
-                     id="com.collins.fmw.cyres.component.menus.SelectImplementation"
+                     id="com.collins.fmw.cyres.component.menus.outline.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
-                     label="Run Ivaldi"
+                     label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
             <menu
                   id="com.collins.fmw.cyres.menus.outline.build"
-                  label="System Build">
+                  label="Trusted Build">
                <command
                      commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
                      label="Build..."
@@ -200,27 +189,20 @@
                      id="com.collins.fmw.cyres.menus.menubar.resiliency.staircase.transformations"
                      label="Model Transformations">
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
-                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
-                        label="Add Attestation Manager..."
-                        style="push">
-                  </command>
-                  <command
                         commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
                         id="com.collins.fmw.cyres.architecture.menus.AddFilter"
                         label="Add Filter..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-                        id="com.collins.fmw.cyres.architecture.menus.AddIsolator"
-                        label="Add Isolator..."
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
+                        label="Add Attestation Manager..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
-                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
-                        label="Add Monitor..."
+                        commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex"
+                        label="Add Simplex Architecture"
                         style="push">
                   </command>
                   <command
@@ -230,14 +212,9 @@
                         style="push">
                   </command>
                   <command
-                        commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex"
-                        label="Add Simplex Architecture"
-                        style="push">
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.seL4Transform"
-                        id="com.collins.fmw.cyres.architecture.menus.seL4Transform"
-                        label="Transform for seL4 build"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
+                        label="Add Monitor..."
                         style="push">
                   </command>
                </menu>
@@ -258,13 +235,13 @@
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
                      id="com.collins.fmw.cyres.architecture.menus.VerifyImplementation"
-                     label="Run Ivaldi"
+                     label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
             <menu
                   id="com.collins.fmw.cyres.menus.menubar.build"
-                  label="System Build">
+                  label="Trusted Build">
                <command
                      commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
                      label="Build..."
@@ -303,11 +280,11 @@
                   id="com.collins.fmw.cyres.menus.editor.requirements"
                   label="Cyber Requirements">
                <menu
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
+                     id="com.collins.fmw.cyres.menus.editor.requirements.generate"
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
+                        id="com.collins.fmw.cyres.menus.editor.requirements.generate.gearcase"
                         label="GearCase"
                         style="push">
                      <parameter
@@ -317,7 +294,7 @@
                   </command>
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
+                        id="com.collins.fmw.cyres.menus.editor.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
                      <parameter
@@ -328,7 +305,7 @@
                </menu>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.import"
+                     id="com.collins.fmw.cyres.menus.editor.requirements.import"
                      label="Import Requirements..."
                      style="push">
                </command>
@@ -338,7 +315,7 @@
                </separator>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.formalize"
+                     id="com.collins.fmw.cyres.menus.editor.requirements.formalize"
                      label="Formalize Requirement"
                      style="push">
                </command>
@@ -348,7 +325,7 @@
                   label="Cyber Resiliency">
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
-                     id="com.collins.fmw.cyres.architecture.menus.ModelAnnotations"
+                     id="com.collins.fmw.cyres.architecture.menus.editor.ModelAnnotations"
                      label="Model Annotations..."
                      style="push">
                </command>
@@ -356,33 +333,15 @@
                      id="com.collins.fmw.cyres.menus.editor.resiliency.staircase.transformations"
                      label="Model Transformations">
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
-                        id="com.collins.fmw.cyres.architecture.menus.AddAttestationManager"
-                        label="Add Attestation Manager..."
-                        style="push">
-                  </command>
-                  <command
                         commandId="com.collins.fmw.cyres.architecture.commands.AddFilter"
-                        id="com.collins.fmw.cyres.architecture.menus.AddFilter"
+                        id="com.collins.fmw.cyres.architecture.menus.editor.AddFilter"
                         label="Add Filter..."
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-                        id="com.collins.fmw.cyres.architecture.menus.AddIsolator"
-                        label="Add Isolator..."
-                        style="push">
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
-                        id="com.collins.fmw.cyres.architecture.menus.AddMonitor"
-                        label="Add Monitor..."
-                        style="push">
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
-                        id="com.collins.fmw.cyres.architecture.menus.AddRouter"
-                        label="Add Router..."
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+                        id="com.collins.fmw.cyres.architecture.menus.editor.AddAttestationManager"
+                        label="Add Attestation Manager..."
                         style="push">
                   </command>
                   <command
@@ -391,9 +350,15 @@
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.seL4Transform"
-                        id="com.collins.fmw.cyres.architecture.menus.seL4Transform"
-                        label="Transform for seL4 build"
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddRouter"
+                        id="com.collins.fmw.cyres.architecture.menus.editor.AddRouter"
+                        label="Add Router..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+                        id="com.collins.fmw.cyres.architecture.menus.editor.AddMonitor"
+                        label="Add Monitor..."
                         style="push">
                   </command>
                </menu>
@@ -407,19 +372,19 @@
                   label="Component Analysis">
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
-                     id="com.collins.fmw.cyres.component.menus.SelectImplementation"
+                     id="com.collins.fmw.cyres.component.menus.editor.SelectImplementation"
                      label="Select Implementation..."
                      style="push">
                </command>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation"
-                     label="Run Ivaldi"
+                     label="Run TA3 tool"
                      style="push">
                </command>
             </menu>
             <menu
                   id="com.collins.fmw.cyres.menus.editor.build"
-                  label="System Build">
+                  label="Trusted Build">
                <command
                      commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
                      label="Build..."
@@ -457,32 +422,20 @@
             name="Import Requirements">
       </command>
       <command
-            id="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
-            name="Add Attestation Manager">
-      </command>
-      <command
             id="com.collins.fmw.cyres.architecture.commands.AddFilter"
             name="Add Filter">
       </command>
       <command
-            id="com.collins.fmw.cyres.architecture.commands.AddMonitor"
-            name="Add Monitor">
-      </command>
-      <command
-            id="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-            name="Add Isolator">
+            id="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
+            name="Add Attestation Manager">
       </command>
       <command
             id="com.collins.fmw.cyres.architecture.commands.AddRouter"
             name="Add Router">
       </command>
       <command
-            id="om.collins.fmw.cyres.architecture.commands.AddSimplex"
-            name="Add Simplex Architecture">
-      </command>
-      <command
-            id="com.collins.fmw.cyres.architecture.commands.seL4Transform"
-            name="Transform for sel4 build">
+            id="com.collins.fmw.cyres.architecture.commands.AddMonitor"
+            name="Add Monitor">
       </command>
       <command
             id="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
@@ -508,32 +461,24 @@
             id="com.collins.fmw.cyres.architecture.commands.Touch"
             name="Touch">
       </command>
+      <command
+            id="om.collins.fmw.cyres.architecture.commands.AddSimplex"
+            name="Add Simplex Architecture">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddAttestationManagerHandler"
-            commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager">
-      </handler>
-      <handler
             class="com.collins.fmw.cyres.architecture.handlers.AddFilterHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.AddFilter">
-      </handler>
-      <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddIsolatorHandler"
-            commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator">
-      </handler>
-      <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddMonitorHandler"
-            commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.AddRouterHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.AddRouter">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddSimplexHandler"
-            commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex">
+            class="com.collins.fmw.cyres.architecture.handlers.AddMonitorHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddMonitor">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.ModelAnnotationsHandler"
@@ -556,12 +501,20 @@
             commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements">
       </handler>
       <handler
+            class="com.collins.fmw.cyres.architecture.handlers.AddAttestationManagerHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddAttestationManager">
+      </handler>
+      <handler
             class="com.collins.fmw.cyres.architecture.handlers.GenerateRequirementsHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.TouchHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.Touch">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.AddSimplexHandler"
+            commandId="om.collins.fmw.cyres.architecture.commands.AddSimplex">
       </handler>
    </extension>
    <extension
