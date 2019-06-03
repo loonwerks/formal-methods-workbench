@@ -1420,7 +1420,7 @@ public class Nenola {
 			Map<String, jkind.lustre.Expr> argExprMap = new HashMap<>();
 
 			for (Entry<String, Expr> entry : this.fields.entrySet()) {
-				jkind.lustre.Expr lustreExpr = entry.getValue().toLustreClockedExpr(state);
+				jkind.lustre.Expr lustreExpr = entry.getValue().toLustreExpr(state);
 				String argName = entry.getKey();
 
 				argExprMap.put(argName, lustreExpr);
@@ -3506,6 +3506,8 @@ public class Nenola {
 
 	public static interface DataContract extends Contract {
 
+		Expr getInitValue();
+
 	}
 
 	public static enum Prim implements DataContract {
@@ -3535,7 +3537,25 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
+		@Override
+		public Expr getInitValue() {
+			switch (this) {
+			case BoolContract:
+				return new BoolLit(false);
+			case IntContract:
+				return new IntLit("0");
+			case RealContract:
+				return new RealLit("0");
+			default:
+				break;
+			}
+
+			throw new RuntimeException("Unhandled initial type for type '" + this.name + "'");
+
+		}
+
 	}
+
 
 	public static class RangeIntContract implements DataContract {
 		public final String name;
@@ -3561,6 +3581,14 @@ public class Nenola {
 		@Override
 		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
+		}
+
+		@Override
+		public Expr getInitValue() {
+
+			return new IntLit("0");
+
+
 		}
 
 	}
@@ -3589,6 +3617,12 @@ public class Nenola {
 		@Override
 		public boolean staticEquals(Contract other) {
 			return this.getName().equals(other.getName());
+		}
+
+		@Override
+		public Expr getInitValue() {
+			return new RealLit("0");
+
 		}
 	}
 
@@ -3696,7 +3730,20 @@ public class Nenola {
 			return this.getName().equals(other.getName());
 		}
 
+		@Override
+		public Expr getInitValue() {
+
+			Map<String, Expr> fieldMap = new HashMap<>();
+			for (Entry<String, DataContract> entry : this.fields.entrySet()) {
+				Expr subExpr = entry.getValue().getInitValue();
+				fieldMap.put(entry.getKey(), subExpr);
+			}
+			return new Nenola.RecordLit(this.name, fieldMap);
+
+		}
+
 	}
+
 
 	public static class ArrayContract implements DataContract {
 
@@ -3736,6 +3783,16 @@ public class Nenola {
 			} else {
 				return false;
 			}
+		}
+
+		@Override
+		public Expr getInitValue() {
+
+			List<Expr> elements = new ArrayList<>();
+			for (int i = 0; i < this.size; i++) {
+				elements.add(this.stemContract.getInitValue());
+			}
+			return new Nenola.ArrayLit(elements);
 		}
 
 	}
@@ -4036,7 +4093,7 @@ public class Nenola {
 			jkind.lustre.IdExpr assumHist = new jkind.lustre.IdExpr("__ASSUME__HIST");
 			inputs.add(new VarDecl(assumHist.id, NamedType.BOOL));
 
-			ExprsGlueProduct assertsConGp = this.toLustreAssertionsFromConnections(globalEnv);
+			ExprsGlueProduct assertsConGp = this.toLustreAssertionsFromConnections(globalEnv, mainNode);
 			assertions.addAll(assertsConGp.exprs);
 			equations.addAll(assertsConGp.glueEquations);
 			locals.addAll(assertsConGp.glueVars);
@@ -4101,17 +4158,27 @@ public class Nenola {
 			return node;
 		}
 
-		private ExprsGlueProduct toLustreAssertionsFromConnections(GlobalEnv globalEnv) {
+		private ExprsGlueProduct toLustreAssertionsFromConnections(GlobalEnv globalEnv, NodeContract mainNode) {
 
 			StaticState state = new StaticState(globalEnv, this);
 
 			List<jkind.lustre.Expr> acc = new ArrayList<>();
-			List<Equation> glueEquations = new ArrayList<>(); // TODO populate
-			List<VarDecl> glueVars = new ArrayList<>(); // TODO populate
+			List<Equation> glueEquations = new ArrayList<>();
+			List<VarDecl> glueVars = new ArrayList<>();
 
 			for (Connection conn : this.connections) {
 				if (conn.exprOp.isPresent()) {
-					acc.add(conn.exprOp.get().toLustreExpr(state));
+
+					if (mainNode.isAsync()) {
+						acc.add(conn.exprOp.get().toLustreClockedExpr(state));
+						glueEquations.addAll(conn.exprOp.get().toLustreClockedEquations(state));
+						glueVars.addAll(conn.exprOp.get().toLustreClockedLocals(state));
+
+					} else {
+						acc.add(conn.exprOp.get().toLustreExpr(state));
+
+					}
+
 				} else {
 
 					String dstName = null;
@@ -4140,26 +4207,34 @@ public class Nenola {
 					}
 
 
-					jkind.lustre.Expr aadlConnExpr;
+					Expr aadlConnExpr;
 
 					if (!conn.delayed) {
-						aadlConnExpr = new jkind.lustre.BinaryExpr(new jkind.lustre.IdExpr(srcName),
-								jkind.lustre.BinaryOp.EQUAL, new jkind.lustre.IdExpr(dstName));
+						aadlConnExpr = new Nenola.BinExpr(new IdExpr(srcName), Nenola.BinRator.Equal,
+								new IdExpr(dstName));
 					} else {
 						// we need to get the correct type for the aadlConnection
 						// we can assume that the source and destination types are
 						// the same at this point
 
 						DataContract srcType = conn.src.inferDataContract(state);
-						jkind.lustre.Expr initExpr = Lustre.getInitValueFromType(srcType.toLustreType());
-						jkind.lustre.Expr preSource = new jkind.lustre.UnaryExpr(UnaryOp.PRE,
-								new jkind.lustre.IdExpr(srcName));
-						jkind.lustre.Expr srcExpr = new jkind.lustre.BinaryExpr(initExpr, BinaryOp.ARROW, preSource);
-						aadlConnExpr = new jkind.lustre.BinaryExpr(srcExpr, BinaryOp.EQUAL,
-								new jkind.lustre.IdExpr(dstName));
+						Expr initExpr = srcType.getInitValue();
+
+						Expr preSource = new Nenola.UnaryExpr(UniRator.Pre, new IdExpr(srcName));
+						Expr srcExpr = new Nenola.BinExpr(initExpr, BinRator.StreamCons, preSource);
+						aadlConnExpr = new BinExpr(srcExpr, BinRator.Equal,
+								new IdExpr(dstName));
 					}
 
-					acc.add(aadlConnExpr);
+					if (mainNode.isAsync()) {
+						acc.add(aadlConnExpr.toLustreClockedExpr(state));
+						glueEquations.addAll(aadlConnExpr.toLustreClockedEquations(state));
+						glueVars.addAll(aadlConnExpr.toLustreClockedLocals(state));
+
+					} else {
+						acc.add(aadlConnExpr.toLustreExpr(state));
+
+					}
 
 				}
 			}
@@ -5546,7 +5621,6 @@ public class Nenola {
 
 	private static List<Node> lustreNodesFromMain(GlobalEnv globalEnv, NodeContract main, boolean isMonolithic) {
 
-		boolean isAsync = main.timingMode.isPresent() && main.timingMode.get() instanceof AsyncMode;
 		List<Node> nodes = new ArrayList<>();
 		Node mainNode = main.toLustreMainNode(globalEnv, isMonolithic);
 		nodes.add(mainNode);

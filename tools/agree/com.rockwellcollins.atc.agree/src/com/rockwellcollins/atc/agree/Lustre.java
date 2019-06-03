@@ -5,7 +5,6 @@ import static jkind.lustre.parsing.LustreParseUtil.to;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,9 +30,7 @@ import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.RecordAccessExpr;
 import jkind.lustre.RecordExpr;
-import jkind.lustre.RecordType;
 import jkind.lustre.TupleExpr;
-import jkind.lustre.Type;
 import jkind.lustre.UnaryExpr;
 import jkind.lustre.UnaryOp;
 import jkind.lustre.VarDecl;
@@ -66,21 +63,6 @@ public class Lustre {
 		return new BinaryExpr(timeInitZero, BinaryOp.AND, timeExpr);
 	}
 
-	public static Expr getInitValueFromType(Type type) {
-		if (type instanceof NamedType) {
-			return getInitValueFromType(type);
-		}
-		if (type instanceof RecordType) {
-			RecordType recordType = (RecordType) type;
-			Map<String, Expr> fieldMap = new HashMap<>();
-			for (Entry<String, Type> entry : recordType.fields.entrySet()) {
-				Expr subExpr = getInitValueFromType(entry.getValue());
-				fieldMap.put(entry.getKey(), subExpr);
-			}
-			return new RecordExpr(recordType.id, fieldMap);
-		}
-		throw new RuntimeException("AGREE cannot figure out an initial type for Lustre type: " + type.getClass());
-	}
 
 	public static Expr makeANDExpr(Expr left, Expr right) {
 		if (left instanceof BoolExpr) {
