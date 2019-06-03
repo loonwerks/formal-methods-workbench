@@ -23,6 +23,12 @@ before_install:
   - "./git-setup.sh"
 
 script:
+  - pushd tools/agree
+  - mvn clean verify
+  - popd
+  - pushd tools/resolute
+  - mvn clean verify
+  - popd
   - pushd tools
   - mvn clean verify
   - popd

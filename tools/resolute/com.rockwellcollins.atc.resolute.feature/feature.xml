@@ -2,7 +2,7 @@
 <feature
       id="com.rockwellcollins.atc.resolute.feature"
       label="Resolute"
-      version="1.0.0.qualifier"
+      version="2.4.0.qualifier"
       provider-name="ROCKWELLCOLLINS">
 
    <description>

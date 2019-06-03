@@ -24,7 +24,7 @@
    <feature url="features/com.collins.fmw.cyres.feature_1.0.0.qualifier.jar" id="com.collins.fmw.cyres.feature" version="1.0.0.qualifier">
       <category name="fmworkbench"/>
    </feature>
-   <feature url="features/com.rockwellcollins.atc.resolute.feature_1.0.0.qualifier.jar" id="com.rockwellcollins.atc.resolute.feature" version="1.0.0.qualifier">
+   <feature url="features/com.rockwellcollins.atc.resolute.feature_2.4.0.qualifier.jar" id="com.rockwellcollins.atc.resolute.feature" version="2.4.0.qualifier">
       <category name="fmworkbench"/>
    </feature>
    <feature url="features/com.rockwellcollins.atc.agree.feature_2.4.0.qualifier.jar" id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier">

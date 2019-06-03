@@ -33,8 +33,6 @@
 
 	<modules>
 		<module>aadl2sexp</module>
-		<module>agree</module>
-		<module>resolute</module>
 		<module>case</module>
 		<module>tcg</module>
 		<module>simulator</module>

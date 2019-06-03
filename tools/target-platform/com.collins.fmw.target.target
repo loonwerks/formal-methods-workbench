@@ -84,5 +84,15 @@
       <unit id="org.osate.xtext.aadl2.errormodel.feature.feature.group" version="2.5.0.vfinal"/>
       <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.5.0/updates/"/>
     </location>
+    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+      <unit id="com.rockwellcollins.atc.agree.feature.feature.group" version="0.0.0"/>
+      <unit id="com.rockwellcollins.atc.agree.feature.source.feature.group" version="0.0.0"/>
+      <repository location="file:agree/repository/target/repository/"/>
+    </location>
+    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+      <unit id="com.rockwellcollins.atc.resolute.feature.feature.group" version="0.0.0"/>
+      <unit id="com.rockwellcollins.atc.resolute.feature.source.feature.group" version="0.0.0"/>
+      <repository location="file:resolute/repository/target/repository/"/>
+    </location>
   </locations>
 </target>
