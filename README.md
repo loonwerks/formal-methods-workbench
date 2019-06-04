@@ -203,10 +203,9 @@ TODO
 
 Install
 =====
-1. Download the latest version of OSATE: (http://www.aadl.info/aadl/osate/stable/).
-2. Start OSATE and go to "Help -> Install New Software..."
-3. Click the "Add..." button in the upper right hand corner and add this URL as an update site: (https://raw.githubusercontent.com/smaccm/update-site/master/site.xml)
-4. Click the box labeled "SMACCM", click "Finish", and proceed through the dialog.
+1. Download the appropriate version of Formal Methods Workbench: (https://github.com/loonwerks/formal-methods-workbench/releases).
+2. Uncompress the archive to a directory of your choice.
+3. Run the FmIDE application.  Mac users may need remove a quarantine marker on the executable.
 
 Notes
 =====
