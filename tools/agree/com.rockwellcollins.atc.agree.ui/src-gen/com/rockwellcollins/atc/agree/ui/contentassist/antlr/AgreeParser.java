@@ -141,9 +141,7 @@ public class AgreeParser extends AbstractPartialContentAssistParser {
 					put(grammarAccess.getSynchStatementAccess().getGroup_1(), "rule__SynchStatement__Group_1__0");
 					put(grammarAccess.getSynchStatementAccess().getGroup_1_3(), "rule__SynchStatement__Group_1_3__0");
 					put(grammarAccess.getSynchStatementAccess().getGroup_2(), "rule__SynchStatement__Group_2__0");
-					put(grammarAccess.getSynchStatementAccess().getGroup_2_4(), "rule__SynchStatement__Group_2_4__0");
 					put(grammarAccess.getSynchStatementAccess().getGroup_3(), "rule__SynchStatement__Group_3__0");
-					put(grammarAccess.getSynchStatementAccess().getGroup_4(), "rule__SynchStatement__Group_4__0");
 					put(grammarAccess.getOrderStatementAccess().getGroup(), "rule__OrderStatement__Group__0");
 					put(grammarAccess.getOrderStatementAccess().getGroup_3(), "rule__OrderStatement__Group_3__0");
 					put(grammarAccess.getPropertyStatementAccess().getGroup(), "rule__PropertyStatement__Group__0");
@@ -413,8 +411,6 @@ public class AgreeParser extends AbstractPartialContentAssistParser {
 					put(grammarAccess.getSynchStatementAccess().getComp2Assignment_1_3_2(), "rule__SynchStatement__Comp2Assignment_1_3_2");
 					put(grammarAccess.getSynchStatementAccess().getMaxAssignment_1_3_4(), "rule__SynchStatement__MaxAssignment_1_3_4");
 					put(grammarAccess.getSynchStatementAccess().getMinAssignment_1_3_6(), "rule__SynchStatement__MinAssignment_1_3_6");
-					put(grammarAccess.getSynchStatementAccess().getElsAssignment_2_3(), "rule__SynchStatement__ElsAssignment_2_3");
-					put(grammarAccess.getSynchStatementAccess().getElsAssignment_2_4_1(), "rule__SynchStatement__ElsAssignment_2_4_1");
 					put(grammarAccess.getOrderStatementAccess().getCompsAssignment_2(), "rule__OrderStatement__CompsAssignment_2");
 					put(grammarAccess.getOrderStatementAccess().getCompsAssignment_3_1(), "rule__OrderStatement__CompsAssignment_3_1");
 					put(grammarAccess.getPropertyStatementAccess().getNameAssignment_1(), "rule__PropertyStatement__NameAssignment_1");

@@ -554,15 +554,6 @@ public interface AgreeFactory extends EFactory
   MNSynchStatement createMNSynchStatement();
 
   /**
-   * Returns a new object of class '<em>Calen Statement</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Calen Statement</em>'.
-   * @generated
-   */
-  CalenStatement createCalenStatement();
-
-  /**
    * Returns a new object of class '<em>Asynch Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->

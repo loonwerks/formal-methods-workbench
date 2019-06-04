@@ -1626,45 +1626,30 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cMinINTEGER_LITTerminalRuleCall_1_3_6_0 = (RuleCall)cMinAssignment_1_3_6.eContents().get(0);
 		private final Keyword cSemicolonKeyword_1_4 = (Keyword)cGroup_1.eContents().get(4);
 		private final Group cGroup_2 = (Group)cAlternatives.eContents().get(2);
-		private final Action cCalenStatementAction_2_0 = (Action)cGroup_2.eContents().get(0);
-		private final Keyword cCalendarKeyword_2_1 = (Keyword)cGroup_2.eContents().get(1);
+		private final Action cAsynchStatementAction_2_0 = (Action)cGroup_2.eContents().get(0);
+		private final Keyword cSynchronyKeyword_2_1 = (Keyword)cGroup_2.eContents().get(1);
 		private final Keyword cColonKeyword_2_2 = (Keyword)cGroup_2.eContents().get(2);
-		private final Assignment cElsAssignment_2_3 = (Assignment)cGroup_2.eContents().get(3);
-		private final CrossReference cElsNamedElementCrossReference_2_3_0 = (CrossReference)cElsAssignment_2_3.eContents().get(0);
-		private final RuleCall cElsNamedElementIDTerminalRuleCall_2_3_0_1 = (RuleCall)cElsNamedElementCrossReference_2_3_0.eContents().get(1);
-		private final Group cGroup_2_4 = (Group)cGroup_2.eContents().get(4);
-		private final Keyword cCommaKeyword_2_4_0 = (Keyword)cGroup_2_4.eContents().get(0);
-		private final Assignment cElsAssignment_2_4_1 = (Assignment)cGroup_2_4.eContents().get(1);
-		private final CrossReference cElsNamedElementCrossReference_2_4_1_0 = (CrossReference)cElsAssignment_2_4_1.eContents().get(0);
-		private final RuleCall cElsNamedElementIDTerminalRuleCall_2_4_1_0_1 = (RuleCall)cElsNamedElementCrossReference_2_4_1_0.eContents().get(1);
-		private final Keyword cSemicolonKeyword_2_5 = (Keyword)cGroup_2.eContents().get(5);
+		private final Keyword cAsynchronousKeyword_2_3 = (Keyword)cGroup_2.eContents().get(3);
+		private final Keyword cSemicolonKeyword_2_4 = (Keyword)cGroup_2.eContents().get(4);
 		private final Group cGroup_3 = (Group)cAlternatives.eContents().get(3);
-		private final Action cAsynchStatementAction_3_0 = (Action)cGroup_3.eContents().get(0);
+		private final Action cLatchedStatementAction_3_0 = (Action)cGroup_3.eContents().get(0);
 		private final Keyword cSynchronyKeyword_3_1 = (Keyword)cGroup_3.eContents().get(1);
 		private final Keyword cColonKeyword_3_2 = (Keyword)cGroup_3.eContents().get(2);
-		private final Keyword cAsynchronousKeyword_3_3 = (Keyword)cGroup_3.eContents().get(3);
+		private final Keyword cLatchedKeyword_3_3 = (Keyword)cGroup_3.eContents().get(3);
 		private final Keyword cSemicolonKeyword_3_4 = (Keyword)cGroup_3.eContents().get(4);
-		private final Group cGroup_4 = (Group)cAlternatives.eContents().get(4);
-		private final Action cLatchedStatementAction_4_0 = (Action)cGroup_4.eContents().get(0);
-		private final Keyword cSynchronyKeyword_4_1 = (Keyword)cGroup_4.eContents().get(1);
-		private final Keyword cColonKeyword_4_2 = (Keyword)cGroup_4.eContents().get(2);
-		private final Keyword cLatchedKeyword_4_3 = (Keyword)cGroup_4.eContents().get(3);
-		private final Keyword cSemicolonKeyword_4_4 = (Keyword)cGroup_4.eContents().get(4);
 		
 		//SynchStatement:
 		//	{SynchStatement} 'synchrony' ':' val=INTEGER_LIT (',' val2=INTEGER_LIT)? sim=('simult' | 'no_simult')? ';'
 		//	| {MNSynchStatement} 'synchrony' ':' (comp1+=[aadl2::NamedElement] ',' comp2+=[aadl2::NamedElement] ':'
 		//	max+=INTEGER_LIT ',' min+=INTEGER_LIT)+ ';'
-		//	| {CalenStatement} 'calendar' ':' els+=[aadl2::NamedElement] ("," els+=[aadl2::NamedElement])* ';'
 		//	| {AsynchStatement} 'synchrony' ':' 'asynchronous' ';'
 		//	| {LatchedStatement} 'synchrony' ':' 'latched' ';';
 		@Override public ParserRule getRule() { return rule; }
 
 		//{SynchStatement} 'synchrony' ':' val=INTEGER_LIT (',' val2=INTEGER_LIT)? sim=('simult' | 'no_simult')? ';' |
 		//{MNSynchStatement} 'synchrony' ':' (comp1+=[aadl2::NamedElement] ',' comp2+=[aadl2::NamedElement] ':' max+=INTEGER_LIT
-		//',' min+=INTEGER_LIT)+ ';' | {CalenStatement} 'calendar' ':' els+=[aadl2::NamedElement] (","
-		//els+=[aadl2::NamedElement])* ';' | {AsynchStatement} 'synchrony' ':' 'asynchronous' ';' | {LatchedStatement}
-		//'synchrony' ':' 'latched' ';'
+		//',' min+=INTEGER_LIT)+ ';' | {AsynchStatement} 'synchrony' ':' 'asynchronous' ';' | {LatchedStatement} 'synchrony' ':'
+		//'latched' ';'
 		public Alternatives getAlternatives() { return cAlternatives; }
 
 		//{SynchStatement} 'synchrony' ':' val=INTEGER_LIT (',' val2=INTEGER_LIT)? sim=('simult' | 'no_simult')? ';'
@@ -1770,50 +1755,29 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//';'
 		public Keyword getSemicolonKeyword_1_4() { return cSemicolonKeyword_1_4; }
 
-		//{CalenStatement} 'calendar' ':' els+=[aadl2::NamedElement] ("," els+=[aadl2::NamedElement])* ';'
+		//{AsynchStatement} 'synchrony' ':' 'asynchronous' ';'
 		public Group getGroup_2() { return cGroup_2; }
 
-		//{CalenStatement}
-		public Action getCalenStatementAction_2_0() { return cCalenStatementAction_2_0; }
+		//{AsynchStatement}
+		public Action getAsynchStatementAction_2_0() { return cAsynchStatementAction_2_0; }
 
-		//'calendar'
-		public Keyword getCalendarKeyword_2_1() { return cCalendarKeyword_2_1; }
+		//'synchrony'
+		public Keyword getSynchronyKeyword_2_1() { return cSynchronyKeyword_2_1; }
 
 		//':'
 		public Keyword getColonKeyword_2_2() { return cColonKeyword_2_2; }
 
-		//els+=[aadl2::NamedElement]
-		public Assignment getElsAssignment_2_3() { return cElsAssignment_2_3; }
-
-		//[aadl2::NamedElement]
-		public CrossReference getElsNamedElementCrossReference_2_3_0() { return cElsNamedElementCrossReference_2_3_0; }
-
-		//ID
-		public RuleCall getElsNamedElementIDTerminalRuleCall_2_3_0_1() { return cElsNamedElementIDTerminalRuleCall_2_3_0_1; }
-
-		//("," els+=[aadl2::NamedElement])*
-		public Group getGroup_2_4() { return cGroup_2_4; }
-
-		//","
-		public Keyword getCommaKeyword_2_4_0() { return cCommaKeyword_2_4_0; }
-
-		//els+=[aadl2::NamedElement]
-		public Assignment getElsAssignment_2_4_1() { return cElsAssignment_2_4_1; }
-
-		//[aadl2::NamedElement]
-		public CrossReference getElsNamedElementCrossReference_2_4_1_0() { return cElsNamedElementCrossReference_2_4_1_0; }
-
-		//ID
-		public RuleCall getElsNamedElementIDTerminalRuleCall_2_4_1_0_1() { return cElsNamedElementIDTerminalRuleCall_2_4_1_0_1; }
+		//'asynchronous'
+		public Keyword getAsynchronousKeyword_2_3() { return cAsynchronousKeyword_2_3; }
 
 		//';'
-		public Keyword getSemicolonKeyword_2_5() { return cSemicolonKeyword_2_5; }
+		public Keyword getSemicolonKeyword_2_4() { return cSemicolonKeyword_2_4; }
 
-		//{AsynchStatement} 'synchrony' ':' 'asynchronous' ';'
+		//{LatchedStatement} 'synchrony' ':' 'latched' ';'
 		public Group getGroup_3() { return cGroup_3; }
 
-		//{AsynchStatement}
-		public Action getAsynchStatementAction_3_0() { return cAsynchStatementAction_3_0; }
+		//{LatchedStatement}
+		public Action getLatchedStatementAction_3_0() { return cLatchedStatementAction_3_0; }
 
 		//'synchrony'
 		public Keyword getSynchronyKeyword_3_1() { return cSynchronyKeyword_3_1; }
@@ -1821,29 +1785,11 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//':'
 		public Keyword getColonKeyword_3_2() { return cColonKeyword_3_2; }
 
-		//'asynchronous'
-		public Keyword getAsynchronousKeyword_3_3() { return cAsynchronousKeyword_3_3; }
+		//'latched'
+		public Keyword getLatchedKeyword_3_3() { return cLatchedKeyword_3_3; }
 
 		//';'
 		public Keyword getSemicolonKeyword_3_4() { return cSemicolonKeyword_3_4; }
-
-		//{LatchedStatement} 'synchrony' ':' 'latched' ';'
-		public Group getGroup_4() { return cGroup_4; }
-
-		//{LatchedStatement}
-		public Action getLatchedStatementAction_4_0() { return cLatchedStatementAction_4_0; }
-
-		//'synchrony'
-		public Keyword getSynchronyKeyword_4_1() { return cSynchronyKeyword_4_1; }
-
-		//':'
-		public Keyword getColonKeyword_4_2() { return cColonKeyword_4_2; }
-
-		//'latched'
-		public Keyword getLatchedKeyword_4_3() { return cLatchedKeyword_4_3; }
-
-		//';'
-		public Keyword getSemicolonKeyword_4_4() { return cSemicolonKeyword_4_4; }
 	}
 
 	public class OrderStatementElements extends AbstractParserRuleElementFinder {
@@ -2384,8 +2330,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		
 		//LinearizationDef:
 		//	'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
-		//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)?
-		//	':' exprBody=Expr ';';
+		//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)? ':'
+		//	exprBody=Expr ';';
 		@Override public ParserRule getRule() { return rule; }
 
 		//'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')' 'over' '[' intervals+=LinearizationInterval (','
@@ -2894,8 +2840,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cDoubleDotRefParserRuleCall_1 = (RuleCall)cAlternatives.eContents().get(1);
 		
 		//BaseType Type:
-		//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT
-		//	| REAL_LIT) ']')?
+		//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT |
+		//	REAL_LIT) ']')?
 		//	| DoubleDotRef;
 		@Override public ParserRule getRule() { return rule; }
 
@@ -4678,8 +4624,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		@Override public ParserRule getRule() { return rule; }
 
 		//=> ({NamedElmExpr} elm=[aadl2::NamedElement|DCID]) | {TimeExpr} 'time' | {IndicesExpr} 'indices' '(' array=Expr ')' | =>
-		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef
-		//'{' args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
+		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef '{'
+		//args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
 		//({EnumLitExpr} 'enum' '(') enumType=DoubleDotRef ',' value=ID ')' | ArrayLiteralExpr | {IntLitExpr} val=INTEGER_LIT |
 		//{PreExpr} 'pre' '(' expr=Expr ')' | {EventExpr} 'event' '(' id=[aadl2::NamedElement] ')' | {LatchedExpr} 'latched' '('
 		//expr=Expr ')' | {TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')' | {TimeRiseExpr} 'timerise' '('
@@ -5755,7 +5701,6 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 	//	{SynchStatement} 'synchrony' ':' val=INTEGER_LIT (',' val2=INTEGER_LIT)? sim=('simult' | 'no_simult')? ';'
 	//	| {MNSynchStatement} 'synchrony' ':' (comp1+=[aadl2::NamedElement] ',' comp2+=[aadl2::NamedElement] ':'
 	//	max+=INTEGER_LIT ',' min+=INTEGER_LIT)+ ';'
-	//	| {CalenStatement} 'calendar' ':' els+=[aadl2::NamedElement] ("," els+=[aadl2::NamedElement])* ';'
 	//	| {AsynchStatement} 'synchrony' ':' 'asynchronous' ';'
 	//	| {LatchedStatement} 'synchrony' ':' 'latched' ';';
 	public SynchStatementElements getSynchStatementAccess() {
@@ -5872,8 +5817,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 
 	//LinearizationDef:
 	//	'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
-	//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)?
-	//	':' exprBody=Expr ';';
+	//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)? ':'
+	//	exprBody=Expr ';';
 	public LinearizationDefElements getLinearizationDefAccess() {
 		return pLinearizationDef;
 	}
@@ -5949,8 +5894,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 	}
 
 	//BaseType Type:
-	//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT
-	//	| REAL_LIT) ']')?
+	//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT |
+	//	REAL_LIT) ']')?
 	//	| DoubleDotRef;
 	public BaseTypeElements getBaseTypeAccess() {
 		return pBaseType;

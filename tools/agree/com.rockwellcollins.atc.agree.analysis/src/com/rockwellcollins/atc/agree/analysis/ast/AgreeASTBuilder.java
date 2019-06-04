@@ -71,7 +71,6 @@ import com.rockwellcollins.atc.agree.agree.AssignStatement;
 import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
-import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
@@ -576,9 +575,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			if (spec instanceof MNSynchStatement) {
 				return TimingModel.ASYNC;
 			}
-			if (spec instanceof CalenStatement) {
-				throw new AgreeException("The use of calendar statements has been depricated");
-			}
 			if (spec instanceof AsynchStatement) {
 				return TimingModel.ASYNC;
 			}
@@ -952,9 +948,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		for (SpecStatement spec : specs) {
 			if (spec instanceof MNSynchStatement) {
 				return getMNSynchConstraint((MNSynchStatement) spec);
-			}
-			if (spec instanceof CalenStatement) {
-				throw new AgreeException("The use of calendar statements has been depricated");
 			}
 			if (spec instanceof AsynchStatement) {
 				return new BoolExpr(true);

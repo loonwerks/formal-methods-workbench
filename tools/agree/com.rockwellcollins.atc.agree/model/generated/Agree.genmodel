@@ -179,9 +179,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Agree.ecore#//MNSynchStatement/max"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Agree.ecore#//MNSynchStatement/min"/>
     </genClasses>
-    <genClasses ecoreClass="Agree.ecore#//CalenStatement">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Agree.ecore#//CalenStatement/els"/>
-    </genClasses>
     <genClasses ecoreClass="Agree.ecore#//AsynchStatement"/>
     <genClasses ecoreClass="Agree.ecore#//LatchedStatement"/>
     <genClasses ecoreClass="Agree.ecore#//NodeEq">
@@ -327,6 +324,9 @@
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//RealCast">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//RealCast/expr"/>
+    </genClasses>
+    <genClasses ecoreClass="Agree.ecore#//CalenStatement">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Agree.ecore#//CalenStatement/els"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//ForeachExpr">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//ForeachExpr/binding"/>
