@@ -6,6 +6,8 @@ The [Formal Methods Workbench](https://github.com/loonwerks/formal-methods-workb
 
 ### Prerequisites
 
+Note: As Oracle now requires a paid subscription license to use their JDK, work is presenly underway investigating use of OpenJDK instead.  Initial results are positive, but presently the only supported JDK is the Oracle JDK 8.
+
 The build for the tools require the Java JDK 8 and the Maven build tool. A recent version of [OSATE2](http://osate.org/) is also needed.
 
 **Java JDK 8**: Download and install [Java 8 JDK](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) if it is not already on the build machine. It does *not* need to be the default JDK, but it does need to exist on the build machine. Mac OSX users might consider [Homebrew](https://brew.sh/): `brew cask install java8`. The new Java 8 JDK is installed at `/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/`.
@@ -65,15 +67,17 @@ Clone the [Formal Methods Workbench](https://github.com/loonwerks/formal-methods
 git clone https://github.com/loonwerks/formal-methods-workbench.git
 ```
 
-### Building the plugins
+### Building the plugins and IDE product
 
-Once **mvn** is using the right JDK, change to the *formal-methods-workbench* directory and build the plugins and IDE:
+Once **mvn** is using the right JDK, change to the *formal-methods-workbench/tools* directory and build the plugins and IDE:
 ```
-$ cd formal-methods-workbench
-$ mvn clean install
+$ cd formal-methods-workbench/tools
+$ mvn clean verify
 ```
 
 Although there are several warnings in the build, there should not be any errors.
+
+The build process packages the formal methods workbench plugins as individual P2 repositories and as a complete integrated development environment product.  The IDE product includes OSATE with all of the individual plugins pre-installed.  Compressed archives for Linux, Windows and MacOSX may be found in the *formal-methods-workbench/tools/ide/target/products* directory.
 
 ### Adding the Plugins to OSATE2
 
@@ -81,10 +85,18 @@ Install the plugins to [OSATE2](http://osate.org/).
 The build creates the plugin bundles for key tools in the `formal-methods-workbench/tools` subdirectory.  Each of the following plugins can be added to [OSATE2](http://osate.org/):
 
    * Resolute: architectural assurance builder tool for AADL
-   * Z3: SMT solver
    * AADL Simulator
    * CASE: ???
    * AGREE: assume-guarantee-style model checker for AADL models
+   * Z3-plugin: Microsoft Z3-Prover packaged as an Eclipse plugin
+
+The Z3-plugin may be installed by:
+
+   1. Download the [Z3-plugin archive](https://github.com/loonwerks/z3-plugin/releases/download/4.7.1/com.collins.trustedsystems.z3.repository-4.7.1.zip) and save to a directory of your choice.
+   1. Select *Help --> Install New Software...* and click **Add** in the dialogue.
+   2. State the name and then click **Archive...**
+   3. In the finder window, navigate to the appropriate directory to install the Z3-plugin
+   4. Click **Add**, select the products to install, and then follow the dialogues.
 
 After starting [OSATE2](http://osate.org/), the general process for each tool is
 
@@ -93,7 +105,6 @@ After starting [OSATE2](http://osate.org/), the general process for each tool is
    3. In the finder window, navigate to the appropriate directory to install the matching plugin:
 
       * **Resolute**: /formal-methods-workbench/tools/resolute/repository/target/com.collins.fmw.resolute.repository-1.0.0-SNAPSHOT.zip
-      * **z3**: /formal-methods-workbench/tools/z3/repository/target/com.collins.fmw.z3.repository-1.0.0-SNAPSHOT.zip
       * **AADL Simulator**: /formal-methods-workbench/tools/simulator/repository/target/com.collins.fmw.aadlsimulator.repository-1.0.0-SNAPSHOT.zip
       * **CASE**: /formal-methods-workbench/tools/case/repository/target/com.collins.fmw.cyres.repository-0.0.0.zip
       * **AGREE**: /formal-methods-workbench/tools/agree/repository/target/com.rockwellcollins.atc.agree.repository-2.4.0-SNAPSHOT.zip 
