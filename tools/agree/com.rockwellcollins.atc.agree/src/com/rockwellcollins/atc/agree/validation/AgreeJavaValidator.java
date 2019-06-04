@@ -72,7 +72,6 @@ import com.rockwellcollins.atc.agree.agree.AssumeStatement;
 import com.rockwellcollins.atc.agree.agree.AsynchStatement;
 import com.rockwellcollins.atc.agree.agree.BinaryExpr;
 import com.rockwellcollins.atc.agree.agree.BoolLitExpr;
-import com.rockwellcollins.atc.agree.agree.CalenStatement;
 import com.rockwellcollins.atc.agree.agree.CallExpr;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
@@ -447,23 +446,6 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	@Check(CheckType.FAST)
-	public void checkCalenStatement(CalenStatement calen) {
-		Classifier container = calen.getContainingClassifier();
-		if (!(container instanceof ComponentImplementation)) {
-			error(calen, "Calendar statements can appear only in component implementations");
-			return;
-		}
-
-		for (int index = 0; index < calen.getEls().size(); ++index) {
-			NamedElement el = calen.getEls().get(index);
-			if (!(el instanceof Subcomponent) || !((Subcomponent) el).getContainingComponentImpl().equals(container)) {
-				error("Element '" + el.getName() + "' is not a subcomponent of '" + container.getName() + "'",
-						calen, AgreePackage.Literals.CALEN_STATEMENT__ELS, index);
-			}
-		}
-	}
-
-	@Check(CheckType.FAST)
 	public void checkFloorCast(FloorCast floor) {
 		if (isInLinearizationBody(floor)) {
 			error(floor, "'event' expressions not allowed in linearization body expressions");
@@ -572,7 +554,7 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			error(sync, "Synchrony statements can appear only in component implementations");
 		}
 
-		if (sync instanceof CalenStatement || sync instanceof MNSynchStatement || sync instanceof AsynchStatement
+		if (sync instanceof MNSynchStatement || sync instanceof AsynchStatement
 				|| sync instanceof LatchedStatement) {
 			return;
 		}
@@ -1919,8 +1901,6 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		for (SpecStatement spec : contract.getSpecs()) {
 			if (spec instanceof SynchStatement) {
 				syncs.add((SynchStatement) spec);
-			} else if (spec instanceof CalenStatement) {
-				syncs.add((CalenStatement) spec);
 			} else if (spec instanceof InitialStatement) {
 				inits.add((InitialStatement) spec);
 			} else if (spec instanceof ConnectionStatement) {
