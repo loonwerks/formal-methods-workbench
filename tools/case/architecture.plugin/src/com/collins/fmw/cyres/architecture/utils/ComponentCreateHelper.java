@@ -13,6 +13,8 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
+import org.osate.aadl2.ProcessorImplementation;
+import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemSubcomponent;
@@ -20,6 +22,8 @@ import org.osate.aadl2.SystemType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.VirtualProcessorImplementation;
+import org.osate.aadl2.VirtualProcessorSubcomponent;
 
 /**
  * This class provides methods for creating component features without knowing
@@ -33,29 +37,63 @@ public class ComponentCreateHelper {
 	}
 
 	public static EClass getTypeClass(ComponentCategory compCategory) {
-		if (compCategory == ComponentCategory.SYSTEM) {
-			return Aadl2Package.eINSTANCE.getSystemType();
-		} else if (compCategory == ComponentCategory.ABSTRACT) {
+		switch (compCategory.getValue()) {
+		case ComponentCategory.ABSTRACT_VALUE:
 			return Aadl2Package.eINSTANCE.getAbstractType();
-		} else if (compCategory == ComponentCategory.PROCESS) {
+		case ComponentCategory.BUS_VALUE:
+			return Aadl2Package.eINSTANCE.getBusType();
+		case ComponentCategory.DATA_VALUE:
+			return Aadl2Package.eINSTANCE.getDataType();
+		case ComponentCategory.DEVICE_VALUE:
+			return Aadl2Package.eINSTANCE.getDeviceType();
+		case ComponentCategory.MEMORY_VALUE:
+			return Aadl2Package.eINSTANCE.getMemoryType();
+		case ComponentCategory.PROCESS_VALUE:
 			return Aadl2Package.eINSTANCE.getProcessType();
-		} else if (compCategory == ComponentCategory.THREAD) {
+		case ComponentCategory.PROCESSOR_VALUE:
+			return Aadl2Package.eINSTANCE.getProcessorType();
+		case ComponentCategory.SUBPROGRAM_VALUE:
+			return Aadl2Package.eINSTANCE.getSubprogramType();
+		case ComponentCategory.SUBPROGRAM_GROUP_VALUE:
+			return Aadl2Package.eINSTANCE.getSubprogramGroupType();
+		case ComponentCategory.SYSTEM_VALUE:
+			return Aadl2Package.eINSTANCE.getSystemType();
+		case ComponentCategory.THREAD_VALUE:
 			return Aadl2Package.eINSTANCE.getThreadType();
-		} else {
+		case ComponentCategory.THREAD_GROUP_VALUE:
+			return Aadl2Package.eINSTANCE.getThreadGroupType();
+		default:
 			return null;
 		}
 	}
 
 	public static EClass getImplClass(ComponentCategory compCategory) {
-		if (compCategory == ComponentCategory.SYSTEM) {
-			return Aadl2Package.eINSTANCE.getSystemImplementation();
-		} else if (compCategory == ComponentCategory.ABSTRACT) {
+		switch (compCategory.getValue()) {
+		case ComponentCategory.ABSTRACT_VALUE:
 			return Aadl2Package.eINSTANCE.getAbstractImplementation();
-		} else if (compCategory == ComponentCategory.PROCESS) {
+		case ComponentCategory.BUS_VALUE:
+			return Aadl2Package.eINSTANCE.getBusImplementation();
+		case ComponentCategory.DATA_VALUE:
+			return Aadl2Package.eINSTANCE.getDataImplementation();
+		case ComponentCategory.DEVICE_VALUE:
+			return Aadl2Package.eINSTANCE.getDeviceImplementation();
+		case ComponentCategory.MEMORY_VALUE:
+			return Aadl2Package.eINSTANCE.getMemoryImplementation();
+		case ComponentCategory.PROCESS_VALUE:
 			return Aadl2Package.eINSTANCE.getProcessImplementation();
-		} else if (compCategory == ComponentCategory.THREAD) {
+		case ComponentCategory.PROCESSOR_VALUE:
+			return Aadl2Package.eINSTANCE.getProcessorImplementation();
+		case ComponentCategory.SUBPROGRAM_VALUE:
+			return Aadl2Package.eINSTANCE.getSubprogramImplementation();
+		case ComponentCategory.SUBPROGRAM_GROUP_VALUE:
+			return Aadl2Package.eINSTANCE.getSubprogramGroupImplementation();
+		case ComponentCategory.SYSTEM_VALUE:
+			return Aadl2Package.eINSTANCE.getSystemImplementation();
+		case ComponentCategory.THREAD_VALUE:
 			return Aadl2Package.eINSTANCE.getThreadImplementation();
-		} else {
+		case ComponentCategory.THREAD_GROUP_VALUE:
+			return Aadl2Package.eINSTANCE.getThreadGroupImplementation();
+		default:
 			return null;
 		}
 	}
@@ -173,6 +211,11 @@ public class ComponentCreateHelper {
 			((ProcessSubcomponent) subcomponent).setProcessSubcomponentType((ProcessImplementation) compImpl);
 		} else if (subcomponent instanceof ThreadSubcomponent) {
 			((ThreadSubcomponent) subcomponent).setThreadSubcomponentType((ThreadImplementation) compImpl);
+		} else if (subcomponent instanceof ProcessorSubcomponent) {
+			((ProcessorSubcomponent) subcomponent).setProcessorSubcomponentType((ProcessorImplementation) compImpl);
+		} else if (subcomponent instanceof VirtualProcessorSubcomponent) {
+			((VirtualProcessorSubcomponent) subcomponent)
+					.setVirtualProcessorSubcomponentType((VirtualProcessorImplementation) compImpl);
 		}
 	}
 

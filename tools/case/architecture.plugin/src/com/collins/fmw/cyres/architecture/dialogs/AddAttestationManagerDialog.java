@@ -108,7 +108,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private void createImplementationNameField(Composite container) {
 
 		Label lblImplNameField = new Label(container, SWT.NONE);
-		lblImplNameField.setText("Attestation Manager Implementation Name");
+		lblImplNameField.setText("Attestation Manager implementation name");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -122,7 +122,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private void createImplementationLanguageField(Composite container) {
 
 		Label lblImplLangField = new Label(container, SWT.NONE);
-		lblImplLangField.setText("Attestation Manager Implementation Language");
+		lblImplLangField.setText("Attestation Manager implementation language");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -135,7 +135,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private void createCacheTimeoutField(Composite container) {
 
 		Label lblCacheTimeoutField = new Label(container, SWT.NONE);
-		lblCacheTimeoutField.setText("Cache Timeout (minutes)");
+		lblCacheTimeoutField.setText("Cache timeout (minutes)");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -148,7 +148,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private void createCacheSizeField(Composite container) {
 
 		Label lblCacheSizeField = new Label(container, SWT.NONE);
-		lblCacheSizeField.setText("Cache Size");
+		lblCacheSizeField.setText("Cache size");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -246,7 +246,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	 */
 	private void createAgreePropertyField(Composite container) {
 		Label lblAgreeField = new Label(container, SWT.NONE);
-		lblAgreeField.setText("Attestation AGREE Contract");
+		lblAgreeField.setText("Attestation AGREE contract");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;

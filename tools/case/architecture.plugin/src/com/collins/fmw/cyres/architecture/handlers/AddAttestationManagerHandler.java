@@ -170,7 +170,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				if (pkgSection == null) {
 					// Something went wrong
-					Dialog.showError("No package section found", "No public or private package sections found.");
+					Dialog.showError("Add Attestation Manager", "No public or private package sections found.");
 					return;
 				}
 

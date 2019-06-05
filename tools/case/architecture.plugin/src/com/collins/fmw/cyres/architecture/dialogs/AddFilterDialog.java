@@ -87,7 +87,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 */
 	private void createFilterImplementationNameField(Composite container) {
 		Label lblFilterImplNameField = new Label(container, SWT.NONE);
-		lblFilterImplNameField.setText("Filter Implementation Name");
+		lblFilterImplNameField.setText("Filter implementation name");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -103,7 +103,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 */
 	private void createImplementationLanguageField(Composite container) {
 		Label lblImplLangField = new Label(container, SWT.NONE);
-		lblImplLangField.setText("Filter Implementation Language");
+		lblImplLangField.setText("Filter implementation language");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -177,7 +177,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 */
 	private void createAgreeField(Composite container) {
 		Label lblAgreeField = new Label(container, SWT.NONE);
-		lblAgreeField.setText("Filter AGREE Contract");
+		lblAgreeField.setText("Filter AGREE contract");
 
 		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
 		txtAgreeProperty = new Text(container, SWT.BORDER);
