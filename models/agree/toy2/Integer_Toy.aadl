@@ -2,15 +2,6 @@ package Integer_Toy
 public 
    with Base_Types;
    with Lib;
-   with Props;
-   
-system Extra
-		
-	properties
-		Props::COMP_TYPE => COMM_DRIVER;
-
-	
-end Extra;
    
    
 system A
@@ -54,14 +45,9 @@ system top_level
 		Input: in data port Base_Types::Integer;
 		Output: out data port Base_Types::Integer;
 		
-		
---	properties
---			Props::COMP_TYPE => COMM_DRIVER;
-			
+
 	annex agree {** 
-	    
-	  eq x : bool = Get_Property(Extra, Props::COMP_TYPE) = Get_Property(Extra, Props::COMP_TYPE);
-	    
+
 	  eq mode : int;
 		assume "System input range " : Lib::ident(Input) < 10;
 		guarantee "mode is always positive" : mode >= 0;
