@@ -9,14 +9,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
-import org.eclipse.xtext.ui.editor.utils.EditorUtils;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.ImplementationExtension;
 import org.osate.aadl2.ListValue;
@@ -126,13 +124,18 @@ public class AddIsolatorHandler extends AadlHandler {
 			return;
 		}
 
+		// Are we isolating entire selected component + subcomponents, or just selected subcomponents?
+		boolean entireImpl = isolatedComponents.get(0).equalsIgnoreCase(sub.getName());
+
+		// Create the isolator component
+		insertIsolatorComponent(sub);
+
 		// Insert the virtual processor type and implementation components
 		// into the same package as the processor.
 		// Note that this could be a different package than the selected subcomponent
 		insertVirtualProcessor(EcoreUtil.getURI(processor));
 
-		// Insert the isolator component
-//		insertIsolatorComponent(uri);
+
 
 		return;
 
@@ -154,6 +157,7 @@ public class AddIsolatorHandler extends AadlHandler {
 
 				final Subcomponent processorSub = (Subcomponent) resource.getEObject(processorURI.fragment());
 				final ComponentImplementation processorImpl = processorSub.getComponentImplementation();
+				final ComponentType processorType = processorImpl.getType();
 				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
 				PackageSection pkgSection = null;
 				// Figure out if the processor is in the public or private section
@@ -190,27 +194,53 @@ public class AddIsolatorHandler extends AadlHandler {
 						.createOwnedClassifier(Aadl2Package.eINSTANCE.getVirtualProcessorType());
 				// Give it a unique name
 				vpType.setName(getUniqueName(VIRTUAL_PROCESSOR_TYPE_NAME, true, pkgSection.getOwnedClassifiers()));
+				// Put in the right place in the package (after the processor implementation)
+				pkgSection.getOwnedClassifiers().move(
+						getIndex(processorImpl.getName(), pkgSection.getOwnedClassifiers()) + 1,
+						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create virtual processor component implementation
 				VirtualProcessorImplementation vpImpl = (VirtualProcessorImplementation) pkgSection
 						.createOwnedClassifier(Aadl2Package.eINSTANCE.getVirtualProcessorImplementation());
 				vpImpl.setName(vpType.getName() + ".Impl");
-				final Realization r = vpImpl.createOwnedRealization();
-				r.setImplemented(vpType);
+				final Realization rVpImpl = vpImpl.createOwnedRealization();
+				rVpImpl.setImplemented(vpType);
+				// Put in the right place in the package
+				pkgSection.getOwnedClassifiers().move(getIndex(vpType.getName(), pkgSection.getOwnedClassifiers()) + 1,
+						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Extend the specified processor implementation
-				ComponentImplementation procExImpl = (ComponentImplementation) pkgSection
+				ComponentImplementation procExtImpl = (ComponentImplementation) pkgSection
 						.createOwnedClassifier(ComponentCreateHelper.getImplClass(processorImpl.getCategory()));
-				ImplementationExtension implEx = procExImpl.createOwnedExtension();
+				procExtImpl.setName(
+						getUniqueName(processorImpl.getName() + "Ext", true, pkgSection.getOwnedClassifiers()));
+				final Realization rProcExImpl = procExtImpl.createOwnedRealization();
+				rProcExImpl.setImplemented(processorType);
+				ImplementationExtension implEx = procExtImpl.createOwnedExtension();
 				implEx.setExtended(processorImpl);
+				// Put in the right place in the package (after the processor implementation)
+				pkgSection.getOwnedClassifiers().move(
+						getIndex(processorImpl.getName(), pkgSection.getOwnedClassifiers()) + 1,
+						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create the virtual processor subcomponent of the specified processor
 				VirtualProcessorSubcomponent vpSub = (VirtualProcessorSubcomponent) ComponentCreateHelper
-						.createOwnedSubcomponent(procExImpl, ComponentCategory.VIRTUAL_PROCESSOR);
+						.createOwnedSubcomponent(procExtImpl, ComponentCategory.VIRTUAL_PROCESSOR);
+				vpSub.setName(VIRTUAL_PROCESSOR_IMPL_NAME);
+				vpSub.setVirtualProcessorSubcomponentType(vpImpl);
 
-				// Replace the original processor implementation subcomponent with the extended one
+				// Replace the original processor / virtual processor implementation subcomponent with the extended one
 				// containing the virtual processor
-				ComponentCreateHelper.setSubcomponentType(processorSub, procExImpl);
+				ComponentCreateHelper.setSubcomponentType(processorSub, procExtImpl);
+
+				// TODO: Bind the virtual processor to the processor
+				ComponentImplementation ci = processorSub.getContainingComponentImpl();
+
+
+				// TODO: Add/Modify Actual_Processor_Binding property
+				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class
+				// If the entire component implementation + all subcomponents are selected, modify existing binding
+				// If selected subcomponents are selected, add the new binding
 
 				return null;
 			});
@@ -221,19 +251,18 @@ public class AddIsolatorHandler extends AadlHandler {
 
 	}
 
-	private void insertIsolatorComponent(URI uri) {
+	private void insertIsolatorComponent(Subcomponent selectedComp) {
 
+		// Get the file to insert into
+		IFile file = Filesystem.getFile(selectedComp.getComponentImplementation().eResource().getURI());
+		XtextEditor editor = ModifyUtils.getEditor(file);
 
-		// Get the active xtext editor so we can make modifications
-		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-
-		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
-
-			@Override
-			public void process(final XtextResource resource) throws Exception {
+		if (editor != null) {
+			editor.getDocument().modify(resource -> {
 
 				// Retrieve the model object to modify
-				Subcomponent selectedComponent = (Subcomponent) resource.getEObject(uri.fragment());
+				Subcomponent selectedComponent = (Subcomponent) resource
+						.getEObject(selectedComp.getComponentImplementation().eResource().getURI().fragment());
 				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
 				PackageSection pkgSection = null;
 				// Figure out if the selected connection is in the public or private section
@@ -253,27 +282,46 @@ public class AddIsolatorHandler extends AadlHandler {
 				if (pkgSection == null) {
 					// Something went wrong
 					Dialog.showError("Add Isolator", "No public or private package sections found.");
-					return;
+					return null;
 				}
 
 				// Import CASE_Properties file
 				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
-					return;
+					return null;
 				}
 				// Import CASE_Model_Transformations file
 				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
-					return;
+					return null;
 				}
 
-				// TODO: Create virtual processor type
+				// If we are not isolating the entire component implementation + subcomponents
+				// We need to pull the selected components out and place in a new implementation
+				if (!isolatedComponents.get(0).equalsIgnoreCase(selectedComp.getName())) {
 
-				// TODO: Create virtual processor implementation
+					// TODO: Create a new isolator component
+					// Figure out component type by looking at the component type of the destination component
+					ComponentCategory compCategory = selectedComponent.getCategory();
 
-				// TODO: Create virtual processor subcomponent
+					final ComponentType isolatorType = (ComponentType) pkgSection
+							.createOwnedClassifier(ComponentCreateHelper.getTypeClass(compCategory));
+
+					// Give it a unique name
+					isolatorType
+							.setName(getUniqueName(ISOLATOR_COMP_TYPE_NAME, true, pkgSection.getOwnedClassifiers()));
+
+					// Create ports
+
+					// TODO: Move selected components to it
+
+				}
+
+				// Add COMP_TYPE ISOLATOR property
+
+				return null;
+			});
+		}
 
 
-			}
-		});
 
 	}
 

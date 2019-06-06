@@ -24,6 +24,7 @@ import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
+import org.osate.ui.dialogs.Dialog;
 
 /**
  * This class provides methods for creating component features without knowing
@@ -198,6 +199,15 @@ public class ComponentCreateHelper {
 			} else if (compCategory == ComponentCategory.THREAD) {
 				return ((ProcessImplementation) compImpl).createOwnedThreadSubcomponent();
 			}
+		} else if (compImpl instanceof ProcessorImplementation) {
+			if (compCategory == ComponentCategory.ABSTRACT) {
+				return ((ProcessorImplementation) compImpl).createOwnedAbstractSubcomponent();
+			} else if (compCategory == ComponentCategory.VIRTUAL_PROCESSOR) {
+				return ((ProcessorImplementation) compImpl).createOwnedVirtualProcessorSubcomponent();
+			}
+		} else {
+			Dialog.showError("Component Create Helper",
+					"Create Owned Subcomponent: unhandled component type (" + compImpl.getTypeName() + ")");
 		}
 		return null;
 	}

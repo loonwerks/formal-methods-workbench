@@ -120,6 +120,9 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	 */
 	private void createComponentSelectionField(Composite container) {
 
+		btnCompSelectionType.clear();
+		btnComponents.clear();
+
 		// Don't display this field if
 		// Component is contains one or no subcomponents OR component is a thread
 		if (this.component.getComponentImplementation().getOwnedSubcomponents() == null
@@ -144,7 +147,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		selectionGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		selectionGroup.setLayout(new GridLayout(1, true));
 
-		btnCompSelectionType.clear();
 		Button option = new Button(selectionGroup, SWT.RADIO);
 		option.setText(this.component.getName() + " and its subcomponents");
 		option.setSelection(true);
@@ -168,7 +170,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		Group compSelectionField = new Group(selectionField, SWT.NO_RADIO_GROUP);
 		compSelectionField.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		compSelectionField.setLayout(new GridLayout(3, true));
-		btnComponents.clear();
 		for (Subcomponent sub : this.component.getComponentImplementation().getOwnedSubcomponents()) {
 			Button comp = new Button(compSelectionField, SWT.CHECK);
 			comp.setText(sub.getName());
@@ -280,8 +281,11 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 		isolatorImplementationName = txtIsolatorImplementationName.getText();
 		virtualProcessorName = txtVirtualProcessorName.getText();
+
 		components.clear();
-		if (btnCompSelectionType.get(0).getSelection()) {
+		if (btnCompSelectionType.isEmpty()) {
+			components.add(component.getName());
+		} else if (btnCompSelectionType.get(0).getSelection()) {
 			components.add(component.getName());
 		} else {
 			for (Button btn : btnComponents) {
