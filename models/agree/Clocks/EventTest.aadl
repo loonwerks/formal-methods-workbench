@@ -4,34 +4,52 @@ public
    
 system Counter
 	features
-		Output: out data port Base_Types::Integer;
+		Output: out event data port Base_Types::Integer;
 			
 	annex agree {** 
-		guarantee "Counter" : Output = (0 -> (pre(Output) + 1));
+		guarantee "Counter" : event(Output) => Output = (0 -> (pre(Output) + 1));
 	**};
 	
 end Counter ; 
    
    
-system Sieve
+system Filter
 	features
-		Input: in data port Base_Types::Integer;
+		Input: in event data port Base_Types::Integer;
 		Output: out event data port Base_Types::Integer;
 			
 	annex agree {** 
-		assume "Sieve" : (Input = 0) -> (pre(Input) < Input);
-		guarantee "Sieve" : Output = Input ;
---		out event Output: Input mod 7 = 0 ;
+		
+		guarantee "Filter" : event(Output) = (event(Input) and not (Input mod 7 = 0));
+		
+		guarantee "Forward" : event(Output) => Output = Input ;
+		
+		
+		
+		--proposal
+		---out event Output1 : fireCondition(Input ...); --no outputs.
+		---out event Output2 : fireCondition(Input ...);
+		
+		
+		-- guarantee : something1(Output1);
+		-- guarantee : something2(Output1, Output2, Input1, Input2);
+		
+		--generated:
+		--guarantee "Output1 fireCondition guarantee" : event(Output1) <=> (event(Input) and event(...) and fireCondition(Input ...));
+		--guarantee "something2" : event(Output1) and event(Output2) and event(Input1) and event(Input2) => something(Output1, Output2, Input1, Input2);
+		
+		
+
 	**};	
-end Sieve ; 
+end Filter ; 
 
 
 system Target
 	features
-		Input: in data port Base_Types::Integer;
+		Input: in event data port Base_Types::Integer;
 			
 	annex agree {** 
-		assume "Target" : ((Input = 0) -> (pre(Input) < Input)) and (not (Input mod 7 = 0)) ;
+		assume "Target" : event(Input) => (not (Input mod 7 = 0)) ;
 	**};
 	
 end Target ; 
@@ -45,11 +63,11 @@ end top_level;
 system implementation top_level.Impl
 	subcomponents
 		counter : system Counter ;
-		sieve : system Sieve ;
+		filter : system Filter ;
 		target : system Target ;
 	connections
-		counter_to_sieve : port counter.Output -> sieve.Input {Communication_Properties::Timing => immediate;};
-		sieve_to_target : port sieve.Output -> target.Input {Communication_Properties::Timing => immediate;};
+		counter_to_sieve : port counter.Output -> filter.Input {Communication_Properties::Timing => immediate;};
+		filter_to_target : port filter.Output -> target.Input {Communication_Properties::Timing => immediate;};
 	annex agree{**	
 
 		
