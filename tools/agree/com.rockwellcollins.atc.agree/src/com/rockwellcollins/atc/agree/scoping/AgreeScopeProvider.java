@@ -220,7 +220,9 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 		IScope outerScope = IScope.NULLSCOPE;
 		if (container instanceof ComponentImplementation) {
 			ComponentImplementation compImpl = (ComponentImplementation) container;
-			outerScope = Scopes.scopeFor(compImpl.getAllConnections(), getScope(ctx.eContainer(), ref));
+			outerScope = getScope(ctx.eContainer(), ref);
+			outerScope = Scopes.scopeFor(compImpl.getAllSubcomponents(), outerScope);
+			outerScope = Scopes.scopeFor(compImpl.getAllConnections(), outerScope);
 		}
 		return outerScope;
 	}
