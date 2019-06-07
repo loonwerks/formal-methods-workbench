@@ -48,7 +48,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:com.collins.fmw.cyres.menus.outline.resiliency.staircase.proofs?after=additions">
+            locationURI="popup:com.collins.fmw.cyres.menus.outline.resiliency.proofs?after=additions">
          <command
                commandId="filter_checker.commads.verify"
                label="SPLAT"
@@ -57,7 +57,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:com.collins.fmw.cyres.menus.editor.resiliency.staircase.proofs?after=additions">
+            locationURI="popup:com.collins.fmw.cyres.menus.editor.resiliency.proofs?after=additions">
          <command
                commandId="filter_checker.commads.verify"
                label="SPLAT"
@@ -66,7 +66,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="menu:com.collins.fmw.cyres.menus.menubar.resiliency.staircase.proofs?after=additions">
+            locationURI="menu:com.collins.fmw.cyres.menus.menubar.resiliency.proofs?after=additions">
          <command
                commandId="filter_checker.commads.verify"
                label="SPLAT"

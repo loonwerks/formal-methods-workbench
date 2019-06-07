@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,
  org.eclipse.xtext.ui,
  org.eclipse.emf.common,
- org.eclipse.ui.console
+ org.eclipse.ui.console,
+ org.osate.ui
 Import-Package: com.collins.fmw.cyres.util.plugin,
  com.rockwellcollins.atc.agree.agree,
  com.rockwellcollins.atc.agree.analysis.handlers,

@@ -174,28 +174,31 @@ TODO: Explain what these tests test and why
 TODO: Give an example
 ```
 
-## Deployment
+## Continuous Integration / Continuous Deployment
 
-TODO: Add additional notes about how to deploy this on a live system
+Continuous integration is conducted through [Travis CI](https://travis-ci.org/loonwerks/formal-methods-workbench) as an open source project.  Presently builds are completed once per day, aggregating the latest development versions of the individual plugins comprising the Formal Methods Workbench and their dependencies.  As the development stabilizes, it is intended that changes checked into the repository will trigger automated builds.
+
+As Travis CI is used for CI/CD, the configuration file for the builds is [.travis.yml](https://github.com/loonwerks/formal-methods-workbench/blob/master/.travis.yml).  This configuration file specifies invocation of maven in the *formal-methods-workbench/tools* directory to conduct all steps of gathering dependencies, compilation, test and packaging.  Presntly two deployments are specified.  The first of these serves the daily development build, storing the resuling P2 plugin repository and the IDE product in the [Releases](https://github.com/loonwerks/formal-methods-workbench/releases) page of this repository.  The second manages the daily builds, deleting stale daily releases.  Necessart support scripts, implemented in Python3, are kept in the *formal-methods-workbench/.travis* directory.
 
 ## Built With
 
-TODO
+Builds are managed through the [Eclipse Tycho](https://www.eclipse.org/tycho/) buid system.  The top-level build is presently launched from the *formal-methods-workbench/tools* directory where an aggregator project collects the various subprojects comprising the Formal Methods Workbench IDE.  The majority of these plugins are presently contained within this repository and directly composed as modules under the top-level build.  However, the Assume-Guarantee REasoning Environment (AGREE) and the Resolute Assurance Case Analysis are (soon to be) maintained in separate repositories and included as dependencies through Tycho/Maven.
 
 ## Contributing
 
-TODO 
+Presently direct contributions to this repository are limited to members of the DARPA CASE program team.  However, we welcome suggestions for improvement submitted via the [Issues](https://github.com/loonwerks/formal-methods-workbench/issues) page.  After disucssion with the team we may welcome pull requests improving or implementing features.  Thanks for your interest in improving the state of the practice in cyber-aware system engineering.
+
 ## Versioning
 
-TODO
+As the Formal Methods Workbench is still in the early stages of development and not all planned plugins have yet been integrated, the current version is 1.0.0-SNAPSHOT.  It is likely that an official release will be made for the next tool evaluation under the DARPA CASE program.
 
-## Authors
+The various plugins immediately composed in this repository presently track their version numbers with that of the aggregate IDE.  Dependency plugins such as AGREE and Resolute maintain their own version number scheme.
 
-TODO
+Presently maintenance of version numbers is completed manually.  It is the intent that the [Tycho Release Workflow](https://wiki.eclipse.org/Tycho/Release_Workflow) will be integrated to automate the release and version numbering process.
 
 ## License
 
-TODO
+This tool is owned and licensed by Collins Aerospace.  A BSD-like 3-clause license is described in the [LICENSE](https://github.com/loonwerks/formal-methods-workbench/blob/master/LICENSE) file.
 
 ## Acknowledgments
 

@@ -1,13 +1,10 @@
 package com.collins.fmw.cyres.json.plugin;
 
-import java.io.IOException;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -20,38 +17,65 @@ import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ge.BusinessObjectSelection;
+import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.util.plugin.Filesystem;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
+import com.collins.fmw.cyres.util.plugin.ModelHashcode;
+import com.collins.fmw.cyres.util.plugin.TraverseProject;
+import com.google.gson.JsonObject;
 
 public class TranslateHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+
 		URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
 		if (uri == null) {
 			return null;
 		}
 
 		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
-		EObject object = resourceSet.getEObject(uri, true);
-		JsonElement json = Aadl2Json.toJson(object);
+		EObject eObj = resourceSet.getEObject(uri, true);
 
-		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+		ComponentImplementation ci = null;
+		if (eObj instanceof ComponentImplementation) {
+			ci = (ComponentImplementation) eObj;
+		}
+
+		IProject project = TraverseProject.getCurrentProject();
+
+		String hashcode = null;
+		try {
+			hashcode = ModelHashcode.getHashcode(ci);
+		} catch (Exception e) {
+			;
+			hashcode = null;
+		}
+
+		JsonObject header = new JsonObject();
+		if (project != null) {
+			header.addProperty("project", project.getName());
+		}
+		if (ci != null) {
+			header.addProperty("implementation", ci.getQualifiedName());
+		}
+		header.addProperty("date", System.currentTimeMillis());
+		if (hashcode != null) {
+			header.addProperty("hash", hashcode);
+		}
 
 		try {
-			URI jsonURI = Aadl2Json.makeJsonFile(uri);
-			IFile jsonIFile = Filesystem.getFile(jsonURI);
-			Filesystem.writeFile(jsonIFile, gson.toJson(json).getBytes());
-		} catch (CoreException | IOException e) {
-			e.printStackTrace();
+			// Generate json
+			Aadl2Json.createJson(header);
+		} catch (Exception e) {
+			Dialog.showError("JSON Generator", "Unable to export model to JSON format.");
+			return null;
 		}
-		return gson;
+
+		return null;
 
 	}
 

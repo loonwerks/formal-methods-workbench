@@ -65,7 +65,7 @@ public class AddFilterHandler extends AadlHandler {
 	private String filterImplementationName;
 	private String filterImplementationLanguage;
 	private PortCategory logPortType;
-	private String filterResoluteClause;
+	private String filterRequirement;
 	private String filterAgreeProperty;
 	private List<String> propagatedGuarantees;
 
@@ -134,7 +134,7 @@ public class AddFilterHandler extends AadlHandler {
 				filterImplementationName = FILTER_IMPL_NAME;
 			}
 			logPortType = wizard.getLogPortType();
-			filterResoluteClause = wizard.getRequirement();
+			filterRequirement = wizard.getRequirement();
 			filterAgreeProperty = wizard.getAgreeProperty();
 			propagatedGuarantees = wizard.getGuaranteeList();
 		} else {
@@ -184,7 +184,7 @@ public class AddFilterHandler extends AadlHandler {
 
 				if (pkgSection == null) {
 					// Something went wrong
-					Dialog.showError("No package section found", "No public or private package sections found.");
+					Dialog.showError("Add Filter", "No public or private package sections found.");
 					return;
 				}
 
@@ -234,10 +234,10 @@ public class AddFilterHandler extends AadlHandler {
 					portOut = ComponentCreateHelper.createOwnedDataPort(filterType);
 					((DataPort) portOut).setDataFeatureClassifier(dataFeatureClassifier);
 				} else if (port instanceof EventPort) {
-					Dialog.showError("Incompatible port type", "Cannot connect a filter to a non-data port.");
+					Dialog.showError("Add Filter", "Cannot connect a filter to a non-data port.");
 					return;
 				} else {
-					Dialog.showError("Undetermined port type",
+					Dialog.showError("Add Filter",
 							"Could not determine the port type of the destination component.");
 					return;
 				}
@@ -356,9 +356,9 @@ public class AddFilterHandler extends AadlHandler {
 						containingImpl.getOwnedPortConnections().size() - 1);
 
 				// Add add_filter claims to resolute prove statement, if applicable
-				if (!filterResoluteClause.isEmpty()) {
-					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterResoluteClause);
-					RequirementsManager.getInstance().modifyRequirement(filterResoluteClause, resource,
+				if (!filterRequirement.isEmpty()) {
+					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
+					RequirementsManager.getInstance().modifyRequirement(filterRequirement, resource,
 							new AddFilterClaim(req.getContext(), filterSubcomp,
 									portConnOut.getName(), dataFeatureClassifier));
 
@@ -373,7 +373,7 @@ public class AddFilterHandler extends AadlHandler {
 					String agreeClauses = "{**" + System.lineSeparator();
 
 					for (String guarantee : propagatedGuarantees) {
-						agreeClauses = agreeClauses + "\t\t\t" + guarantee + System.lineSeparator();
+						agreeClauses = agreeClauses + guarantee + System.lineSeparator();
 					}
 
 					// replace source out port name with filter out port name
@@ -381,7 +381,7 @@ public class AddFilterHandler extends AadlHandler {
 							FILTER_PORT_OUT_NAME);
 
 					if (!filterAgreeProperty.isEmpty()) {
-						agreeClauses = agreeClauses + "\t\t\t" + filterAgreeProperty + System.lineSeparator();
+						agreeClauses = agreeClauses + filterAgreeProperty + System.lineSeparator();
 					}
 
 					// Add message preservation spec
@@ -392,7 +392,7 @@ public class AddFilterHandler extends AadlHandler {
 							+ "_DataPreservation \"Preserve filter input data\" : filter_out = filter_in;"
 							+ System.lineSeparator();
 
-					agreeClauses = agreeClauses + "\t\t**}";
+					agreeClauses = agreeClauses + "**}";
 
 					final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper
 							.createOwnedAnnexSubclause(filterType);
