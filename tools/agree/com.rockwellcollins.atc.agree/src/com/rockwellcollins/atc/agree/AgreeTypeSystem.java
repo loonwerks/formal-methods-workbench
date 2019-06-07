@@ -23,6 +23,7 @@ import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EnumerationType;
@@ -240,9 +241,6 @@ public class AgreeTypeSystem {
 	}
 
 	public static TypeDef typeDefFromClassifier(Classifier c) {
-
-
-
 		if (c instanceof AadlBoolean || c.getName().contains("Boolean")) {
 			return Prim.BoolTypeDef;
 		} else if (c instanceof AadlInteger || c.getName().contains("Integer") || c.getName().contains("Natural")
@@ -250,63 +248,64 @@ public class AgreeTypeSystem {
 			return Prim.IntTypeDef;
 		} else if (c instanceof AadlReal || c.getName().contains("Float")) {
 			return Prim.RealTypeDef;
-		} else if (c instanceof DataType) {
-			Classifier ext = c.getExtended();
-			if (ext != null && (ext instanceof AadlInteger || ext.getName().contains("Integer")
-					|| ext.getName().contains("Natural") || ext.getName().contains("Unsigned"))) {
-
-
-				List<PropertyAssociation> pas = c.getAllPropertyAssociations();
-				for (PropertyAssociation choice : pas) {
-					Property p = choice.getProperty();
-
-					PropertyExpression v = choice.getOwnedValues().get(0).getOwnedValue();
-
-					String key = p.getQualifiedName();
-
-					if (key.equals("Data_Model::Integer_Range")) {
-						if (v instanceof RangeValue) {
-							try {
-								RangeValue rangeValue = (RangeValue) v;
-								long min = intFromPropExp(rangeValue.getMinimum()).get();
-								long max = intFromPropExp(rangeValue.getMaximum()).get();
-								return new RangeIntTypeDef(min, max);
-							} catch (Exception e) {
-								return Prim.ErrorTypeDef;
-							}
-						}
-					}
-				}
-				return Prim.IntTypeDef;
-
-			} else if (ext != null && (ext instanceof AadlReal || ext.getName().contains("Float"))) {
-
-				List<PropertyAssociation> pas = c.getAllPropertyAssociations();
-				for (PropertyAssociation choice : pas) {
-					Property p = choice.getProperty();
-
-					PropertyExpression v = choice.getOwnedValues().get(0).getOwnedValue();
-
-					String key = p.getQualifiedName();
-
-					if (key.equals("Data_Model::Real_Range")) {
-						if (v instanceof RangeValue) {
-							try {
-								RangeValue rangeValue = (RangeValue) v;
-								double min = realFromPropExp(rangeValue.getMinimum()).get();
-								double max = realFromPropExp(rangeValue.getMaximum()).get();
-								return new RangeRealTypeDef(min, max);
-							} catch (Exception e) {
-								return Prim.ErrorTypeDef;
-							}
-						}
-					}
-				}
-				return Prim.RealTypeDef;
-			}
-
-
+		} else if (c instanceof DataType
+				|| (c instanceof DataImplementation && ((DataImplementation) c).getAllSubcomponents().isEmpty()
+						&& ((DataImplementation) c).getType() != null)) {
+			// Includes special case for data implementations implementing extensions of primitive types
 			List<PropertyAssociation> pas = c.getAllPropertyAssociations();
+			List<Classifier> exts = (c instanceof DataImplementation ? ((DataImplementation) c).getType() : c)
+					.getSelfPlusAllExtended();
+			for (Classifier ext : exts) {
+				if (ext != null && (ext instanceof AadlInteger || ext.getName().contains("Integer")
+						|| ext.getName().contains("Natural") || ext.getName().contains("Unsigned"))) {
+
+					for (PropertyAssociation choice : pas) {
+						Property p = choice.getProperty();
+
+						PropertyExpression v = choice.getOwnedValues().get(0).getOwnedValue();
+
+						String key = p.getQualifiedName();
+
+						if (key.equals("Data_Model::Integer_Range")) {
+							if (v instanceof RangeValue) {
+								try {
+									RangeValue rangeValue = (RangeValue) v;
+									long min = intFromPropExp(rangeValue.getMinimum()).get();
+									long max = intFromPropExp(rangeValue.getMaximum()).get();
+									return new RangeIntTypeDef(min, max);
+								} catch (Exception e) {
+									return Prim.ErrorTypeDef;
+								}
+							}
+						}
+					}
+					return Prim.IntTypeDef;
+
+				} else if (ext != null && (ext instanceof AadlReal || ext.getName().contains("Float"))) {
+
+					for (PropertyAssociation choice : pas) {
+						Property p = choice.getProperty();
+
+						PropertyExpression v = choice.getOwnedValues().get(0).getOwnedValue();
+
+						String key = p.getQualifiedName();
+
+						if (key.equals("Data_Model::Real_Range")) {
+							if (v instanceof RangeValue) {
+								try {
+									RangeValue rangeValue = (RangeValue) v;
+									double min = realFromPropExp(rangeValue.getMinimum()).get();
+									double max = realFromPropExp(rangeValue.getMaximum()).get();
+									return new RangeRealTypeDef(min, max);
+								} catch (Exception e) {
+									return Prim.ErrorTypeDef;
+								}
+							}
+						}
+					}
+					return Prim.RealTypeDef;
+				}
+			}
 
 			boolean prop_isArray = false;
 			int prop_arraySize = 0;
@@ -379,7 +378,6 @@ public class AgreeTypeSystem {
 				return new EnumTypeDef(name, prop_enumValues, c);
 
 			}
-
 
 		} else if (c instanceof ComponentClassifier) {
 
