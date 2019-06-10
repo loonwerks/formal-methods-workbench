@@ -128,9 +128,6 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//ParamStatement/expr"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//ParamStatement/type"/>
     </genClasses>
-    <genClasses ecoreClass="Agree.ecore#//LiftStatement">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Agree.ecore#//LiftStatement/subcomp"/>
-    </genClasses>
     <genClasses ecoreClass="Agree.ecore#//ConnectionStatement">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Agree.ecore#//ConnectionStatement/conn"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//ConnectionStatement/expr"/>
@@ -327,6 +324,9 @@
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//RealCast">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//RealCast/expr"/>
+    </genClasses>
+    <genClasses ecoreClass="Agree.ecore#//LiftStatement">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Agree.ecore#//LiftStatement/subcomp"/>
     </genClasses>
     <genClasses ecoreClass="Agree.ecore#//ForeachExpr">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Agree.ecore#//ForeachExpr/binding"/>

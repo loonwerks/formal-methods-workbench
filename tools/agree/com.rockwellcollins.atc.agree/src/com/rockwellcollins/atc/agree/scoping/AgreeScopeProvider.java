@@ -61,7 +61,6 @@ import com.rockwellcollins.atc.agree.agree.ForallExpr;
 import com.rockwellcollins.atc.agree.agree.GetPropertyExpr;
 import com.rockwellcollins.atc.agree.agree.InputStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
@@ -564,14 +563,6 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 		return IScope.NULLSCOPE;
 
-	}
-
-
-
-	IScope scope_LiftStatement_subcomp(LiftStatement ctx, EReference ref) {
-		IScope prevScope = prevScope(ctx, ref);
-		ComponentImplementation container = ctx.getContainingComponentImpl();
-		return Scopes.scopeFor(container.getAllSubcomponents(), prevScope);
 	}
 
 

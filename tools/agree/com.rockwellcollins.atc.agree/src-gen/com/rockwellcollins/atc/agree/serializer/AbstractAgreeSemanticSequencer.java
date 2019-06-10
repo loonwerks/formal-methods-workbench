@@ -48,7 +48,6 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -359,9 +358,6 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 				return; 
 			case AgreePackage.LIBRARY_FN_DEF:
 				sequence_LibraryFnDef(context, (LibraryFnDef) semanticObject); 
-				return; 
-			case AgreePackage.LIFT_STATEMENT:
-				sequence_SpecStatement(context, (LiftStatement) semanticObject); 
 				return; 
 			case AgreePackage.LINEARIZATION_DEF:
 				sequence_LinearizationDef(context, (LinearizationDef) semanticObject); 
@@ -1885,8 +1881,8 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, AgreePackage.Literals.CONNECTION_STATEMENT__EXPR));
 		}
 		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
-		feeder.accept(grammarAccess.getSpecStatementAccess().getConnNamedElementIDTerminalRuleCall_4_2_0_1(), semanticObject.eGet(AgreePackage.Literals.CONNECTION_STATEMENT__CONN, false));
-		feeder.accept(grammarAccess.getSpecStatementAccess().getExprExprParserRuleCall_4_4_0(), semanticObject.getExpr());
+		feeder.accept(grammarAccess.getSpecStatementAccess().getConnNamedElementIDTerminalRuleCall_3_2_0_1(), semanticObject.eGet(AgreePackage.Literals.CONNECTION_STATEMENT__CONN, false));
+		feeder.accept(grammarAccess.getSpecStatementAccess().getExprExprParserRuleCall_3_4_0(), semanticObject.getExpr());
 		feeder.finish();
 	}
 	
@@ -1906,25 +1902,6 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 		}
 		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
 		feeder.accept(grammarAccess.getSpecStatementAccess().getExprExprParserRuleCall_1_3_0(), semanticObject.getExpr());
-		feeder.finish();
-	}
-	
-	
-	/**
-	 * Contexts:
-	 *     Element returns LiftStatement
-	 *     SpecStatement returns LiftStatement
-	 *
-	 * Constraint:
-	 *     subcomp=[NamedElement|ID]
-	 */
-	protected void sequence_SpecStatement(ISerializationContext context, LiftStatement semanticObject) {
-		if (errorAcceptor != null) {
-			if (transientValues.isValueTransient(semanticObject, AgreePackage.Literals.LIFT_STATEMENT__SUBCOMP) == ValueTransient.YES)
-				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, AgreePackage.Literals.LIFT_STATEMENT__SUBCOMP));
-		}
-		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
-		feeder.accept(grammarAccess.getSpecStatementAccess().getSubcompNamedElementIDTerminalRuleCall_3_2_0_1(), semanticObject.eGet(AgreePackage.Literals.LIFT_STATEMENT__SUBCOMP, false));
 		feeder.finish();
 	}
 	

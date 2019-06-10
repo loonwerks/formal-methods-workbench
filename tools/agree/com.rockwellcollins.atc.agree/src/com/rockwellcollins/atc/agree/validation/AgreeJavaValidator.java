@@ -46,7 +46,6 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.annexsupport.AnnexUtil;
 
@@ -95,7 +94,6 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -780,25 +778,6 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			error(statement,
 					"Expression for 'initially' statement is of type '" + nameOfTypeDef(exprType)
 					+ "' but must be of type 'bool'");
-		}
-	}
-
-	@Check(CheckType.FAST)
-	public void checkLift(LiftStatement lift) {
-
-
-		if (!(lift.getSubcomp() instanceof NamedElement)) {
-			error(lift, "Lift statements can be applied only to direct subcomponents."
-					+ "Place a lift statement in the subcomponents contract for heavy lifting");
-		}
-
-		NamedElement namedEl = lift.getSubcomp();
-
-		if (namedEl != null) {
-			if (!(namedEl instanceof SubcomponentImpl)) {
-				error(lift, "Lift statements must apply to subcomponent implementations. '" + namedEl.getName()
-				+ "' is not a subcomponent.");
-			}
 		}
 	}
 
