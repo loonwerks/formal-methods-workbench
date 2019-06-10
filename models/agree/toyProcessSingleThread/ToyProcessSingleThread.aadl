@@ -85,7 +85,7 @@ end top_level;
 
 system implementation top_level.Impl
 	subcomponents
-		A_sub : process A ; 
+		A_sub : process A.impl ; 
 		B_sub : system B ; 
 		C_sub : system C ; 
 	connections
