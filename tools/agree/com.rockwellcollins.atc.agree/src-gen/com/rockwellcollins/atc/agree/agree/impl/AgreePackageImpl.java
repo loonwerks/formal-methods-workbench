@@ -53,6 +53,7 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
+import com.rockwellcollins.atc.agree.agree.LiftContractStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -393,6 +394,13 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   private EClass paramStatementEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass liftContractStatementEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -1884,6 +1892,17 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
   public EReference getParamStatement_Type()
   {
     return (EReference)paramStatementEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EClass getLiftContractStatement()
+  {
+    return liftContractStatementEClass;
   }
 
   /**
@@ -3698,6 +3717,8 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     createEReference(paramStatementEClass, PARAM_STATEMENT__EXPR);
     createEReference(paramStatementEClass, PARAM_STATEMENT__TYPE);
 
+    liftContractStatementEClass = createEClass(LIFT_CONTRACT_STATEMENT);
+
     connectionStatementEClass = createEClass(CONNECTION_STATEMENT);
     createEReference(connectionStatementEClass, CONNECTION_STATEMENT__CONN);
     createEReference(connectionStatementEClass, CONNECTION_STATEMENT__EXPR);
@@ -3993,6 +4014,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     agreeContractEClass.getESuperTypes().add(this.getContract());
     initialStatementEClass.getESuperTypes().add(this.getSpecStatement());
     paramStatementEClass.getESuperTypes().add(this.getSpecStatement());
+    liftContractStatementEClass.getESuperTypes().add(this.getSpecStatement());
     connectionStatementEClass.getESuperTypes().add(this.getSpecStatement());
     assumeStatementEClass.getESuperTypes().add(this.getNamedSpecStatement());
     guaranteeStatementEClass.getESuperTypes().add(this.getNamedSpecStatement());
@@ -4184,6 +4206,8 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     initEClass(paramStatementEClass, ParamStatement.class, "ParamStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getParamStatement_Expr(), this.getExpr(), null, "expr", null, 0, 1, ParamStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getParamStatement_Type(), this.getType(), null, "type", null, 0, 1, ParamStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(liftContractStatementEClass, LiftContractStatement.class, "LiftContractStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
     initEClass(connectionStatementEClass, ConnectionStatement.class, "ConnectionStatement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getConnectionStatement_Conn(), theAadl2Package.getNamedElement(), null, "conn", null, 0, 1, ConnectionStatement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

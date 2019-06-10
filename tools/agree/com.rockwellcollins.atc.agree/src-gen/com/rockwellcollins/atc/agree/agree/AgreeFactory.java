@@ -374,6 +374,15 @@ public interface AgreeFactory extends EFactory
   ParamStatement createParamStatement();
 
   /**
+   * Returns a new object of class '<em>Lift Contract Statement</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Lift Contract Statement</em>'.
+   * @generated
+   */
+  LiftContractStatement createLiftContractStatement();
+
+  /**
    * Returns a new object of class '<em>Connection Statement</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->

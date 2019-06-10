@@ -103,6 +103,7 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
       case AgreePackage.AGREE_CONTRACT: return createAgreeContract();
       case AgreePackage.INITIAL_STATEMENT: return createInitialStatement();
       case AgreePackage.PARAM_STATEMENT: return createParamStatement();
+      case AgreePackage.LIFT_CONTRACT_STATEMENT: return createLiftContractStatement();
       case AgreePackage.CONNECTION_STATEMENT: return createConnectionStatement();
       case AgreePackage.ASSUME_STATEMENT: return createAssumeStatement();
       case AgreePackage.GUARANTEE_STATEMENT: return createGuaranteeStatement();
@@ -633,6 +634,18 @@ public class AgreeFactoryImpl extends EFactoryImpl implements AgreeFactory
   {
     ParamStatementImpl paramStatement = new ParamStatementImpl();
     return paramStatement;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public LiftContractStatement createLiftContractStatement()
+  {
+    LiftContractStatementImpl liftContractStatement = new LiftContractStatementImpl();
+    return liftContractStatement;
   }
 
   /**

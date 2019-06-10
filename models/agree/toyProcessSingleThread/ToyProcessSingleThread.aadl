@@ -2,38 +2,47 @@ package ToyProcessSingleThread
 public 
    with Base_Types;
    
---thread X
---	features
---		Input: in data port Base_Types::Integer;
---		Output: out data port Base_Types::Integer;
---			
---	annex agree {** 
---		assume "X input range" : Input < 20;
---		guarantee "X output range" : Output < 2*Input;
---	**};	
---end X ; 
-   
-process A
+thread X
 	features
 		Input: in data port Base_Types::Integer;
 		Output: out data port Base_Types::Integer;
 			
 	annex agree {** 
-		assume "A input range" : Input < 20;
-		guarantee "A output range" : Output < 2*Input;
+		assume "X input range" : Input < 20;
+		guarantee "X output range" : Output < 2*Input;
 	**};	
+end X ; 
+   
+process A
+	features
+		MyInput: in data port Base_Types::Integer;
+		MyOutput: out data port Base_Types::Integer;
+			
+--	annex agree {** 
+--		assume "A input range" : MyInput < 20;
+--		guarantee "A output range" : MyOutput < 2*MyInput;
+--	**};
+
+--	annex agree {** 
+--		lift contract;
+--	**};	
 end A ; 
 
---process implementation A.impl
---	
---	subcomponents
---		xthread : thread X;
---		
---	connections
---		INTO_X : port Input -> xthread.Input {Communication_Properties::Timing => immediate;};
---		OUTOF_X : port xthread.Output -> Output {Communication_Properties::Timing => immediate;};
---	
---end A.impl ; 
+process implementation A.impl
+	
+	subcomponents
+		xthread : thread X;
+		
+	connections
+		INTO_X : port MyInput -> xthread.Input {Communication_Properties::Timing => immediate;};
+		OUTOF_X : port xthread.Output -> MyOutput {Communication_Properties::Timing => immediate;};
+		
+		
+	annex agree {** 
+		lift contract;
+	**};	
+	
+end A.impl ; 
 
 system B
 	features
@@ -80,9 +89,9 @@ system implementation top_level.Impl
 		B_sub : system B ; 
 		C_sub : system C ; 
 	connections
-		IN_TO_A : port Input -> A_sub.Input {Communication_Properties::Timing => immediate;};
-		A_TO_B : port A_sub.Output -> B_sub.Input {Communication_Properties::Timing => immediate;};
-		A_TO_C : port A_sub.Output -> C_sub.Input1 {Communication_Properties::Timing => immediate;};
+		IN_TO_A : port Input -> A_sub.MyInput {Communication_Properties::Timing => immediate;};
+		A_TO_B : port A_sub.MyOutput -> B_sub.Input {Communication_Properties::Timing => immediate;};
+		A_TO_C : port A_sub.MyOutput -> C_sub.Input1 {Communication_Properties::Timing => immediate;};
 		B_TO_C : port B_sub.Output -> C_sub.Input2 {Communication_Properties::Timing => immediate;};
 		C_TO_Output : port C_sub.Output -> Output {Communication_Properties::Timing => immediate;}; 
 		

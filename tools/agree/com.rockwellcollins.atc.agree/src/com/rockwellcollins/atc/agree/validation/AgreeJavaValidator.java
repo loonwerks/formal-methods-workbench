@@ -94,6 +94,7 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
+import com.rockwellcollins.atc.agree.agree.LiftContractStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -779,6 +780,108 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 					"Expression for 'initially' statement is of type '" + nameOfTypeDef(exprType)
 					+ "' but must be of type 'bool'");
 		}
+	}
+
+	@Check(CheckType.FAST)
+	public void checkLiftContract(LiftContractStatement lcst) {
+		Classifier comp = lcst.getContainingClassifier();
+
+		if (comp instanceof ComponentImplementation) {
+
+
+			ComponentType ct = ((ComponentImplementation) comp).getType();
+			List<AnnexSubclause> agreeAnnexes = AnnexUtil.getAllAnnexSubclauses(ct,
+					AgreePackage.eINSTANCE.getAgreeContractSubclause());
+			if (agreeAnnexes.size() > 0) {
+				error(lcst,
+						"'lift contract;' statement is not allowed in component implementation whose type has an AGREE annex.");
+
+			}
+
+			List<Subcomponent> subcomps = ((ComponentImplementation) comp).getAllSubcomponents();
+
+			if (subcomps.size() == 1) {
+
+				Subcomponent subcomp = subcomps.get(0);
+				Classifier subCls = subcomp.getClassifier();
+				ComponentType subCt = null;
+				if (subCls instanceof ComponentImplementation) {
+					subCt = ((ComponentImplementation) subCls).getType();
+				} else if (subCls instanceof ComponentType) {
+					subCt = (ComponentType) subCls;
+				} else {
+					throw new RuntimeException();
+				}
+
+				{
+					Set<String> usedInPorts = new HashSet<>();
+					Set<String> usedOutPorts = new HashSet<>();
+
+					for (Connection conn : ((ComponentImplementation) comp).getAllConnections()) {
+						{
+							NamedElement sourceNe = conn.getSource().getConnectionEnd();
+							if (sourceNe.getContainingClassifier() == subCt) {
+								usedOutPorts.add(sourceNe.getName());
+							}
+						}
+
+						{
+							NamedElement destNe = conn.getDestination().getConnectionEnd();
+							if (destNe.getContainingClassifier() == subCt) {
+								usedInPorts.add(destNe.getName());
+							}
+						}
+
+					}
+
+					for (Feature feat : subCt.getAllFeatures()) {
+
+						boolean isIn = false;
+						if (feat instanceof DataPort) {
+							isIn = ((DataPort) feat).isIn();
+						} else if (feat instanceof EventDataPort) {
+							isIn = ((EventDataPort) feat).isIn();
+						} else if (feat instanceof EventPort) {
+							isIn = ((EventPort) feat).isIn();
+						}
+
+
+						if (isIn) {
+							if (!usedInPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection into "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						} else {
+							if (!usedOutPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection out of "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						}
+
+					}
+
+
+
+				}
+
+
+			} else {
+
+				error(lcst,
+						"'lift contract;' statement is not allowed in component implementation whithout exactly one subcomponent.");
+
+
+			}
+
+
+		} else {
+			error(lcst, "'lift contract;' statement is not allowed in component interface.");
+		}
+
 	}
 
 	@Check(CheckType.FAST)
