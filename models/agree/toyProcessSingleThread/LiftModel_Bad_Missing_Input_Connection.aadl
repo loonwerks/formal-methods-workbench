@@ -1,4 +1,4 @@
-package ToyProcessSingleThread
+package LiftModel_Bad_Missing_Input_Connection
 public 
    with Base_Types;
    
@@ -17,15 +17,7 @@ process A
 	features
 		MyInput: in data port Base_Types::Integer;
 		MyOutput: out data port Base_Types::Integer;
-			
---	annex agree {** 
---		assume "A input range" : MyInput < 20;
---		guarantee "A output range" : MyOutput < 2*MyInput;
---	**};
-
---	annex agree {** 
---		lift contract;
---	**};	
+	
 end A ; 
 
 process implementation A.impl
@@ -34,7 +26,6 @@ process implementation A.impl
 		xthread : thread X;
 		
 	connections
-		INTO_X : port MyInput -> xthread.Input {Communication_Properties::Timing => immediate;};
 		OUTOF_X : port xthread.Output -> MyOutput {Communication_Properties::Timing => immediate;};
 		
 		
@@ -101,4 +92,4 @@ system implementation top_level.Impl
 	
 end top_level.Impl;
 	
-end ToyProcessSingleThread;
+end LiftModel_Bad_Missing_Input_Connection;
