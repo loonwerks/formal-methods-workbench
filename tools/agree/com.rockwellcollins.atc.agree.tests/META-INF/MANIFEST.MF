@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: com.rockwellcollins.atc.agree.tests
+Bundle-ManifestVersion: 2
+Bundle-Name: AGREE Language Tests
+Bundle-Vendor: Collins Aerospace
+Bundle-Version: 2.4.0.qualifier
+Bundle-SymbolicName: com.rockwellcollins.atc.agree.tests;singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: com.google.guava,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ org.junit.jupiter.api;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.xtext.testing,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ com.itemis.xtext.testing;bundle-version="0.2.0",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.xtext.aadl2;bundle-version="1.0.0",
+ org.osate.pluginsupport;bundle-version="1.0.0",
+ com.rockwellcollins.atc.agree,
+ com.rockwellcollins.atc.agree.ui;bundle-version="2.4.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.rockwellcollins.atc.agree.tests;x-internal=true
+Bundle-Activator: com.rockwellcollins.atc.agree.tests.Activator
