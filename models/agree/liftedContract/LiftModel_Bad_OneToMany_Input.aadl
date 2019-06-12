@@ -1,10 +1,11 @@
-package LiftModel_Good
+package LiftModel_Bad_OneToMany_Input
 public 
    with Base_Types;
    
 thread X
 	features
 		Input: in data port Base_Types::Integer;
+		OtherInput: in data port Base_Types::Integer;
 		Output: out data port Base_Types::Integer;
 			
 	annex agree {** 
@@ -16,16 +17,7 @@ end X ;
 process A
 	features
 		MyInput: in data port Base_Types::Integer;
-		MyOutput: out data port Base_Types::Integer;
-			
---	annex agree {** 
---		assume "A input range" : MyInput < 20;
---		guarantee "A output range" : MyOutput < 2*MyInput;
---	**};
-
---	annex agree {** 
---		lift contract;
---	**};	
+		MyOutput: out data port Base_Types::Integer;	
 end A ; 
 
 process implementation A.impl
@@ -35,9 +27,9 @@ process implementation A.impl
 		
 	connections
 		INTO_X : port MyInput -> xthread.Input {Communication_Properties::Timing => immediate;};
+		OTHER_INTO_X : port MyInput -> xthread.OtherInput {Communication_Properties::Timing => immediate;};
 		OUTOF_X : port xthread.Output -> MyOutput {Communication_Properties::Timing => immediate;};
-		
-		
+
 	annex agree {** 
 		lift contract;
 	**};	
@@ -101,4 +93,4 @@ system implementation top_level.Impl
 	
 end top_level.Impl;
 	
-end LiftModel_Good;
+end LiftModel_Bad_OneToMany_Input;

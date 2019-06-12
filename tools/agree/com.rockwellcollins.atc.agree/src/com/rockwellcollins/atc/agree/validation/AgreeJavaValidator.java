@@ -814,21 +814,89 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 				}
 
 				{
-					Set<String> usedInPorts = new HashSet<>();
-					Set<String> usedOutPorts = new HashSet<>();
+					Set<String> usedParentInPorts = new HashSet<>();
+					Set<String> usedParentOutPorts = new HashSet<>();
+
+					Set<String> usedChildInPorts = new HashSet<>();
+					Set<String> usedChildOutPorts = new HashSet<>();
 
 					for (Connection conn : ((ComponentImplementation) comp).getAllConnections()) {
 						{
 							NamedElement sourceNe = conn.getSource().getConnectionEnd();
 							if (sourceNe.getContainingClassifier() == subCt) {
-								usedOutPorts.add(sourceNe.getName());
+
+								if (usedChildOutPorts.contains(sourceNe.getName())) {
+									error(lcst,
+											"'lift contract;' statement is not allowed in component implementation whith more than one connection out of same output "
+													+ sourceNe.getQualifiedName() + ".");
+								}
+
+								usedChildOutPorts.add(sourceNe.getName());
 							}
+
+							if (sourceNe.getContainingClassifier() == ct) {
+								if (usedParentInPorts.contains(sourceNe.getName())) {
+									error(lcst,
+											"'lift contract;' statement is not allowed in component implementation whith more than one connection out of same input "
+													+ sourceNe.getQualifiedName() + ".");
+								}
+
+								usedParentInPorts.add(sourceNe.getName());
+
+							}
+
 						}
 
 						{
 							NamedElement destNe = conn.getDestination().getConnectionEnd();
 							if (destNe.getContainingClassifier() == subCt) {
-								usedInPorts.add(destNe.getName());
+
+								if (usedChildInPorts.contains(destNe.getName())) {
+									error(lcst,
+											"'lift contract;' statement is not allowed in component implementation whith more than one connection into same input "
+													+ destNe.getQualifiedName() + ".");
+								}
+
+								usedChildInPorts.add(destNe.getName());
+							}
+
+							if (destNe.getContainingClassifier() == ct) {
+
+								if (usedParentOutPorts.contains(destNe.getName())) {
+									error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whith more than one connection into same output "
+												+ destNe.getQualifiedName() + ".");
+								}
+								usedParentOutPorts.add(destNe.getName());
+							}
+						}
+
+					}
+
+					for (Feature feat : comp.getAllFeatures()) {
+
+						boolean isIn = false;
+						if (feat instanceof DataPort) {
+							isIn = ((DataPort) feat).isIn();
+						} else if (feat instanceof EventDataPort) {
+							isIn = ((EventDataPort) feat).isIn();
+						} else if (feat instanceof EventPort) {
+							isIn = ((EventPort) feat).isIn();
+						}
+
+						if (isIn) {
+							if (!usedParentInPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection from input "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						} else {
+							if (!usedParentOutPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection to output "
+												+ feat.getQualifiedName() + ".");
+
 							}
 						}
 
@@ -847,14 +915,14 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 
 
 						if (isIn) {
-							if (!usedInPorts.contains(feat.getName())) {
+							if (!usedChildInPorts.contains(feat.getName())) {
 								error(lcst,
 										"'lift contract;' statement is not allowed in component implementation whithout connection into "
 												+ feat.getQualifiedName() + ".");
 
 							}
 						} else {
-							if (!usedOutPorts.contains(feat.getName())) {
+							if (!usedChildOutPorts.contains(feat.getName())) {
 								error(lcst,
 										"'lift contract;' statement is not allowed in component implementation whithout connection out of "
 												+ feat.getQualifiedName() + ".");
