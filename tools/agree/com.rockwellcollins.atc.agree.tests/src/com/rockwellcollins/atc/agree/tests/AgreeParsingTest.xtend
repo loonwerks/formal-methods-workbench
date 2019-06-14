@@ -115,11 +115,11 @@ class AgreeParsingTest extends XtextTest {
 				Assert.assertEquals('x', name)
 				Assert.assertTrue(type instanceof PrimType)
 				type as PrimType => [
-				    Assert.assertEquals('int', name)
-				    Assert.assertNull(lowNeg)
-				    Assert.assertNull(rangeLow)
-				    Assert.assertNull(highNeg)
-				    Assert.assertNull(rangeHigh)
+					Assert.assertEquals('int', name)
+					Assert.assertNull(lowNeg)
+					Assert.assertNull(rangeLow)
+					Assert.assertNull(highNeg)
+					Assert.assertNull(rangeHigh)
 				]
 				Assert.assertTrue(expr instanceof IntLitExpr)
 				expr as IntLitExpr => [
