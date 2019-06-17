@@ -28,10 +28,10 @@ def manage_daily_builds():
     releases = repository.releases()
     # extract keys and sort by build date
     release_keys = {x.id : x.created_at  for x in releases}
-    sorted_keys = {k: v for k, v in sorted(release_keys.items(), key=lambda x: x[1])}
+    sorted_keys = sorted(release_keys.items(), reverse=True, key=lambda x: x[1])
     print('%s' % (pformat(sorted_keys)))
     # filter to obtain the keys to delete
-    delete_keys = [x for x in sorted_keys.keys()][2:]
+    delete_keys = [v[0] for v in sorted_keys[2:]]
     print('Deleting releases: %s' % (pformat(delete_keys)))
     # iterate, deleting the releases and corresponding tags
     for rel in releases:
