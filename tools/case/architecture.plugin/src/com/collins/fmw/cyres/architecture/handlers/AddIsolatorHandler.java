@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.ui.editor.XtextEditor;
@@ -82,19 +81,22 @@ public class AddIsolatorHandler extends AadlHandler {
 			return;
 		}
 
-		// Check if this subcomponent (or its parent if subcomponent is a thread or thread group)
-		// is bound to a processor
-		Subcomponent processor = getBoundProcessor(sub);
-		if (processor == null) {
-			// TODO: Remove this restriction and present user with list of processors and virtual processors to choose from
-			// TODO: May need to look at Available_Processor_Bindings property to do this
+		// Check if this subcomponent (or its ancestor) is bound to a processor
+		List<Subcomponent> processors = getBoundProcessors(sub);
+		// TODO: Remove this restriction and present user with list of processors and virtual processors to choose from
+		// TODO: May need to look at Available_Processor_Bindings property to do this
+		if (processors.isEmpty()) {
 			Dialog.showError("Add Isolator",
 					"The selected subcomponent must be bound to a processor or virtual processor.");
 			return;
-		} else if (processor.getComponentImplementation() == null) {
-			Dialog.showError("Add Isolator",
-					"The selected subcomponent must be bound to a processor or virtual processor implementation.");
-			return;
+		} else {
+			for (Subcomponent p : processors) {
+				if (p.getComponentImplementation() == null) {
+					Dialog.showError("Add Isolator",
+							"The selected subcomponent must be bound to a processor or virtual processor implementations.");
+					return;
+				}
+			}
 		}
 
 		// Open wizard to enter filter info
@@ -128,12 +130,12 @@ public class AddIsolatorHandler extends AadlHandler {
 		boolean entireImpl = isolatedComponents.get(0).equalsIgnoreCase(sub.getName());
 
 		// Create the isolator component
-		insertIsolatorComponent(sub);
+//		insertIsolatorComponent(sub);
 
 		// Insert the virtual processor type and implementation components
 		// into the same package as the processor.
 		// Note that this could be a different package than the selected subcomponent
-		insertVirtualProcessor(EcoreUtil.getURI(processor));
+//		insertVirtualProcessor(EcoreUtil.getURI(processor), entireImpl);
 
 
 
@@ -145,8 +147,9 @@ public class AddIsolatorHandler extends AadlHandler {
 	 * Inserts the virtual processor type and implementation components
 	 * into the same package as the specified processor.
 	 * @param processorURI - URI of the processor component implementation subcomponent to put the virtual processor in
+	 * @param entireImpl - indicates whether the entire component should be isolated or just specific subcomponents
 	 */
-	private void insertVirtualProcessor(URI processorURI) {
+	private void insertVirtualProcessor(URI processorURI, boolean entireImpl) {
 
 		// Get the file to insert into
 		IFile file = Filesystem.getFile(processorURI);
@@ -234,13 +237,19 @@ public class AddIsolatorHandler extends AadlHandler {
 				ComponentCreateHelper.setSubcomponentType(processorSub, procExtImpl);
 
 				// TODO: Bind the virtual processor to the processor
+				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class?
 				ComponentImplementation ci = processorSub.getContainingComponentImpl();
 
 
 				// TODO: Add/Modify Actual_Processor_Binding property
-				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class
+				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class?
 				// If the entire component implementation + all subcomponents are selected, modify existing binding
-				// If selected subcomponents are selected, add the new binding
+				// If selected subcomponents are selected, add the new binding(s)
+				if (entireImpl) {
+
+				} else {
+
+				}
 
 				return null;
 			});
@@ -326,12 +335,13 @@ public class AddIsolatorHandler extends AadlHandler {
 	}
 
 	/**
-	 * Returns the subcomponent that the specified subcomponent is bound to.
-	 * Will return null if specified subcomponent is not bound to a processor or virtual processor.
+	 * Returns the processor or virtual processor subcomponents that the specified subcomponent are bound to.
+	 * Will return an empty list if specified subcomponent is not bound to a processor or virtual processor.
 	 * @param sub - Subcomponent
-	 * @return - ProcessSubcomponent or VirtualProcessSubcomponent
+	 * @return - List of ProcessSubcomponent or VirtualProcessSubcomponent
 	 */
-	private Subcomponent getBoundProcessor(Subcomponent sub) {
+	private List<Subcomponent> getBoundProcessors(Subcomponent sub) {
+		List<Subcomponent> processors = new ArrayList<>();
 		ComponentImplementation ci = sub.getContainingComponentImpl();
 		for (PropertyAssociation pa : ci.getOwnedPropertyAssociations()) {
 			if (pa.getProperty().getName().equalsIgnoreCase("Actual_Processor_Binding")) {
@@ -346,9 +356,8 @@ public class AddIsolatorHandler extends AadlHandler {
 									// Get the processor this subcomponent is bound to
 									if (refVal.getPath().getNamedElement() instanceof ProcessorSubcomponent || refVal
 											.getPath().getNamedElement() instanceof VirtualProcessorSubcomponent) {
-										return (Subcomponent) refVal.getPath().getNamedElement();
+										processors.add((Subcomponent) refVal.getPath().getNamedElement());
 									}
-									break;
 								}
 							}
 						}
@@ -357,7 +366,13 @@ public class AddIsolatorHandler extends AadlHandler {
 				}
 			}
 		}
-		return null;
+		// TODO: If there aren't any processors found, look at parent component bindings
+		if (processors.isEmpty()) {
+//			return getBoundProcessors(sub.get)
+		}
+
+		return processors;
 	}
+
 
 }
