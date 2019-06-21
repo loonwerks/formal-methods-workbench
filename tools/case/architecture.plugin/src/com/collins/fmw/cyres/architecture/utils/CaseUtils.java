@@ -6,8 +6,9 @@ import java.util.List;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlBoolean;
@@ -30,10 +31,10 @@ import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.impl.PropertySetImpl;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.util.plugin.TraverseProject;
 
 public class CaseUtils {
 
@@ -150,7 +151,11 @@ public class CaseUtils {
 	 */
 	public static PropertySet getPropertySet(String propSetName, String propSetFile) {
 
-		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
+//		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
+		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
+		if (resourceSet == null) {
+			return null;
+		}
 
 		PropertySet propSet = null;
 
@@ -158,7 +163,7 @@ public class CaseUtils {
 		// but not imported into this model
 		for (Resource r : resourceSet.getResources()) {
 			final EObject eObj = r.getContents().get(0);
-			if (eObj instanceof PropertySetImpl) {
+			if (eObj instanceof PropertySet) {
 				PropertySet propSetImpl = (PropertySet) eObj;
 				if (propSetImpl.getName().equalsIgnoreCase(propSetName)) {
 					propSet = propSetImpl;
@@ -357,7 +362,11 @@ public class CaseUtils {
 	public static AadlPackage getAadlPackage(String packageName, String packageFile) {
 
 		AadlPackage aadlPackage = null;
-		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
+//		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
+		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
+		if (resourceSet == null) {
+			return null;
+		}
 
 		// Check to see if the package file resource has already been loaded
 		// but not imported into this model

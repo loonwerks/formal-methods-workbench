@@ -7,19 +7,19 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
-import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Realization;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ge.BusinessObjectSelection;
 import org.osate.ui.dialogs.Dialog;
 
@@ -37,7 +37,11 @@ public class TranslateHandler extends AbstractHandler {
 			return null;
 		}
 
-		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
+//		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
+		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
+		if (resourceSet == null) {
+			return null;
+		}
 		EObject eObj = resourceSet.getEObject(uri, true);
 
 		ComponentImplementation ci = null;

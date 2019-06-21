@@ -7,6 +7,8 @@ import java.util.function.Function;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.Adapters;
@@ -22,19 +24,22 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.Realization;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ge.BusinessObjectSelection;
 
 public abstract class AadlHandler extends AbstractHandler {
@@ -80,7 +85,8 @@ public abstract class AadlHandler extends AbstractHandler {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				if (xtextEditor == null) {
-					return getWorker(uri, monitor).apply(OsateResourceUtil.getResourceSet());
+//					return getWorker(uri, monitor).apply(OsateResourceUtil.getResourceSet());
+					return getWorker(uri, monitor).apply(getResourceSet());
 				} else {
 					return xtextEditor.getDocument().readOnly(getUnitOfWork(uri, monitor));
 				}
@@ -176,5 +182,34 @@ public abstract class AadlHandler extends AbstractHandler {
 
 	protected IWorkbenchWindow getWindow() {
 		return window;
+	}
+
+	protected ResourceSet getResourceSet() {
+		// Eclipse does not have the concept of a "current project"
+		// So we will use the project associated with the file that is currently
+		// visible in the editor to obtain the resource set
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = window.getActivePage();
+		IEditorPart activeEditor = activePage.getActiveEditor();
+		IProject project = null;
+
+		if (activeEditor != null) {
+			IEditorInput input = activeEditor.getEditorInput();
+
+			project = input.getAdapter(IProject.class);
+			if (project == null) {
+				IResource resource = input.getAdapter(IResource.class);
+				if (resource != null) {
+					project = resource.getProject();
+				}
+			}
+		}
+
+		if (project != null) {
+			return new XtextResourceSetProvider().get(project);
+		}
+
+		return null;
+
 	}
 }
