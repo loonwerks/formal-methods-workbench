@@ -94,15 +94,14 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 	private void checkAgreeVerification(String verificationName) {
 		for (AgreeLogResult logResult : agreeLogResults) {
 			if (logResult.getName().contentEquals(verificationName)) {
-
-				// Check status
-				if (!logResult.getResult().equalsIgnoreCase(Status.VALID.toString())) {
-					throw new ResoluteFailException("AGREE analysis failed", evalContext.getThisInstance());
-				}
 				// Check hashcode
 				if (!logResult.getHashcode().contentEquals(modelHashcode)) {
 					throw new ResoluteFailException("AGREE analysis was not run on the current version of the model",
 							evalContext.getThisInstance());
+				}
+				// Check status
+				if (!logResult.getResult().equalsIgnoreCase(Status.VALID.toString())) {
+					throw new ResoluteFailException("AGREE analysis failed", evalContext.getThisInstance());
 				}
 				break;
 			}
