@@ -1,0 +1,27 @@
+package Should_FailToGenerateModel_When_SubclassRedefiningGuaranteeOnExistingFeature
+public
+    with Base_Types;
+    
+	system Base
+        features
+            A : out data port Base_Types::Integer;
+        annex agree {**
+            guarantee A_not_zero "A != 0" : A != 0;
+        **};
+    end Base;
+    
+    system implementation Base.i
+    end Base.i;
+    
+    system Subclass extends Base
+        annex agree {**
+            guarantee A_greater_zero "A > 0" : A > 0;
+        **};
+    end Subclass;
+    
+    system implementation Subclass.i extends Base.i
+       annex agree {**
+       **};
+    end Subclass.i;
+    
+end Should_FailToGenerateModel_When_SubclassRedefiningGuaranteeOnExistingFeature;
