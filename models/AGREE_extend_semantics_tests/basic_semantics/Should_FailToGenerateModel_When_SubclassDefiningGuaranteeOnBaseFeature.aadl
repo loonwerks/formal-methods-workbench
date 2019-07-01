@@ -12,7 +12,7 @@ public
 	
 	system Subclass extends Base
         annex agree {**
-            assume A_not_zero "A != 0" : A != 0;
+            guarantee A_not_zero "A != 0" : A != 0;
         **};
 	end Subclass;
 	
