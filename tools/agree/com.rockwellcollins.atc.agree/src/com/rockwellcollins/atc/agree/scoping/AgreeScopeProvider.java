@@ -142,7 +142,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 				components.addAll(getNamedElements(((ComponentImplementation) ctx).getType()));
 
 			} else if (ctx instanceof ComponentType) {
-				List<Feature> fs = ((ComponentType) ctx).getAllFeatures();
+				List<Feature> fs = ((ComponentType) ctx).getOwnedFeatures();
 				components.addAll(fs);
 
 			}
