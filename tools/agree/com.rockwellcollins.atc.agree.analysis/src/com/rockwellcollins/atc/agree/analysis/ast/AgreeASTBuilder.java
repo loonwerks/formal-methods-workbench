@@ -314,53 +314,61 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		boolean hasSubcomponents = false;
 		ComponentClassifier compClass = compInst.getComponentClassifier();
 		if (compClass instanceof ComponentImplementation && (isTop || isMonolithic)) {
-			AgreeContractSubclause annex = getAgreeAnnex(compClass);
 
-			for (ComponentInstance subInst : compInst.getComponentInstances()) {
-				hasSubcomponents = true;
-				curInst = subInst;
-				AgreeNode subNode = getAgreeNode(subInst, false);
-				if (subNode != null) {
-					foundSubNode = true;
-					subNodes.add(subNode);
-				}
-			}
-			boolean latched = false;
-			if (annex != null) {
-				hasDirectAnnex = true;
-				AgreeContract contract = (AgreeContract) annex.getContract();
+			ComponentClassifier cc = compClass;
+			while (cc != null) {
 
-				curInst = compInst;
-				assertions.addAll(getAssertionStatements(contract.getSpecs()));
-				getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
-				assertions.addAll(getPropertyStatements(contract.getSpecs()));
-				assertions.addAll(getAssignmentStatements(contract.getSpecs()));
-				userDefinedConections.addAll(getConnectionStatements(contract.getSpecs()));
+				AgreeContractSubclause annex = getAgreeAnnex(cc);
 
-				lemmas.addAll(getLemmaStatements(contract.getSpecs()));
-				addLustreNodes(contract.getSpecs());
-				gatherLustreTypes(contract.getSpecs());
-				// the clock constraints contain other nodes that we add
-				clockConstraint = getClockConstraint(contract.getSpecs(), subNodes);
-				timing = getTimingModel(contract.getSpecs());
-
-				outputs.addAll(getEquationVars(contract.getSpecs(), compInst));
-
-				for (SpecStatement spec : contract.getSpecs()) {
-					if (spec instanceof LatchedStatement) {
-						latched = true;
-						break;
+				for (ComponentInstance subInst : compInst.getComponentInstances()) {
+					hasSubcomponents = true;
+					curInst = subInst;
+					AgreeNode subNode = getAgreeNode(subInst, false);
+					if (subNode != null) {
+						foundSubNode = true;
+						subNodes.add(subNode);
 					}
 				}
+				boolean latched = false;
+				if (annex != null) {
+					hasDirectAnnex = true;
+					AgreeContract contract = (AgreeContract) annex.getContract();
+
+					curInst = compInst;
+					assertions.addAll(getAssertionStatements(contract.getSpecs()));
+					getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
+					assertions.addAll(getPropertyStatements(contract.getSpecs()));
+					assertions.addAll(getAssignmentStatements(contract.getSpecs()));
+					userDefinedConections.addAll(getConnectionStatements(contract.getSpecs()));
+
+					lemmas.addAll(getLemmaStatements(contract.getSpecs()));
+					addLustreNodes(contract.getSpecs());
+					gatherLustreTypes(contract.getSpecs());
+					// the clock constraints contain other nodes that we add
+					clockConstraint = getClockConstraint(contract.getSpecs(), subNodes);
+					timing = getTimingModel(contract.getSpecs());
+
+					outputs.addAll(getEquationVars(contract.getSpecs(), compInst));
+
+					for (SpecStatement spec : contract.getSpecs()) {
+						if (spec instanceof LatchedStatement) {
+							latched = true;
+							break;
+						}
+					}
+
+				}
+				aadlConnections.addAll(getConnections(((ComponentImplementation) cc).getAllConnections(),
+						compInst, subNodes, latched));
+
+				connections.addAll(filterConnections(aadlConnections, userDefinedConections));
+
+				cc = (ComponentClassifier) cc.getExtended();
 
 			}
-			aadlConnections.addAll(getConnections(((ComponentImplementation) compClass).getAllConnections(), compInst,
-					subNodes, latched));
-
-			connections.addAll(filterConnections(aadlConnections, userDefinedConections));
-
 			// make compClass the type so we can get it's other contract
 			// elements
+
 			compClass = ((ComponentImplementation) compClass).getType();
 		} else if (compClass instanceof ComponentImplementation) {
 			compClass = ((ComponentImplementation) compClass).getType();
