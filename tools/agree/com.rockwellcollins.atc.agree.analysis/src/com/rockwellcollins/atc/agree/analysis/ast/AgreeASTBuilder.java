@@ -371,24 +371,28 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			timing = TimingModel.SYNC;
 		}
 
-		AgreeContractSubclause annex = getAgreeAnnex(compClass);
-		if (annex != null) {
-			hasDirectAnnex = true;
-			AgreeContract contract = (AgreeContract) annex.getContract();
-			// this makes files for monolithic verification a bit smaller
-			if (isTop || !hasSubcomponents) {
-				assumptions.addAll(getAssumptionStatements(contract.getSpecs()));
-				guarantees.addAll(getGuaranteeStatements(contract.getSpecs()));
-			}
-			// we count eqstatements with expressions as assertions
-			getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
-			assertions.addAll(getPropertyStatements(contract.getSpecs()));
-			outputs.addAll(getEquationVars(contract.getSpecs(), compInst));
-			getAgreeInputVars(contract.getSpecs(), compInst).addAllTo(inputs, assumptions, guarantees);
-			initialConstraint = getInitialConstraint(contract.getSpecs());
+		while (compClass != null) {
+			AgreeContractSubclause annex = getAgreeAnnex(compClass);
+			if (annex != null) {
+				hasDirectAnnex = true;
+				AgreeContract contract = (AgreeContract) annex.getContract();
+				// this makes files for monolithic verification a bit smaller
+				if (isTop || !hasSubcomponents) {
+					assumptions.addAll(getAssumptionStatements(contract.getSpecs()));
+					guarantees.addAll(getGuaranteeStatements(contract.getSpecs()));
+				}
+				// we count eqstatements with expressions as assertions
+				getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
+				assertions.addAll(getPropertyStatements(contract.getSpecs()));
+				outputs.addAll(getEquationVars(contract.getSpecs(), compInst));
+				getAgreeInputVars(contract.getSpecs(), compInst).addAllTo(inputs, assumptions, guarantees);
+				initialConstraint = getInitialConstraint(contract.getSpecs());
 
-			addLustreNodes(contract.getSpecs());
-			gatherLustreTypes(contract.getSpecs());
+				addLustreNodes(contract.getSpecs());
+				gatherLustreTypes(contract.getSpecs());
+			}
+
+			compClass = (ComponentClassifier) compClass.getExtended();
 		}
 
 		gatherUnspecifiedAadlProperties(unspecifiedAadlProperties, inputs, assumptions, guarantees);
