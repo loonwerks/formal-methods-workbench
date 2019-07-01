@@ -55,7 +55,7 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 		try {
 			agreeLogResults = AgreeFileUtil.readAgreeLog();
 			if (agreeLogResults.size() == 0) {
-				throw new ResoluteFailException("AGREE results log is empty", evalContext.getThisInstance());
+				throw new ResoluteFailException("[ERROR] AGREE results log is empty", evalContext.getThisInstance());
 			}
 		} catch (Exception e) {
 			throw new ResoluteFailException(e.getMessage(), evalContext.getThisInstance());
@@ -77,7 +77,7 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 			verificationName = verificationName.concat(si.getComponentImplementation().getName());
 		} else {
 			throw new ResoluteFailException(
-					"Resolute AgreeCheck can only be called from a component or component implementation.",
+					"[ERROR] Resolute AgreeCheck can only be called from a component or component implementation.",
 					evalContext.getThisInstance());
 		}
 
@@ -96,12 +96,12 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 			if (logResult.getName().contentEquals(verificationName)) {
 				// Check hashcode
 				if (!logResult.getHashcode().contentEquals(modelHashcode)) {
-					throw new ResoluteFailException("AGREE analysis was not run on the current version of the model",
+					throw new ResoluteFailException("AGREE analysis was run on the current version of the model",
 							evalContext.getThisInstance());
 				}
 				// Check status
 				if (!logResult.getResult().equalsIgnoreCase(Status.VALID.toString())) {
-					throw new ResoluteFailException("AGREE analysis failed", evalContext.getThisInstance());
+					throw new ResoluteFailException("AGREE analysis passed", evalContext.getThisInstance());
 				}
 				break;
 			}
