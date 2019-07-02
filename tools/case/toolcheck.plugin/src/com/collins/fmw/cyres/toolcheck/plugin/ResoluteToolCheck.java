@@ -47,7 +47,7 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 
 		// Make sure this instance is a component
 		if (!(evalContext.getThisInstance() instanceof ComponentInstanceImpl)) {
-			throw new ResoluteFailException("ToolCheck can only be called from a component.",
+			throw new ResoluteFailException("[ERROR] ToolCheck can only be called from a component.",
 					evalContext.getThisInstance());
 		}
 
@@ -57,7 +57,7 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 				toolName, "", null);
 
 		if (outputFileName.isEmpty()) {
-			throw new ResoluteFailException("ToolCheck could not determine the output file name of the "
+			throw new ResoluteFailException("[ERROR] ToolCheck could not determine the output file name of the "
 					+ arg.getString() + " tool.  It must be specified in the preferences.",
 					evalContext.getThisInstance());
 		}
@@ -124,10 +124,11 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 			// so just set it to zero (otherwise it will be IResource.NULL_STAMP)
 			resourceTimestamps.put(file.getName(), 0L);
 		} else if (!file.isAccessible()) {
-			throw new ResoluteFailException("Unable to access file " + file.getName() + ".",
+			throw new ResoluteFailException("[ERROR] Unable to access file " + file.getName() + ".",
 					evalContext.getThisInstance());
 		} else if (file.getLocalTimeStamp() == IResource.NULL_STAMP) {
-			throw new ResoluteFailException(file.getName() + " does not have a valid modification timestamp.",
+			throw new ResoluteFailException(
+					"[ERROR] " + file.getName() + " does not have a valid modification timestamp.",
 					evalContext.getThisInstance());
 		} else {
 			resourceTimestamps.put(file.getName(), file.getLocalTimeStamp());

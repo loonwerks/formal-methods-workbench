@@ -142,6 +142,7 @@ import com.rockwellcollins.atc.agree.services.AgreeGrammarAccess;
 		tokenNameToValue.put("Returns", "'returns'");
 		tokenNameToValue.put("Calendar", "'calendar'");
 		tokenNameToValue.put("Constant", "'constant'");
+		tokenNameToValue.put("Contract", "'contract'");
 		tokenNameToValue.put("External", "'external'");
 		tokenNameToValue.put("Ordering", "'ordering'");
 		tokenNameToValue.put("Property", "'property'");
@@ -5045,11 +5046,11 @@ rule__SpecStatement__Group_3__0__Impl
     }
 :
 (
-{ before(grammarAccess.getSpecStatementAccess().getLiftStatementAction_3_0()); }
+{ before(grammarAccess.getSpecStatementAccess().getLiftContractStatementAction_3_0()); }
 (
 
 )
-{ after(grammarAccess.getSpecStatementAccess().getLiftStatementAction_3_0()); }
+{ after(grammarAccess.getSpecStatementAccess().getLiftContractStatementAction_3_0()); }
 )
 
 ;
@@ -5107,9 +5108,11 @@ rule__SpecStatement__Group_3__2__Impl
     }
 :
 (
-{ before(grammarAccess.getSpecStatementAccess().getSubcompAssignment_3_2()); }
-(rule__SpecStatement__SubcompAssignment_3_2)
-{ after(grammarAccess.getSpecStatementAccess().getSubcompAssignment_3_2()); }
+{ before(grammarAccess.getSpecStatementAccess().getContractKeyword_3_2()); }
+
+	Contract 
+
+{ after(grammarAccess.getSpecStatementAccess().getContractKeyword_3_2()); }
 )
 
 ;
@@ -30039,25 +30042,6 @@ rule__SpecStatement__TypeAssignment_2_4
 (
 { before(grammarAccess.getSpecStatementAccess().getTypeTypeParserRuleCall_2_4_0()); }
 	ruleType{ after(grammarAccess.getSpecStatementAccess().getTypeTypeParserRuleCall_2_4_0()); }
-)
-
-;
-finally {
-	restoreStackSize(stackSize);
-}
-
-rule__SpecStatement__SubcompAssignment_3_2
-    @init {
-		int stackSize = keepStackSize();
-    }
-:
-(
-{ before(grammarAccess.getSpecStatementAccess().getSubcompNamedElementCrossReference_3_2_0()); }
-(
-{ before(grammarAccess.getSpecStatementAccess().getSubcompNamedElementIDTerminalRuleCall_3_2_0_1()); }
-	RULE_ID{ after(grammarAccess.getSpecStatementAccess().getSubcompNamedElementIDTerminalRuleCall_3_2_0_1()); }
-)
-{ after(grammarAccess.getSpecStatementAccess().getSubcompNamedElementCrossReference_3_2_0()); }
 )
 
 ;

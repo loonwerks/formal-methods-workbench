@@ -25,7 +25,7 @@ import jkind.lustre.Expr;
 
 public class AgreeStatement implements AgreeASTElement, EObject {
 	public final String string;
-	public final Expr expr;
+	public Expr expr;
 	public final EObject reference;
 
 	public AgreeStatement(String string, Expr expr, EObject reference) {

@@ -151,7 +151,6 @@ public class CaseUtils {
 	 */
 	public static PropertySet getPropertySet(String propSetName, String propSetFile) {
 
-//		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
 		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
 		if (resourceSet == null) {
 			return null;
@@ -362,7 +361,6 @@ public class CaseUtils {
 	public static AadlPackage getAadlPackage(String packageName, String packageFile) {
 
 		AadlPackage aadlPackage = null;
-//		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
 		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
 		if (resourceSet == null) {
 			return null;

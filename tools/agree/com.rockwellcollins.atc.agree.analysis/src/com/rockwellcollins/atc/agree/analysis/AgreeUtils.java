@@ -35,9 +35,13 @@ import org.osate.annexsupport.AnnexUtil;
 import org.osate.xtext.aadl2.properties.util.PropertyUtils;
 
 import com.google.inject.Injector;
+import com.rockwellcollins.atc.agree.agree.AgreeContract;
+import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
+import com.rockwellcollins.atc.agree.agree.LiftContractStatement;
+import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.ThisRef;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeASTBuilder;
 import com.rockwellcollins.atc.agree.analysis.ast.AgreeProgram;
@@ -238,7 +242,8 @@ public class AgreeUtils {
 	public static boolean containsTransitiveAgreeAnnex(ComponentInstance compInst, boolean isMonolithic) {
 		Subcomponent subComp = compInst.getSubcomponent();
 		if (!isMonolithic) {
-			return typeContainsAgreeAnnex(subComp);
+			return liftedTypeContainsAgreeAnnex(subComp.getComponentImplementation())
+					|| typeContainsAgreeAnnex(subComp);
 		}
 
 		if (containsAgreeAnnex(subComp)) {
@@ -251,6 +256,29 @@ public class AgreeUtils {
 			}
 		}
 		return false;
+	}
+
+	private static boolean liftedTypeContainsAgreeAnnex(ComponentImplementation ci) {
+		List<AnnexSubclause> agreeAnnexes = AnnexUtil.getAllAnnexSubclauses(ci,
+				AgreePackage.eINSTANCE.getAgreeContractSubclause());
+		for (AnnexSubclause annex : agreeAnnexes) {
+			AgreeContract contract = (AgreeContract) ((AgreeContractSubclause) annex).getContract();
+			for (SpecStatement spec : contract.getSpecs()) {
+
+				if (spec instanceof LiftContractStatement) {
+
+					Subcomponent sub = ci.getAllSubcomponents().get(0);
+
+					return typeContainsAgreeAnnex(sub);
+
+				}
+
+			}
+
+		}
+
+		return false;
+
 	}
 
 	public static boolean typeContainsAgreeAnnex(Subcomponent subComp) {
