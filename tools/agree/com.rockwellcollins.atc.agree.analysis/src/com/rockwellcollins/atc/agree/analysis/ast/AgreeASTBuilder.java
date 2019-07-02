@@ -20,11 +20,11 @@ import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AadlReal;
-import org.osate.aadl2.AbstractNamedValue;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
@@ -42,8 +42,6 @@ import org.osate.aadl2.FeatureGroupType;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.NumberValue;
-import org.osate.aadl2.Operation;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.PropertyExpression;
@@ -96,6 +94,7 @@ import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
+import com.rockwellcollins.atc.agree.agree.LiftContractStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
@@ -183,7 +182,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	public static final String unspecifiedAadlPropertyPrefix = "_unspec_property_";
 
 	public static List<Node> globalNodes;
-	private static Set<Type> globalTypes;
 
 	// EGM: array-backend
 
@@ -224,7 +222,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 		this.isMonolithic = isMonolithic;
 		globalNodes = new ArrayList<>();
-		globalTypes = new HashSet<>();
 		renamings = new HashMap<>();
 		refMap = new HashMap<>();
 
@@ -313,6 +310,9 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		boolean hasDirectAnnex = false;
 		boolean hasSubcomponents = false;
 		ComponentClassifier compClass = compInst.getComponentClassifier();
+
+		Map<String, jkind.lustre.Expr> portRewriteMap = new HashMap<>();
+
 		if (compClass instanceof ComponentImplementation && (isTop || isMonolithic)) {
 			AgreeContractSubclause annex = getAgreeAnnex(compClass);
 
@@ -332,7 +332,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 
 				curInst = compInst;
 				assertions.addAll(getAssertionStatements(contract.getSpecs()));
-				getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
+				getEquationStatements(contract.getSpecs(), portRewriteMap).addAllTo(locals, assertions, guarantees);
 				assertions.addAll(getPropertyStatements(contract.getSpecs()));
 				assertions.addAll(getAssignmentStatements(contract.getSpecs()));
 				userDefinedConections.addAll(getConnectionStatements(contract.getSpecs()));
@@ -363,7 +363,47 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			// elements
 			compClass = ((ComponentImplementation) compClass).getType();
 		} else if (compClass instanceof ComponentImplementation) {
-			compClass = ((ComponentImplementation) compClass).getType();
+
+			AgreeContractSubclause compImpAnnex = getAgreeAnnex(compClass);
+
+			ComponentType ct = ((ComponentImplementation) compClass).getType();
+
+			AgreeContract contract = (AgreeContract) compImpAnnex.getContract();
+			for (SpecStatement spec : contract.getSpecs()) {
+				if (spec instanceof LiftContractStatement) {
+
+					Subcomponent sub = ((ComponentImplementation) compClass).getOwnedSubcomponents().get(0);
+
+					ct = sub.getComponentType();
+
+
+					for (Connection conn : ((ComponentImplementation) compClass).getAllConnections()) {
+
+
+						NamedElement sourceNe = conn.getSource().getConnectionEnd();
+						NamedElement destNe = conn.getDestination().getConnectionEnd();
+
+						String sourceStr = sourceNe.getName().replace("::", "__");
+
+						String destStr = destNe.getName().replace("::", "__");
+
+						if (ct == sourceNe.getContainingClassifier()) {
+							portRewriteMap.put(sourceStr, new IdExpr(destStr));
+
+						} else if (ct == destNe.getContainingClassifier()) {
+							portRewriteMap.put(destStr, new IdExpr(sourceStr));
+
+						}
+
+
+					}
+
+
+				}
+			}
+
+
+			compClass = ct;
 		}
 		curInst = compInst;
 
@@ -377,11 +417,12 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			AgreeContract contract = (AgreeContract) annex.getContract();
 			// this makes files for monolithic verification a bit smaller
 			if (isTop || !hasSubcomponents) {
-				assumptions.addAll(getAssumptionStatements(contract.getSpecs()));
-				guarantees.addAll(getGuaranteeStatements(contract.getSpecs()));
+				assumptions.addAll(getAssumptionStatements(contract.getSpecs(), portRewriteMap));
+				guarantees.addAll(getGuaranteeStatements(contract.getSpecs(), portRewriteMap));
 			}
+
 			// we count eqstatements with expressions as assertions
-			getEquationStatements(contract.getSpecs()).addAllTo(locals, assertions, guarantees);
+			getEquationStatements(contract.getSpecs(), portRewriteMap).addAllTo(locals, assertions, guarantees);
 			assertions.addAll(getPropertyStatements(contract.getSpecs()));
 			outputs.addAll(getEquationVars(contract.getSpecs(), compInst));
 			getAgreeInputVars(contract.getSpecs(), compInst).addAllTo(inputs, assumptions, guarantees);
@@ -1177,7 +1218,8 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		return props;
 	}
 
-	private GatheredVariablesAndConstraints getEquationStatements(EList<SpecStatement> specs) {
+	private GatheredVariablesAndConstraints getEquationStatements(EList<SpecStatement> specs,
+			Map<String, jkind.lustre.Expr> rewriteMap) {
 		GatheredVariablesAndConstraints result = new GatheredVariablesAndConstraints();
 		for (SpecStatement spec : specs) {
 			if (spec instanceof EqStatement) {
@@ -1185,7 +1227,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 				EList<Arg> lhs = eq.getLhs();
 				if (eq.getExpr() != null) {
 
-					Expr expr = doSwitch(eq.getExpr());
+					Expr expr = substitute(doSwitch(eq.getExpr()), rewriteMap);
 
 					if (lhs.size() != 1) {
 						List<Expr> ids = new ArrayList<>();
@@ -1206,79 +1248,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	}
 
 
-
-
-	private PropertyExpression getPropertyExpression (AbstractNamedValue nv) {
-		if (nv instanceof PropertyConstant) {
-			return ((PropertyConstant) nv).getConstantValue();
-		}
-
-		// TODO: EGM need to pull out the property value rather that the default value,
-		// but I am not sure how to do that.
-		if (nv instanceof Property) {
-			assert ("ERROR: default property value in AgreeASTBuilder::PropertyExpression" == null);
-			return ((Property) nv).getDefaultValue();
-		}
-
-		// nv is an enumeration literal
-		assert ("ERROR: enumeration literal in AgreeASTBuildter::getPropertyExpression" == null);
-		return null;
-	}
-
-	// EGM-COMMENT: RangeValueImpl::getNumberValue(pe) does not cover the NamedValue instance
-	// of a property expression. The getNumberValue here duplicates that code and adds the
-	// missing type. RangeValueImpl::getNumberValue(pe) is used by RangeValueImpl::getMavimumValue()
-	// and its minimum value counterpart. These are needed for the range constraints.
-	private NumberValue getNumberValue(PropertyExpression pe) {
-		if (pe instanceof Operation) {
-			pe = ((Operation) pe).getOwnedPropertyExpressions().get(0);
-		}
-
-		if (pe instanceof NumberValue) {
-			return (NumberValue) pe;
-		}
-
-		if (pe instanceof PropertyConstant) {
-			return (NumberValue) ((PropertyConstant) pe).getConstantValue();
-		}
-
-		if (pe instanceof NamedValue) {
-			pe = getPropertyExpression(((NamedValue) pe).getNamedValue());
-			return getNumberValue(pe);
-		}
-
-		assert ("ERROR: missing type in AgreeASTBuilder::getNumberValue" == null);
-		return null;
-	}
-
-//
-//	private double getScaledValue(PropertyExpression pe) {
-//		return getNumberValue(pe).getScaledValue();
-//	}
-
-//	private Expr createExprForBound(String name, RangeValue rv, Function<BigDecimal, Expr> makeExpr) {
-//		double min = getScaledValue(rv.getMinimum());
-//		double max = getScaledValue(rv.getMaximum());
-//		IdExpr id = new IdExpr(name);
-//		Expr lowVal = makeExpr.apply(BigDecimal.valueOf(min));
-//		Expr highVal = makeExpr.apply(BigDecimal.valueOf(max));
-//		Expr lowBound = new BinaryExpr(lowVal, BinaryOp.LESSEQUAL, id);
-//		Expr highBound = new BinaryExpr(id, BinaryOp.LESSEQUAL, highVal);
-//		return LustreExprFactory.makeANDExpr(lowBound, highBound);
-//	}
-
-
-//	private List<Expr> getArrayRangeConstraint(String namePrefix, ArrayTypeDef array) {
-//		List<Expr> constraints = new ArrayList<>();
-//		assert (array.baseType instanceof DataClassifier);
-//		Expr expr = getDataClassifierRangeConstraintExprs(AgreeTypeSystem.nameOfTypeDef(array.baseType),
-//				(DataClassifier) array.baseType)
-//				.stream().reduce(new BoolExpr(true), (a, b) -> new BinaryExpr(a, BinaryOp.AND, b));
-//		for (int i = 0; i < array.dimension; ++i) {
-//			String name = namePrefix + "[" + i + "]";
-//		}
-//		return constraints;
-//	}
 
 	private List<Expr> getConstraintsFromTypeDef(String name, AgreeTypeSystem.TypeDef typeDef) {
 		List<Expr> constraints = new ArrayList<>();
@@ -1493,34 +1462,41 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 //				.filter(pa -> "Real_Range".equals(pa.getProperty().getName())).collect(Collectors.toList());
 //	}
 
-	private List<AgreeStatement> getAssumptionStatements(EList<SpecStatement> specs) {
+	private List<AgreeStatement> getAssumptionStatements(EList<SpecStatement> specs, Map<String, jkind.lustre.Expr> rewriteMap) {
 		List<AgreeStatement> assumptions = new ArrayList<>();
 		for (SpecStatement spec : specs) {
 			if (spec instanceof AssumeStatement) {
 				AssumeStatement assumption = (AssumeStatement) spec;
 				String str = assumption.getStr();
 				if (assumption.getExpr() != null) {
-					assumptions.add(new AgreeStatement(str, doSwitch(assumption.getExpr()), assumption));
+					assumptions.add(new AgreeStatement(str, substitute(doSwitch(assumption.getExpr()), rewriteMap), assumption));
 				} else {
 					PatternStatement pattern = assumption.getPattern();
-					assumptions.add(new AgreePatternBuilder(str, assumption, this).doSwitch(pattern));
+
+					AgreeStatement patAssumption = new AgreePatternBuilder(str, assumption, this).doSwitch(pattern);
+					patAssumption.expr = substitute(patAssumption.expr, rewriteMap);
+					assumptions.add(patAssumption);
 				}
 			}
 		}
 		return assumptions;
 	}
 
-	private List<AgreeStatement> getGuaranteeStatements(EList<SpecStatement> specs) {
+	private List<AgreeStatement> getGuaranteeStatements(EList<SpecStatement> specs,
+			Map<String, jkind.lustre.Expr> rewriteMap) {
 		List<AgreeStatement> guarantees = new ArrayList<>();
 		for (SpecStatement spec : specs) {
 			if (spec instanceof GuaranteeStatement) {
 				GuaranteeStatement guarantee = (GuaranteeStatement) spec;
 				String str = guarantee.getStr();
 				if (guarantee.getExpr() != null) {
-					guarantees.add(new AgreeStatement(str, doSwitch(guarantee.getExpr()), guarantee));
+					guarantees.add(
+							new AgreeStatement(str, substitute(doSwitch(guarantee.getExpr()), rewriteMap), guarantee));
 				} else {
 					PatternStatement pattern = guarantee.getPattern();
-					guarantees.add(new AgreePatternBuilder(str, guarantee, this).doSwitch(pattern));
+					AgreeStatement patStatement = new AgreePatternBuilder(str, guarantee, this).doSwitch(pattern);
+					patStatement.expr = substitute(patStatement.expr, rewriteMap);
+					guarantees.add(patStatement);
 				}
 			}
 		}
@@ -2183,6 +2159,18 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			return new ArrayExpr(elems);
 		}
 		throw new RuntimeException("Error caseIndicesExpr");
+	}
+
+	private Expr substitute(Expr context, Map<String, Expr> rewriteMap) {
+		Expr acc = context;
+		for (Entry<String, Expr> entry : rewriteMap.entrySet()) {
+			String name = entry.getKey();
+			Expr newExpr = entry.getValue();
+			acc = substitute(acc, name, newExpr);
+		}
+
+		return acc;
+
 	}
 
 	private Expr substitute(Expr context, String name, Expr newExpr) {

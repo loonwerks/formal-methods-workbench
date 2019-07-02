@@ -259,11 +259,9 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cTypeTypeParserRuleCall_2_4_0 = (RuleCall)cTypeAssignment_2_4.eContents().get(0);
 		private final Keyword cSemicolonKeyword_2_5 = (Keyword)cGroup_2.eContents().get(5);
 		private final Group cGroup_3 = (Group)cAlternatives.eContents().get(3);
-		private final Action cLiftStatementAction_3_0 = (Action)cGroup_3.eContents().get(0);
+		private final Action cLiftContractStatementAction_3_0 = (Action)cGroup_3.eContents().get(0);
 		private final Keyword cLiftKeyword_3_1 = (Keyword)cGroup_3.eContents().get(1);
-		private final Assignment cSubcompAssignment_3_2 = (Assignment)cGroup_3.eContents().get(2);
-		private final CrossReference cSubcompNamedElementCrossReference_3_2_0 = (CrossReference)cSubcompAssignment_3_2.eContents().get(0);
-		private final RuleCall cSubcompNamedElementIDTerminalRuleCall_3_2_0_1 = (RuleCall)cSubcompNamedElementCrossReference_3_2_0.eContents().get(1);
+		private final Keyword cContractKeyword_3_2 = (Keyword)cGroup_3.eContents().get(2);
 		private final Keyword cSemicolonKeyword_3_3 = (Keyword)cGroup_3.eContents().get(3);
 		private final Group cGroup_4 = (Group)cAlternatives.eContents().get(4);
 		private final Action cConnectionStatementAction_4_0 = (Action)cGroup_4.eContents().get(0);
@@ -293,7 +291,7 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//	NamedSpecStatement
 		//	| {InitialStatement} 'initially' ':' expr=Expr ';'
 		//	| {ParamStatement} 'parameter' expr=Expr ':' type=Type ';'
-		//	| {LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';'
+		//	| {LiftContractStatement} 'lift' 'contract' ';'
 		//	| {ConnectionStatement} 'connection' conn=[aadl2::NamedElement] ':' expr=Expr ';'
 		//	| SynchStatement
 		//	| OrderStatement
@@ -311,7 +309,7 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		@Override public ParserRule getRule() { return rule; }
 
 		//NamedSpecStatement | {InitialStatement} 'initially' ':' expr=Expr ';' | {ParamStatement} 'parameter' expr=Expr ':'
-		//type=Type ';' | {LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';' | {ConnectionStatement} 'connection'
+		//type=Type ';' | {LiftContractStatement} 'lift' 'contract' ';' | {ConnectionStatement} 'connection'
 		//conn=[aadl2::NamedElement] ':' expr=Expr ';' | SynchStatement | OrderStatement | PropertyStatement | ConstStatement |
 		//EnumStatement | EqStatement | AssignStatement | LinearizationDef | FnDef | LibraryFnDef | NodeDef | RecordDef |
 		//InputStatement
@@ -368,23 +366,17 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//';'
 		public Keyword getSemicolonKeyword_2_5() { return cSemicolonKeyword_2_5; }
 
-		//{LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';'
+		//{LiftContractStatement} 'lift' 'contract' ';'
 		public Group getGroup_3() { return cGroup_3; }
 
-		//{LiftStatement}
-		public Action getLiftStatementAction_3_0() { return cLiftStatementAction_3_0; }
+		//{LiftContractStatement}
+		public Action getLiftContractStatementAction_3_0() { return cLiftContractStatementAction_3_0; }
 
 		//'lift'
 		public Keyword getLiftKeyword_3_1() { return cLiftKeyword_3_1; }
 
-		//subcomp=[aadl2::NamedElement]
-		public Assignment getSubcompAssignment_3_2() { return cSubcompAssignment_3_2; }
-
-		//[aadl2::NamedElement]
-		public CrossReference getSubcompNamedElementCrossReference_3_2_0() { return cSubcompNamedElementCrossReference_3_2_0; }
-
-		//ID
-		public RuleCall getSubcompNamedElementIDTerminalRuleCall_3_2_0_1() { return cSubcompNamedElementIDTerminalRuleCall_3_2_0_1; }
+		//'contract'
+		public Keyword getContractKeyword_3_2() { return cContractKeyword_3_2; }
 
 		//';'
 		public Keyword getSemicolonKeyword_3_3() { return cSemicolonKeyword_3_3; }
@@ -2384,8 +2376,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		
 		//LinearizationDef:
 		//	'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
-		//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)?
-		//	':' exprBody=Expr ';';
+		//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)? ':'
+		//	exprBody=Expr ';';
 		@Override public ParserRule getRule() { return rule; }
 
 		//'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')' 'over' '[' intervals+=LinearizationInterval (','
@@ -2894,8 +2886,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cDoubleDotRefParserRuleCall_1 = (RuleCall)cAlternatives.eContents().get(1);
 		
 		//BaseType Type:
-		//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT
-		//	| REAL_LIT) ']')?
+		//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT |
+		//	REAL_LIT) ']')?
 		//	| DoubleDotRef;
 		@Override public ParserRule getRule() { return rule; }
 
@@ -4678,8 +4670,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		@Override public ParserRule getRule() { return rule; }
 
 		//=> ({NamedElmExpr} elm=[aadl2::NamedElement|DCID]) | {TimeExpr} 'time' | {IndicesExpr} 'indices' '(' array=Expr ')' | =>
-		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef
-		//'{' args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
+		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef '{'
+		//args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
 		//({EnumLitExpr} 'enum' '(') enumType=DoubleDotRef ',' value=ID ')' | ArrayLiteralExpr | {IntLitExpr} val=INTEGER_LIT |
 		//{PreExpr} 'pre' '(' expr=Expr ')' | {EventExpr} 'event' '(' id=[aadl2::NamedElement] ')' | {LatchedExpr} 'latched' '('
 		//expr=Expr ')' | {TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')' | {TimeRiseExpr} 'timerise' '('
@@ -5647,7 +5639,7 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 	//	NamedSpecStatement
 	//	| {InitialStatement} 'initially' ':' expr=Expr ';'
 	//	| {ParamStatement} 'parameter' expr=Expr ':' type=Type ';'
-	//	| {LiftStatement} 'lift' subcomp=[aadl2::NamedElement] ';'
+	//	| {LiftContractStatement} 'lift' 'contract' ';'
 	//	| {ConnectionStatement} 'connection' conn=[aadl2::NamedElement] ':' expr=Expr ';'
 	//	| SynchStatement
 	//	| OrderStatement
@@ -5872,8 +5864,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 
 	//LinearizationDef:
 	//	'linearization' name=ID '(' args+=Arg (',' args+=Arg)* ')'
-	//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)?
-	//	':' exprBody=Expr ';';
+	//	'over' '[' intervals+=LinearizationInterval (',' intervals+=LinearizationInterval)* ']' ('within' precision=Expr)? ':'
+	//	exprBody=Expr ';';
 	public LinearizationDefElements getLinearizationDefAccess() {
 		return pLinearizationDef;
 	}
@@ -5949,8 +5941,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 	}
 
 	//BaseType Type:
-	//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT
-	//	| REAL_LIT) ']')?
+	//	{PrimType} name=primTypes ('[' lowNeg='-'? rangeLow=(INTEGER_LIT | REAL_LIT) ',' highNeg='-'? rangeHigh=(INTEGER_LIT |
+	//	REAL_LIT) ']')?
 	//	| DoubleDotRef;
 	public BaseTypeElements getBaseTypeAccess() {
 		return pBaseType;
