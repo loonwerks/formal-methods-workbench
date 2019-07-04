@@ -7,6 +7,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.osate.aadl2.Aadl2Factory;
@@ -151,10 +152,7 @@ public class CaseUtils {
 	 */
 	public static PropertySet getPropertySet(String propSetName, String propSetFile) {
 
-		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
-		if (resourceSet == null) {
-			return null;
-		}
+		final ResourceSet resourceSet = new ResourceSetImpl();
 
 		PropertySet propSet = null;
 

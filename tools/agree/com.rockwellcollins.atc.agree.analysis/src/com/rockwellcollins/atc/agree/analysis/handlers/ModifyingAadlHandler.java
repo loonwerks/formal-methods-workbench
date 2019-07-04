@@ -9,6 +9,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.resource.SaveOptions;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 
@@ -22,8 +23,7 @@ public abstract class ModifyingAadlHandler extends AadlHandler {
 				IStatus[] status = new IStatus[1];
 				getWindow().getShell().getDisplay().syncExec(() -> {
 					if (xtextEditor == null) {
-//						final ResourceSet rs = OsateResourceUtil.getResourceSet();
-						final ResourceSet rs = getResourceSet();
+						final ResourceSet rs = new ResourceSetImpl();
 						status[0] = getWorker(uri, monitor).apply(rs);
 
 						// Save the model

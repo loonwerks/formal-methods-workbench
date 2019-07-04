@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Adapters;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -17,7 +18,6 @@ import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
-import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Realization;
 import org.osate.ge.BusinessObjectSelection;
@@ -32,24 +32,20 @@ public class TranslateHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
+		final URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
 		if (uri == null) {
 			return null;
 		}
 
-//		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
-		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
-		if (resourceSet == null) {
-			return null;
-		}
-		EObject eObj = resourceSet.getEObject(uri, true);
+		final ResourceSet resourceSet = new ResourceSetImpl();
+		final EObject eObj = resourceSet.getEObject(uri, true);
 
 		ComponentImplementation ci = null;
 		if (eObj instanceof ComponentImplementation) {
 			ci = (ComponentImplementation) eObj;
 		}
 
-		IProject project = TraverseProject.getCurrentProject();
+		final IProject project = TraverseProject.getCurrentProject();
 
 		String hashcode = null;
 		try {
@@ -59,7 +55,7 @@ public class TranslateHandler extends AbstractHandler {
 			hashcode = null;
 		}
 
-		JsonObject header = new JsonObject();
+		final JsonObject header = new JsonObject();
 		if (project != null) {
 			header.addProperty("project", project.getName());
 		}
