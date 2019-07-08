@@ -2,6 +2,7 @@ package com.collins.fmw.cyres.json.plugin;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
+import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AadlReal;
@@ -612,6 +613,13 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	public JsonElement caseAadlString(AadlString s) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("AadlString"));
+		return result;
+	}
+
+	@Override
+	public JsonElement caseAadlBoolean(AadlBoolean b) {
+		JsonObject result = new JsonObject();
+		result.add("kind", new JsonPrimitive("AadlBoolean"));
 		return result;
 	}
 
