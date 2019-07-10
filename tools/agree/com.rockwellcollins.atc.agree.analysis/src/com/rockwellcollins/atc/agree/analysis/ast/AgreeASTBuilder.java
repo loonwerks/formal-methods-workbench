@@ -374,43 +374,45 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			compClass = ((ComponentImplementation) compClass).getType();
 		} else if (compClass instanceof ComponentImplementation) {
 
-			AgreeContractSubclause compImpAnnex = getAgreeAnnex(compClass);
-
 			ComponentType ct = ((ComponentImplementation) compClass).getType();
 
-			AgreeContract contract = (AgreeContract) compImpAnnex.getContract();
-			for (SpecStatement spec : contract.getSpecs()) {
-				if (spec instanceof LiftContractStatement) {
+			AgreeContractSubclause compImpAnnex = getAgreeAnnex(compClass);
+			if (compImpAnnex != null) {
+				AgreeContract contract = (AgreeContract) compImpAnnex.getContract();
+				for (SpecStatement spec : contract.getSpecs()) {
+					if (spec instanceof LiftContractStatement) {
 
-					Subcomponent sub = ((ComponentImplementation) compClass).getOwnedSubcomponents().get(0);
+						Subcomponent sub = ((ComponentImplementation) compClass).getOwnedSubcomponents().get(0);
 
-					ct = sub.getComponentType();
-
-
-					for (Connection conn : ((ComponentImplementation) compClass).getAllConnections()) {
+						ct = sub.getComponentType();
 
 
-						NamedElement sourceNe = conn.getSource().getConnectionEnd();
-						NamedElement destNe = conn.getDestination().getConnectionEnd();
+						for (Connection conn : ((ComponentImplementation) compClass).getAllConnections()) {
 
-						String sourceStr = sourceNe.getName().replace("::", "__");
 
-						String destStr = destNe.getName().replace("::", "__");
+							NamedElement sourceNe = conn.getSource().getConnectionEnd();
+							NamedElement destNe = conn.getDestination().getConnectionEnd();
 
-						if (ct == sourceNe.getContainingClassifier()) {
-							portRewriteMap.put(sourceStr, new IdExpr(destStr));
+							String sourceStr = sourceNe.getName().replace("::", "__");
 
-						} else if (ct == destNe.getContainingClassifier()) {
-							portRewriteMap.put(destStr, new IdExpr(sourceStr));
+							String destStr = destNe.getName().replace("::", "__");
+
+							if (ct == sourceNe.getContainingClassifier()) {
+								portRewriteMap.put(sourceStr, new IdExpr(destStr));
+
+							} else if (ct == destNe.getContainingClassifier()) {
+								portRewriteMap.put(destStr, new IdExpr(sourceStr));
+
+							}
+
 
 						}
 
-
 					}
-
-
 				}
+
 			}
+
 
 
 			compClass = ct;
