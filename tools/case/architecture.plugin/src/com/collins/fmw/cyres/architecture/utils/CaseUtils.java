@@ -1,15 +1,11 @@
 package com.collins.fmw.cyres.architecture.utils;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlBoolean;
@@ -32,13 +28,13 @@ import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.StringLiteral;
-import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.util.plugin.TraverseProject;
+import com.collins.fmw.cyres.architecture.Activator;
 
 public class CaseUtils {
 
+	public static final String CASE_RESOURCE_PATH = Activator.PLUGIN_ID + "/resources/";
 	public static final String CASE_PROPSET_NAME = "CASE_Properties";
 	public static final String CASE_PROPSET_FILE = "CASE_Properties.aadl";
 	public static final String CASE_MODEL_TRANSFORMATIONS_NAME = "CASE_Model_Transformations";
@@ -65,7 +61,7 @@ public class CaseUtils {
 
 		if (casePropSet == null) {
 			// Try importing the resource
-			casePropSet = getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE);
+			casePropSet = getCasePropertySet();
 			if (casePropSet == null) {
 				Dialog.showError("Could not import " + CASE_PROPSET_NAME,
 						"Property set " + CASE_PROPSET_NAME + " could not be found.");
@@ -76,6 +72,26 @@ public class CaseUtils {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Gets the CASE property set from either the current resource, or
+	 * the specified file, provided as an OSATE plugin.
+	 * @return PropertySet
+	 */
+	public static PropertySet getCasePropertySet() {
+
+		PropertySet propSet = null;
+
+		final String pathName = CASE_RESOURCE_PATH + CASE_PROPSET_FILE;
+		final ResourceSet resourceSet = new ResourceSetImpl();
+		final Resource r = resourceSet.getResource(URI.createPlatformPluginURI(pathName, true), true);
+		final EObject eObj = r.getContents().get(0);
+		if (eObj instanceof PropertySet) {
+			propSet = (PropertySet) eObj;
+		}
+
+		return propSet;
 	}
 
 	/**
@@ -100,7 +116,7 @@ public class CaseUtils {
 
 		if (casePackage == null) {
 			// Try importing the resource
-			casePackage = getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME, CASE_MODEL_TRANSFORMATIONS_FILE);
+			casePackage = getCaseModelTransformationsPackage();
 			if (casePackage == null) {
 				Dialog.showError("Could not import " + CASE_MODEL_TRANSFORMATIONS_NAME,
 						"Package " + CASE_MODEL_TRANSFORMATIONS_NAME + " could not be found.");
@@ -135,72 +151,21 @@ public class CaseUtils {
 	}
 
 	/**
-	 * Gets the CASE property set from either the current resource, or
-	 * the specified file, provided as an OSATE plugin.
-	 * @return PropertySet
+	 * Gets the CASE Model Transformations Package
+	 * @return AadlPackage
 	 */
-	public static PropertySet getCasePropertySet() {
-		return getPropertySet(CASE_PROPSET_NAME, CASE_PROPSET_FILE);
-	}
-
-	/**
-	 * Gets the property set from either the current resource, or
-	 * the specified file, provided as an OSATE plugin.
-	 * @param propSetName - The name of the property set
-	 * @param propSetFile - The file name containing the property set
-	 * @return PropertySet
-	 */
-	public static PropertySet getPropertySet(String propSetName, String propSetFile) {
-
+	public static AadlPackage getCaseModelTransformationsPackage() {
+		AadlPackage aadlPkg = null;
+		final String pathName = CASE_RESOURCE_PATH + CASE_MODEL_TRANSFORMATIONS_FILE;
 		final ResourceSet resourceSet = new ResourceSetImpl();
-
-		PropertySet propSet = null;
-
-		// Check to see if the property set file resource has already been loaded
-		// but not imported into this model
-		for (Resource r : resourceSet.getResources()) {
-			final EObject eObj = r.getContents().get(0);
-			if (eObj instanceof PropertySet) {
-				PropertySet propSetImpl = (PropertySet) eObj;
-				if (propSetImpl.getName().equalsIgnoreCase(propSetName)) {
-					propSet = propSetImpl;
-					break;
-				}
-			}
+		final Resource r = resourceSet.getResource(URI.createPlatformPluginURI(pathName, true), true);
+		final EObject eObj = r.getContents().get(0);
+		if (eObj instanceof AadlPackage) {
+			aadlPkg = (AadlPackage) eObj;
 		}
-
-		// If the logical resource has not been loaded, create it
-		if (propSet == null) {
-
-			// Find the Property Set File
-			// The file is provided as an OSATE Plugin_Contribution,
-			// so retrieve its URI, which has already been created at launch
-			final List<URI> contributedAadl = PluginSupportUtil.getContributedAadl();
-			URI uri = null;
-			for (URI u : contributedAadl) {
-				if (u.lastSegment().equalsIgnoreCase(propSetFile)) {
-					uri = u;
-					break;
-				}
-			}
-			if (uri == null) {
-				Dialog.showError(propSetName + " Properties", "Could not find the " + propSetFile + " property file.");
-				return null;
-			}
-			// Create a resource for the property set file URI
-			try {
-				Resource propResource = resourceSet.createResource(uri);
-				propResource.load(null);
-				// Grab the PropertySet specified in the CASE Prop file
-				propSet = (PropertySet) propResource.getContents().get(0);
-			} catch (IOException e) {
-				Dialog.showError(propSetName + " Properties", "Could not load the " + propSetFile + " property file.");
-				return null;
-			}
-		}
-
-		return propSet;
+		return aadlPkg;
 	}
+
 
 	/**
 	 * Adds a name/value property association to the provided thread component.
@@ -337,77 +302,6 @@ public class CaseUtils {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Gets the CASE Model Transformations Package from either the current resource, or
-	 * the specified file, provided as an OSATE plugin.
-	 * @param resourceSet - The ResourceSet that contains all open resources
-	 * @return AadlPackage
-	 */
-	public static AadlPackage getCaseModelTransformationsPackage() {
-		return getAadlPackage(CASE_MODEL_TRANSFORMATIONS_NAME, CASE_MODEL_TRANSFORMATIONS_FILE);
-	}
-
-	/**
-	 * Gets the AADL Package from either the current resource, or
-	 * the specified file, provided as an OSATE plugin.
-	 * @param packageName - The name of the AADL package
-	 * @param packageFile - The name of the file containing the AADL package
-	 * @return AadlPackage
-	 */
-	public static AadlPackage getAadlPackage(String packageName, String packageFile) {
-
-		AadlPackage aadlPackage = null;
-		ResourceSet resourceSet = new XtextResourceSetProvider().get(TraverseProject.getCurrentProject());
-		if (resourceSet == null) {
-			return null;
-		}
-
-		// Check to see if the package file resource has already been loaded
-		// but not imported into this model
-		for (Resource r : resourceSet.getResources()) {
-			final EObject eObj = r.getContents().get(0);
-			if (eObj instanceof AadlPackage) {
-				AadlPackage tmpPkg = (AadlPackage) eObj;
-				if (tmpPkg.getName().equalsIgnoreCase(packageName)) {
-					aadlPackage = tmpPkg;
-					break;
-				}
-			}
-		}
-
-		// If the logical resource has not been loaded, create it
-		if (aadlPackage == null) {
-
-			// Find the Property Set File
-			// The file is provided as an OSATE Plugin_Contribution,
-			// so retrieve its URI, which has already been created at launch
-			final List<URI> contributedAadl = PluginSupportUtil.getContributedAadl();
-			URI uri = null;
-			for (URI u : contributedAadl) {
-				if (u.lastSegment().equalsIgnoreCase(packageFile)) {
-					uri = u;
-					break;
-				}
-			}
-			if (uri == null) {
-				Dialog.showError(packageName + " Package", "Could not find the " + packageFile + " file.");
-				return null;
-			}
-			// Create a resource for the property set file URI
-			try {
-				Resource packageResource = resourceSet.createResource(uri);
-				packageResource.load(null);
-				// Grab the PropertySet specified in the CASE Prop file
-				aadlPackage = (AadlPackage) packageResource.getContents().get(0);
-			} catch (IOException e) {
-				Dialog.showError(packageName + " Package", "Could not laod the " + packageFile + " file.");
-				return null;
-			}
-		}
-
-		return aadlPackage;
 	}
 
 }

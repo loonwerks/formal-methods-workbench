@@ -7,8 +7,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -37,8 +35,7 @@ public class TranslateHandler extends AbstractHandler {
 			return null;
 		}
 
-		final ResourceSet resourceSet = new ResourceSetImpl();
-		final EObject eObj = resourceSet.getEObject(uri, true);
+		final EObject eObj = getEObject(uri);
 
 		ComponentImplementation ci = null;
 		if (eObj instanceof ComponentImplementation) {
@@ -51,7 +48,6 @@ public class TranslateHandler extends AbstractHandler {
 		try {
 			hashcode = ModelHashcode.getHashcode(ci);
 		} catch (Exception e) {
-			;
 			hashcode = null;
 		}
 
@@ -71,7 +67,7 @@ public class TranslateHandler extends AbstractHandler {
 			// Generate json
 			Aadl2Json.createJson(header);
 		} catch (Exception e) {
-			Dialog.showError("JSON Generator", "Unable to export model to JSON format.");
+			Dialog.showError("JSON Generator", "Unable to export model to JSON format");
 			return null;
 		}
 
@@ -108,6 +104,11 @@ public class TranslateHandler extends AbstractHandler {
 		return null;
 	}
 
-
+	private EObject getEObject(URI uri) {
+		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+		return xtextEditor.getDocument().readOnly(resource -> {
+			return resource.getResourceSet().getEObject(uri, true);
+		});
+	}
 
 }
