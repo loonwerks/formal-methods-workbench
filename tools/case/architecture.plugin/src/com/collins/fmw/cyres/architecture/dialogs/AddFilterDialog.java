@@ -54,7 +54,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> sourceGuarantees = new ArrayList<>();
 	private List<String> propagateGuarantees = new ArrayList<>();
 	private List<String> requirements = new ArrayList<>();
-//	private List<String> compoundFilterSpecIds = new ArrayList<>();
 
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
@@ -90,16 +89,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 		createImplementationLanguageField(container);
 		createLogPortField(container);
 
-//		if (compoundFilter != null) {
-//			// Compile list of existing filter spec IDs
-//			// We don't want the user to specify one of these IDs
-//			ComponentImplementation ci = compoundFilter.getComponentImplementation();
-//			for (PropertyExpression expr : ci.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_SPEC")) {
-//				if (expr instanceof StringLiteral) {
-//					compoundFilterSpecIds.add(((StringLiteral) expr).getValue());
-//				}
-//			}
-//		}
 		createRequirementField(container);
 		if (compoundFilter == null) {
 			// Don't show the propagate guarantees field if we're adding a spec to an existing filter.
@@ -235,12 +224,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 		cboFilterRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
 		cboFilterRequirement.setLayoutData(dataInfoField);
 
-		for (String clause : requirements) {
-//			if (!compoundFilterSpecIds.contains(clause)) {
-				// Don't include the existing filter spec IDs in the list
-				cboFilterRequirement.add(clause);
-//			}
-		}
+		requirements.forEach(r -> cboFilterRequirement.add(r));
+
 	}
 
 	/**
@@ -310,11 +295,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 				break;
 			}
 		}
-//		if (compoundFilterSpecIds.contains(cboFilterRequirement.getText())) {
-//			Dialog.showError("Add Filter", "The requirement " + cboFilterRequirement.getText()
-//					+ " already has a filter specification assigned to it.");
-//			return;
-//		}
+
 		filterRequirement = cboFilterRequirement.getText();
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees.clear();

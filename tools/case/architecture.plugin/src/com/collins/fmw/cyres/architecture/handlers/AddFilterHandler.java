@@ -100,8 +100,6 @@ public class AddFilterHandler extends AadlHandler {
 		if (isFilter(comp)) {
 			if (Dialog.askQuestion("Add Filter",
 					"A CASE Filter cannot be inserted next to another CASE Filter.  Would you like to add a new filter specification to the existing filter instead?")) {
-//				filterAgreeProperty = Dialog.getInput("Add Filter",
-//						"Enter the AGREE contract for the new filter specification.", "", null);
 
 				createCompoundFilter = true;
 				// Get filter outgoing connection
@@ -120,9 +118,6 @@ public class AddFilterHandler extends AadlHandler {
 					return;
 				}
 
-//				if (filterAgreeProperty != null) {
-//					addFilterSpec(EcoreUtil.getURI(comp));
-//				}
 			} else {
 				return;
 			}
@@ -134,13 +129,8 @@ public class AddFilterHandler extends AadlHandler {
 				if (isFilter(comp)) {
 					if (Dialog.askQuestion("Add Filter",
 							"A CASE Filter cannot be inserted next to another CASE Filter.  Would you like to add a new filter specification to the existing filter instead?")) {
-//				filterAgreeProperty = Dialog.getInput("Add Filter",
-//						"Enter the AGREE contract for the new filter specification.", "", null);
 						createCompoundFilter = true;
 						filterOutConn = selectedConnection;
-//				if (filterAgreeProperty != null) {
-//					addFilterSpec(EcoreUtil.getURI(comp));
-//				}
 					} else {
 						return;
 					}

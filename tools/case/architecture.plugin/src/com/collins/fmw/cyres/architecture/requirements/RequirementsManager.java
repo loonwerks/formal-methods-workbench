@@ -89,109 +89,6 @@ public class RequirementsManager {
 
 	}
 
-//	private static void findImportedRequirements() {
-//
-//		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-//
-//		importedRequirements = xtextEditor.getDocument().readOnly(resource -> {
-//
-//			List<CyberRequirement> resoluteClauses = new ArrayList<>();
-//
-//			// Get all the packages in this project
-//			ResourceSet rs = resource.getResourceSet();
-//			for (Resource r : rs.getResources()) {
-//
-//				// Get the components in the model
-//				ModelUnit modelUnit = (ModelUnit) r.getContents().get(0);
-//				if (modelUnit instanceof AadlPackage) {
-//					AadlPackage aadlPkg = (AadlPackage) modelUnit;
-//					PublicPackageSection pkgSection = aadlPkg.getOwnedPublicSection();
-//					for (Classifier classifier : pkgSection.getOwnedClassifiers()) {
-//
-//						for (AnnexSubclause annexSubclause : classifier.getOwnedAnnexSubclauses()) {
-//							DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-//							// See if there's a resolute annex
-//							if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-//								ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
-//										.getParsedAnnexSubclause();
-//								// See if there are any 'prove' clauses
-//								for (AnalysisStatement as : resoluteClause.getProves()) {
-//									if (as instanceof ProveStatement) {
-//										ProveStatement prove = (ProveStatement) as;
-//										Expr expr = prove.getExpr();
-//										if (expr instanceof FnCallExpr) {
-//											FnCallExpr fnCall = (FnCallExpr) expr;
-//											// Check if the corresponding function definition is in private section
-//											FunctionDefinition fd = fnCall.getFn();
-//											if (AadlUtil
-//													.getContainingPackageSection(fd) instanceof PrivatePackageSection
-//													&& AadlUtil.getContainingPackage(fd) == aadlPkg) {
-//												String reqType = "";
-//												String reqText = "";
-//												DefinitionBody db = fd.getBody();
-//												if (db instanceof ClaimBody) {
-//													ClaimBody cb = (ClaimBody) db;
-//													for (ClaimText ct : cb.getClaim()) {
-//														// Assumption that claim text is only a string
-//														if (ct instanceof ClaimString) {
-//															ClaimString cs = (ClaimString) ct;
-//															reqText += cs.getStr();
-//														}
-//													}
-//												}
-//												if (reqText.matches("^\\[.+\\]\\s.+")) {
-//													// Extract the Requirement type from the text
-//													reqType = reqText.substring(1, reqText.indexOf("]"));
-//													reqText = reqText.substring(reqText.indexOf("]") + 1).trim();
-//												}
-//												// See if there is an agree statement with this requirement id
-//												boolean agree = false;
-//
-//												for (AnnexSubclause agreeAnnexSubclause : classifier
-//														.getOwnedAnnexSubclauses()) {
-//													DefaultAnnexSubclause defaultAgreeSubclause = (DefaultAnnexSubclause) agreeAnnexSubclause;
-//													// See if there's an agree annex
-//													if (defaultAgreeSubclause
-//															.getParsedAnnexSubclause() instanceof AgreeContractSubclause) {
-//														AgreeContractSubclause agreeSubclause = (AgreeContractSubclause) defaultAgreeSubclause
-//																.getParsedAnnexSubclause();
-//														AgreeContract contract = (AgreeContract) agreeSubclause
-//																.getContract();
-//														for (SpecStatement ss : contract.getSpecs()) {
-//															if (ss instanceof NamedSpecStatement) {
-//																NamedSpecStatement nss = (NamedSpecStatement) ss;
-//																if (nss.getName().equalsIgnoreCase(fd.getName())) {
-//																	agree = true;
-//																	break;
-//																}
-//															}
-//														}
-//														break;
-//													}
-//												}
-////												CyberRequirement req = new CyberRequirement(reqType, fd.getName(),
-////														reqText, classifier, agree, "");
-//												CyberRequirement req = new CyberRequirement(reqType, fd.getName(),
-//														reqText, classifier.getQualifiedName(), agree, "");
-//
-//												if (fd.getName() != null && !resoluteClauses.contains(req)) {
-//													resoluteClauses.add(req);
-//												}
-//											}
-//										}
-//									}
-//								}
-//								break;
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//			return resoluteClauses;
-//		});
-//	}
-
 	private static void findImportedRequirements() {
 
 		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
@@ -341,7 +238,6 @@ public class RequirementsManager {
 		if (editor != null) {
 			editor.getDocument().modify(resource -> {
 
-//				req.insertClaim(new BaseClaim(req.getId(), req.getType(), req.getText()), resource);
 				req.insertClaim(new BaseClaim(req), resource);
 
 				// Add AGREE, if necessary

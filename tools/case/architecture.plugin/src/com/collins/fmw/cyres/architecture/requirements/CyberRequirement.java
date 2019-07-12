@@ -62,16 +62,6 @@ public class CyberRequirement {
 		this.rationale = rationale;
 	}
 
-//	public CyberRequirement(String type, String id, String text, Classifier contextClassifier, boolean agree,
-//			String rationale) {
-//		this.type = type;
-//		this.id = id;
-//		this.text = text;
-//		this.context = contextClassifier.getQualifiedName();
-//		this.agree = agree;
-//		this.rationale = rationale;
-//	}
-
 	public String getType() {
 		return this.type;
 	}
@@ -343,7 +333,6 @@ public class CyberRequirement {
 	private Classifier getModificationContext(String qualifiedName, Resource resource) {
 		// Get modification context
 		Classifier modificationContext = null;
-//		Classifier implementationContext = getImplementationClassifier(this.context);
 		TreeIterator<EObject> x = EcoreUtil.getAllContents(resource, true);
 		while (x.hasNext()) {
 			EObject next = x.next();
@@ -355,8 +344,6 @@ public class CyberRequirement {
 						Subcomponent sub = (Subcomponent) nextElement;
 						modificationContext = sub.getComponentType();
 					} else {
-//				if (nextClass.getQualifiedName().equalsIgnoreCase(this.context)) {
-//				if (nextClass.getQualifiedName().equalsIgnoreCase(implementationContext.getQualifiedName())) {
 						modificationContext = (Classifier) nextElement;
 					}
 					break;
