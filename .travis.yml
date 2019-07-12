@@ -68,7 +68,7 @@ deploy:
     target_commitish: $TRAVIS_COMMIT
     on:
       branch: master
-      condition: $TRAVIS_EVENT_TYPE = cron
+      condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
   # Delete older nightly build releases
   - provider: script
     script: python3 .travis/manage_daily_builds.py
