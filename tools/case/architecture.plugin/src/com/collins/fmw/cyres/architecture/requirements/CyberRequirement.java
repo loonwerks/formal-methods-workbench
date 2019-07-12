@@ -371,6 +371,10 @@ public class CyberRequirement {
 	 * @param qualifiedName
 	 * @return
 	 */
+	public Classifier getImplementationClassifier() {
+		return getImplementationClassifier(this.context);
+	}
+
 	public static Classifier getImplementationClassifier(String qualifiedName) {
 		Classifier classifier = null;
 		if (!qualifiedName.contains("::")) {
@@ -402,6 +406,44 @@ public class CyberRequirement {
 		}
 
 		return classifier;
+	}
+
+	public FunctionDefinition getResoluteClaim() {
+		FunctionDefinition fnDef = null;
+
+		// Get AADL Package
+		Classifier classifier = getImplementationClassifier();
+		if (classifier == null) {
+			return null;
+		}
+		AadlPackage aadlPkg = AadlUtil.getContainingPackage(classifier);
+		if (aadlPkg == null) {
+			return null;
+		}
+
+		// Get private section
+		PrivatePackageSection privateSection = aadlPkg.getOwnedPrivateSection();
+		if (privateSection == null) {
+			return null;
+		}
+
+		// Get Resolute annex
+		for (AnnexLibrary annexLib : privateSection.getOwnedAnnexLibraries()) {
+			if (annexLib instanceof DefaultAnnexLibrary && annexLib.getName().equalsIgnoreCase("resolute")) {
+				DefaultAnnexLibrary defaultLib = (DefaultAnnexLibrary) annexLib;
+				ResoluteLibrary resLib = (ResoluteLibrary) defaultLib.getParsedAnnexLibrary();
+				// Iterate over requirements
+				for (Definition def : resLib.getDefinitions()) {
+					if (def instanceof FunctionDefinition && def.getName().equalsIgnoreCase(this.id)) {
+						fnDef = (FunctionDefinition) def;
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		return fnDef;
 	}
 
 	public IFile getContainingFile() {

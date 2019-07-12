@@ -394,6 +394,7 @@ public class RequirementsManager {
 //		jsonFile.exportFile(file);
 	}
 
+
 	private XtextEditor getEditor(IFile file) {
 		IWorkbenchPage page = null;
 		IEditorPart part = null;

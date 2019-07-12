@@ -10,6 +10,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
@@ -22,6 +23,7 @@ import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
@@ -52,14 +54,16 @@ import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.unparsing.AgreeAnnexUnparser;
+import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
+import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
 
 public class AddFilterHandler extends AadlHandler {
 
 	static final String FILTER_COMP_TYPE_NAME = "CASE_Filter";
 	static final String FILTER_PORT_IN_NAME = "filter_in";
 	static final String FILTER_PORT_OUT_NAME = "filter_out";
-	static final String FILTER_LOG_PORT_NAME = "message_log";
-	static final String FILTER_IMPL_NAME = "FLT";
+	public static final String FILTER_LOG_PORT_NAME = "message_log";
+	public static final String FILTER_IMPL_NAME = "FLT";
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String filterImplementationName;
@@ -90,31 +94,58 @@ public class AddFilterHandler extends AadlHandler {
 			return;
 		}
 
+		boolean createCompoundFilter = false;
 		ComponentType comp = subcomponent.getComponentType();
+		PortConnection filterOutConn = null;
 		if (isFilter(comp)) {
 			if (Dialog.askQuestion("Add Filter",
-					"A CASE Filter cannot be inserted next to another CASE Filter.  Instead, would you like to add a new filter specification to the existing filter?")) {
-				filterAgreeProperty = Dialog.getInput("Add Filter",
-						"Enter the AGREE contract for the new filter specification.", "", null);
-				if (filterAgreeProperty != null) {
-					addFilterSpec(EcoreUtil.getURI(comp));
-				}
-			}
-			return;
-		}
+					"A CASE Filter cannot be inserted next to another CASE Filter.  Would you like to add a new filter specification to the existing filter instead?")) {
+//				filterAgreeProperty = Dialog.getInput("Add Filter",
+//						"Enter the AGREE contract for the new filter specification.", "", null);
 
-		subcomponent = (Subcomponent) selectedConnection.getSource().getContext();
-		comp = subcomponent.getComponentType();
-		if (isFilter(comp)) {
-			if (Dialog.askQuestion("Add Filter",
-					"A CASE Filter cannot be inserted next to another CASE Filter.  Instead, would you like to add a new filter specification to the existing filter?")) {
-				filterAgreeProperty = Dialog.getInput("Add Filter",
-						"Enter the AGREE contract for the new filter specification.", "", null);
-				if (filterAgreeProperty != null) {
-					addFilterSpec(EcoreUtil.getURI(comp));
+				createCompoundFilter = true;
+				// Get filter outgoing connection
+				ComponentImplementation ci = subcomponent.getContainingComponentImpl();
+				for (Connection conn : ci.getOwnedConnections()) {
+					Subcomponent src = (Subcomponent) conn.getSource().getContext();
+					if (src != null && src.getName().equalsIgnoreCase(subcomponent.getName())) {
+						filterOutConn = (PortConnection) conn;
+						break;
+					}
+				}
+
+				if (filterOutConn == null) {
+					Dialog.showError("Add Filter",
+							"Unable to find the outgoing connection of the existing CASE Filter.");
+					return;
+				}
+
+//				if (filterAgreeProperty != null) {
+//					addFilterSpec(EcoreUtil.getURI(comp));
+//				}
+			} else {
+				return;
+			}
+		} else {
+
+			subcomponent = (Subcomponent) selectedConnection.getSource().getContext();
+			if (subcomponent != null) {
+				comp = subcomponent.getComponentType();
+				if (isFilter(comp)) {
+					if (Dialog.askQuestion("Add Filter",
+							"A CASE Filter cannot be inserted next to another CASE Filter.  Would you like to add a new filter specification to the existing filter instead?")) {
+//				filterAgreeProperty = Dialog.getInput("Add Filter",
+//						"Enter the AGREE contract for the new filter specification.", "", null);
+						createCompoundFilter = true;
+						filterOutConn = selectedConnection;
+//				if (filterAgreeProperty != null) {
+//					addFilterSpec(EcoreUtil.getURI(comp));
+//				}
+					} else {
+						return;
+					}
 				}
 			}
-			return;
 		}
 
 		// Open wizard to enter filter info
@@ -122,10 +153,29 @@ public class AddFilterHandler extends AadlHandler {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 
 		wizard.setGuaranteeList(getSourceName(uri), getSourceGuarantees(uri));
+		// Provide list of requirements so the user can choose which requirement is driving this
+		// model transformation.
+		// We only want to list requirements that aren't already associated with a filter transform
 		List<String> requirements = new ArrayList<>();
-		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> requirements.add(r.getId()));
-		wizard.setRequirements(requirements);
+		for (CyberRequirement req : RequirementsManager.getInstance().getImportedRequirements()) {
+			FunctionDefinition fd = req.getResoluteClaim();
+			boolean addFilterFound = false;
+			for (FnCallExpr fnCallExpr : EcoreUtil2.getAllContentsOfType(fd.getBody().getExpr(), FnCallExpr.class)) {
+				if (fnCallExpr.getFn().getName().equalsIgnoreCase("add_filter")) {
+					addFilterFound = true;
+					break;
+				}
+			}
+			if (!addFilterFound) {
+				requirements.add(req.getId());
+			}
 
+		}
+
+		wizard.setRequirements(requirements);
+		if (createCompoundFilter) {
+			wizard.createCompoundFilter(subcomponent);
+		}
 		wizard.create();
 		if (wizard.open() == Window.OK) {
 			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
@@ -142,7 +192,11 @@ public class AddFilterHandler extends AadlHandler {
 		}
 
 		// Insert the filter component
-		insertFilterComponent(uri);
+		if (createCompoundFilter) {
+			addFilterSpec(EcoreUtil.getURI(subcomponent), EcoreUtil.getURI(filterOutConn));
+		} else {
+			insertFilterComponent(uri);
+		}
 
 		return;
 
@@ -481,7 +535,7 @@ public class AddFilterHandler extends AadlHandler {
 	 * Adds a new spec to the specified filter
 	 * @param uri
 	 */
-	private void addFilterSpec(URI uri) {
+	private void addFilterSpec(URI subURI, URI connURI) {
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
@@ -490,7 +544,20 @@ public class AddFilterHandler extends AadlHandler {
 			@Override
 			public void process(final XtextResource resource) throws Exception {
 
-				ComponentType filter = (ComponentType) resource.getEObject(uri.fragment());
+				Subcomponent subcomponent = (Subcomponent) resource.getEObject(subURI.fragment());
+				ComponentType filter = subcomponent.getComponentType();
+
+				PortConnection connection = (PortConnection) resource.getEObject(connURI.fragment());
+				Port port = (Port) connection.getDestination().getConnectionEnd();
+				DataSubcomponentType dataFeatureClassifier = null;
+				if (port instanceof EventDataPort) {
+					dataFeatureClassifier = ((EventDataPort) port).getDataFeatureClassifier();
+				} else if (port instanceof DataPort) {
+					dataFeatureClassifier = ((DataPort) port).getDataFeatureClassifier();
+				} else {
+					Dialog.showError("Add Filter", "Could not determine the port type of the filter.");
+					return;
+				}
 
 				String filterPropId = "";
 				try {
@@ -544,7 +611,7 @@ public class AddFilterHandler extends AadlHandler {
 				// Get current property value
 				String propVal = "";
 				EList<PropertyExpression> propVals = filter.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_SPEC");
-				if (propVals != null) {
+				if (!propVals.isEmpty()) {
 					for (PropertyExpression expr : propVals) {
 						if (expr instanceof StringLiteral) {
 							propVal += ((StringLiteral) expr).getValue() + ",";
@@ -558,6 +625,14 @@ public class AddFilterHandler extends AadlHandler {
 				// Write property to filter component
 				if (!CaseUtils.addCasePropertyAssociation("COMP_SPEC", propVal, filter)) {
 //						return;
+				}
+
+				// Add add_filter claims to resolute prove statement, if applicable
+				if (!filterRequirement.isEmpty()) {
+					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
+					RequirementsManager.getInstance().modifyRequirement(filterRequirement, resource, new AddFilterClaim(
+							req.getContext(), subcomponent, connection.getName(), dataFeatureClassifier));
+
 				}
 			}
 		});
