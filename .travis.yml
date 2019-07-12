@@ -74,4 +74,4 @@ deploy:
     script: python3 .travis/manage_daily_builds.py
     on:
       branch: master
-      condition: $TRAVIS_EVENT_TYPE = cron
+      condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
