@@ -62,7 +62,7 @@ public class GenerateRequirementsHandler extends AadlHandler {
 
 			try {
 				// Generate json
-				URI jsonURI = Aadl2Json.createJson(header);
+				URI jsonURI = Aadl2Json.createJson(header, false);
 			} catch (Exception e) {
 				Dialog.showError("Generate Cyber Requirements", "Unable to export model to JSON format.");
 				return;

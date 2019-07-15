@@ -65,7 +65,7 @@ public class TranslateHandler extends AbstractHandler {
 
 		try {
 			// Generate json
-			Aadl2Json.createJson(header);
+			Aadl2Json.createJson(header, true);
 		} catch (Exception e) {
 			Dialog.showError("JSON Generator", "Unable to export model to JSON format");
 			return null;

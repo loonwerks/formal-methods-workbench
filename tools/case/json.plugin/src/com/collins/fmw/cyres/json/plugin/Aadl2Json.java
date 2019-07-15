@@ -57,10 +57,10 @@ public class Aadl2Json {
 	}
 
 	static public URI createJson() throws Exception {
-		return createJson(null);
+		return createJson(null, true);
 	}
 
-	static public URI createJson(JsonObject header) throws Exception {
+	static public URI createJson(JsonObject header, boolean parseAnnexes) throws Exception {
 
 		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
@@ -70,7 +70,7 @@ public class Aadl2Json {
 
 		EObject original = xtextEditor.getDocument().readOnly(resource -> resource.getContents().get(0));
 
-		JsonElement je = toJson(original);
+		JsonElement je = toJson(original, parseAnnexes);
 
 		if (header != null) {
 			header.add("modelUnits", je);
@@ -104,9 +104,9 @@ public class Aadl2Json {
 
 	}
 
-	public static JsonElement toJson(EObject o) {
+	public static JsonElement toJson(EObject o, boolean parseAnnexes) {
 
-		AadlTranslate aadlTranslate = new AadlTranslate();
+		AadlTranslate aadlTranslate = new AadlTranslate(parseAnnexes);
 
 //		AgreeTranslate agreeTranslate = new AgreeTranslate();
 
