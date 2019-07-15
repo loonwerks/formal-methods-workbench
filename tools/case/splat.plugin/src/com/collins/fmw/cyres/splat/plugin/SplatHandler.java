@@ -21,6 +21,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.ui.dialogs.Dialog;
@@ -32,7 +33,6 @@ public class SplatHandler extends AbstractHandler {
 
 	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
 
-	private IWorkbenchWindow window;
 
 	private MessageConsole findConsole(String name) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -83,6 +83,8 @@ public class SplatHandler extends AbstractHandler {
 
 			MessageConsole console = findConsole("HOL Proof of Filter Claims");
 			MessageConsoleStream out = console.newMessageStream();
+
+			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			IWorkbenchPage page = window.getActivePage();
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;
 			IConsoleView view = (IConsoleView) page.showView(id);
@@ -96,6 +98,7 @@ public class SplatHandler extends AbstractHandler {
 
 		} catch (Exception e) {
 			Dialog.showError("SPLAT", "SPLAT has encountered an error and was unable to complete.");
+			e.printStackTrace();
 			return null;
 		}
 
