@@ -69,13 +69,16 @@ public class GenerateRequirementsHandler extends AadlHandler {
 			}
 
 			// TODO: Call tool
-			try {
-				IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(this.executionEvent);
-				IHandlerService handlerService = window.getService(IHandlerService.class);
-				handlerService.executeCommand("com.collins.fmw.cyres.architecture.commands.ImportRequirements", null);
-			} catch (Exception e) {
-				Dialog.showError("Generate Cyber Requirements", e.getMessage());
-				return;
+			if (Dialog.askQuestion("Generate Cyber Requirements", "DCRYPPS analysis complete.  Import requirements?")) {
+				try {
+					IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(this.executionEvent);
+					IHandlerService handlerService = window.getService(IHandlerService.class);
+					handlerService.executeCommand("com.collins.fmw.cyres.architecture.commands.ImportRequirements",
+							null);
+				} catch (Exception e) {
+					Dialog.showError("Generate Cyber Requirements", e.getMessage());
+					return;
+				}
 			}
 
 			break;
