@@ -6,16 +6,17 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.ui.editor.XtextEditor;
+import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ContainedNamedElement;
-import org.osate.aadl2.ImplementationExtension;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.PackageSection;
@@ -81,7 +82,7 @@ public class AddIsolatorHandler extends AadlHandler {
 			return;
 		}
 
-		// Check if this subcomponent (or its ancestor) is bound to a processor
+		// Check if this subcomponent is bound to a processor
 		List<Subcomponent> processors = getBoundProcessors(sub);
 		// TODO: Remove this restriction and present user with list of processors and virtual processors to choose from
 		// TODO: May need to look at Available_Processor_Bindings property to do this
@@ -93,7 +94,7 @@ public class AddIsolatorHandler extends AadlHandler {
 			for (Subcomponent p : processors) {
 				if (p.getComponentImplementation() == null) {
 					Dialog.showError("Add Isolator",
-							"The selected subcomponent must be bound to a processor or virtual processor implementations.");
+							"The selected subcomponent must be bound to a processor or virtual processor implementation.");
 					return;
 				}
 			}
@@ -129,13 +130,14 @@ public class AddIsolatorHandler extends AadlHandler {
 		// Are we isolating entire selected component + subcomponents, or just selected subcomponents?
 		boolean entireImpl = isolatedComponents.get(0).equalsIgnoreCase(sub.getName());
 
-		// Create the isolator component
+//		// Create the isolator component
+//		NOT NEEDED SINCE EXISTING COMPONENTS JUST NEED TO BE BOUND TO VIRTUAL PROCESSOR
 //		insertIsolatorComponent(sub);
 
 		// Insert the virtual processor type and implementation components
-		// into the same package as the processor.
-		// Note that this could be a different package than the selected subcomponent
-//		insertVirtualProcessor(EcoreUtil.getURI(processor), entireImpl);
+		// into the same package as the selected subcomponent's containing implementation.
+		// Note that this could be a different package than the bound processor(s).
+		insertVirtualProcessor(EcoreUtil.getURI(sub));
 
 
 
@@ -145,26 +147,32 @@ public class AddIsolatorHandler extends AadlHandler {
 
 	/**
 	 * Inserts the virtual processor type and implementation components
-	 * into the same package as the specified processor.
-	 * @param processorURI - URI of the processor component implementation subcomponent to put the virtual processor in
-	 * @param entireImpl - indicates whether the entire component should be isolated or just specific subcomponents
+	 * into the same package as the selected subcomponent.
+	 * @param selectedComponentURI - URI of the selected subcomponent
 	 */
-	private void insertVirtualProcessor(URI processorURI, boolean entireImpl) {
+	private void insertVirtualProcessor(URI selectedComponentURI) {
 
 		// Get the file to insert into
-		IFile file = Filesystem.getFile(processorURI);
-		XtextEditor editor = ModifyUtils.getEditor(file);
+//		IFile file = Filesystem.getFile(processorURI);
+//		XtextEditor editor = ModifyUtils.getEditor(file);
+
+		// Get the active xtext editor so we can make modifications
+		final XtextEditor editor = EditorUtils.getActiveXtextEditor();
 
 		if (editor != null) {
 			editor.getDocument().modify(resource -> {
 
-				final Subcomponent processorSub = (Subcomponent) resource.getEObject(processorURI.fragment());
-				final ComponentImplementation processorImpl = processorSub.getComponentImplementation();
-				final ComponentType processorType = processorImpl.getType();
+//				final Subcomponent processorSub = (Subcomponent) resource.getEObject(processorURI.fragment());
+//				final ComponentImplementation processorImpl = processorSub.getComponentImplementation();
+//				final ComponentType processorType = processorImpl.getType();
+				final Subcomponent selectedSub = (Subcomponent) resource.getEObject(selectedComponentURI.fragment());
+//				final ComponentImplementation ci = selectedSub.getContainingComponentImpl();
 				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
 				PackageSection pkgSection = null;
-				// Figure out if the processor is in the public or private section
-				EObject eObj = processorImpl.eContainer();
+//				// Figure out if the processor is in the public or private section
+//				EObject eObj = processorImpl.eContainer();
+				// Figure out if the selected subcomponent is in the public or private section
+				EObject eObj = selectedSub.eContainer();
 				while (eObj != null) {
 					if (eObj instanceof PublicPackageSection) {
 						pkgSection = aadlPkg.getOwnedPublicSection();
@@ -197,9 +205,14 @@ public class AddIsolatorHandler extends AadlHandler {
 						.createOwnedClassifier(Aadl2Package.eINSTANCE.getVirtualProcessorType());
 				// Give it a unique name
 				vpType.setName(getUniqueName(VIRTUAL_PROCESSOR_TYPE_NAME, true, pkgSection.getOwnedClassifiers()));
-				// Put in the right place in the package (after the processor implementation)
+//				// Put in the right place in the package (after the processor implementation)
+//				pkgSection.getOwnedClassifiers().move(
+//						getIndex(processorImpl.getName(), pkgSection.getOwnedClassifiers()) + 1,
+//						pkgSection.getOwnedClassifiers().size() - 1);
+				// TODO: Put in the right place in the package (before the selected subcomponent's containing implementation)
 				pkgSection.getOwnedClassifiers().move(
-						getIndex(processorImpl.getName(), pkgSection.getOwnedClassifiers()) + 1,
+						getIndex(selectedSub.getContainingComponentImpl().getTypeName(),
+								pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create virtual processor component implementation
@@ -212,44 +225,44 @@ public class AddIsolatorHandler extends AadlHandler {
 				pkgSection.getOwnedClassifiers().move(getIndex(vpType.getName(), pkgSection.getOwnedClassifiers()) + 1,
 						pkgSection.getOwnedClassifiers().size() - 1);
 
-				// Extend the specified processor implementation
-				ComponentImplementation procExtImpl = (ComponentImplementation) pkgSection
-						.createOwnedClassifier(ComponentCreateHelper.getImplClass(processorImpl.getCategory()));
-				procExtImpl.setName(
-						getUniqueName(processorImpl.getName() + "Ext", true, pkgSection.getOwnedClassifiers()));
-				final Realization rProcExImpl = procExtImpl.createOwnedRealization();
-				rProcExImpl.setImplemented(processorType);
-				ImplementationExtension implEx = procExtImpl.createOwnedExtension();
-				implEx.setExtended(processorImpl);
-				// Put in the right place in the package (after the processor implementation)
-				pkgSection.getOwnedClassifiers().move(
-						getIndex(processorImpl.getName(), pkgSection.getOwnedClassifiers()) + 1,
-						pkgSection.getOwnedClassifiers().size() - 1);
+//				// Extend the specified processor implementation
+//				ComponentImplementation procExtImpl = (ComponentImplementation) pkgSection
+//						.createOwnedClassifier(ComponentCreateHelper.getImplClass(processorImpl.getCategory()));
+//				procExtImpl.setName(
+//						getUniqueName(processorImpl.getName() + "Ext", true, pkgSection.getOwnedClassifiers()));
+//				final Realization rProcExImpl = procExtImpl.createOwnedRealization();
+//				rProcExImpl.setImplemented(processorType);
+//				ImplementationExtension implEx = procExtImpl.createOwnedExtension();
+//				implEx.setExtended(processorImpl);
+//				// Put in the right place in the package (after the processor implementation)
+//				pkgSection.getOwnedClassifiers().move(
+//						getIndex(processorImpl.getName(), pkgSection.getOwnedClassifiers()) + 1,
+//						pkgSection.getOwnedClassifiers().size() - 1);
 
-				// Create the virtual processor subcomponent of the specified processor
-				VirtualProcessorSubcomponent vpSub = (VirtualProcessorSubcomponent) ComponentCreateHelper
-						.createOwnedSubcomponent(procExtImpl, ComponentCategory.VIRTUAL_PROCESSOR);
-				vpSub.setName(VIRTUAL_PROCESSOR_IMPL_NAME);
-				vpSub.setVirtualProcessorSubcomponentType(vpImpl);
+//				// Create the virtual processor subcomponent of the specified processor
+//				VirtualProcessorSubcomponent vpSub = (VirtualProcessorSubcomponent) ComponentCreateHelper
+//						.createOwnedSubcomponent(procExtImpl, ComponentCategory.VIRTUAL_PROCESSOR);
+//				vpSub.setName(VIRTUAL_PROCESSOR_IMPL_NAME);
+//				vpSub.setVirtualProcessorSubcomponentType(vpImpl);
 
-				// Replace the original processor / virtual processor implementation subcomponent with the extended one
-				// containing the virtual processor
-				ComponentCreateHelper.setSubcomponentType(processorSub, procExtImpl);
+//				// Replace the original processor / virtual processor implementation subcomponent with the extended one
+//				// containing the virtual processor
+//				ComponentCreateHelper.setSubcomponentType(processorSub, procExtImpl);
 
-				// TODO: Bind the virtual processor to the processor
-				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class?
-				ComponentImplementation ci = processorSub.getContainingComponentImpl();
+//				// TODO: Bind the virtual processor to the processor
+//				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class?
+//				ComponentImplementation ci = processorSub.getContainingComponentImpl();
 
 
-				// TODO: Add/Modify Actual_Processor_Binding property
-				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class?
-				// If the entire component implementation + all subcomponents are selected, modify existing binding
-				// If selected subcomponents are selected, add the new binding(s)
-				if (entireImpl) {
-
-				} else {
-
-				}
+//				// TODO: Add/Modify Actual_Processor_Binding property
+//				// TODO: Consider Allowed_Processor_Binding and Allowed_Processor_Binding_Class?
+//				// If the entire component implementation + all subcomponents are selected, modify existing binding
+//				// If selected subcomponents are selected, add the new binding(s)
+//				if (entireImpl) {
+//
+//				} else {
+//
+//				}
 
 				return null;
 			});
