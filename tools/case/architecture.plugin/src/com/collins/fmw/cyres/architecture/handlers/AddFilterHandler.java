@@ -148,14 +148,20 @@ public class AddFilterHandler extends AadlHandler {
 		// We only want to list requirements that aren't already associated with a filter transform
 		List<String> requirements = new ArrayList<>();
 		for (CyberRequirement req : RequirementsManager.getInstance().getImportedRequirements()) {
-			FunctionDefinition fd = req.getResoluteClaim();
 			boolean addFilterFound = false;
-			for (FnCallExpr fnCallExpr : EcoreUtil2.getAllContentsOfType(fd.getBody().getExpr(), FnCallExpr.class)) {
-				if (fnCallExpr.getFn().getName().equalsIgnoreCase("add_filter")) {
-					addFilterFound = true;
-					break;
+			try {
+				FunctionDefinition fd = req.getResoluteClaim();
+				for (FnCallExpr fnCallExpr : EcoreUtil2.getAllContentsOfType(fd.getBody().getExpr(),
+						FnCallExpr.class)) {
+					if (fnCallExpr.getFn().getName().equalsIgnoreCase("add_filter")) {
+						addFilterFound = true;
+						break;
+					}
 				}
+			} catch (NullPointerException e) {
+				addFilterFound = false;
 			}
+
 			if (!addFilterFound) {
 				requirements.add(req.getId());
 			}
