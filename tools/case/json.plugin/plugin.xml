@@ -4,7 +4,7 @@
 
    <extension point="org.eclipse.ui.commands">
 
-     <command categoryId="com.collins.fmw.cyres.json.commands"
+     <command
            id="com.collins.fmw.cyres.json.commands.translate"
            name="Export to JSON">
      </command>
