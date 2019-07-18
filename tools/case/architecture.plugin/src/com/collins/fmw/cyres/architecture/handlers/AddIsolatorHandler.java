@@ -83,6 +83,7 @@ public class AddIsolatorHandler extends AadlHandler {
 		}
 
 		// Check if this subcomponent is bound to a processor
+		// ASSUMPTION: processor binding will be specified for selected subcomponent, or its subcomponents
 		List<Subcomponent> processors = getBoundProcessors(sub);
 		// TODO: Remove this restriction and present user with list of processors and virtual processors to choose from
 		// TODO: May need to look at Available_Processor_Bindings property to do this
@@ -139,7 +140,9 @@ public class AddIsolatorHandler extends AadlHandler {
 		// Note that this could be a different package than the bound processor(s).
 		insertVirtualProcessor(EcoreUtil.getURI(sub));
 
-
+		// ASSUMPTION: The selected component or subcomponents are bound to the same processors
+		// (in other words, processor bindings are the same for all selected components)
+		// Bind virtual processor to processor(s) that selected components are bound to
 
 		return;
 
@@ -221,7 +224,7 @@ public class AddIsolatorHandler extends AadlHandler {
 				vpImpl.setName(vpType.getName() + ".Impl");
 				final Realization rVpImpl = vpImpl.createOwnedRealization();
 				rVpImpl.setImplemented(vpType);
-				// Put in the right place in the package
+				// Put in the right place in the package (after the virtual processor component type)
 				pkgSection.getOwnedClassifiers().move(getIndex(vpType.getName(), pkgSection.getOwnedClassifiers()) + 1,
 						pkgSection.getOwnedClassifiers().size() - 1);
 
@@ -268,8 +271,8 @@ public class AddIsolatorHandler extends AadlHandler {
 			});
 		}
 
-		// Close editor, if necessary
-		ModifyUtils.closeEditor(editor, true);
+//		// Close editor, if necessary
+//		ModifyUtils.closeEditor(editor, true);
 
 	}
 

@@ -221,9 +221,19 @@ public class AddFilterDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboFilterRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboFilterRequirement = new Combo(container, SWT.BORDER);
 		cboFilterRequirement.setLayoutData(dataInfoField);
-
+		// This seems to be the best way to prevent user from entering text
+		cboFilterRequirement.addVerifyListener(e -> {
+			for (String s : cboFilterRequirement.getItems()) {
+				if (s.equals(e.text)) {
+					e.doit = true;
+					return;
+				}
+			}
+			e.doit = false;
+		});
+		cboFilterRequirement.add("");
 		requirements.forEach(r -> cboFilterRequirement.add(r));
 
 	}

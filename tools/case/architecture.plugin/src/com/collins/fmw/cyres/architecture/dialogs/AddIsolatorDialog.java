@@ -234,11 +234,20 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboIsolatorRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboIsolatorRequirement = new Combo(container, SWT.BORDER);
 		cboIsolatorRequirement.setLayoutData(dataInfoField);
-		for (String clause : requirements) {
-			cboIsolatorRequirement.add(clause);
-		}
+		// This seems to be the best way to prevent user from entering text
+		cboIsolatorRequirement.addVerifyListener(e -> {
+			for (String s : cboIsolatorRequirement.getItems()) {
+				if (s.equals(e.text)) {
+					e.doit = true;
+					return;
+				}
+			}
+			e.doit = false;
+		});
+		cboIsolatorRequirement.add("");
+		requirements.forEach(r -> cboIsolatorRequirement.add(r));
 	}
 
 	/**

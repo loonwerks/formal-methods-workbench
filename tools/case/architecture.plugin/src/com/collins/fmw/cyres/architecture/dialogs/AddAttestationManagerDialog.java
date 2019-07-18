@@ -215,11 +215,21 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboRequirement = new Combo(container, SWT.BORDER);
 		cboRequirement.setLayoutData(dataInfoField);
-		for (String clause : requirements) {
-			cboRequirement.add(clause);
-		}
+		// This seems to be the best way to prevent user from entering text
+		cboRequirement.addVerifyListener(e -> {
+			for (String s : cboRequirement.getItems()) {
+				if (s.equals(e.text)) {
+					e.doit = true;
+					return;
+				}
+			}
+			e.doit = false;
+		});
+		cboRequirement.add("");
+		requirements.forEach(r -> cboRequirement.add(r));
+
 	}
 
 	/**
