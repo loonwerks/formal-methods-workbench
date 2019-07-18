@@ -55,6 +55,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> propagateGuarantees = new ArrayList<>();
 	private List<String> requirements = new ArrayList<>();
 
+	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
+
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
 		setHelpAvailable(false);
@@ -96,6 +98,9 @@ public class AddFilterDialog extends TitleAreaDialog {
 			createGuaranteeSelectionField(container);
 		}
 		createAgreeField(container);
+
+		// set focus
+		parent.forceFocus();
 
 		return area;
 	}
@@ -233,8 +238,9 @@ public class AddFilterDialog extends TitleAreaDialog {
 			}
 			e.doit = false;
 		});
-		cboFilterRequirement.add("");
+		cboFilterRequirement.add(NO_REQUIREMENT_SELECTED);
 		requirements.forEach(r -> cboFilterRequirement.add(r));
+		cboFilterRequirement.setText(NO_REQUIREMENT_SELECTED);
 
 	}
 
@@ -307,6 +313,9 @@ public class AddFilterDialog extends TitleAreaDialog {
 		}
 
 		filterRequirement = cboFilterRequirement.getText();
+		if (filterRequirement.equals(NO_REQUIREMENT_SELECTED)) {
+			filterRequirement = "";
+		}
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees.clear();
 		for (int i = 0; i < btnPropagateGuarantees.size(); i++) {

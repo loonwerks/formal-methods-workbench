@@ -42,6 +42,8 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	private Subcomponent component = null;
 	private List<String> requirements = new ArrayList<>();
 
+	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
+
 	public AddIsolatorDialog(Shell parentShell) {
 		super(parentShell);
 		setHelpAvailable(false);
@@ -246,8 +248,9 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 			}
 			e.doit = false;
 		});
-		cboIsolatorRequirement.add("");
+		cboIsolatorRequirement.add(NO_REQUIREMENT_SELECTED);
 		requirements.forEach(r -> cboIsolatorRequirement.add(r));
+		cboIsolatorRequirement.setText(NO_REQUIREMENT_SELECTED);
 	}
 
 	/**
@@ -311,6 +314,9 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 			}
 		}
 		isolatorRequirement = cboIsolatorRequirement.getText();
+		if (isolatorRequirement.equals(NO_REQUIREMENT_SELECTED)) {
+			isolatorRequirement = "";
+		}
 		agreeProperty = txtAgreeProperty.getText();
 
 	}

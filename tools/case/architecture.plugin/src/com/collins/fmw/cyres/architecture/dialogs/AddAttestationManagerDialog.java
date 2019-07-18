@@ -48,6 +48,8 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private List<String> requirements = new ArrayList<>();
 	private String agreeProperty;
 
+	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
+
 	public AddAttestationManagerDialog(Shell parentShell) {
 		super(parentShell);
 		setHelpAvailable(false);
@@ -227,8 +229,9 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 			}
 			e.doit = false;
 		});
-		cboRequirement.add("");
+		cboRequirement.add(NO_REQUIREMENT_SELECTED);
 		requirements.forEach(r -> cboRequirement.add(r));
+		cboRequirement.setText(NO_REQUIREMENT_SELECTED);
 
 	}
 
@@ -289,6 +292,9 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 			}
 		}
 		requirement = cboRequirement.getText();
+		if (requirement.equals(NO_REQUIREMENT_SELECTED)) {
+			requirement = "";
+		}
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees = btnPropagateGuarantees.getSelection();
 	}
