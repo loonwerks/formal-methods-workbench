@@ -29,6 +29,7 @@ import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
+import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.handlers.AddFilterHandler;
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
@@ -228,16 +229,6 @@ public class AddFilterDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = GridData.FILL;
 		cboFilterRequirement = new Combo(container, SWT.BORDER);
 		cboFilterRequirement.setLayoutData(dataInfoField);
-		// This seems to be the best way to prevent user from entering text
-		cboFilterRequirement.addVerifyListener(e -> {
-			for (String s : cboFilterRequirement.getItems()) {
-				if (s.equals(e.text)) {
-					e.doit = true;
-					return;
-				}
-			}
-			e.doit = false;
-		});
 		cboFilterRequirement.add(NO_REQUIREMENT_SELECTED);
 		requirements.forEach(r -> cboFilterRequirement.add(r));
 		cboFilterRequirement.setText(NO_REQUIREMENT_SELECTED);
@@ -299,9 +290,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	/**
 	 * Saves information entered into the text fields.  This is needed because the
 	 * text fields are disposed when the dialog closes.
-	 * @param container
 	 */
-	private void saveInput() {
+	private boolean saveInput() {
 		filterImplementationLanguage = txtFilterImplementationLanguage.getText();
 		filterImplementationName = txtFilterImplementationName.getText();
 		logPortType = null;
@@ -315,6 +305,12 @@ public class AddFilterDialog extends TitleAreaDialog {
 		filterRequirement = cboFilterRequirement.getText();
 		if (filterRequirement.equals(NO_REQUIREMENT_SELECTED)) {
 			filterRequirement = "";
+		} else if (!requirements.contains(filterRequirement)) {
+			Dialog.showError("Add Filter",
+					"Filter requirement " + filterRequirement
+							+ " does not exist in the model.  Select a requirement from the list, or choose "
+							+ NO_REQUIREMENT_SELECTED + ".");
+			return false;
 		}
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees.clear();
@@ -345,11 +341,14 @@ public class AddFilterDialog extends TitleAreaDialog {
 				propagateGuarantees.add(guarantee);
 			}
 		}
+		return true;
 	}
 
 	@Override
 	protected void okPressed() {
-		saveInput();
+		if (!saveInput()) {
+			return;
+		}
 		super.okPressed();
 	}
 

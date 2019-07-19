@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.Subcomponent;
+import org.osate.ui.dialogs.Dialog;
 
 public class AddIsolatorDialog extends TitleAreaDialog {
 
@@ -238,16 +239,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = GridData.FILL;
 		cboIsolatorRequirement = new Combo(container, SWT.BORDER);
 		cboIsolatorRequirement.setLayoutData(dataInfoField);
-		// This seems to be the best way to prevent user from entering text
-		cboIsolatorRequirement.addVerifyListener(e -> {
-			for (String s : cboIsolatorRequirement.getItems()) {
-				if (s.equals(e.text)) {
-					e.doit = true;
-					return;
-				}
-			}
-			e.doit = false;
-		});
 		cboIsolatorRequirement.add(NO_REQUIREMENT_SELECTED);
 		requirements.forEach(r -> cboIsolatorRequirement.add(r));
 		cboIsolatorRequirement.setText(NO_REQUIREMENT_SELECTED);
@@ -289,7 +280,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	 * text fields are disposed when the dialog closes.
 	 * @param container
 	 */
-	private void saveInput() {
+	private boolean saveInput() {
 
 		isolatorImplementationName = txtIsolatorImplementationName.getText();
 		virtualProcessorName = txtVirtualProcessorName.getText();
@@ -316,9 +307,15 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		isolatorRequirement = cboIsolatorRequirement.getText();
 		if (isolatorRequirement.equals(NO_REQUIREMENT_SELECTED)) {
 			isolatorRequirement = "";
+		} else if (!requirements.contains(isolatorRequirement)) {
+			Dialog.showError("Add Isolator",
+					"Isolator requirement " + isolatorRequirement
+							+ " does not exist in the model.  Select a requirement from the list, or choose "
+							+ NO_REQUIREMENT_SELECTED + ".");
+			return false;
 		}
 		agreeProperty = txtAgreeProperty.getText();
-
+		return true;
 	}
 
 	public String getIsolatorImplementationName() {

@@ -219,16 +219,6 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = GridData.FILL;
 		cboRequirement = new Combo(container, SWT.BORDER);
 		cboRequirement.setLayoutData(dataInfoField);
-		// This seems to be the best way to prevent user from entering text
-		cboRequirement.addVerifyListener(e -> {
-			for (String s : cboRequirement.getItems()) {
-				if (s.equals(e.text)) {
-					e.doit = true;
-					return;
-				}
-			}
-			e.doit = false;
-		});
 		cboRequirement.add(NO_REQUIREMENT_SELECTED);
 		requirements.forEach(r -> cboRequirement.add(r));
 		cboRequirement.setText(NO_REQUIREMENT_SELECTED);
@@ -270,7 +260,9 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		saveInput();
+		if (!saveInput()) {
+			return;
+		}
 		super.okPressed();
 	}
 
@@ -279,7 +271,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	 * text fields are disposed when the dialog closes.
 	 * @param container
 	 */
-	private void saveInput() {
+	private boolean saveInput() {
 		implementationName = txtImplementationName.getText();
 		implementationLanguage = txtImplementationLanguage.getText();
 		cacheTimeout = txtCacheTimeout.getText();
@@ -294,9 +286,16 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		requirement = cboRequirement.getText();
 		if (requirement.equals(NO_REQUIREMENT_SELECTED)) {
 			requirement = "";
+		} else if (!requirements.contains(requirement)) {
+			Dialog.showError("Add Attestation Manager",
+					"Attestation Manager requirement " + requirement
+							+ " does not exist in the model.  Select a requirement from the list, or choose "
+							+ NO_REQUIREMENT_SELECTED + ".");
+			return false;
 		}
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees = btnPropagateGuarantees.getSelection();
+		return true;
 	}
 
 	public String getImplementationName() {
