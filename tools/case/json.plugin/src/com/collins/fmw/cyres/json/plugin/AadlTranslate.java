@@ -68,10 +68,15 @@ import com.google.gson.JsonPrimitive;
 public class AadlTranslate extends Aadl2Switch<JsonElement> {
 
 	AgreeTranslate agreeTranslate = new AgreeTranslate();
-	boolean parseAnnexes = true;
 
-	public AadlTranslate(boolean parseAnnexes) {
-		this.parseAnnexes = parseAnnexes;
+	public enum AgreePrintOption {
+		PARSE, UNPARSE, BOTH
+	};
+
+	private AgreePrintOption agreePrintOption = AgreePrintOption.PARSE;
+
+	public AadlTranslate(AgreePrintOption agreePrintOption) {
+		this.agreePrintOption = agreePrintOption;
 	}
 
 	@Override
@@ -301,11 +306,13 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		JsonObject result = new JsonObject();
 		result.add("name", new JsonPrimitive(al.getName()));
 		result.add("kind", new JsonPrimitive("AnnexLibrary"));
-		if (parseAnnexes) {
-			if (al.getName().equalsIgnoreCase("agree")) {
+
+		if (al.getName().equalsIgnoreCase("agree")) {
+			if (this.agreePrintOption == AgreePrintOption.PARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
 				// AGREE annex will be parsed
 				result.add("parsedAnnexLibrary", agreeTranslate.genAnnexLibrary(al));
-			} else {
+			}
+			if (this.agreePrintOption == AgreePrintOption.UNPARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
 				DefaultAnnexLibrary defaultAnnexLib = (DefaultAnnexLibrary) al;
 				result.add("sourceText", new JsonPrimitive(defaultAnnexLib.getSourceText().replace("\"", "\\\"")));
 			}
@@ -313,6 +320,7 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 			DefaultAnnexLibrary defaultAnnexLib = (DefaultAnnexLibrary) al;
 			result.add("sourceText", new JsonPrimitive(defaultAnnexLib.getSourceText().replace("\"", "\\\"")));
 		}
+
 		return result;
 	}
 
@@ -322,11 +330,13 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		JsonObject result = new JsonObject();
 		result.add("name", new JsonPrimitive(as.getName()));
 		result.add("kind", new JsonPrimitive("AnnexSubclause"));
-		if (parseAnnexes) {
-			if (as.getName().equalsIgnoreCase("agree")) {
+
+		if (as.getName().equalsIgnoreCase("agree")) {
+			if (this.agreePrintOption == AgreePrintOption.PARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
 				// AGREE annex will be parsed
 				result.add("parsedAnnexSubclause", agreeTranslate.genAnnexSubclause(as));
-			} else {
+			}
+			if (this.agreePrintOption == AgreePrintOption.UNPARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
 				DefaultAnnexSubclause defaultAnnexSubclause = (DefaultAnnexSubclause) as;
 				result.add("sourceText",
 						new JsonPrimitive(defaultAnnexSubclause.getSourceText().replace("\"", "\\\"")));
@@ -335,6 +345,7 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 			DefaultAnnexSubclause defaultAnnexSubclause = (DefaultAnnexSubclause) as;
 			result.add("sourceText", new JsonPrimitive(defaultAnnexSubclause.getSourceText().replace("\"", "\\\"")));
 		}
+
 		return result;
 	}
 

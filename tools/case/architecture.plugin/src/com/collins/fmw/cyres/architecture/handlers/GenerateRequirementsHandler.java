@@ -10,6 +10,7 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.json.plugin.Aadl2Json;
+import com.collins.fmw.cyres.json.plugin.AadlTranslate.AgreePrintOption;
 import com.collins.fmw.cyres.util.plugin.ModelHashcode;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
 import com.google.gson.JsonObject;
@@ -62,7 +63,7 @@ public class GenerateRequirementsHandler extends AadlHandler {
 
 			try {
 				// Generate json
-				URI jsonURI = Aadl2Json.createJson(header, false);
+				URI jsonURI = Aadl2Json.createJson(header, AgreePrintOption.BOTH);
 			} catch (Exception e) {
 				Dialog.showError("Generate Cyber Requirements", "Unable to export model to JSON format.");
 				return;

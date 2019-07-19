@@ -17,6 +17,7 @@ import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PropertySet;
 
+import com.collins.fmw.cyres.json.plugin.AadlTranslate.AgreePrintOption;
 import com.collins.fmw.cyres.util.plugin.Filesystem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -57,10 +58,10 @@ public class Aadl2Json {
 	}
 
 	static public URI createJson() throws Exception {
-		return createJson(null, true);
+		return createJson(null, AgreePrintOption.PARSE);
 	}
 
-	static public URI createJson(JsonObject header, boolean parseAnnexes) throws Exception {
+	static public URI createJson(JsonObject header, AgreePrintOption agreePrintOption) throws Exception {
 
 		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
@@ -70,7 +71,7 @@ public class Aadl2Json {
 
 		EObject original = xtextEditor.getDocument().readOnly(resource -> resource.getContents().get(0));
 
-		JsonElement je = toJson(original, parseAnnexes);
+		JsonElement je = toJson(original, agreePrintOption);
 
 		if (header != null) {
 			header.add("modelUnits", je);
@@ -104,9 +105,9 @@ public class Aadl2Json {
 
 	}
 
-	public static JsonElement toJson(EObject o, boolean parseAnnexes) {
+	public static JsonElement toJson(EObject o, AgreePrintOption agreePrintOption) {
 
-		AadlTranslate aadlTranslate = new AadlTranslate(parseAnnexes);
+		AadlTranslate aadlTranslate = new AadlTranslate(agreePrintOption);
 
 //		AgreeTranslate agreeTranslate = new AgreeTranslate();
 

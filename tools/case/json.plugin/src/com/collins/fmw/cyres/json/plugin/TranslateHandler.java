@@ -21,6 +21,7 @@ import org.osate.aadl2.Realization;
 import org.osate.ge.BusinessObjectSelection;
 import org.osate.ui.dialogs.Dialog;
 
+import com.collins.fmw.cyres.json.plugin.AadlTranslate.AgreePrintOption;
 import com.collins.fmw.cyres.util.plugin.ModelHashcode;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
 import com.google.gson.JsonObject;
@@ -65,7 +66,7 @@ public class TranslateHandler extends AbstractHandler {
 
 		try {
 			// Generate json
-			Aadl2Json.createJson(header, true);
+			Aadl2Json.createJson(header, AgreePrintOption.BOTH);
 		} catch (Exception e) {
 			Dialog.showError("JSON Generator", "Unable to export model to JSON format");
 			return null;
