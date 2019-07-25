@@ -44,6 +44,8 @@ import org.osate.xtext.aadl2.properties.util.DeploymentProperties;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddIsolatorDialog;
+import com.collins.fmw.cyres.architecture.requirements.AddIsolatorClaim;
+import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
@@ -330,13 +332,13 @@ public class AddIsolatorHandler extends AadlHandler {
 					}
 				}
 
-//				// If the entire component implementation + all subcomponents are selected, modify existing binding
-//				// If selected subcomponents are selected, add the new binding(s)
-//				if (entireImpl) {
-//
-//				} else {
-//
-//				}
+				// Add add_isolator claims to resolute prove statement, if applicable
+				if (!isolatorRequirement.isEmpty()) {
+					CyberRequirement req = RequirementsManager.getInstance().getRequirement(isolatorRequirement);
+					RequirementsManager.getInstance().modifyRequirement(isolatorRequirement, resource,
+							new AddIsolatorClaim(req.getContext(), vpSub));
+
+				}
 
 				return null;
 			});
