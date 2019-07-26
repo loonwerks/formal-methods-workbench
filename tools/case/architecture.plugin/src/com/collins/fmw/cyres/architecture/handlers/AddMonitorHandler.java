@@ -91,7 +91,7 @@ public class AddMonitorHandler extends AadlHandler {
 
 		// Display message that user still needs to wire expected input and alert output
 		Dialog.showWarning("Add Monitor",
-				"The monitor has been added to the model. However, you must manually wire the expected input and alert to the appropriate ports.");
+				"The monitor has been added to the model. However, you must manually wire the monitor's expected input and alert output ports to the appropriate components.");
 
 		return;
 
@@ -299,13 +299,13 @@ public class AddMonitorHandler extends AadlHandler {
 				monitorObservedDst.setContext(monitorSubcomp);
 				monitorObservedDst.setConnectionEnd(portObserved);
 
-				// TODO: Put portConnObserved in right place (after selected connection)
+				// Put portConnObserved in right place (after selected connection)
 				destName = selectedConnection.getName();
 				containingImpl.getOwnedPortConnections().move(
 						getIndex(destName, containingImpl.getOwnedPortConnections()) + 1,
 						containingImpl.getOwnedPortConnections().size() - 1);
 
-				// Add add_monitor claims to resolute prove statement, if applicable
+				// TODO: Add add_monitor claims to resolute prove statement, if applicable
 				if (!monitorRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(monitorRequirement);
 					RequirementsManager.getInstance().modifyRequirement(monitorRequirement, resource,
