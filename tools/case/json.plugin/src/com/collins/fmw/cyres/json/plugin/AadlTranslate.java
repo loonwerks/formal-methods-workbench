@@ -362,6 +362,13 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		} else {
 			result.add("classifier", new JsonPrimitive(sc.getClassifier().getQualifiedName()));
 		}
+		JsonArray properties = new JsonArray();
+		for (PropertyAssociation pa : sc.getOwnedPropertyAssociations()) {
+			properties.add(doSwitch(pa));
+		}
+		if (properties.size() > 0) {
+			result.add("properties", properties);
+		}
 		return result;
 	}
 
