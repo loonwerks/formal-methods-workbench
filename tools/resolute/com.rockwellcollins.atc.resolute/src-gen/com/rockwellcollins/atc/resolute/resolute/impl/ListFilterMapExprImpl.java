@@ -95,6 +95,7 @@ public class ListFilterMapExprImpl extends ExprImpl implements ListFilterMapExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getMap()
   {
     return map;
@@ -122,6 +123,7 @@ public class ListFilterMapExprImpl extends ExprImpl implements ListFilterMapExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setMap(Expr newMap)
   {
     if (newMap != map)
@@ -143,6 +145,7 @@ public class ListFilterMapExprImpl extends ExprImpl implements ListFilterMapExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Arg> getArgs()
   {
     if (args == null)
@@ -157,6 +160,7 @@ public class ListFilterMapExprImpl extends ExprImpl implements ListFilterMapExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getFilter()
   {
     return filter;
@@ -184,6 +188,7 @@ public class ListFilterMapExprImpl extends ExprImpl implements ListFilterMapExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setFilter(Expr newFilter)
   {
     if (newFilter != filter)

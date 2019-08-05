@@ -66,6 +66,7 @@ public class IntExprImpl extends ExprImpl implements IntExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public IntegerLiteral getVal()
   {
     return val;
@@ -93,6 +94,7 @@ public class IntExprImpl extends ExprImpl implements IntExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setVal(IntegerLiteral newVal)
   {
     if (newVal != val)

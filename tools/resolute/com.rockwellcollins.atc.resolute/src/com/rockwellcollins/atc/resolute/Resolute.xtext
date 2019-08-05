@@ -220,6 +220,7 @@ BuiltInFn:
 |	'is_device'
 |	'is_memory'
 |	'is_thread'
+|	'is_thread_group'
 |	'is_process'
 |	'is_data'
 

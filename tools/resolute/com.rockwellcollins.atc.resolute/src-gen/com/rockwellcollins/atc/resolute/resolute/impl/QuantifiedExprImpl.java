@@ -105,6 +105,7 @@ public class QuantifiedExprImpl extends ExprImpl implements QuantifiedExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getQuant()
   {
     return quant;
@@ -115,6 +116,7 @@ public class QuantifiedExprImpl extends ExprImpl implements QuantifiedExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setQuant(String newQuant)
   {
     String oldQuant = quant;
@@ -128,6 +130,7 @@ public class QuantifiedExprImpl extends ExprImpl implements QuantifiedExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Arg> getArgs()
   {
     if (args == null)
@@ -142,6 +145,7 @@ public class QuantifiedExprImpl extends ExprImpl implements QuantifiedExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getExpr()
   {
     return expr;
@@ -169,6 +173,7 @@ public class QuantifiedExprImpl extends ExprImpl implements QuantifiedExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)
@@ -301,7 +306,7 @@ public class QuantifiedExprImpl extends ExprImpl implements QuantifiedExpr
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
+    StringBuilder result = new StringBuilder(super.toString());
     result.append(" (quant: ");
     result.append(quant);
     result.append(')');

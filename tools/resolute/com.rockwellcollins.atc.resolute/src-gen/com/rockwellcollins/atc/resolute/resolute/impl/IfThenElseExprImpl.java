@@ -87,6 +87,7 @@ public class IfThenElseExprImpl extends ExprImpl implements IfThenElseExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getCond()
   {
     return cond;
@@ -114,6 +115,7 @@ public class IfThenElseExprImpl extends ExprImpl implements IfThenElseExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setCond(Expr newCond)
   {
     if (newCond != cond)
@@ -135,6 +137,7 @@ public class IfThenElseExprImpl extends ExprImpl implements IfThenElseExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getThen()
   {
     return then;
@@ -162,6 +165,7 @@ public class IfThenElseExprImpl extends ExprImpl implements IfThenElseExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setThen(Expr newThen)
   {
     if (newThen != then)
@@ -183,6 +187,7 @@ public class IfThenElseExprImpl extends ExprImpl implements IfThenElseExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getElse()
   {
     return else_;
@@ -210,6 +215,7 @@ public class IfThenElseExprImpl extends ExprImpl implements IfThenElseExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setElse(Expr newElse)
   {
     if (newElse != else_)

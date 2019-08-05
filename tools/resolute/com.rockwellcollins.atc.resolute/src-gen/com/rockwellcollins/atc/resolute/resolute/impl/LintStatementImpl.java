@@ -66,6 +66,7 @@ public class LintStatementImpl extends MinimalEObjectImpl.Container implements L
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getExpr()
   {
     return expr;
@@ -93,6 +94,7 @@ public class LintStatementImpl extends MinimalEObjectImpl.Container implements L
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

@@ -71,6 +71,7 @@ public class ResoluteLibraryImpl extends AnnexLibraryImpl implements ResoluteLib
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Definition> getDefinitions()
   {
     if (definitions == null)

@@ -78,6 +78,7 @@ public class ClaimArgImpl extends ClaimTextImpl implements ClaimArg
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ClaimTextVar getArg()
   {
     if (arg != null && arg.eIsProxy())
@@ -108,6 +109,7 @@ public class ClaimArgImpl extends ClaimTextImpl implements ClaimArg
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setArg(ClaimTextVar newArg)
   {
     ClaimTextVar oldArg = arg;
@@ -121,6 +123,7 @@ public class ClaimArgImpl extends ClaimTextImpl implements ClaimArg
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public UnitLiteral getUnit()
   {
     if (unit != null && ((EObject)unit).eIsProxy())
@@ -151,6 +154,7 @@ public class ClaimArgImpl extends ClaimTextImpl implements ClaimArg
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setUnit(UnitLiteral newUnit)
   {
     UnitLiteral oldUnit = unit;

@@ -29,10 +29,6 @@ public interface FunctionDefinition extends Namespace, Definition
    * Returns the value of the '<em><b>Args</b></em>' containment reference list.
    * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.Arg}.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Args</em>' containment reference list isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Args</em>' containment reference list.
    * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getFunctionDefinition_Args()
@@ -44,10 +40,6 @@ public interface FunctionDefinition extends Namespace, Definition
   /**
    * Returns the value of the '<em><b>Body</b></em>' containment reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Body</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Body</em>' containment reference.
    * @see #setBody(DefinitionBody)

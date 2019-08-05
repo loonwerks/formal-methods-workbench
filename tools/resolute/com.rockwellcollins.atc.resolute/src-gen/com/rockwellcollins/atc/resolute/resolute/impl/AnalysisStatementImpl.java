@@ -67,6 +67,7 @@ public class AnalysisStatementImpl extends ElementImpl implements AnalysisStatem
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getExpr()
   {
     return expr;
@@ -94,6 +95,7 @@ public class AnalysisStatementImpl extends ElementImpl implements AnalysisStatem
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

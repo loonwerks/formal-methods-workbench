@@ -836,6 +836,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		case "is_device":
 		case "is_memory":
 		case "is_thread":
+		case "is_thread_group":
 		case "is_process":
 		case "is_data":
 		case "is_event_port":
@@ -1393,6 +1394,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		case "is_device":
 		case "is_memory":
 		case "is_thread":
+		case "is_thread_group":
 		case "is_process":
 		case "is_data":
 		case "is_of_type":

@@ -454,6 +454,11 @@ public class ResoluteBuiltInFnCallEvaluator {
 			return new BoolValue(ci.getCategory() == ComponentCategory.THREAD);
 		}
 
+		case "is_thread_group": {
+			ComponentInstance ci = (ComponentInstance) args.get(0).getNamedElement();
+			return new BoolValue(ci.getCategory() == ComponentCategory.THREAD_GROUP);
+		}
+
 		case "is_process": {
 			ComponentInstance ci = (ComponentInstance) args.get(0).getNamedElement();
 			return new BoolValue(ci.getCategory() == ComponentCategory.PROCESS);

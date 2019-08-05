@@ -93,6 +93,7 @@ public class LibraryFnTypeImpl extends TypeImpl implements LibraryFnType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getLibName()
   {
     return libName;
@@ -103,6 +104,7 @@ public class LibraryFnTypeImpl extends TypeImpl implements LibraryFnType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setLibName(String newLibName)
   {
     String oldLibName = libName;
@@ -116,6 +118,7 @@ public class LibraryFnTypeImpl extends TypeImpl implements LibraryFnType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getFnType()
   {
     return fnType;
@@ -126,6 +129,7 @@ public class LibraryFnTypeImpl extends TypeImpl implements LibraryFnType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setFnType(String newFnType)
   {
     String oldFnType = fnType;
@@ -220,7 +224,7 @@ public class LibraryFnTypeImpl extends TypeImpl implements LibraryFnType
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
+    StringBuilder result = new StringBuilder(super.toString());
     result.append(" (libName: ");
     result.append(libName);
     result.append(", fnType: ");

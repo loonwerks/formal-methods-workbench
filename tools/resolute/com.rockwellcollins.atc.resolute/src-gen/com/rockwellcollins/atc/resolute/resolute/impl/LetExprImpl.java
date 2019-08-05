@@ -77,6 +77,7 @@ public class LetExprImpl extends ExprImpl implements LetExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LetBinding getBinding()
   {
     return binding;
@@ -104,6 +105,7 @@ public class LetExprImpl extends ExprImpl implements LetExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setBinding(LetBinding newBinding)
   {
     if (newBinding != binding)
@@ -125,6 +127,7 @@ public class LetExprImpl extends ExprImpl implements LetExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getExpr()
   {
     return expr;
@@ -152,6 +155,7 @@ public class LetExprImpl extends ExprImpl implements LetExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

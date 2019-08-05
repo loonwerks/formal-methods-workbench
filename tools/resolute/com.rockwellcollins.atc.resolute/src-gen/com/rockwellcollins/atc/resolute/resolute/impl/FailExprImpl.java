@@ -84,6 +84,7 @@ public class FailExprImpl extends ExprImpl implements FailExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getVal()
   {
     return val;
@@ -111,6 +112,7 @@ public class FailExprImpl extends ExprImpl implements FailExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setVal(Expr newVal)
   {
     if (newVal != val)
@@ -132,6 +134,7 @@ public class FailExprImpl extends ExprImpl implements FailExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<ClaimText> getFailmsg()
   {
     if (failmsg == null)

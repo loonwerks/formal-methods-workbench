@@ -71,6 +71,7 @@ public class RulesetBodyImpl extends MinimalEObjectImpl.Container implements Rul
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<LintStatement> getLintStatements()
   {
     if (lintStatements == null)

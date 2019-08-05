@@ -86,6 +86,7 @@ public class FunctionDefinitionImpl extends NamespaceImpl implements FunctionDef
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Arg> getArgs()
   {
     if (args == null)
@@ -100,6 +101,7 @@ public class FunctionDefinitionImpl extends NamespaceImpl implements FunctionDef
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public DefinitionBody getBody()
   {
     return body;
@@ -127,6 +129,7 @@ public class FunctionDefinitionImpl extends NamespaceImpl implements FunctionDef
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setBody(DefinitionBody newBody)
   {
     if (newBody != body)

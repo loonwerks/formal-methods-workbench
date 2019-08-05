@@ -69,6 +69,7 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<ClaimText> getClaim()
   {
     if (claim == null)

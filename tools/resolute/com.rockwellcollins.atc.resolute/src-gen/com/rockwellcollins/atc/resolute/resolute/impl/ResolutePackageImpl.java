@@ -476,7 +476,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
 
   /**
    * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-   * 
+   *
    * <p>This method is used to initialize {@link ResolutePackage#eINSTANCE} when that field is accessed.
    * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
    * <!-- begin-user-doc -->
@@ -491,7 +491,8 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     if (isInited) return (ResolutePackage)EPackage.Registry.INSTANCE.getEPackage(ResolutePackage.eNS_URI);
 
     // Obtain or create and register package
-    ResolutePackageImpl theResolutePackage = (ResolutePackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof ResolutePackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new ResolutePackageImpl());
+    Object registeredResolutePackage = EPackage.Registry.INSTANCE.get(eNS_URI);
+    ResolutePackageImpl theResolutePackage = registeredResolutePackage instanceof ResolutePackageImpl ? (ResolutePackageImpl)registeredResolutePackage : new ResolutePackageImpl();
 
     isInited = true;
 
@@ -508,7 +509,6 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
     // Mark meta-data to indicate it can't be changed
     theResolutePackage.freeze();
 
-  
     // Update the registry and return the package
     EPackage.Registry.INSTANCE.put(ResolutePackage.eNS_URI, theResolutePackage);
     return theResolutePackage;
@@ -519,6 +519,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getResoluteLibrary()
   {
     return resoluteLibraryEClass;
@@ -529,6 +530,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getResoluteLibrary_Definitions()
   {
     return (EReference)resoluteLibraryEClass.getEStructuralFeatures().get(0);
@@ -539,6 +541,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getDefinition()
   {
     return definitionEClass;
@@ -549,6 +552,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getType()
   {
     return typeEClass;
@@ -559,6 +563,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getBaseType()
   {
     return baseTypeEClass;
@@ -569,6 +574,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getBaseType_ParamType()
   {
     return (EReference)baseTypeEClass.getEStructuralFeatures().get(0);
@@ -579,6 +585,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getBaseType_Type()
   {
     return (EAttribute)baseTypeEClass.getEStructuralFeatures().get(1);
@@ -589,6 +596,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getArg()
   {
     return argEClass;
@@ -599,6 +607,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getArg_Type()
   {
     return (EReference)argEClass.getEStructuralFeatures().get(0);
@@ -609,6 +618,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getConstantDefinition()
   {
     return constantDefinitionEClass;
@@ -619,6 +629,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getConstantDefinition_Type()
   {
     return (EReference)constantDefinitionEClass.getEStructuralFeatures().get(0);
@@ -629,6 +640,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getConstantDefinition_Expr()
   {
     return (EReference)constantDefinitionEClass.getEStructuralFeatures().get(1);
@@ -639,6 +651,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getFunctionDefinition()
   {
     return functionDefinitionEClass;
@@ -649,6 +662,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFunctionDefinition_Args()
   {
     return (EReference)functionDefinitionEClass.getEStructuralFeatures().get(0);
@@ -659,6 +673,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFunctionDefinition_Body()
   {
     return (EReference)functionDefinitionEClass.getEStructuralFeatures().get(1);
@@ -669,6 +684,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getDefinitionBody()
   {
     return definitionBodyEClass;
@@ -679,6 +695,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getDefinitionBody_Expr()
   {
     return (EReference)definitionBodyEClass.getEStructuralFeatures().get(0);
@@ -689,6 +706,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getClaimText()
   {
     return claimTextEClass;
@@ -699,6 +717,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getClaimTextVar()
   {
     return claimTextVarEClass;
@@ -709,6 +728,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getExpr()
   {
     return exprEClass;
@@ -719,6 +739,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getLetBinding()
   {
     return letBindingEClass;
@@ -729,6 +750,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLetBinding_Type()
   {
     return (EReference)letBindingEClass.getEStructuralFeatures().get(0);
@@ -739,6 +761,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLetBinding_Expr()
   {
     return (EReference)letBindingEClass.getEStructuralFeatures().get(1);
@@ -749,6 +772,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getResoluteSubclause()
   {
     return resoluteSubclauseEClass;
@@ -759,6 +783,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getResoluteSubclause_Proves()
   {
     return (EReference)resoluteSubclauseEClass.getEStructuralFeatures().get(0);
@@ -769,6 +794,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getNestedDotID()
   {
     return nestedDotIDEClass;
@@ -779,6 +805,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getNestedDotID_Base()
   {
     return (EReference)nestedDotIDEClass.getEStructuralFeatures().get(0);
@@ -789,6 +816,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getNestedDotID_Sub()
   {
     return (EReference)nestedDotIDEClass.getEStructuralFeatures().get(1);
@@ -799,6 +827,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getLintStatement()
   {
     return lintStatementEClass;
@@ -809,6 +838,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLintStatement_Expr()
   {
     return (EReference)lintStatementEClass.getEStructuralFeatures().get(0);
@@ -819,6 +849,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getRuleset()
   {
     return rulesetEClass;
@@ -829,6 +860,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getRuleset_Body()
   {
     return (EReference)rulesetEClass.getEStructuralFeatures().get(0);
@@ -839,6 +871,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getRulesetBody()
   {
     return rulesetBodyEClass;
@@ -849,6 +882,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getRulesetBody_LintStatements()
   {
     return (EReference)rulesetBodyEClass.getEStructuralFeatures().get(0);
@@ -859,6 +893,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getAnalysisStatement()
   {
     return analysisStatementEClass;
@@ -869,6 +904,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getAnalysisStatement_Expr()
   {
     return (EReference)analysisStatementEClass.getEStructuralFeatures().get(0);
@@ -879,6 +915,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getListType()
   {
     return listTypeEClass;
@@ -889,6 +926,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getListType_Type()
   {
     return (EReference)listTypeEClass.getEStructuralFeatures().get(0);
@@ -899,6 +937,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getSetType()
   {
     return setTypeEClass;
@@ -909,6 +948,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getSetType_Type()
   {
     return (EReference)setTypeEClass.getEStructuralFeatures().get(0);
@@ -919,6 +959,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getLibraryFnType()
   {
     return libraryFnTypeEClass;
@@ -929,6 +970,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getLibraryFnType_LibName()
   {
     return (EAttribute)libraryFnTypeEClass.getEStructuralFeatures().get(0);
@@ -939,6 +981,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getLibraryFnType_FnType()
   {
     return (EAttribute)libraryFnTypeEClass.getEStructuralFeatures().get(1);
@@ -949,6 +992,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getQuantArg()
   {
     return quantArgEClass;
@@ -959,6 +1003,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getQuantArg_Expr()
   {
     return (EReference)quantArgEClass.getEStructuralFeatures().get(0);
@@ -969,6 +1014,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getFunctionBody()
   {
     return functionBodyEClass;
@@ -979,6 +1025,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFunctionBody_Type()
   {
     return (EReference)functionBodyEClass.getEStructuralFeatures().get(0);
@@ -989,6 +1036,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getClaimBody()
   {
     return claimBodyEClass;
@@ -999,6 +1047,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getClaimBody_Claim()
   {
     return (EReference)claimBodyEClass.getEStructuralFeatures().get(0);
@@ -1009,6 +1058,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getClaimString()
   {
     return claimStringEClass;
@@ -1019,6 +1069,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getClaimString_Str()
   {
     return (EAttribute)claimStringEClass.getEStructuralFeatures().get(0);
@@ -1029,6 +1080,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getClaimArg()
   {
     return claimArgEClass;
@@ -1039,6 +1091,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getClaimArg_Arg()
   {
     return (EReference)claimArgEClass.getEStructuralFeatures().get(0);
@@ -1049,6 +1102,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getClaimArg_Unit()
   {
     return (EReference)claimArgEClass.getEStructuralFeatures().get(1);
@@ -1059,6 +1113,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getBinaryExpr()
   {
     return binaryExprEClass;
@@ -1069,6 +1124,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getBinaryExpr_Left()
   {
     return (EReference)binaryExprEClass.getEStructuralFeatures().get(0);
@@ -1079,6 +1135,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getBinaryExpr_Op()
   {
     return (EAttribute)binaryExprEClass.getEStructuralFeatures().get(1);
@@ -1089,6 +1146,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getBinaryExpr_Right()
   {
     return (EReference)binaryExprEClass.getEStructuralFeatures().get(2);
@@ -1099,6 +1157,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getInstanceOfExpr()
   {
     return instanceOfExprEClass;
@@ -1109,6 +1168,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getInstanceOfExpr_Expr()
   {
     return (EReference)instanceOfExprEClass.getEStructuralFeatures().get(0);
@@ -1119,6 +1179,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getInstanceOfExpr_Type()
   {
     return (EReference)instanceOfExprEClass.getEStructuralFeatures().get(1);
@@ -1129,6 +1190,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getUnaryExpr()
   {
     return unaryExprEClass;
@@ -1139,6 +1201,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getUnaryExpr_Op()
   {
     return (EAttribute)unaryExprEClass.getEStructuralFeatures().get(0);
@@ -1149,6 +1212,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getUnaryExpr_Expr()
   {
     return (EReference)unaryExprEClass.getEStructuralFeatures().get(1);
@@ -1159,6 +1223,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getCastExpr()
   {
     return castExprEClass;
@@ -1169,6 +1234,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getCastExpr_Type()
   {
     return (EReference)castExprEClass.getEStructuralFeatures().get(0);
@@ -1179,6 +1245,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getCastExpr_Expr()
   {
     return (EReference)castExprEClass.getEStructuralFeatures().get(1);
@@ -1189,6 +1256,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getIdExpr()
   {
     return idExprEClass;
@@ -1199,6 +1267,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getIdExpr_Id()
   {
     return (EReference)idExprEClass.getEStructuralFeatures().get(0);
@@ -1209,6 +1278,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getThisExpr()
   {
     return thisExprEClass;
@@ -1219,6 +1289,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getThisExpr_Sub()
   {
     return (EReference)thisExprEClass.getEStructuralFeatures().get(0);
@@ -1229,6 +1300,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getFailExpr()
   {
     return failExprEClass;
@@ -1239,6 +1311,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFailExpr_Val()
   {
     return (EReference)failExprEClass.getEStructuralFeatures().get(0);
@@ -1249,6 +1322,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFailExpr_Failmsg()
   {
     return (EReference)failExprEClass.getEStructuralFeatures().get(1);
@@ -1259,6 +1333,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getIntExpr()
   {
     return intExprEClass;
@@ -1269,6 +1344,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getIntExpr_Val()
   {
     return (EReference)intExprEClass.getEStructuralFeatures().get(0);
@@ -1279,6 +1355,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getRealExpr()
   {
     return realExprEClass;
@@ -1289,6 +1366,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getRealExpr_Val()
   {
     return (EReference)realExprEClass.getEStructuralFeatures().get(0);
@@ -1299,6 +1377,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getBoolExpr()
   {
     return boolExprEClass;
@@ -1309,6 +1388,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getBoolExpr_Val()
   {
     return (EReference)boolExprEClass.getEStructuralFeatures().get(0);
@@ -1319,6 +1399,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getStringExpr()
   {
     return stringExprEClass;
@@ -1329,6 +1410,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getStringExpr_Val()
   {
     return (EReference)stringExprEClass.getEStructuralFeatures().get(0);
@@ -1339,6 +1421,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getIfThenElseExpr()
   {
     return ifThenElseExprEClass;
@@ -1349,6 +1432,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getIfThenElseExpr_Cond()
   {
     return (EReference)ifThenElseExprEClass.getEStructuralFeatures().get(0);
@@ -1359,6 +1443,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getIfThenElseExpr_Then()
   {
     return (EReference)ifThenElseExprEClass.getEStructuralFeatures().get(1);
@@ -1369,6 +1454,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getIfThenElseExpr_Else()
   {
     return (EReference)ifThenElseExprEClass.getEStructuralFeatures().get(2);
@@ -1379,6 +1465,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getQuantifiedExpr()
   {
     return quantifiedExprEClass;
@@ -1389,6 +1476,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getQuantifiedExpr_Quant()
   {
     return (EAttribute)quantifiedExprEClass.getEStructuralFeatures().get(0);
@@ -1399,6 +1487,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getQuantifiedExpr_Args()
   {
     return (EReference)quantifiedExprEClass.getEStructuralFeatures().get(1);
@@ -1409,6 +1498,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getQuantifiedExpr_Expr()
   {
     return (EReference)quantifiedExprEClass.getEStructuralFeatures().get(2);
@@ -1419,6 +1509,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getLibraryFnCallExpr()
   {
     return libraryFnCallExprEClass;
@@ -1429,6 +1520,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getLibraryFnCallExpr_LibName()
   {
     return (EAttribute)libraryFnCallExprEClass.getEStructuralFeatures().get(0);
@@ -1439,6 +1531,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getLibraryFnCallExpr_FnName()
   {
     return (EAttribute)libraryFnCallExprEClass.getEStructuralFeatures().get(1);
@@ -1449,6 +1542,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLibraryFnCallExpr_Args()
   {
     return (EReference)libraryFnCallExprEClass.getEStructuralFeatures().get(2);
@@ -1459,6 +1553,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getBuiltInFnCallExpr()
   {
     return builtInFnCallExprEClass;
@@ -1469,6 +1564,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EAttribute getBuiltInFnCallExpr_Fn()
   {
     return (EAttribute)builtInFnCallExprEClass.getEStructuralFeatures().get(0);
@@ -1479,6 +1575,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getBuiltInFnCallExpr_Args()
   {
     return (EReference)builtInFnCallExprEClass.getEStructuralFeatures().get(1);
@@ -1489,6 +1586,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getFnCallExpr()
   {
     return fnCallExprEClass;
@@ -1499,6 +1597,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFnCallExpr_Fn()
   {
     return (EReference)fnCallExprEClass.getEStructuralFeatures().get(0);
@@ -1509,6 +1608,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getFnCallExpr_Args()
   {
     return (EReference)fnCallExprEClass.getEStructuralFeatures().get(1);
@@ -1519,6 +1619,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getLintExpr()
   {
     return lintExprEClass;
@@ -1529,6 +1630,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLintExpr_LintStmt()
   {
     return (EReference)lintExprEClass.getEStructuralFeatures().get(0);
@@ -1539,6 +1641,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getListFilterMapExpr()
   {
     return listFilterMapExprEClass;
@@ -1549,6 +1652,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getListFilterMapExpr_Map()
   {
     return (EReference)listFilterMapExprEClass.getEStructuralFeatures().get(0);
@@ -1559,6 +1663,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getListFilterMapExpr_Args()
   {
     return (EReference)listFilterMapExprEClass.getEStructuralFeatures().get(1);
@@ -1569,6 +1674,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getListFilterMapExpr_Filter()
   {
     return (EReference)listFilterMapExprEClass.getEStructuralFeatures().get(2);
@@ -1579,6 +1685,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getListExpr()
   {
     return listExprEClass;
@@ -1589,6 +1696,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getListExpr_Exprs()
   {
     return (EReference)listExprEClass.getEStructuralFeatures().get(0);
@@ -1599,6 +1707,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getSetFilterMapExpr()
   {
     return setFilterMapExprEClass;
@@ -1609,6 +1718,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getSetFilterMapExpr_Map()
   {
     return (EReference)setFilterMapExprEClass.getEStructuralFeatures().get(0);
@@ -1619,6 +1729,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getSetFilterMapExpr_Args()
   {
     return (EReference)setFilterMapExprEClass.getEStructuralFeatures().get(1);
@@ -1629,6 +1740,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getSetFilterMapExpr_Filter()
   {
     return (EReference)setFilterMapExprEClass.getEStructuralFeatures().get(2);
@@ -1639,6 +1751,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getSetExpr()
   {
     return setExprEClass;
@@ -1649,6 +1762,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getSetExpr_Exprs()
   {
     return (EReference)setExprEClass.getEStructuralFeatures().get(0);
@@ -1659,6 +1773,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getLetExpr()
   {
     return letExprEClass;
@@ -1669,6 +1784,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLetExpr_Binding()
   {
     return (EReference)letExprEClass.getEStructuralFeatures().get(0);
@@ -1679,6 +1795,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EReference getLetExpr_Expr()
   {
     return (EReference)letExprEClass.getEStructuralFeatures().get(1);
@@ -1689,6 +1806,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getWarningStatement()
   {
     return warningStatementEClass;
@@ -1699,6 +1817,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getErrorStatement()
   {
     return errorStatementEClass;
@@ -1709,6 +1828,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getInfoStatement()
   {
     return infoStatementEClass;
@@ -1719,6 +1839,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getProveStatement()
   {
     return proveStatementEClass;
@@ -1729,6 +1850,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EClass getCheckStatement()
   {
     return checkStatementEClass;
@@ -1739,6 +1861,7 @@ public class ResolutePackageImpl extends EPackageImpl implements ResolutePackage
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ResoluteFactory getResoluteFactory()
   {
     return (ResoluteFactory)getEFactoryInstance();
