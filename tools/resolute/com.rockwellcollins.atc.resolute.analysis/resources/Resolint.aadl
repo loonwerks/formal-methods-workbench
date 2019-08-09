@@ -1,0 +1,20 @@
+package Resolint
+public
+	annex Resolute {**
+		lint_check(a : aadl, b : bool) <=
+			** a **
+			b
+			
+		lint_check_set(a : {aadl}, b : bool) <=
+			** a **
+			forall(s : a) . lint_check(s, b)
+			
+		lint_check_list(a : [aadl], b : bool) <=
+			** a **
+			forall(s : as_set(a)) . lint_check(s, b)
+			
+		print(s:string) <=
+			** s **
+			false
+	**};
+end Resolint;

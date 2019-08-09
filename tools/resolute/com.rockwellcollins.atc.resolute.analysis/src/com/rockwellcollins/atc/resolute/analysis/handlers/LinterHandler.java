@@ -24,7 +24,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.nodemodel.INode;
-import org.eclipse.xtext.nodemodel.impl.RootNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentImplementation;
@@ -37,6 +36,9 @@ import org.osate.aadl2.instance.FlowSpecificationInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
+import org.osate.aadl2.modelsupport.util.AadlUtil;
+import org.osate.aadl2.parsesupport.AObject;
+import org.osate.aadl2.parsesupport.LocationReference;
 import org.osate.ui.dialogs.Dialog;
 
 import com.rockwellcollins.atc.resolute.analysis.execution.EvaluationContext;
@@ -159,25 +161,21 @@ public class LinterHandler extends AadlHandler {
 		int warnings = 0;
 
 		for (ResoluteResult resoluteResult : checkTrees) {
-			if (!resoluteResult.isValid()) {
+			if (resoluteResult != null && !resoluteResult.isValid()) {
 				LintResult result = (LintResult) resoluteResult;
 				try {
-					IMarker marker = getIResource(result.getLocation().eResource()).createMarker(MARKER_TYPE);
-					marker.setAttribute(IMarker.MESSAGE, result.getText());
-					int severity = result.getSeverity();
-					marker.setAttribute(IMarker.SEVERITY, severity);
-					if (severity == IMarker.SEVERITY_ERROR) {
-						errors++;
-					} else if (severity == IMarker.SEVERITY_WARNING) {
-						warnings++;
+					for (EObject ref : result.getLocations()) {
+						IMarker marker = getIResource(ref.eResource()).createMarker(MARKER_TYPE);
+						marker.setAttribute(IMarker.MESSAGE, result.getText());
+						int severity = result.getSeverity();
+						marker.setAttribute(IMarker.SEVERITY, severity);
+						if (severity == IMarker.SEVERITY_ERROR) {
+							errors++;
+						} else if (severity == IMarker.SEVERITY_WARNING) {
+							warnings++;
+						}
+						marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberFor(ref));
 					}
-					INode node = NodeModelUtils.getNode(result.getLocation());
-					int lineNum = 0;
-					while (!(node instanceof RootNode)) {
-						lineNum += node.getTotalStartLine();
-						node = node.getParent();
-					}
-					marker.setAttribute(IMarker.LINE_NUMBER, lineNum);
 				} catch (CoreException exception) {
 					exception.printStackTrace();
 				}
@@ -200,6 +198,35 @@ public class LinterHandler extends AadlHandler {
 			Dialog.showInfo("Resolint", message);
 		}
 
+	}
+
+	public static int getLineNumberFor(EObject obj) {
+		if (obj == null) {
+			return 0;
+		}
+		if (obj instanceof AObject) {
+			LocationReference locref = ((AObject) obj).getLocationReference();
+			if (locref != null) {
+				return locref.getLine();
+			}
+		}
+		INode node = null;
+		int lineNum = 0;
+		EObject defaultannex = AadlUtil.getContainingDefaultAnnex(obj);
+		if (defaultannex != null) {
+			node = NodeModelUtils.findActualNodeFor(defaultannex);
+			if (node != null) {
+				lineNum = node.getStartLine() - 1;
+			}
+		}
+
+		node = NodeModelUtils.findActualNodeFor(obj);
+
+		if (node != null) {
+			return lineNum + node.getStartLine();
+		}
+
+		return 0;
 	}
 
 	protected static IResource getIResource(Resource r) {
