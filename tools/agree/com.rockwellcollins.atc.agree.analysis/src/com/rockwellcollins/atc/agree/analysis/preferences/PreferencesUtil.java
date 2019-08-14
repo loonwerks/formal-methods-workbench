@@ -52,7 +52,7 @@ public class PreferencesUtil {
 		case PreferenceConstants.MODEL_CHECKER_KIND2WEB:
 			return getKind2WebApi(remoteUrl);
 		case PreferenceConstants.MODEL_CHECKER_SALLY:
-			return getSallyApi(remoteUrl);
+			return getSallyApi();
 		default:
 			throw new IllegalArgumentException("Unknown model checker setting: " + modelChecker);
 		}
@@ -155,9 +155,9 @@ public class PreferencesUtil {
 		return api;
 	}
 
-	private static Kind2WebApi getSallyApi(String uri) {
+	private static SallyApi getSallyApi() {
 		IPreferenceStore prefs = getPreferenceStore();
-		SallyApi api = new SallyApi(uri);
+		SallyApi api = new SallyApi();
 		api.setTimeout(prefs.getInt(PreferenceConstants.PREF_TIMEOUT));
 		return api;
 	}
