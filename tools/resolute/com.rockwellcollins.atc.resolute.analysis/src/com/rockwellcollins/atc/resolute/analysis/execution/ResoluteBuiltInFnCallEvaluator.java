@@ -948,25 +948,25 @@ public class ResoluteBuiltInFnCallEvaluator {
 				DataPort dp = (DataPort) feature;
 				return dp.getDataFeatureClassifier();
 			} else if (feature instanceof EventDataPort) {
-				EventDataPort dp = (EventDataPort) ne;
+				EventDataPort dp = (EventDataPort) feature;
 				return dp.getDataFeatureClassifier();
 			} else if (feature instanceof DataAccess) {
-				DataAccess dp = (DataAccess) ne;
+				DataAccess dp = (DataAccess) feature;
 				return dp.getDataFeatureClassifier();
 			} else if (feature instanceof BusAccess) {
-				BusAccess dp = (BusAccess) ne;
+				BusAccess dp = (BusAccess) feature;
 				BusFeatureClassifier val = dp.getBusFeatureClassifier();
 				if (val instanceof BusClassifier) {
 					return (BusClassifier) val;
 				}
 			} else if (ne instanceof Feature) {
-				Feature dp = (Feature) ne;
+				Feature dp = feature;
 				FeatureClassifier val = dp.getFeatureClassifier();
 				if (val instanceof ComponentClassifier) {
 					return (ComponentClassifier) val;
 				}
-			}else if(feature instanceof FeatureGroup){
-				FeatureGroup featGroup = (FeatureGroup)feature;
+			} else if (feature instanceof FeatureGroup) {
+				FeatureGroup featGroup = (FeatureGroup) feature;
 				return featGroup.getAllFeatureGroupType();
 			}
 			return (NamedElement) fi.getFeature().getFeatureClassifier();
