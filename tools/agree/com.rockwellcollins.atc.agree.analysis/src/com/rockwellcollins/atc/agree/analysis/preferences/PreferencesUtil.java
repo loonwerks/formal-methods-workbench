@@ -19,6 +19,7 @@ import jkind.api.JRealizabilityApi;
 import jkind.api.Kind2Api;
 import jkind.api.Kind2WebApi;
 import jkind.api.KindApi;
+import jkind.api.SallyApi;
 
 public class PreferencesUtil {
 	public static KindApi getKindApi() {
