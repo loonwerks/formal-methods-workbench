@@ -37,7 +37,7 @@ def manage_daily_builds():
     for rel in releases:
         print('examining rel %d from %s...' % (rel.id, str(rel.created_at)))
         if rel.id in delete_keys:
-            print(' deleting %d.' % (rel.id))
+            print(' deleting release id %d and tag %s.' % (rel.id, rel.tag_name))
             rel_tag_ref = repository.ref('tags/%s' % (rel.tag_name))
             rel.delete()
             if rel_tag_ref is not None:
