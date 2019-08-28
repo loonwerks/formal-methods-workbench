@@ -165,16 +165,18 @@ public class LinterHandler extends AadlHandler {
 				LintResult result = (LintResult) resoluteResult;
 				try {
 					for (EObject ref : result.getLocations()) {
-						IMarker marker = getIResource(ref.eResource()).createMarker(MARKER_TYPE);
-						marker.setAttribute(IMarker.MESSAGE, result.getText());
-						int severity = result.getSeverity();
-						marker.setAttribute(IMarker.SEVERITY, severity);
-						if (severity == IMarker.SEVERITY_ERROR) {
-							errors++;
-						} else if (severity == IMarker.SEVERITY_WARNING) {
-							warnings++;
+						if (ref != null) {
+							IMarker marker = getIResource(ref.eResource()).createMarker(MARKER_TYPE);
+							marker.setAttribute(IMarker.MESSAGE, result.getText());
+							int severity = result.getSeverity();
+							marker.setAttribute(IMarker.SEVERITY, severity);
+							if (severity == IMarker.SEVERITY_ERROR) {
+								errors++;
+							} else if (severity == IMarker.SEVERITY_WARNING) {
+								warnings++;
+							}
+							marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberFor(ref));
 						}
-						marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberFor(ref));
 					}
 				} catch (CoreException exception) {
 					exception.printStackTrace();
