@@ -40,6 +40,7 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.properties.PropertyDoesNotApplyToHolderException;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddAttestationManagerDialog;
@@ -55,6 +56,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 	static final String AM_REQUEST_MSG_NAME = "CASE_AttestationRequestMsg";
 	static final String AM_RESPONSE_MSG_NAME = "CASE_AttestationResponseMsg";
+	static final String AM_REQUEST_MSG_IMPL_NAME = "CASE_AttestationRequestMsg.Impl";
+	static final String AM_RESPONSE_MSG_IMPL_NAME = "CASE_AttestationResponseMsg.Impl";
 	static final String AM_COMP_TYPE_NAME = "CASE_AttestationManager";
 	static final String AM_LOG_PORT_NAME = "message_log";
 	static final String AM_PORT_ATTESTATION_REQUEST_NAME = "am_request";
@@ -154,7 +157,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				final AadlPackage aadlPkg = (AadlPackage) resource.getContents().get(0);
 				PackageSection pkgSection = null;
-				// Figure out if the comm driver is in the public or private section
+				// Figure out if the comm driver's containing implementation is in the public or private section
 				EObject eObj = commDriver.eContainer();
 				while (eObj != null) {
 					if (eObj instanceof PublicPackageSection) {
@@ -188,10 +191,61 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Per convention, we will attach all properties and contracts to the thread.
 				// For this model transformation, we will create the thread first, then wrap it in a process
 				// component, using the same mechanism we use for the seL4 transformation
-				boolean isProcess = (compCategory == ComponentCategory.PROCESS);
+				final boolean isProcess = (compCategory == ComponentCategory.PROCESS);
 				if (isProcess) {
 					compCategory = ComponentCategory.THREAD;
 				}
+
+				// Create new comm driver component that extends the selected one
+				final ComponentType commDriverType = (ComponentType) pkgSection
+						.createOwnedClassifier(ComponentCreateHelper.getTypeClass(compCategory));
+				// Give it a unique name
+				commDriverType.setName(getUniqueName(commDriver.getComponentType().getName() + "_Attestation", true,
+						pkgSection.getOwnedClassifiers()));
+				commDriverType.setExtended(commDriver.getComponentType());
+
+				// Get the request and response message types from the CASE_Model_Transformations package
+				DataImplementation requestMsgImpl = null;
+				DataImplementation responseMsgImpl = null;
+				AadlPackage caseModelTransformationsPkg = CaseUtils.getCaseModelTransformationsPackage();
+				for (Classifier classifier : caseModelTransformationsPkg.getOwnedPublicSection()
+						.getOwnedClassifiers()) {
+					if (classifier.getName().equalsIgnoreCase(AM_REQUEST_MSG_IMPL_NAME)) {
+						requestMsgImpl = (DataImplementation) classifier;
+					} else if (classifier.getName().equalsIgnoreCase(AM_RESPONSE_MSG_IMPL_NAME)) {
+						responseMsgImpl = (DataImplementation) classifier;
+					}
+				}
+
+				// Create attestation request and response ports
+				final EventDataPort commReq = (EventDataPort) ComponentCreateHelper
+						.createOwnedEventDataPort(commDriverType);
+				final EventDataPort commRes = (EventDataPort) ComponentCreateHelper
+						.createOwnedEventDataPort(commDriverType);
+				commReq.setDataFeatureClassifier(requestMsgImpl);
+				commRes.setDataFeatureClassifier(responseMsgImpl);
+				commReq.setName(AM_PORT_ATTESTATION_REQUEST_NAME);
+				commReq.setIn(true);
+				commRes.setName(AM_PORT_ATTESTATION_RESPONSE_NAME);
+				commRes.setOut(true);
+
+				// TODO: AGREE?
+
+				// Put just above it's containing implementation
+				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
+						pkgSection.getOwnedClassifiers().size() - 1);
+
+				// Create extended comm driver implementation
+				final ComponentImplementation commDriverImpl = (ComponentImplementation) pkgSection
+						.createOwnedClassifier(ComponentCreateHelper.getImplClass(compCategory));
+				commDriverImpl.setName(commDriverType.getName() + ".Impl");
+				commDriverImpl.setExtended(commDriver.getComponentImplementation());
+				final Realization commRealization = commDriverImpl.createOwnedRealization();
+				commRealization.setImplemented(commDriverType);
+
+				// Add it to proper place (below extended comm driver type)
+				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
+						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create Attestation Manager component type
 				final ComponentType attestationManagerType = (ComponentType) pkgSection
@@ -234,19 +288,11 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 						amPortNames.add(commPort.getName());
 						amPortTypes.add((DataImplementation) dataFeatureClassifier);
-					}
-				}
 
-				// Get the request and response message types from the CASE_Model_Transformations package
-				DataImplementation requestMsgImpl = null;
-				DataImplementation responseMsgImpl = null;
-				AadlPackage caseModelTransformationsPkg = CaseUtils.getCaseModelTransformationsPackage();
-				for (Classifier classifier : caseModelTransformationsPkg.getOwnedPublicSection()
-						.getOwnedClassifiers()) {
-					if (classifier.getName().equalsIgnoreCase("CASE_AttestationRequestMsg.Impl")) {
-						requestMsgImpl = (DataImplementation) classifier;
-					} else if (classifier.getName().equalsIgnoreCase("CASE_AttestationResponseMsg.Impl")) {
-						responseMsgImpl = (DataImplementation) classifier;
+						// The data subcomponent type could be in a different package.
+						// Make sure to include it in the with clause
+						importContainingPackage(dataFeatureClassifier, pkgSection);
+
 					}
 				}
 
@@ -277,18 +323,18 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					logPort.setName(AM_LOG_PORT_NAME);
 				}
 
-				// Add attestation request/response ports on comm driver (or create new comm driver component?)
-				final ComponentType commDriverType = commDriver.getComponentType();
-				final EventDataPort commReq = (EventDataPort) ComponentCreateHelper
-						.createOwnedEventDataPort(commDriverType);
-				final EventDataPort commRes = (EventDataPort) ComponentCreateHelper
-						.createOwnedEventDataPort(commDriverType);
-				commReq.setDataFeatureClassifier(requestMsgImpl);
-				commRes.setDataFeatureClassifier(responseMsgImpl);
-				commReq.setName(AM_PORT_ATTESTATION_REQUEST_NAME);
-				commReq.setIn(true);
-				commRes.setName(AM_PORT_ATTESTATION_RESPONSE_NAME);
-				commRes.setOut(true);
+//				// Add attestation request/response ports on comm driver (or create new comm driver component?)
+//				final ComponentType commDriverType = commDriver.getComponentType();
+//				final EventDataPort commReq = (EventDataPort) ComponentCreateHelper
+//						.createOwnedEventDataPort(commDriverType);
+//				final EventDataPort commRes = (EventDataPort) ComponentCreateHelper
+//						.createOwnedEventDataPort(commDriverType);
+//				commReq.setDataFeatureClassifier(requestMsgImpl);
+//				commRes.setDataFeatureClassifier(responseMsgImpl);
+//				commReq.setName(AM_PORT_ATTESTATION_REQUEST_NAME);
+//				commReq.setIn(true);
+//				commRes.setName(AM_PORT_ATTESTATION_RESPONSE_NAME);
+//				commRes.setOut(true);
 
 				// Add Attestation Manager properties
 				// CASE_Properties::COMP_TYPE Property
@@ -316,17 +362,19 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 				}
 
-				// Put Attestation Manager in proper location (just after the comm driver)
-				String destName = "";
-				if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
-					// Get the component type implementation name
-					destName = commDriver.getComponentImplementation().getName();
-				} else {
-					// Get the component type name
-					destName = commDriver.getComponentImplementation().getType().getName();
-				}
+				// Put Attestation Manager in proper location (just after the extended comm driver)
+//				String destName = "";
+//				if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
+//					// Get the component type implementation name
+//					destName = commDriver.getComponentImplementation().getName();
+//				} else {
+//					// Get the component type name
+//					destName = commDriver.getComponentImplementation().getType().getName();
+//				}
 
-				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 1,
+//				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 1,
+//						pkgSection.getOwnedClassifiers().size() - 1);
+				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create Attestation Manager implementation
@@ -337,8 +385,10 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				r.setImplemented(attestationManagerType);
 
 				// Add it to proper place
-				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 2,
+				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
+//				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 2,
+//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// CASE_Properties::COMP_IMPL property
 				if (!implementationLanguage.isEmpty()) {
@@ -362,16 +412,27 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 				}
 
-				// Get the parent component implementation
-				final ComponentImplementation containingImpl = commDriver.getContainingComponentImpl();
+//				// Get the parent component implementation
+//				final ComponentImplementation containingImpl = commDriver.getContainingComponentImpl();
+
+				// Replace the comm driver with the extended comm driver
+				for (Subcomponent sub : ci.getOwnedSubcomponents()) {
+					if (sub.getName().equalsIgnoreCase(commDriver.getName())) {
+						ComponentCreateHelper.setSubcomponentType(sub, commDriverImpl);
+					}
+				}
 
 				// Insert attestation manager in process component implementation
+//				final Subcomponent attestationManagerSubcomp = ComponentCreateHelper
+//						.createOwnedSubcomponent(containingImpl, compCategory);
 				final Subcomponent attestationManagerSubcomp = ComponentCreateHelper
-						.createOwnedSubcomponent(containingImpl, compCategory);
+						.createOwnedSubcomponent(ci, compCategory);
 
 				// Give it a unique name
+//				attestationManagerSubcomp
+//						.setName(getUniqueName(implementationName, true, containingImpl.getOwnedSubcomponents()));
 				attestationManagerSubcomp
-						.setName(getUniqueName(implementationName, true, containingImpl.getOwnedSubcomponents()));
+						.setName(getUniqueName(implementationName, true, ci.getOwnedSubcomponents()));
 				// Assign thread implementation
 				ComponentCreateHelper.setSubcomponentType(attestationManagerSubcomp, attestationManagerImpl);
 
@@ -379,7 +440,8 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 				// Create new connections between comm driver / attestation manager / destination components
 				String connName = "";
-				for (PortConnection conn : containingImpl.getOwnedPortConnections()) {
+//				for (PortConnection conn : containingImpl.getOwnedPortConnections()) {
+				for (PortConnection conn : ci.getOwnedPortConnections()) {
 					// Ignore bus connections (destination context not null)
 					if (conn.getSource().getContext() == commDriver && conn.getDestination().getContext() != null) {
 						// Create connection from attestation manager to destination components
@@ -443,13 +505,18 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				int idxOffset = 1;
 				for (PortConnection newPortConn : newPortConns) {
 					// Make sure each new connection has a unique name
+//					newPortConn.setName(
+//							getUniqueName(CONNECTION_IMPL_NAME, false, containingImpl.getOwnedPortConnections()));
 					newPortConn.setName(
-							getUniqueName(CONNECTION_IMPL_NAME, false, containingImpl.getOwnedPortConnections()));
-					containingImpl.getOwnedPortConnections().add(newPortConn);
+							getUniqueName(CONNECTION_IMPL_NAME, false, ci.getOwnedPortConnections()));
+//					containingImpl.getOwnedPortConnections().add(newPortConn);
+					ci.getOwnedPortConnections().add(newPortConn);
 					// Move to right place
-					containingImpl.getOwnedPortConnections().move(
-							getIndex(connName, containingImpl.getOwnedPortConnections()) + idxOffset,
-							containingImpl.getOwnedPortConnections().size() - 1);
+//					containingImpl.getOwnedPortConnections().move(
+//							getIndex(connName, containingImpl.getOwnedPortConnections()) + idxOffset,
+//							containingImpl.getOwnedPortConnections().size() - 1);
+					ci.getOwnedPortConnections().move(getIndex(connName, ci.getOwnedPortConnections()) + idxOffset,
+							ci.getOwnedPortConnections().size() - 1);
 					idxOffset++;
 				}
 
@@ -526,10 +593,13 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 					agreeClauses = agreeClauses + "**}";
 
-					final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper
-							.createOwnedAnnexSubclause(attestationManagerType);
-					annexSubclauseImpl.setName("agree");
-					annexSubclauseImpl.setSourceText(agreeClauses);
+					// If agreeClauses is not an empty annex, print it
+					if (attestationAgreeProperty.length() > 0 || guarantees.size() > 0) {
+						final DefaultAnnexSubclause annexSubclauseImpl = ComponentCreateHelper
+								.createOwnedAnnexSubclause(attestationManagerType);
+						annexSubclauseImpl.setName("agree");
+						annexSubclauseImpl.setSourceText(agreeClauses);
+					}
 				}
 
 				if (isProcess) {
@@ -546,20 +616,26 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 	private boolean isCompType(Subcomponent comp, String compType) {
 
-		EList<PropertyExpression> propVal = comp.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_TYPE");
-		if (propVal != null) {
-			for (PropertyExpression expr : propVal) {
-				if (expr instanceof NamedValue) {
-					NamedValue namedVal = (NamedValue) expr;
-					AbstractNamedValue absVal = namedVal.getNamedValue();
-					if (absVal instanceof EnumerationLiteral) {
-						EnumerationLiteral enVal = (EnumerationLiteral) absVal;
-						if (enVal.getName().equalsIgnoreCase(compType)) {
-							return true;
+		try {
+
+			EList<PropertyExpression> propVal = comp.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_TYPE");
+
+			if (propVal != null) {
+				for (PropertyExpression expr : propVal) {
+					if (expr instanceof NamedValue) {
+						NamedValue namedVal = (NamedValue) expr;
+						AbstractNamedValue absVal = namedVal.getNamedValue();
+						if (absVal instanceof EnumerationLiteral) {
+							EnumerationLiteral enVal = (EnumerationLiteral) absVal;
+							if (enVal.getName().equalsIgnoreCase(compType)) {
+								return true;
+							}
 						}
 					}
 				}
 			}
+		} catch (PropertyDoesNotApplyToHolderException e) {
+			return false;
 		}
 		return false;
 	}

@@ -340,7 +340,7 @@ public
 			true
 		
 		-- Top-level claim for proper insertion of an isolator
-		add_isolator(c : component) <=
+		add_isolator(c : component, isolator : component) <=
 			** "Isolator added to " c **
 			true
 			

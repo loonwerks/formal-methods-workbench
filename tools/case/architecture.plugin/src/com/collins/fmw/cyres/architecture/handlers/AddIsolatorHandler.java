@@ -35,6 +35,7 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.ThreadGroupSubcomponent;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
@@ -71,12 +72,13 @@ public class AddIsolatorHandler extends AadlHandler {
 		// Get the current selection
 		EObject eObj = getEObject(uri);
 		Subcomponent sub = null;
-		// TODO: handle thread group, system, device, abstract subcomponents
-		if (eObj instanceof ProcessSubcomponent || eObj instanceof ThreadSubcomponent) {
+		// TODO: handle system, device, abstract subcomponents
+		if (eObj instanceof ProcessSubcomponent || eObj instanceof ThreadSubcomponent
+				|| eObj instanceof ThreadGroupSubcomponent) {
 			sub = (Subcomponent) eObj;
 		} else {
 			Dialog.showError("Add Isolator",
-					"A process or thread implementation subcomponent must be selected in order to add isolation.");
+					"A process, thread, or thread group implementation subcomponent must be selected in order to add isolation.");
 			return;
 		}
 

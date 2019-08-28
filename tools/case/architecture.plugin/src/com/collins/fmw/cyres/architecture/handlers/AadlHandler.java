@@ -25,8 +25,12 @@ import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Realization;
+import org.osate.aadl2.modelsupport.util.AadlUtil;
 
 public abstract class AadlHandler extends AbstractHandler {
 
@@ -198,6 +202,29 @@ public abstract class AadlHandler extends AbstractHandler {
 		} while (!done);
 
 		return newIdentifier;
+	}
+
+	/**
+	 * Adds the containing package of the specified object to the specified package section's with clause if it isn't already present
+	 * @param obj - Object whose containing package needs to be imported
+	 * @param pkgSection - Package Section
+	 */
+	protected void importContainingPackage(EObject obj, PackageSection pkgSection) {
+
+		AadlPackage pkg = AadlUtil.getContainingPackage(obj);
+		if (pkg == null) {
+			return;
+		}
+		boolean pkgFound = false;
+		for (ModelUnit mu : pkgSection.getImportedUnits()) {
+			if (mu.getName().equalsIgnoreCase(pkg.getName())) {
+				pkgFound = true;
+				break;
+			}
+		}
+		if (!pkgFound) {
+			pkgSection.getImportedUnits().add(pkg);
+		}
 	}
 
 	/**
