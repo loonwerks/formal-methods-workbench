@@ -72,7 +72,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		createVirtualProcessorNameField(container);
 		createComponentSelectionField(container);
 		createRequirementField(container);
-		createAgreeField(container);
+//		createAgreeField(container);
 
 		return area;
 	}
