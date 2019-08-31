@@ -32,7 +32,7 @@ public class AddIsolatorClaim extends BuiltInClaim {
 	@Override
 	public List<Arg> getDefinitionParams() {
 		List<Arg> defParams = new ArrayList<>();
-		defParams.add(Create.arg("context", Create.baseType("component")));
+		defParams.add(Create.arg("comp_context", Create.baseType("component")));
 		defParams.add(Create.arg("isolator", Create.baseType("component")));
 		return defParams;
 	}

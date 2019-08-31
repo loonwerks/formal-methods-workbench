@@ -320,9 +320,9 @@ public
 		---------------------------
 		
 		-- Top-level claim for proper insertion of a filter
-		add_filter(context : component, filter : component, conn_name : string, msg_type : data) <=
-			** "Filter " filter " is properly added to component " context **
-			filter_exists(filter, context, conn_name) and filter_not_bypassed(filter, context, msg_type) and filter_prop_checked()
+		add_filter(comp_context : component, filter : component, conn_name : string, msg_type : data) <=
+			** "Filter " filter " is properly added to component " comp_context **
+			filter_exists(filter, comp_context, conn_name) and filter_not_bypassed(filter, comp_context, msg_type) and filter_prop_checked()
 			
 		-- Top-level claim for proper insertion of attestation manager
 		add_attestation_manager(comm_driver : component, attestation_manager : component) <=
@@ -367,16 +367,16 @@ public
 		
 		-- Check to see if there is a filter immediately before 
 		-- the component on the communication pathway.
-		filter_exists(filter : component, context : component, conn_name : string) <=
-			** "Filter " filter " is connected to component " context " by connection " conn_name **
-			let conns : {connection} = {c for (c : connections(context)) | destination_component(c) = context and source_component(c) = filter};
+		filter_exists(filter : component, comp_context : component, conn_name : string) <=
+			** "Filter " filter " is connected to component " comp_context " by connection " conn_name **
+			let conns : {connection} = {c for (c : connections(comp_context)) | destination_component(c) = comp_context and source_component(c) = filter};
 			is_filter(filter) and exists(c : conns) . name(c) = conn_name
 	
 		-- Make sure there is no communication pathway that avoids the filter
-		filter_not_bypassed(filter : component, context : component, msg_type : data) <=
+		filter_not_bypassed(filter : component, comp_context : component, msg_type : data) <=
 			** "Filter " filter " cannot be bypassed" **
-			let filter_srcs : {component} = get_filter_sources(context, filter, msg_type); 
-			let non_filter_srcs : {component} = get_non_filter_sources(context, filter, msg_type); 
+			let filter_srcs : {component} = get_filter_sources(comp_context, filter, msg_type); 
+			let non_filter_srcs : {component} = get_non_filter_sources(comp_context, filter, msg_type); 
 			length(intersect(filter_srcs, non_filter_srcs)) = 0
 		
 		get_non_filter_sources(target : component, filter : component, msg_type : data) : {component} = 

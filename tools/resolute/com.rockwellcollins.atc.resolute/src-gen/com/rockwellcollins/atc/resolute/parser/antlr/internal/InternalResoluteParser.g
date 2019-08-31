@@ -1388,22 +1388,192 @@ ruleDefinitionBody returns [EObject current=null]
 )(
 (
 		{ 
-	        newCompositeNode(grammarAccess.getDefinitionBodyAccess().getExprExprParserRuleCall_1_3_0()); 
+	        newCompositeNode(grammarAccess.getDefinitionBodyAccess().getContextClaimContextParserRuleCall_1_3_0()); 
 	    }
-		lv_expr_10_0=ruleExpr		{
+		lv_context_10_0=ruleClaimContext		{
+	        if ($current==null) {
+	            $current = createModelElementForParent(grammarAccess.getDefinitionBodyRule());
+	        }
+       		add(
+       			$current, 
+       			"context",
+        		lv_context_10_0, 
+        		"com.rockwellcollins.atc.resolute.Resolute.ClaimContext");
+	        afterParserOrEnumRuleCall();
+	    }
+
+)
+)*(
+(
+		{ 
+	        newCompositeNode(grammarAccess.getDefinitionBodyAccess().getAssumptionsClaimAssumptionParserRuleCall_1_4_0()); 
+	    }
+		lv_assumptions_11_0=ruleClaimAssumption		{
+	        if ($current==null) {
+	            $current = createModelElementForParent(grammarAccess.getDefinitionBodyRule());
+	        }
+       		add(
+       			$current, 
+       			"assumptions",
+        		lv_assumptions_11_0, 
+        		"com.rockwellcollins.atc.resolute.Resolute.ClaimAssumption");
+	        afterParserOrEnumRuleCall();
+	    }
+
+)
+)*(
+(
+		{ 
+	        newCompositeNode(grammarAccess.getDefinitionBodyAccess().getExprExprParserRuleCall_1_5_0()); 
+	    }
+		lv_expr_12_0=ruleExpr		{
 	        if ($current==null) {
 	            $current = createModelElementForParent(grammarAccess.getDefinitionBodyRule());
 	        }
        		set(
        			$current, 
        			"expr",
-        		lv_expr_10_0, 
+        		lv_expr_12_0, 
         		"com.rockwellcollins.atc.resolute.Resolute.Expr");
 	        afterParserOrEnumRuleCall();
 	    }
 
 )
 )))
+;
+
+
+
+
+
+// Entry rule entryRuleClaimContext
+entryRuleClaimContext returns [EObject current=null]
+	:
+	{ newCompositeNode(grammarAccess.getClaimContextRule()); }
+	 iv_ruleClaimContext=ruleClaimContext 
+	 { $current=$iv_ruleClaimContext.current; } 
+	 EOF 
+;
+
+// Rule ClaimContext
+ruleClaimContext returns [EObject current=null] 
+    @init { enterRule(); 
+    }
+    @after { leaveRule(); }:
+(
+	otherlv_0=Context
+    {
+    	newLeafNode(otherlv_0, grammarAccess.getClaimContextAccess().getContextKeyword_0());
+    }
+(
+(
+		lv_name_1_0=RULE_ID
+		{
+			newLeafNode(lv_name_1_0, grammarAccess.getClaimContextAccess().getNameIDTerminalRuleCall_1_0()); 
+		}
+		{
+	        if ($current==null) {
+	            $current = createModelElement(grammarAccess.getClaimContextRule());
+	        }
+       		setWithLastConsumed(
+       			$current, 
+       			"name",
+        		lv_name_1_0, 
+        		"org.osate.xtext.aadl2.properties.Properties.ID");
+	    }
+
+)
+)
+	otherlv_2=Colon
+    {
+    	newLeafNode(otherlv_2, grammarAccess.getClaimContextAccess().getColonKeyword_2());
+    }
+(
+(
+		{ 
+	        newCompositeNode(grammarAccess.getClaimContextAccess().getValStringTermParserRuleCall_3_0()); 
+	    }
+		lv_val_3_0=ruleStringTerm		{
+	        if ($current==null) {
+	            $current = createModelElementForParent(grammarAccess.getClaimContextRule());
+	        }
+       		set(
+       			$current, 
+       			"val",
+        		lv_val_3_0, 
+        		"org.osate.xtext.aadl2.properties.Properties.StringTerm");
+	        afterParserOrEnumRuleCall();
+	    }
+
+)
+))
+;
+
+
+
+
+
+// Entry rule entryRuleClaimAssumption
+entryRuleClaimAssumption returns [EObject current=null]
+	:
+	{ newCompositeNode(grammarAccess.getClaimAssumptionRule()); }
+	 iv_ruleClaimAssumption=ruleClaimAssumption 
+	 { $current=$iv_ruleClaimAssumption.current; } 
+	 EOF 
+;
+
+// Rule ClaimAssumption
+ruleClaimAssumption returns [EObject current=null] 
+    @init { enterRule(); 
+    }
+    @after { leaveRule(); }:
+(
+	otherlv_0=Assumption
+    {
+    	newLeafNode(otherlv_0, grammarAccess.getClaimAssumptionAccess().getAssumptionKeyword_0());
+    }
+(
+(
+		lv_name_1_0=RULE_ID
+		{
+			newLeafNode(lv_name_1_0, grammarAccess.getClaimAssumptionAccess().getNameIDTerminalRuleCall_1_0()); 
+		}
+		{
+	        if ($current==null) {
+	            $current = createModelElement(grammarAccess.getClaimAssumptionRule());
+	        }
+       		setWithLastConsumed(
+       			$current, 
+       			"name",
+        		lv_name_1_0, 
+        		"org.osate.xtext.aadl2.properties.Properties.ID");
+	    }
+
+)
+)
+	otherlv_2=Colon
+    {
+    	newLeafNode(otherlv_2, grammarAccess.getClaimAssumptionAccess().getColonKeyword_2());
+    }
+(
+(
+		{ 
+	        newCompositeNode(grammarAccess.getClaimAssumptionAccess().getValStringTermParserRuleCall_3_0()); 
+	    }
+		lv_val_3_0=ruleStringTerm		{
+	        if ($current==null) {
+	            $current = createModelElementForParent(grammarAccess.getClaimAssumptionRule());
+	        }
+       		set(
+       			$current, 
+       			"val",
+        		lv_val_3_0, 
+        		"org.osate.xtext.aadl2.properties.Properties.StringTerm");
+	        afterParserOrEnumRuleCall();
+	    }
+
+)
+))
 ;
 
 

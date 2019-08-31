@@ -39,7 +39,6 @@ Definition:
 	ConstantDefinition 
 |	FunctionDefinition
 |	Ruleset
-//|	RuleDefinition
 ;
 
 Type:
@@ -112,7 +111,15 @@ FunctionDefinition:
 
 DefinitionBody:
 	 {FunctionBody} ':' type=Type '=' expr=Expr
-|	 {ClaimBody} '<=' ('**'(claim+=ClaimText)+'**') expr=Expr
+|	 {ClaimBody} '<=' ('**'(claim+=ClaimText)+'**') (context+=ClaimContext)* (assumptions+=ClaimAssumption)* expr=Expr
+;
+
+ClaimContext:
+	'context' name=ID ':' val=StringTerm
+;
+
+ClaimAssumption:
+	'assumption' name=ID ':' val=StringTerm
 ;
 
 ClaimText:
