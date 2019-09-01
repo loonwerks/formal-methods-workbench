@@ -27,12 +27,10 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	private List<Button> btnCompSelectionType = new ArrayList<>();
 	private List<Button> btnComponents = new ArrayList<>();
 	private Combo cboIsolatorRequirement;
-	private Text txtAgreeProperty;
 
 	private String virtualProcessorName = "";
 	private List<String> components = new ArrayList<>();
 	private String isolatorRequirement = "";
-	private String agreeProperty = "";
 
 	private Subcomponent component = null;
 	private List<String> requirements = new ArrayList<>();
@@ -72,7 +70,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		createVirtualProcessorNameField(container);
 		createComponentSelectionField(container);
 		createRequirementField(container);
-//		createAgreeField(container);
 
 		return area;
 	}
@@ -182,19 +179,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		cboIsolatorRequirement.setText(NO_REQUIREMENT_SELECTED);
 	}
 
-	/**
-	 * Creates the input text field for specifying the filter agree property
-	 * @param container
-	 */
-	private void createAgreeField(Composite container) {
-		Label lblAgreeField = new Label(container, SWT.NONE);
-		lblAgreeField.setText("Isolator AGREE contract");
-
-		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
-		txtAgreeProperty = new Text(container, SWT.BORDER);
-		txtAgreeProperty.setLayoutData(dataInfoField);
-
-	}
 
 	@Override
 	protected void okPressed() {
@@ -245,7 +229,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 							+ NO_REQUIREMENT_SELECTED + ".");
 			return false;
 		}
-		agreeProperty = txtAgreeProperty.getText();
+
 		return true;
 	}
 
@@ -259,10 +243,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 	public String getRequirement() {
 		return isolatorRequirement;
-	}
-
-	public String getAgreeProperty() {
-		return agreeProperty;
 	}
 
 	public void setSelectedComponent(Subcomponent component) {

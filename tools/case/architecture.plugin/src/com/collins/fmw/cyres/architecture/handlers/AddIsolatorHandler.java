@@ -60,7 +60,6 @@ public class AddIsolatorHandler extends AadlHandler {
 	private String virtualProcessorName;
 	private List<String> isolatedComponents;
 	private String isolatorRequirement;
-	private String isolatorAgreeProperty;
 
 	@Override
 	protected void runCommand(URI uri) {
@@ -116,7 +115,6 @@ public class AddIsolatorHandler extends AadlHandler {
 			}
 			isolatedComponents = wizard.getIsolatedComponents();
 			isolatorRequirement = wizard.getRequirement();
-			isolatorAgreeProperty = wizard.getAgreeProperty();
 		} else {
 			return;
 		}
