@@ -11,7 +11,9 @@ import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
 import com.rockwellcollins.atc.resolute.resolute.BuiltInFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.CastExpr;
+import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
+import com.rockwellcollins.atc.resolute.resolute.ClaimContext;
 import com.rockwellcollins.atc.resolute.resolute.ClaimText;
 import com.rockwellcollins.atc.resolute.resolute.ConstantDefinition;
 import com.rockwellcollins.atc.resolute.resolute.Definition;
@@ -192,13 +194,33 @@ public class ResoluteFormatter extends PropertiesFormatter {
     for (final ClaimText claim : _claim) {
       this.format(claim, document);
     }
-    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+    EList<ClaimContext> _context = claimbody.getContext();
+    for (final ClaimContext context : _context) {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+        it.setNewLines(1);
+      };
+      final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+        it.indent();
+      };
+      document.<ClaimContext>surround(document.<ClaimContext>prepend(context, _function_3), _function_4);
+    }
+    EList<ClaimAssumption> _assumptions = claimbody.getAssumptions();
+    for (final ClaimAssumption assumption : _assumptions) {
+      final Procedure1<IHiddenRegionFormatter> _function_5 = (IHiddenRegionFormatter it) -> {
+        it.setNewLines(1);
+      };
+      final Procedure1<IHiddenRegionFormatter> _function_6 = (IHiddenRegionFormatter it) -> {
+        it.indent();
+      };
+      document.<ClaimAssumption>surround(document.<ClaimAssumption>prepend(assumption, _function_5), _function_6);
+    }
+    final Procedure1<IHiddenRegionFormatter> _function_7 = (IHiddenRegionFormatter it) -> {
       it.setNewLines(1);
     };
-    final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+    final Procedure1<IHiddenRegionFormatter> _function_8 = (IHiddenRegionFormatter it) -> {
       it.indent();
     };
-    document.<Expr>surround(document.<Expr>prepend(claimbody.getExpr(), _function_3), _function_4);
+    document.<Expr>surround(document.<Expr>prepend(claimbody.getExpr(), _function_7), _function_8);
     this.formatExpr(claimbody.getExpr(), document);
   }
   
