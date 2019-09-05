@@ -24,11 +24,13 @@ import org.osate.ui.dialogs.Dialog;
 public class AddIsolatorDialog extends TitleAreaDialog {
 
 	private Text txtVirtualProcessorName;
+	private Text txtVirtualMachineOS;
 	private List<Button> btnCompSelectionType = new ArrayList<>();
 	private List<Button> btnComponents = new ArrayList<>();
 	private Combo cboIsolatorRequirement;
 
 	private String virtualProcessorName = "";
+	private String virtualMachineOS = "";
 	private List<String> components = new ArrayList<>();
 	private String isolatorRequirement = "";
 
@@ -68,6 +70,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 		// Add filter information fields
 		createVirtualProcessorNameField(container);
+		createOSField(container);
 		createComponentSelectionField(container);
 		createRequirementField(container);
 
@@ -89,6 +92,22 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		txtVirtualProcessorName = new Text(container, SWT.BORDER);
 		txtVirtualProcessorName.setLayoutData(dataInfoField);
 		txtVirtualProcessorName.setText("VPROC");
+	}
+
+	/**
+	 * Creates the input text field for specifying the OS on the VM
+	 * @param container
+	 */
+	private void createOSField(Composite container) {
+		Label lblOSField = new Label(container, SWT.NONE);
+		lblOSField.setText("Virtual machine OS");
+
+		GridData dataInfoField = new GridData();
+		dataInfoField.grabExcessHorizontalSpace = true;
+		dataInfoField.horizontalAlignment = SWT.FILL;
+		txtVirtualMachineOS = new Text(container, SWT.BORDER);
+		txtVirtualMachineOS.setLayoutData(dataInfoField);
+		txtVirtualMachineOS.setText("Linux");
 	}
 
 	/**
@@ -205,6 +224,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	private boolean saveInput() {
 
 		virtualProcessorName = txtVirtualProcessorName.getText();
+		virtualMachineOS = txtVirtualMachineOS.getText();
 
 		components.clear();
 		if (btnCompSelectionType.isEmpty()) {
@@ -235,6 +255,10 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 	public String getVirtualProcessorName() {
 		return virtualProcessorName;
+	}
+
+	public String getVirtualMachineOS() {
+		return virtualMachineOS;
 	}
 
 	public List<String> getIsolatedComponents() {

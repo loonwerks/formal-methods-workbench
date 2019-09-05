@@ -58,6 +58,7 @@ public class AddIsolatorHandler extends AadlHandler {
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String virtualProcessorName;
+	private String virtualMachineOS;
 	private List<String> isolatedComponents;
 	private String isolatorRequirement;
 
@@ -110,6 +111,7 @@ public class AddIsolatorHandler extends AadlHandler {
 		wizard.create();
 		if (wizard.open() == Window.OK) {
 			virtualProcessorName = wizard.getVirtualProcessorName();
+			virtualMachineOS = wizard.getVirtualMachineOS();
 			if (virtualProcessorName == "") {
 				virtualProcessorName = VIRTUAL_PROCESSOR_IMPL_NAME;
 			}
@@ -225,6 +227,13 @@ public class AddIsolatorHandler extends AadlHandler {
 				// Put in the right place in the package (after the virtual processor component type)
 				pkgSection.getOwnedClassifiers().move(getIndex(vpType.getName(), pkgSection.getOwnedClassifiers()) + 1,
 						pkgSection.getOwnedClassifiers().size() - 1);
+
+				// CASE::OS Property
+				if (!virtualMachineOS.isEmpty()) {
+					if (!CaseUtils.addCasePropertyAssociation("OS", virtualMachineOS, vpImpl)) {
+//						return;
+					}
+				}
 
 				// Create virtual processor subcomponent
 				final VirtualProcessorSubcomponent vpSub = (VirtualProcessorSubcomponent) ComponentCreateHelper
