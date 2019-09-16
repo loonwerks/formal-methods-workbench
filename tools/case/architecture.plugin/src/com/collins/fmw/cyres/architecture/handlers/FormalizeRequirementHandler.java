@@ -2,10 +2,6 @@ package com.collins.fmw.cyres.architecture.handlers;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.ui.editor.XtextEditor;
-import org.eclipse.xtext.ui.editor.utils.EditorUtils;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
@@ -48,22 +44,27 @@ public class FormalizeRequirementHandler extends AadlHandler {
 
 		final String reqId = funDef.getName();
 
-		// Get the active xtext editor so we can make modifications
-		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+//		// Get the active xtext editor so we can make modifications
+//		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+//
+//		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
+//
+//			@Override
+//			public void process(final XtextResource resource) throws Exception {
+//
+//				if (!RequirementsManager.getInstance().formalizeRequirement(reqId, resource)) {
+//					Dialog.showError("Formalize Requirement",
+//							"Selection does not appear to be an imported cyber requirement.");
+//					return;
+//				}
+//
+//			}
+//		});
 
-		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
-
-			@Override
-			public void process(final XtextResource resource) throws Exception {
-
-				if (!RequirementsManager.getInstance().formalizeRequirement(reqId, resource)) {
-					Dialog.showError("Formalize Requirement",
-							"Selection does not appear to be an imported cyber requirement.");
-					return;
-				}
-
-			}
-		});
+		if (!RequirementsManager.getInstance().formalizeRequirement(reqId)) {
+			Dialog.showError("Formalize Requirement", "Selection does not appear to be an imported cyber requirement.");
+			return;
+		}
 	}
 
 }

@@ -12,25 +12,27 @@ public class BaseClaim extends BuiltInClaim {
 
 	public final static String BASE_CLAIM = null;
 
-	private final String reqId;
-	private final String reqType;
-	private final String reqText;
-	private final String reqContext;
+//	private final String reqId;
+//	private final String reqType;
+//	private final String reqText;
+//	private final String reqContext;
+	private final CyberRequirement requirement;
 
 	private FunctionDefinition claimDef = null;
 
 	public BaseClaim(CyberRequirement requirement) {
 		super(BASE_CLAIM);
-		this.reqId = requirement.getId();
-		this.reqType = requirement.getType();
-		this.reqText = requirement.getText();
-		this.reqContext = requirement.getContext();
+//		this.reqId = requirement.getId();
+//		this.reqType = requirement.getType();
+//		this.reqText = requirement.getText();
+//		this.reqContext = requirement.getContext();
+		this.requirement = requirement;
 	}
 
 	@Override
 	public List<Expr> getCallArgs() {
 		List<Expr> callArgs = new ArrayList<>();
-		callArgs.add(Create.THIS(this.reqContext));
+		callArgs.add(Create.THIS(this.requirement.getContext()));
 		return callArgs;
 	}
 
@@ -44,14 +46,18 @@ public class BaseClaim extends BuiltInClaim {
 	@Override
 	public FunctionDefinition buildClaimDefinition(FunctionDefinition fd) {
 
-		ClaimBuilder builder = new ClaimBuilder(this.reqId);
+		ClaimBuilder builder = new ClaimBuilder(this.requirement.getId());
 		List<Arg> defParams = getDefinitionParams();
 
 		for (Arg arg : defParams) {
 			builder.addArg(arg);
 		}
 
-		builder.addClaimString("[" + this.reqType + "] " + this.reqText);
+		// create the claim string
+		final String claimString = "[" + this.requirement.getType() + "] "
+				+ this.requirement.getText();
+
+		builder.addClaimString(claimString);
 		builder.addClaimExpr(Create.FALSE());
 
 		this.claimDef = builder.build();

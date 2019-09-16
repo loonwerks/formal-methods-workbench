@@ -1,12 +1,12 @@
 package com.collins.fmw.cyres.architecture.requirements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -16,30 +16,16 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.DefaultAnnexSubclause;
-import org.osate.aadl2.ModelUnit;
-import org.osate.aadl2.PrivatePackageSection;
-import org.osate.aadl2.PublicPackageSection;
-import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
 
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
-import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement;
-import com.rockwellcollins.atc.resolute.resolute.Arg;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ClaimString;
 import com.rockwellcollins.atc.resolute.resolute.ClaimText;
+import com.rockwellcollins.atc.resolute.resolute.Definition;
 import com.rockwellcollins.atc.resolute.resolute.DefinitionBody;
-import com.rockwellcollins.atc.resolute.resolute.Expr;
-import com.rockwellcollins.atc.resolute.resolute.FnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.FunctionDefinition;
-import com.rockwellcollins.atc.resolute.resolute.NestedDotID;
-import com.rockwellcollins.atc.resolute.resolute.ProveStatement;
-import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
-import com.rockwellcollins.atc.resolute.resolute.ThisExpr;
+import com.rockwellcollins.atc.resolute.resolute.ResoluteLibrary;
 
 /**
  *  Manages insertion, deletion, and modification of logical CASE requirements/claims in the model
@@ -47,251 +33,33 @@ import com.rockwellcollins.atc.resolute.resolute.ThisExpr;
 public class RequirementsManager {
 
 	private static IProject currentProject = null;
-	private static List<CyberRequirement> importedRequirements = new ArrayList<>();
-	private static List<CyberRequirement> omittedRequirements = new ArrayList<>();
-
 	// Singleton instance
 	private static RequirementsManager instance = null;
-
-	private RequirementsManager() {
-
-	}
+	private List<CyberRequirement> importedRequirements = new ArrayList<>();
 
 	public static RequirementsManager getInstance() {
 
 		if (instance == null || currentProject == null) {
-			initRequirements();
 			instance = new RequirementsManager();
 		}
 
 		return instance;
 	}
 
-	public void reset() {
-		currentProject = null;
-		importedRequirements = new ArrayList<>();
-		omittedRequirements = new ArrayList<>();
-	}
-
-	private static void initRequirements() {
-		// Initialize requirements list
-		importedRequirements = new ArrayList<>();
-		omittedRequirements = new ArrayList<>();
-
-		if (currentProject == null) {
-			currentProject = TraverseProject.getCurrentProject();
+	private static void closeEditor(XtextEditor editor, boolean save) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (save) {
+			page.saveEditor(editor, false);
 		}
-		// Read in any existing imported requirements
-		findImportedRequirements();
 
-		// Read in any existing omitted requirements
-		readOmittedRequirements();
-
-	}
-
-	private static void findImportedRequirements() {
-
-		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
-
-		importedRequirements = xtextEditor.getDocument().readOnly(resource -> {
-
-			List<CyberRequirement> resoluteClauses = new ArrayList<>();
-
-			// Get all the packages in this project
-			ResourceSet rs = resource.getResourceSet();
-			for (Resource r : rs.getResources()) {
-
-				// Get the components in the model
-				ModelUnit modelUnit = (ModelUnit) r.getContents().get(0);
-				if (modelUnit instanceof AadlPackage) {
-					AadlPackage aadlPkg = (AadlPackage) modelUnit;
-
-					PublicPackageSection pkgSection = aadlPkg.getOwnedPublicSection();
-					for (Classifier classifier : pkgSection.getOwnedClassifiers()) {
-
-						if (classifier instanceof ComponentImplementation) {
-							for (AnnexSubclause annexSubclause : classifier.getOwnedAnnexSubclauses()) {
-								DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-								// See if there's a resolute annex
-								if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-									ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause
-											.getParsedAnnexSubclause();
-									// See if there are any 'prove' clauses
-									for (AnalysisStatement as : resoluteClause.getProves()) {
-										if (as instanceof ProveStatement) {
-											ProveStatement prove = (ProveStatement) as;
-											Expr expr = prove.getExpr();
-											if (expr instanceof FnCallExpr) {
-												FnCallExpr fnCall = (FnCallExpr) expr;
-												// Check if the corresponding function definition is in private section
-												FunctionDefinition fd = fnCall.getFn();
-												if (AadlUtil.getContainingPackageSection(
-														fd) instanceof PrivatePackageSection
-														&& AadlUtil.getContainingPackage(fd) == aadlPkg) {
-													String reqType = "";
-													String reqText = "";
-													DefinitionBody db = fd.getBody();
-													if (db instanceof ClaimBody) {
-														ClaimBody cb = (ClaimBody) db;
-														for (ClaimText ct : cb.getClaim()) {
-															// Assumption that claim text is only a string
-															if (ct instanceof ClaimString) {
-																ClaimString cs = (ClaimString) ct;
-																reqText += cs.getStr();
-															}
-														}
-													}
-													if (reqText.matches("^\\[.+\\]\\s.+")) {
-														// Extract the Requirement type from the text
-														reqType = reqText.substring(1, reqText.indexOf("]"));
-														reqText = reqText.substring(reqText.indexOf("]") + 1).trim();
-													}
-
-													// Get the context from the context parameter (it will always be the first param)
-													String context = "";
-													Expr argExpr = fnCall.getArgs().get(0);
-													// The context should always be "this" or "this.<subcomponent>"
-													if (argExpr instanceof ThisExpr) {
-
-														NestedDotID subExpr = ((ThisExpr) argExpr).getSub();
-														if (subExpr != null) {
-															while (subExpr.getSub() != null) {
-																subExpr = subExpr.getSub();
-															}
-														}
-
-														if (subExpr.getBase() instanceof Subcomponent) {
-															context = ((Subcomponent) subExpr.getBase())
-																	.getQualifiedName();
-														} else {
-															context = classifier.getQualifiedName();
-														}
-
-													}
-
-													// See if there is an agree statement with this requirement id
-													// If there's a property_id parameter then there is
-													boolean agree = false;
-													for (Arg arg : fd.getArgs()) {
-														if (arg.getName().equalsIgnoreCase("property_id")) {
-															agree = true;
-															break;
-														}
-													}
-
-													CyberRequirement req = new CyberRequirement(reqType, fd.getName(),
-															reqText, context, agree, "");
-
-													if (fd.getName() != null && !resoluteClauses.contains(req)) {
-														resoluteClauses.add(req);
-													}
-												}
-											}
-										}
-									}
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			return resoluteClauses;
-		});
-	}
-
-	private static void readOmittedRequirements() {
-		// TODO: Read in omitted requirements file
-
-	}
-
-	public List<CyberRequirement> getImportedRequirements() {
-		return importedRequirements;
-	}
-
-	public List<CyberRequirement> getOmittedRequirements() {
-		return omittedRequirements;
-	}
-
-	public CyberRequirement getRequirement(String requirementId) {
-		for (CyberRequirement req : importedRequirements) {
-			if (req.getId().equalsIgnoreCase(requirementId)) {
-				return req;
-			}
-		}
-		return null;
-	}
-
-	public void importRequirements(List<CyberRequirement> reqs) {
-		for (CyberRequirement req : reqs) {
-			importRequirement(req);
+		if (editor.equals(EditorUtils.getActiveXtextEditor())) {
+			return;
+		} else {
+			page.closeEditor(editor, false);
 		}
 	}
 
-	public void importRequirement(CyberRequirement req) {
-
-		// Get the file to insert into
-		IFile file = req.getContainingFile();
-		XtextEditor editor = getEditor(file);
-
-		if (editor != null) {
-			editor.getDocument().modify(resource -> {
-
-				req.insertClaim(new BaseClaim(req), resource);
-
-				// Add AGREE, if necessary
-				if (req.hasAgree()) {
-					formalizeRequirement(req, resource);
-				}
-
-				return null;
-			});
-		}
-
-		// Close editor, if necessary
-		closeEditor(editor, true);
-
-		// Add the requirement to the imported requirements list
-		importedRequirements.add(req);
-	}
-
-	public void modifyRequirement(String reqId, Resource resource, BuiltInClaim claim) {
-
-		for (CyberRequirement req : importedRequirements) {
-			if (req.getId().equalsIgnoreCase(reqId)) {
-				req.insertClaim(claim, resource);
-				break;
-			}
-		}
-	}
-
-	public boolean formalizeRequirement(String reqId, Resource resource) {
-		for (CyberRequirement req : importedRequirements) {
-			if (req.getId().equalsIgnoreCase(reqId)) {
-				req.setAgree();
-				formalizeRequirement(req, resource);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void formalizeRequirement(CyberRequirement req, Resource resource) {
-		req.insertClaim(new AgreePropCheckedClaim(req.getId(), req.getContext()), resource);
-		req.insertAgree(resource);
-	}
-
-	public void addOmittedRequirements(List<CyberRequirement> omittedReqs, String implementation) {
-		omittedRequirements.addAll(omittedReqs);
-		// TODO: Write to file
-		JsonRequirementsFile jsonFile = new JsonRequirementsFile("StairCASE", System.currentTimeMillis(),
-				implementation, "", omittedReqs);
-//		jsonFile.exportFile(file);
-	}
-
-
-	private XtextEditor getEditor(IFile file) {
+	private static XtextEditor getEditor(IFile file) {
 		IWorkbenchPage page = null;
 		IEditorPart part = null;
 
@@ -315,17 +83,343 @@ public class RequirementsManager {
 		return xedit;
 	}
 
-	private void closeEditor(XtextEditor editor, boolean save) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		if (save) {
-			page.saveEditor(editor, false);
+	private RequirementsManager() {
+		// Initialize requirements list
+
+		if (currentProject == null) {
+			currentProject = TraverseProject.getCurrentProject();
 		}
 
-		if (editor.equals(EditorUtils.getActiveXtextEditor())) {
-			return;
-		} else {
-			page.closeEditor(editor, false);
+		// Read in any existing imported requirements
+		findImportedRequirements();
+
+//		// Read in any existing omitted requirements
+//		readOmittedRequirements();
+	}
+
+//	public void addOmittedRequirements(List<CyberRequirement> omittedReqs, String implementation) {
+//		omittedRequirements.addAll(omittedReqs);
+//	}
+
+	public boolean formalizeRequirement(String reqId) {
+		CyberRequirement req = getRequirement(reqId);
+		if (req == null) {
+			return false;
 		}
+		req.setAgree();
+		formalizeRequirement(req);
+		return true;
+	}
+
+	public boolean unformalizeRequirement(String reqId) {
+		CyberRequirement req = getRequirement(reqId);
+		if (req == null) {
+			return false;
+		}
+		req.setStatus(CyberRequirement.add);
+		unformalizeRequirement(req);
+		return true;
+	}
+
+	public List<CyberRequirement> getImportedRequirements() {
+		return importedRequirements;
+	}
+
+//	public List<CyberRequirement> getOmittedRequirements() {
+//		return omittedRequirements;
+//	}
+
+	public CyberRequirement getRequirement(String requirementId) {
+		for (CyberRequirement req : importedRequirements) {
+			if (req.getId().equalsIgnoreCase(requirementId)) {
+				return req;
+			}
+		}
+		return null;
+	}
+
+	public void importRequirement(CyberRequirement req) {
+		if (req == null) {
+			return;
+		}
+
+		insertClaim(req, new BaseClaim(req));
+
+		// Add the requirement to the imported requirements list
+		importedRequirements.add(req);
+
+//		if (req.hasAgree()) {
+//			formalizeRequirement(req.getId());
+//		}
+	}
+
+	public void removeRequirement(String reqId, boolean removeAgree) {
+		CyberRequirement req = getRequirement(reqId);
+		if (req == null) {
+			return;
+		}
+		if (req.hasAgree()) {
+			if (!removeAgree) {
+				throw new RuntimeException(
+						"Formalized requirement can only be removed after removing the formalization.");
+			}
+//			removeAgree(req);
+			unformalizeRequirement(reqId);
+		}
+
+		removeClaim(req, new BaseClaim(req));
+
+		// Add the requirement to the imported requirements list
+		importedRequirements.remove(req);
+	}
+
+	public void importRequirements(List<CyberRequirement> reqs) {
+		for (CyberRequirement req : reqs) {
+			importRequirement(req);
+		}
+	}
+
+	public void modifyRequirement(String reqId, BuiltInClaim claim) {
+		CyberRequirement req = getRequirement(reqId);
+		if (req != null) {
+			insertClaim(req, claim);
+		}
+	}
+
+	public void reset() {
+		currentProject = null;
+		importedRequirements.clear();
+		findImportedRequirements();
+//		omittedRequirements.clear();
+	}
+
+//	public void saveOmittedRequirements(String filename) {
+//		// TODO: Write to file
+//		JsonRequirementsFile jsonFile = new JsonRequirementsFile("", System.currentTimeMillis(), "", "",
+//				omittedRequirements);
+//		jsonFile.exportFile(new File(filename));
+//	}
+
+	protected void findImportedRequirements() {
+
+		// TODO: this call is necessary to initialize the resolute requirements file (if it hasn't been initialized).
+		CaseUtils.getCaseRequirementsPackage();
+		IFile file = CaseUtils.getCaseRequirementsFile();
+		XtextEditor editor = getEditor(file);
+
+		if (editor != null) {
+			importedRequirements = editor.getDocument().readOnly(resource -> {
+
+				// Get modification context
+				AadlPackage aadlPkg = CyberRequirement.getResoluteModificationContext(CaseUtils.CASE_REQUIREMENTS_NAME,
+						resource);
+				if (aadlPkg == null) {
+					return Collections.emptyList();
+				}
+
+				ResoluteLibrary resLib = CyberRequirement.getResoluteLibrary(aadlPkg);
+				if (resLib == null) {
+					return Collections.emptyList();
+				}
+
+				// If this function definition already exists, remove it
+				List<CyberRequirement> resoluteClauses = new ArrayList<>();
+				for (Definition def : resLib.getDefinitions()) {
+					if (def instanceof FunctionDefinition) {
+						FunctionDefinition fd = (FunctionDefinition) def;
+						DefinitionBody db = fd.getBody();
+						if (db instanceof ClaimBody) {
+							String reqClaimString = "";
+							ClaimBody cb = (ClaimBody) db;
+							for (ClaimText ct : cb.getClaim()) {
+								if (ct instanceof ClaimString) {
+									reqClaimString += ct;
+								}
+							}
+							// Annotate claim with requirement information
+							CyberRequirement r = CyberRequirement.parseClaimString(fd.getName(), reqClaimString, cb);
+							if (r != null) {
+								resoluteClauses.add(r);
+							}
+						}
+					}
+				}
+
+				return resoluteClauses;
+			});
+
+			// Close editor, if necessary (no saving, read-only)
+			closeEditor(editor, false);
+		}
+	}
+
+	protected void formalizeRequirement(CyberRequirement req) {
+		insertClaim(req, new AgreePropCheckedClaim(req.getId(), req.getContext()));
+		// TODO: make it more efficient by pushing this inside the insertClaimCall?
+		insertAgree(req);
+	}
+
+	protected void unformalizeRequirement(CyberRequirement req) {
+		removeClaim(req, new AgreePropCheckedClaim(req.getId(), req.getContext()));
+		removeAgree(req);
+	}
+
+	protected void editAgree(CyberRequirement req, final boolean insert) {
+		if (req == null) {
+			return;
+		}
+
+		// Read the file that contains the requirement's context and determine the subcomponent's type
+		IFile file = req.getContainingFile();
+		XtextEditor editor = getEditor(file);
+
+		if (editor == null) {
+			return;
+		}
+
+		String compQualifiedName = editor.getDocument().readOnly(resource -> {
+			return CyberRequirement.getModificationContext(req.getContext(), resource).getQualifiedName();
+		});
+
+		closeEditor(editor, false);
+
+		// Insert requirement into the subcomponent type's agree annex
+		file = CyberRequirement.getContainingFile(compQualifiedName);
+		editor = getEditor(file);
+
+		if (editor == null) {
+			return;
+		}
+
+		editor.getDocument().modify(resource -> {
+			if (insert) {
+				req.insertAgree(compQualifiedName, resource);
+			} else {
+				req.removeAgree(compQualifiedName, resource);
+			}
+			return null;
+		});
+
+		// Close editor, if necessary
+		closeEditor(editor, true);
+	}
+
+	protected void insertAgree(CyberRequirement req) {
+		editAgree(req, true);
+	}
+
+	protected void removeAgree(CyberRequirement req) {
+		editAgree(req, false);
+	}
+
+	protected void insertClaim(CyberRequirement req, BuiltInClaim claim) {
+		Map.Entry<BuiltInClaim, FunctionDefinition> ret = insertClaimDefinition(req, claim);
+		if (ret != null) {
+			insertClaimCall(req, ret.getKey(), ret.getValue());
+		}
+	}
+
+	protected boolean removeClaim(CyberRequirement req, BuiltInClaim claim) {
+//		return removeClaimDefinition(req, claim);
+		FunctionDefinition fd = removeClaimDefinition(req, claim);
+		if (claim instanceof BaseClaim) {
+			return fd == null ? false : removeClaimCall(req, fd);
+		}
+		// TODO: poorly written; meaning of return value is not clear; rewrite
+		return true;
+	}
+
+	protected void insertClaimCall(CyberRequirement req, BuiltInClaim claim, FunctionDefinition fd) {
+		if (req == null || claim == null || fd == null) {
+			return;
+		}
+
+		// Get the file to insert into
+		IFile file = req.getContainingFile();
+		XtextEditor editor = getEditor(file);
+
+		if (editor == null) {
+			return;
+		}
+
+		editor.getDocument().modify(resource -> {
+			req.insertClaimCall(claim, fd, resource);
+			return null;
+		});
+
+		// Close editor, if necessary
+		closeEditor(editor, true);
+	}
+
+	protected Map.Entry<BuiltInClaim, FunctionDefinition> insertClaimDefinition(CyberRequirement req,
+			BuiltInClaim claim) {
+		if (req == null || claim == null) {
+			return null;
+		}
+
+		// Get the file to insert into
+		IFile file = CaseUtils.getCaseRequirementsFile();
+		XtextEditor editor = getEditor(file);
+
+		if (editor == null) {
+			return null;
+		}
+
+		Map.Entry<BuiltInClaim, FunctionDefinition> ret = editor.getDocument().modify(resource -> {
+			return req.insertClaimDef(claim, resource);
+		});
+
+		// Close editor, if necessary
+		closeEditor(editor, true);
+
+		return ret;
+	}
+
+	protected FunctionDefinition removeClaimDefinition(CyberRequirement req,
+			BuiltInClaim claim) {
+		if (req == null || claim == null) {
+			return null;
+		}
+
+		// Get the file to insert into
+		IFile file = CaseUtils.getCaseRequirementsFile();
+		XtextEditor editor = getEditor(file);
+
+		if (editor == null) {
+			return null;
+		}
+
+		FunctionDefinition fd = editor.getDocument().modify(resource -> {
+			return req.removeClaimDef(claim, resource);
+		});
+
+		// Close editor, if necessary
+		closeEditor(editor, true);
+
+		return fd;
+	}
+
+	protected boolean removeClaimCall(CyberRequirement req, FunctionDefinition fd) {
+		if (req == null || fd == null) {
+			return false;
+		}
+
+		// Get the file to insert into
+		IFile file = req.getContainingFile();
+		XtextEditor editor = getEditor(file);
+
+		if (editor == null) {
+			return false;
+		}
+
+		boolean success = editor.getDocument().modify(resource -> {
+			return req.removeClaimCall(fd, resource);
+		});
+
+		// Close editor, if necessary
+		closeEditor(editor, true);
+
+		return success;
 	}
 
 }
