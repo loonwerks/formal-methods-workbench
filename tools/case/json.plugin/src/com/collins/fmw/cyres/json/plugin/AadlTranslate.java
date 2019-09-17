@@ -199,7 +199,8 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		result.add("category", new JsonPrimitive(ct.getCategory().getName()));
 		TypeExtension te = ct.getOwnedExtension();
 		if (te != null) {
-			result.add("extends", doSwitch(te.getExtended()));
+//			result.add("extends", doSwitch(te.getExtended()));
+			result.add("extends", new JsonPrimitive(te.getExtended().getQualifiedName()));
 		}
 
 		JsonArray features = new JsonArray();
@@ -241,7 +242,8 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		result.add("category", new JsonPrimitive(ci.getCategory().getName()));
 		ImplementationExtension ie = ci.getOwnedExtension();
 		if (ie != null) {
-			result.add("extends", doSwitch(ie.getExtended()));
+//			result.add("extends", doSwitch(ie.getExtended()));
+			result.add("extends", new JsonPrimitive(ie.getExtended().getQualifiedName()));
 		}
 
 		JsonArray subcomponents = new JsonArray();
@@ -622,8 +624,11 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		if (pt == null) {
 			pt = lt.getReferencedElementType();
 		}
-		result.add("elementType", doSwitch(pt));
-
+		if (pt.hasName()) {
+			result.add("propertyType", new JsonPrimitive(pt.getQualifiedName()));
+		} else {
+			result.add("propertyType", doSwitch(pt));
+		}
 		return result;
 	}
 
