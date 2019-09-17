@@ -215,6 +215,11 @@ public abstract class AadlHandler extends AbstractHandler {
 		if (pkg == null) {
 			return;
 		}
+		// Don't add the with clause if it is for the current package
+		AadlPackage thisPkg = AadlUtil.getContainingPackage(pkgSection);
+		if (thisPkg == null || pkg.getName().equalsIgnoreCase(thisPkg.getName())) {
+			return;
+		}
 		boolean pkgFound = false;
 		for (ModelUnit mu : pkgSection.getImportedUnits()) {
 			if (mu.getName().equalsIgnoreCase(pkg.getName())) {

@@ -62,7 +62,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	static final String AM_LOG_PORT_NAME = "message_log";
 	static final String AM_PORT_ATTESTATION_REQUEST_NAME = "am_request";
 	static final String AM_PORT_ATTESTATION_RESPONSE_NAME = "am_response";
-	static final String AM_IMPL_NAME = "AM";
+	public static final String AM_IMPL_NAME = "AM";
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String implementationName;

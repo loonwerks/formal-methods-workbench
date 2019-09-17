@@ -21,6 +21,8 @@ import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
+import com.collins.fmw.cyres.architecture.handlers.AddIsolatorHandler;
+
 public class AddIsolatorDialog extends TitleAreaDialog {
 
 	private Text txtVirtualProcessorName;
@@ -37,6 +39,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	private Subcomponent component = null;
 	private List<String> requirements = new ArrayList<>();
 
+	private static final String DEFAULT_OS = "Linux";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddIsolatorDialog(Shell parentShell) {
@@ -91,7 +94,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtVirtualProcessorName = new Text(container, SWT.BORDER);
 		txtVirtualProcessorName.setLayoutData(dataInfoField);
-		txtVirtualProcessorName.setText("VPROC");
+		txtVirtualProcessorName.setText(AddIsolatorHandler.VIRTUAL_PROCESSOR_IMPL_NAME);
 	}
 
 	/**
@@ -107,7 +110,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtVirtualMachineOS = new Text(container, SWT.BORDER);
 		txtVirtualMachineOS.setLayoutData(dataInfoField);
-		txtVirtualMachineOS.setText("Linux");
+		txtVirtualMachineOS.setText(DEFAULT_OS);
 	}
 
 	/**
@@ -228,13 +231,13 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 		components.clear();
 		if (btnCompSelectionType.isEmpty()) {
-			components.add(component.getName());
+			components.add(component.getQualifiedName());
 		} else if (btnCompSelectionType.get(0).getSelection()) {
-			components.add(component.getName());
+			components.add(component.getQualifiedName());
 		} else {
 			for (Button btn : btnComponents) {
 				if (btn.getSelection()) {
-					components.add(component.getName() + "." + btn.getText());
+					components.add(component.getQualifiedName() + "." + btn.getText());
 				}
 			}
 		}
