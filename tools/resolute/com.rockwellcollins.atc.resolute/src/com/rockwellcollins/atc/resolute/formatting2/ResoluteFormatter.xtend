@@ -278,6 +278,7 @@ class ResoluteFormatter extends PropertiesFormatter {
 	}
 
 	def dispatch void format(NestedDotID nesteddotid, extension IFormattableDocument document) {
+		nesteddotid.regionFor.keywords(".").forEach[surround[noSpace]];
 		format(nesteddotid.getSub(), document);
 	}
 
@@ -298,6 +299,10 @@ class ResoluteFormatter extends PropertiesFormatter {
 		// { }
 		expr.regionFor.keyword("{").append[noSpace];
 		expr.regionFor.keyword("}").prepend[noSpace];
+		
+		// ,
+		expr.regionFor.keywords(",").forEach[append[oneSpace]];
+		expr.regionFor.keywords(",").forEach[prepend[noSpace]];
 		
 		format(expr, document);
 	}
