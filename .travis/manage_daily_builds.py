@@ -27,7 +27,7 @@ def manage_daily_builds():
     # get list of releases
     releases = repository.releases()
     # extract keys and sort by build date
-    release_keys = {x.id : x.created_at  for x in releases}
+    release_keys = {x.id : x.created_at for x in releases if "Nightly development build" in x.title} 
     sorted_keys = sorted(release_keys.items(), reverse=True, key=lambda x: x[1])
     print('%s' % (pformat(sorted_keys)))
     # filter to obtain the keys to delete
