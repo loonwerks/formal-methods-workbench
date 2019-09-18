@@ -228,6 +228,9 @@ public class ComponentCreateHelper {
 		} else if (subcomponent instanceof VirtualProcessorSubcomponent) {
 			((VirtualProcessorSubcomponent) subcomponent)
 					.setVirtualProcessorSubcomponentType((VirtualProcessorImplementation) compImpl);
+		} else {
+			Dialog.showError("Component Create Helper", "Set Subcomponent Type: unhandled subcomponent type ("
+					+ subcomponent.getSubcomponentType().getName() + ")");
 		}
 	}
 

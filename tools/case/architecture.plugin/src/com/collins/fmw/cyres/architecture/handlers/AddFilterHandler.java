@@ -94,6 +94,14 @@ public class AddFilterHandler extends AadlHandler {
 			return;
 		}
 
+		// For now a filter can only be added onto a thread, thread group, or process
+		ComponentCategory compCategory = subcomponent.getCategory();
+		if (compCategory != ComponentCategory.THREAD && compCategory != ComponentCategory.THREAD_GROUP
+				&& compCategory != ComponentCategory.PROCESS) {
+			Dialog.showError("Add Filter", "A filter can only be connected to a thread, thread group, or process.");
+			return;
+		}
+
 		boolean createCompoundFilter = false;
 		ComponentType comp = subcomponent.getComponentType();
 		PortConnection filterOutConn = null;
@@ -255,8 +263,10 @@ public class AddFilterHandler extends AadlHandler {
 				// Per convention, we will attach all properties and contracts to the thread.
 				// For this model transformation, we will create the thread first, then wrap it in a process
 				// component, using the same mechanism we use for the seL4 transformation
-				boolean isProcess = (compCategory == ComponentCategory.PROCESS);
+				final boolean isProcess = (compCategory == ComponentCategory.PROCESS);
 				if (isProcess) {
+					compCategory = ComponentCategory.THREAD;
+				} else if (compCategory == ComponentCategory.THREAD_GROUP) {
 					compCategory = ComponentCategory.THREAD;
 				}
 
@@ -297,6 +307,10 @@ public class AddFilterHandler extends AadlHandler {
 
 				portOut.setOut(true);
 				portOut.setName(FILTER_PORT_OUT_NAME);
+
+				// The data subcomponent type could be in a different package.
+				// Make sure to include it in the with clause
+				importContainingPackage(dataFeatureClassifier, pkgSection);
 
 				// Create log port, if necessary
 				if (logPortType != null) {
@@ -341,19 +355,27 @@ public class AddFilterHandler extends AadlHandler {
 					}
 				}
 
-				// Move filter to proper location
-				// (just before component it connects to on communication pathway)
-				final Subcomponent subcomponent = (Subcomponent) selectedConnection.getDestination().getContext();
-				String destName = "";
-				if (subcomponent.getSubcomponentType() instanceof ComponentImplementation) {
-					// Get the component type name
-					destName = subcomponent.getComponentImplementation().getType().getName();
-				} else {
-					destName = subcomponent.getName();
-				}
+				final ComponentImplementation containingImpl = selectedConnection.getContainingComponentImpl();
+//				final Subcomponent subcomponent = (Subcomponent) selectedConnection.getDestination().getContext();
+//				String destName1 = "";
+//				if (subcomponent.getSubcomponentType() instanceof ComponentImplementation) {
+//					// Get the component type name
+//					destName1 = subcomponent.getComponentImplementation().getType().getName();
+//					destName1 = subcomponent.getContainingComponentImpl().getTypeName();
+//				} else {
+//					destName1 = subcomponent.getName();
+//				}
 
-				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()),
-						pkgSection.getOwnedClassifiers().size() - 1);
+				// Move filter to top of file
+				pkgSection.getOwnedClassifiers().move(0, pkgSection.getOwnedClassifiers().size() - 1);
+
+//				pkgSection.getOwnedClassifiers()
+////						.move(getIndex(subcomponent.getContainingComponentImpl().getTypeName(), pkgSection.getOwnedClassifiers()),
+//						.move(getIndex(containingImpl.getTypeName(), pkgSection.getOwnedClassifiers()),
+//								pkgSection.getOwnedClassifiers().size() - 1);
+
+//				pkgSection.getOwnedClassifiers().move(getIndex(destName1, pkgSection.getOwnedClassifiers()),
+//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create Filter implementation
 				final ComponentImplementation filterImpl = (ComponentImplementation) pkgSection
@@ -362,10 +384,6 @@ public class AddFilterHandler extends AadlHandler {
 				final Realization r = filterImpl.createOwnedRealization();
 				r.setImplemented(filterType);
 
-				// Add it to proper place
-				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()),
-						pkgSection.getOwnedClassifiers().size() - 1);
-
 				// CASE::COMP_IMPL property
 				if (!filterImplementationLanguage.isEmpty()) {
 					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl)) {
@@ -373,8 +391,16 @@ public class AddFilterHandler extends AadlHandler {
 					}
 				}
 
-				final ComponentImplementation containingImpl = selectedConnection
-						.getContainingComponentImpl();
+				// Add it to proper place (just below component type)
+				pkgSection.getOwnedClassifiers().move(1, pkgSection.getOwnedClassifiers().size() - 1);
+
+//				pkgSection.getOwnedClassifiers().move(getIndex(destName1, pkgSection.getOwnedClassifiers()),
+//						pkgSection.getOwnedClassifiers().size() - 1);
+
+//				pkgSection.getOwnedClassifiers()
+////						.move(getIndex(subcomponent.getContainingComponentImpl().getTypeName(),
+//						.move(getIndex(containingImpl.getTypeName(), pkgSection.getOwnedClassifiers()),
+//								pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Insert filter feature in process component implementation
 				final Subcomponent filterSubcomp = ComponentCreateHelper.createOwnedSubcomponent(containingImpl,
@@ -400,7 +426,7 @@ public class AddFilterHandler extends AadlHandler {
 				filterOutDst.setConnectionEnd(selectedConnection.getDestination().getConnectionEnd());
 
 				// Put portConnOut in right place (after portConnIn)
-				destName = selectedConnection.getName();
+				String destName = selectedConnection.getName();
 				containingImpl.getOwnedPortConnections().move(
 						getIndex(destName, containingImpl.getOwnedPortConnections()) + 1,
 						containingImpl.getOwnedPortConnections().size() - 1);
@@ -431,16 +457,17 @@ public class AddFilterHandler extends AadlHandler {
 							FILTER_PORT_OUT_NAME);
 
 					if (!filterAgreeProperty.isEmpty()) {
+
 						agreeClauses = agreeClauses + filterAgreeProperty + System.lineSeparator();
 					}
 
-					// Add message preservation spec
-					if (filterPropId.isEmpty()) {
-						filterPropId = "Filter";
-					}
-					agreeClauses = agreeClauses + "guarantee " + filterPropId
-							+ "_DataPreservation \"Preserve filter input data\" : filter_out = filter_in;"
-							+ System.lineSeparator();
+//					// Add message preservation spec
+//					if (filterPropId.isEmpty()) {
+//						filterPropId = "Filter";
+//					}
+//					agreeClauses = agreeClauses + "guarantee " + filterPropId
+//							+ "_DataPreservation \"Preserve filter input data\" : filter_out = filter_in;"
+//							+ System.lineSeparator();
 
 					agreeClauses = agreeClauses + "**}";
 
@@ -509,20 +536,24 @@ public class AddFilterHandler extends AadlHandler {
 	 * @param comp
 	 */
 	private boolean isFilter(ComponentType comp) {
-		EList<PropertyExpression> propVal = comp.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_TYPE");
-		if (propVal != null) {
-			for (PropertyExpression expr : propVal) {
-				if (expr instanceof NamedValue) {
-					NamedValue namedVal = (NamedValue) expr;
-					AbstractNamedValue absVal = namedVal.getNamedValue();
-					if (absVal instanceof EnumerationLiteral) {
-						EnumerationLiteral enVal = (EnumerationLiteral) absVal;
-						if (enVal.getName().equalsIgnoreCase("FILTER")) {
-							return true;
+		try {
+			EList<PropertyExpression> propVal = comp.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_TYPE");
+			if (propVal != null) {
+				for (PropertyExpression expr : propVal) {
+					if (expr instanceof NamedValue) {
+						NamedValue namedVal = (NamedValue) expr;
+						AbstractNamedValue absVal = namedVal.getNamedValue();
+						if (absVal instanceof EnumerationLiteral) {
+							EnumerationLiteral enVal = (EnumerationLiteral) absVal;
+							if (enVal.getName().equalsIgnoreCase("FILTER")) {
+								return true;
+							}
 						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			return false;
 		}
 		return false;
 	}

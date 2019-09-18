@@ -21,22 +21,25 @@ import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
+import com.collins.fmw.cyres.architecture.handlers.AddIsolatorHandler;
+
 public class AddIsolatorDialog extends TitleAreaDialog {
 
 	private Text txtVirtualProcessorName;
+	private Text txtVirtualMachineOS;
 	private List<Button> btnCompSelectionType = new ArrayList<>();
 	private List<Button> btnComponents = new ArrayList<>();
 	private Combo cboIsolatorRequirement;
-	private Text txtAgreeProperty;
 
 	private String virtualProcessorName = "";
+	private String virtualMachineOS = "";
 	private List<String> components = new ArrayList<>();
 	private String isolatorRequirement = "";
-	private String agreeProperty = "";
 
 	private Subcomponent component = null;
 	private List<String> requirements = new ArrayList<>();
 
+	private static final String DEFAULT_OS = "Linux";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddIsolatorDialog(Shell parentShell) {
@@ -70,9 +73,9 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 		// Add filter information fields
 		createVirtualProcessorNameField(container);
+		createOSField(container);
 		createComponentSelectionField(container);
 		createRequirementField(container);
-		createAgreeField(container);
 
 		return area;
 	}
@@ -91,7 +94,23 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtVirtualProcessorName = new Text(container, SWT.BORDER);
 		txtVirtualProcessorName.setLayoutData(dataInfoField);
-		txtVirtualProcessorName.setText("VPROC");
+		txtVirtualProcessorName.setText(AddIsolatorHandler.VIRTUAL_PROCESSOR_IMPL_NAME);
+	}
+
+	/**
+	 * Creates the input text field for specifying the OS on the VM
+	 * @param container
+	 */
+	private void createOSField(Composite container) {
+		Label lblOSField = new Label(container, SWT.NONE);
+		lblOSField.setText("Virtual machine OS");
+
+		GridData dataInfoField = new GridData();
+		dataInfoField.grabExcessHorizontalSpace = true;
+		dataInfoField.horizontalAlignment = SWT.FILL;
+		txtVirtualMachineOS = new Text(container, SWT.BORDER);
+		txtVirtualMachineOS.setLayoutData(dataInfoField);
+		txtVirtualMachineOS.setText(DEFAULT_OS);
 	}
 
 	/**
@@ -182,19 +201,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		cboIsolatorRequirement.setText(NO_REQUIREMENT_SELECTED);
 	}
 
-	/**
-	 * Creates the input text field for specifying the filter agree property
-	 * @param container
-	 */
-	private void createAgreeField(Composite container) {
-		Label lblAgreeField = new Label(container, SWT.NONE);
-		lblAgreeField.setText("Isolator AGREE contract");
-
-		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
-		txtAgreeProperty = new Text(container, SWT.BORDER);
-		txtAgreeProperty.setLayoutData(dataInfoField);
-
-	}
 
 	@Override
 	protected void okPressed() {
@@ -221,16 +227,17 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	private boolean saveInput() {
 
 		virtualProcessorName = txtVirtualProcessorName.getText();
+		virtualMachineOS = txtVirtualMachineOS.getText();
 
 		components.clear();
 		if (btnCompSelectionType.isEmpty()) {
-			components.add(component.getName());
+			components.add(component.getQualifiedName());
 		} else if (btnCompSelectionType.get(0).getSelection()) {
-			components.add(component.getName());
+			components.add(component.getQualifiedName());
 		} else {
 			for (Button btn : btnComponents) {
 				if (btn.getSelection()) {
-					components.add(component.getName() + "." + btn.getText());
+					components.add(component.getQualifiedName() + "." + btn.getText());
 				}
 			}
 		}
@@ -245,12 +252,16 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 							+ NO_REQUIREMENT_SELECTED + ".");
 			return false;
 		}
-		agreeProperty = txtAgreeProperty.getText();
+
 		return true;
 	}
 
 	public String getVirtualProcessorName() {
 		return virtualProcessorName;
+	}
+
+	public String getVirtualMachineOS() {
+		return virtualMachineOS;
 	}
 
 	public List<String> getIsolatedComponents() {
@@ -259,10 +270,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 	public String getRequirement() {
 		return isolatorRequirement;
-	}
-
-	public String getAgreeProperty() {
-		return agreeProperty;
 	}
 
 	public void setSelectedComponent(Subcomponent component) {

@@ -11,7 +11,9 @@ import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
 import com.rockwellcollins.atc.resolute.resolute.BuiltInFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.CastExpr;
+import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
+import com.rockwellcollins.atc.resolute.resolute.ClaimContext;
 import com.rockwellcollins.atc.resolute.resolute.ClaimText;
 import com.rockwellcollins.atc.resolute.resolute.ConstantDefinition;
 import com.rockwellcollins.atc.resolute.resolute.Definition;
@@ -192,13 +194,33 @@ public class ResoluteFormatter extends PropertiesFormatter {
     for (final ClaimText claim : _claim) {
       this.format(claim, document);
     }
-    final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+    EList<ClaimContext> _context = claimbody.getContext();
+    for (final ClaimContext context : _context) {
+      final Procedure1<IHiddenRegionFormatter> _function_3 = (IHiddenRegionFormatter it) -> {
+        it.setNewLines(1);
+      };
+      final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+        it.indent();
+      };
+      document.<ClaimContext>surround(document.<ClaimContext>prepend(context, _function_3), _function_4);
+    }
+    EList<ClaimAssumption> _assumptions = claimbody.getAssumptions();
+    for (final ClaimAssumption assumption : _assumptions) {
+      final Procedure1<IHiddenRegionFormatter> _function_5 = (IHiddenRegionFormatter it) -> {
+        it.setNewLines(1);
+      };
+      final Procedure1<IHiddenRegionFormatter> _function_6 = (IHiddenRegionFormatter it) -> {
+        it.indent();
+      };
+      document.<ClaimAssumption>surround(document.<ClaimAssumption>prepend(assumption, _function_5), _function_6);
+    }
+    final Procedure1<IHiddenRegionFormatter> _function_7 = (IHiddenRegionFormatter it) -> {
       it.setNewLines(1);
     };
-    final Procedure1<IHiddenRegionFormatter> _function_4 = (IHiddenRegionFormatter it) -> {
+    final Procedure1<IHiddenRegionFormatter> _function_8 = (IHiddenRegionFormatter it) -> {
       it.indent();
     };
-    document.<Expr>surround(document.<Expr>prepend(claimbody.getExpr(), _function_3), _function_4);
+    document.<Expr>surround(document.<Expr>prepend(claimbody.getExpr(), _function_7), _function_8);
     this.formatExpr(claimbody.getExpr(), document);
   }
   
@@ -443,6 +465,13 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final NestedDotID nesteddotid, @Extension final IFormattableDocument document) {
+    final Consumer<ISemanticRegion> _function = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.surround(it, _function_1);
+    };
+    this.textRegionExtensions.regionFor(nesteddotid).keywords(".").forEach(_function);
     this.format(nesteddotid.getSub(), document);
   }
   
@@ -479,6 +508,20 @@ public class ResoluteFormatter extends PropertiesFormatter {
       it.noSpace();
     };
     document.prepend(this.textRegionExtensions.regionFor(expr).keyword("}"), _function_5);
+    final Consumer<ISemanticRegion> _function_6 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_7 = (IHiddenRegionFormatter it_1) -> {
+        it_1.oneSpace();
+      };
+      document.append(it, _function_7);
+    };
+    this.textRegionExtensions.regionFor(expr).keywords(",").forEach(_function_6);
+    final Consumer<ISemanticRegion> _function_7 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_8 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_8);
+    };
+    this.textRegionExtensions.regionFor(expr).keywords(",").forEach(_function_7);
     this.format(expr, document);
   }
   

@@ -21,13 +21,12 @@ import org.eclipse.swt.widgets.Text;
 import org.osate.aadl2.PortCategory;
 import org.osate.ui.dialogs.Dialog;
 
+import com.collins.fmw.cyres.architecture.handlers.AddAttestationManagerHandler;
+
 /**
  * This class creates the Add Attestation Manager wizard
  */
 public class AddAttestationManagerDialog extends TitleAreaDialog {
-
-	private static int MAX_CACHE_SIZE = 6;
-	private static int DEFAULT_CACHE_SIZE = 4;
 
 	private Text txtImplementationName;
 	private Text txtImplementationLanguage;
@@ -48,6 +47,10 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private List<String> requirements = new ArrayList<>();
 	private String agreeProperty;
 
+	private static final int MAX_CACHE_SIZE = 6;
+	private static final int DEFAULT_CACHE_SIZE = 4;
+
+	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddAttestationManagerDialog(Shell parentShell) {
@@ -117,7 +120,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtImplementationName = new Text(container, SWT.BORDER);
 		txtImplementationName.setLayoutData(dataInfoField);
-		txtImplementationName.setText("AM");
+		txtImplementationName.setText(AddAttestationManagerHandler.AM_IMPL_NAME);
 
 	}
 
@@ -131,6 +134,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtImplementationLanguage = new Text(container, SWT.BORDER);
 		txtImplementationLanguage.setLayoutData(dataInfoField);
+		txtImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
 
 	}
 

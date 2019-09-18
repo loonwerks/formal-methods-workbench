@@ -38,6 +38,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 	private List<String> requirements = new ArrayList<>();
 
+	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddMonitorDialog(Shell parentShell) {
@@ -101,6 +102,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = GridData.FILL;
 		txtMonitorImplementationLanguage = new Text(container, SWT.BORDER);
 		txtMonitorImplementationLanguage.setLayoutData(dataInfoField);
+		txtMonitorImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
 	}
 
 	/**

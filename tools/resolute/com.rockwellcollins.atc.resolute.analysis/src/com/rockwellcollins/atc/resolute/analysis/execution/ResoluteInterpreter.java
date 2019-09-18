@@ -1,6 +1,5 @@
 package com.rockwellcollins.atc.resolute.analysis.execution;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
@@ -46,16 +45,11 @@ public class ResoluteInterpreter {
 			severity = IMarker.SEVERITY_INFO;
 		}
 
-		ResoluteResult subResult = evaluateLintStatementBody(lintStatement);
-		String lintText = ((ClaimResult) subResult).getText();
-//		Map<String, EObject> references = Collections.emptyMap();
-		Map<String, EObject> references = ((ClaimResult) subResult).getReferences();
-		ArrayList<EObject> refList = new ArrayList<>(references.values());
-		EObject eObj = lintStatement;
-		if (!refList.isEmpty()) {
-			eObj = refList.get(0);
+		ResoluteResult result = evaluateLintStatementBody(lintStatement);
+		if (result instanceof ClaimResult) {
+			return new LintResult(severity, lintStatement, (ClaimResult) result);
 		}
-		return new LintResult(severity, lintText, subResult, references, eObj);
+		return null;
 	}
 
 	private ResoluteResult evaluateLintStatementBody(LintStatement lintStatement) {

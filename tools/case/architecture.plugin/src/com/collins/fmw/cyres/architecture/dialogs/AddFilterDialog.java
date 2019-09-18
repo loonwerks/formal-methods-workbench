@@ -56,6 +56,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> propagateGuarantees = new ArrayList<>();
 	private List<String> requirements = new ArrayList<>();
 
+	private static final String DEFAULT_IMPL_NAME = "FLT";
+	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddFilterDialog(Shell parentShell) {
@@ -151,6 +153,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 				}
 			}
 			txtFilterImplementationLanguage.setEnabled(false);
+		} else {
+			txtFilterImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
 		}
 	}
 

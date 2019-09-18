@@ -35,6 +35,7 @@ import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.ThreadGroupSubcomponent;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
@@ -53,13 +54,13 @@ import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
 public class AddIsolatorHandler extends AadlHandler {
 
 	static final String VIRTUAL_PROCESSOR_TYPE_NAME = "CASE_Virtual_Processor";
-	static final String VIRTUAL_PROCESSOR_IMPL_NAME = "VPROC";
+	public static final String VIRTUAL_PROCESSOR_IMPL_NAME = "VPROC";
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String virtualProcessorName;
+	private String virtualMachineOS;
 	private List<String> isolatedComponents;
 	private String isolatorRequirement;
-	private String isolatorAgreeProperty;
 
 	@Override
 	protected void runCommand(URI uri) {
@@ -71,12 +72,13 @@ public class AddIsolatorHandler extends AadlHandler {
 		// Get the current selection
 		EObject eObj = getEObject(uri);
 		Subcomponent sub = null;
-		// TODO: handle thread group, system, device, abstract subcomponents
-		if (eObj instanceof ProcessSubcomponent || eObj instanceof ThreadSubcomponent) {
+		// TODO: handle system, device, abstract subcomponents
+		if (eObj instanceof ProcessSubcomponent || eObj instanceof ThreadSubcomponent
+				|| eObj instanceof ThreadGroupSubcomponent) {
 			sub = (Subcomponent) eObj;
 		} else {
 			Dialog.showError("Add Isolator",
-					"A process or thread implementation subcomponent must be selected in order to add isolation.");
+					"A process, thread, or thread group implementation subcomponent must be selected in order to add isolation.");
 			return;
 		}
 
@@ -109,17 +111,15 @@ public class AddIsolatorHandler extends AadlHandler {
 		wizard.create();
 		if (wizard.open() == Window.OK) {
 			virtualProcessorName = wizard.getVirtualProcessorName();
+			virtualMachineOS = wizard.getVirtualMachineOS();
 			if (virtualProcessorName == "") {
 				virtualProcessorName = VIRTUAL_PROCESSOR_IMPL_NAME;
 			}
 			isolatedComponents = wizard.getIsolatedComponents();
 			isolatorRequirement = wizard.getRequirement();
-			isolatorAgreeProperty = wizard.getAgreeProperty();
 		} else {
 			return;
 		}
-
-
 
 		// create set of bound processors
 		Set<String> boundProcessors = new HashSet<>();
@@ -226,6 +226,13 @@ public class AddIsolatorHandler extends AadlHandler {
 				pkgSection.getOwnedClassifiers().move(getIndex(vpType.getName(), pkgSection.getOwnedClassifiers()) + 1,
 						pkgSection.getOwnedClassifiers().size() - 1);
 
+				// CASE::OS Property
+				if (!virtualMachineOS.isEmpty()) {
+					if (!CaseUtils.addCasePropertyAssociation("OS", virtualMachineOS, vpImpl)) {
+//						return;
+					}
+				}
+
 				// Create virtual processor subcomponent
 				final VirtualProcessorSubcomponent vpSub = (VirtualProcessorSubcomponent) ComponentCreateHelper
 						.createOwnedSubcomponent(containingImpl,
@@ -261,7 +268,7 @@ public class AddIsolatorHandler extends AadlHandler {
 									while (i.hasNext()) {
 										ContainedNamedElement containedNamedElement = i.next();
 										ContainmentPathElement containmentPathElement = containedNamedElement.getPath();
-										String appliesTo = containmentPathElement.getNamedElement().getName();
+										String appliesTo = containmentPathElement.getNamedElement().getQualifiedName();
 										// If an entire subcomponent (including its subcomponents) is selected, remove
 										// any of its subcomponent bindings to this processor
 										if (isolatedComponents.contains(appliesTo)) {
@@ -321,9 +328,9 @@ public class AddIsolatorHandler extends AadlHandler {
 					ContainedNamedElement cne = pa.createAppliesTo();
 					cpe = cne.createPath();
 					cpe.setNamedElement(selectedSub);
-					if (!s.equalsIgnoreCase(selectedSub.getName())) {
+					if (!s.equalsIgnoreCase(selectedSub.getQualifiedName())) {
 						for (Subcomponent sub : selectedSub.getComponentImplementation().getOwnedSubcomponents()) {
-							if (s.equalsIgnoreCase(selectedSub.getName() + "." + sub.getName())) {
+							if (s.equalsIgnoreCase(selectedSub.getQualifiedName() + "." + sub.getName())) {
 								cpe = cpe.createPath();
 								cpe.setNamedElement(sub);
 								break;
@@ -336,7 +343,7 @@ public class AddIsolatorHandler extends AadlHandler {
 				if (!isolatorRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(isolatorRequirement);
 					RequirementsManager.getInstance().modifyRequirement(isolatorRequirement, resource,
-							new AddIsolatorClaim(req.getContext(), vpSub));
+							new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub));
 
 				}
 

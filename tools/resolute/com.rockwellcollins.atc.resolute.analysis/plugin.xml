@@ -208,6 +208,10 @@
             file="resources/Resolute_Stdlib.aadl"
             id="com.rockwellcollins.atc.resolute.analysis.aadlcontribution4">
       </aadlcontribution>
+      <aadlcontribution
+            file="resources/Resolint.aadl"
+            id="com.rockwellcollins.atc.resolute.analysis.aadlcontribution1">
+      </aadlcontribution>
    </extension>
    <extension
          id="com.rockwellcollins.atc.resolute.linter.marker"
