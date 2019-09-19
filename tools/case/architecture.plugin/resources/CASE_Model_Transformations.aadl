@@ -487,7 +487,7 @@ public
 		-- specified VM
 		subcomponents_not_bound_to_other_processors(isolated_components : {component}, isolator : component) <=
 			** "Subcomponents are not bound to other processors" **
-			let subs : {component} = get_subcomponents(isolated_components);
+			let subs : {component} = get_subcomponents(next_subcomponent(isolated_components));
 			forall (s : subs) . not exists (i : component) . (is_bound_to(s, i) and not (i = isolator))
 			
 		-- Get set of descendants
@@ -506,7 +506,7 @@ public
 			is_seL4_component(comp) => (has_property(comp, CASE_Properties::COMP_IMPL) and property(comp, CASE_Properties::COMP_IMPL) = "CakeML")
 			
 		-- checks that a component will run on seL4 by checking that the processors it is bound to have the seL4 OS property
-		is_seL4_component(comp : component) : bool
+		is_seL4_component(comp : component) : bool =
 			let proc : {component} = {c for (c : component) | (is_processor(c) or is_virtual_processor(c)) and is_bound_to(comp, c)};
 			(size(proc) > 0) and forall (p : proc) . (has_property(p, CASE_Properties::OS) and property(p, CASE_Properties::OS) = "seL4")
 		
