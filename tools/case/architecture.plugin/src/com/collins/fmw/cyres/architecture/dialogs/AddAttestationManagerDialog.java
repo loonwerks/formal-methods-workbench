@@ -46,6 +46,8 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private String commDriver = "";
 	private List<String> requirements = new ArrayList<>();
 	private String agreeProperty;
+	private boolean associateWithNewRequirement = false;
+	private String attestationManagerName = AddAttestationManagerHandler.AM_IMPL_NAME;
 
 	private static final int MAX_CACHE_SIZE = 6;
 	private static final int DEFAULT_CACHE_SIZE = 4;
@@ -74,9 +76,14 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return size;
 	}
 
-	public void create(String commDriver, List<String> requirements) {
+	public void create(String commDriver, List<String> requirements, boolean associateWithNewRequirement,
+			String attestationManagerName) {
 		this.commDriver = commDriver;
 		this.requirements = requirements;
+		this.associateWithNewRequirement = associateWithNewRequirement;
+		if (attestationManagerName != null && !attestationManagerName.isEmpty()) {
+			this.attestationManagerName = attestationManagerName;
+		}
 		if (commDriver == null || commDriver.isEmpty()) {
 			Dialog.showError("Add Attestation Manager", "Unknown communication driver.");
 			return;
@@ -99,12 +106,16 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		// Add attestation manager information fields
 		createImplementationNameField(container);
 		createImplementationLanguageField(container);
-		createCacheTimeoutField(container);
-		createCacheSizeField(container);
-		createLogPortField(container);
+		if (!associateWithNewRequirement) {
+			createCacheTimeoutField(container);
+			createCacheSizeField(container);
+			createLogPortField(container);
+		}
 		createRequirementField(container);
-		createPropagateGuaranteesField(container);
-		createAgreePropertyField(container);
+		if (!associateWithNewRequirement) {
+			createPropagateGuaranteesField(container);
+			createAgreePropertyField(container);
+		}
 
 		return area;
 	}
@@ -120,7 +131,10 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtImplementationName = new Text(container, SWT.BORDER);
 		txtImplementationName.setLayoutData(dataInfoField);
-		txtImplementationName.setText(AddAttestationManagerHandler.AM_IMPL_NAME);
+		txtImplementationName.setText(this.attestationManagerName);
+		if (associateWithNewRequirement) {
+			txtImplementationName.setEnabled(false);
+		}
 
 	}
 
@@ -135,7 +149,9 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		txtImplementationLanguage = new Text(container, SWT.BORDER);
 		txtImplementationLanguage.setLayoutData(dataInfoField);
 		txtImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
-
+		if (associateWithNewRequirement) {
+			txtImplementationLanguage.setEnabled(false);
+		}
 	}
 
 	private void createCacheTimeoutField(Composite container) {

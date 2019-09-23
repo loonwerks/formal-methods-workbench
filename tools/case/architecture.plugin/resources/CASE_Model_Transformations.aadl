@@ -13,7 +13,6 @@ public
 		subcomponents
 			src: data Base_Types::Integer;
 			dst: data Base_Types::Integer;
---			msg_type: data Base_Types::Integer;
 			trusted: data Base_Types::Boolean;
 			HMAC: data Base_Types::Boolean;
 	end CASE_MsgHeader.Impl;
@@ -327,7 +326,7 @@ public
 		-- Top-level claim for proper insertion of attestation manager
 		add_attestation_manager(comm_driver : component, attestation_manager : component) <=
 			** "Attestation Manager added for communications driver " comm_driver **
-			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager) and attestation_manager_prop_checked()			
+			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager)			
 		
 		-- Top-level claim for proper insertion of an isolator
 		add_isolator(c : component, isolated_components : {component}, isolator : component) <=
