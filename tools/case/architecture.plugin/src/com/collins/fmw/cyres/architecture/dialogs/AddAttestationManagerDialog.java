@@ -3,6 +3,7 @@ package com.collins.fmw.cyres.architecture.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -18,10 +19,20 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DataPort;
+import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.EventPort;
+import org.osate.aadl2.Feature;
+import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.PortCategory;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.handlers.AddAttestationManagerHandler;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 /**
  * This class creates the Add Attestation Manager wizard
@@ -46,8 +57,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private String commDriver = "";
 	private List<String> requirements = new ArrayList<>();
 	private String agreeProperty;
-	private boolean associateWithNewRequirement = false;
-	private String attestationManagerName = AddAttestationManagerHandler.AM_IMPL_NAME;
+	private Subcomponent attestationManager = null;
 
 	private static final int MAX_CACHE_SIZE = 6;
 	private static final int DEFAULT_CACHE_SIZE = 4;
@@ -76,14 +86,11 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		return size;
 	}
 
-	public void create(String commDriver, List<String> requirements, boolean associateWithNewRequirement,
-			String attestationManagerName) {
+	public void create(String commDriver, List<String> requirements, Subcomponent attestationManager) {
 		this.commDriver = commDriver;
 		this.requirements = requirements;
-		this.associateWithNewRequirement = associateWithNewRequirement;
-		if (attestationManagerName != null && !attestationManagerName.isEmpty()) {
-			this.attestationManagerName = attestationManagerName;
-		}
+		this.attestationManager = attestationManager;
+
 		if (commDriver == null || commDriver.isEmpty()) {
 			Dialog.showError("Add Attestation Manager", "Unknown communication driver.");
 			return;
@@ -106,13 +113,11 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		// Add attestation manager information fields
 		createImplementationNameField(container);
 		createImplementationLanguageField(container);
-		if (!associateWithNewRequirement) {
-			createCacheTimeoutField(container);
-			createCacheSizeField(container);
-			createLogPortField(container);
-		}
+		createCacheTimeoutField(container);
+		createCacheSizeField(container);
+		createLogPortField(container);
 		createRequirementField(container);
-		if (!associateWithNewRequirement) {
+		if (attestationManager == null) {
 			createPropagateGuaranteesField(container);
 			createAgreePropertyField(container);
 		}
@@ -131,8 +136,10 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtImplementationName = new Text(container, SWT.BORDER);
 		txtImplementationName.setLayoutData(dataInfoField);
-		txtImplementationName.setText(this.attestationManagerName);
-		if (associateWithNewRequirement) {
+		if (attestationManager == null) {
+			txtImplementationName.setText(AddAttestationManagerHandler.AM_IMPL_NAME);
+		} else {
+			txtImplementationName.setText(attestationManager.getName());
 			txtImplementationName.setEnabled(false);
 		}
 
@@ -149,7 +156,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		txtImplementationLanguage = new Text(container, SWT.BORDER);
 		txtImplementationLanguage.setLayoutData(dataInfoField);
 		txtImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
-		if (associateWithNewRequirement) {
+		if (attestationManager != null) {
 			txtImplementationLanguage.setEnabled(false);
 		}
 	}
@@ -164,6 +171,19 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtCacheTimeout = new Text(container, SWT.BORDER);
 		txtCacheTimeout.setLayoutData(dataInfoField);
+
+		if (attestationManager != null) {
+			ComponentImplementation ci = attestationManager.getComponentImplementation();
+			EList<PropertyExpression> propVals = ci.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "CACHE_TIMEOUT");
+			if (!propVals.isEmpty()) {
+				// There should be only one property value
+				PropertyExpression expr = propVals.get(0);
+				if (expr instanceof IntegerLiteral) {
+					txtCacheTimeout.setText(Long.toString(((IntegerLiteral) expr).getValue()));
+				}
+			}
+			txtCacheTimeout.setEnabled(false);
+		}
 
 	}
 
@@ -180,7 +200,20 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		for (int i = 1; i <= MAX_CACHE_SIZE; i++) {
 			cboCacheSize.add(Integer.toString(i));
 		}
-		cboCacheSize.setText(Integer.toString(DEFAULT_CACHE_SIZE));
+		if (attestationManager == null) {
+			cboCacheSize.setText(Integer.toString(DEFAULT_CACHE_SIZE));
+		} else {
+			ComponentImplementation ci = attestationManager.getComponentImplementation();
+			EList<PropertyExpression> propVals = ci.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "CACHE_SIZE");
+			if (!propVals.isEmpty()) {
+				// There should be only one property value
+				PropertyExpression expr = propVals.get(0);
+				if (expr instanceof IntegerLiteral) {
+					cboCacheSize.setText(Long.toString(((IntegerLiteral) expr).getValue()));
+				}
+			}
+			cboCacheSize.setEnabled(false);
+		}
 
 	}
 
@@ -217,6 +250,27 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		Button btnEventDataLogPort = new Button(logGroup, SWT.RADIO);
 		btnEventDataLogPort.setText("Event Data");
 		btnEventDataLogPort.setSelection(false);
+
+		if (attestationManager != null) {
+			ComponentType ct = attestationManager.getComponentType();
+			for (Feature f : ct.getOwnedFeatures()) {
+				if (f.getName().equalsIgnoreCase(AddAttestationManagerHandler.AM_LOG_PORT_NAME)) {
+					btnNoLogPort.setSelection(false);
+					if (f instanceof DataPort) {
+						btnDataLogPort.setSelection(true);
+					} else if (f instanceof EventPort) {
+						btnEventLogPort.setSelection(true);
+					} else if (f instanceof EventDataPort) {
+						btnEventDataLogPort.setSelection(true);
+					}
+					break;
+				}
+			}
+			btnDataLogPort.setEnabled(false);
+			btnEventLogPort.setEnabled(false);
+			btnEventDataLogPort.setEnabled(false);
+			btnNoLogPort.setEnabled(false);
+		}
 
 		btnLogPortType.add(btnDataLogPort);
 		btnLogPortType.add(btnEventLogPort);
@@ -313,8 +367,10 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 							+ NO_REQUIREMENT_SELECTED + ".");
 			return false;
 		}
-		agreeProperty = txtAgreeProperty.getText();
-		propagateGuarantees = btnPropagateGuarantees.getSelection();
+		if (attestationManager == null) {
+			agreeProperty = txtAgreeProperty.getText();
+			propagateGuarantees = btnPropagateGuarantees.getSelection();
+		}
 		return true;
 	}
 

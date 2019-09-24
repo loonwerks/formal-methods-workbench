@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.resource.XtextResource;
@@ -22,6 +23,7 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Connection;
+import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponentType;
@@ -59,7 +61,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	static final String AM_REQUEST_MSG_IMPL_NAME = "CASE_AttestationRequestMsg.Impl";
 	static final String AM_RESPONSE_MSG_IMPL_NAME = "CASE_AttestationResponseMsg.Impl";
 	static final String AM_COMP_TYPE_NAME = "CASE_AttestationManager";
-	static final String AM_LOG_PORT_NAME = "message_log";
+	public static final String AM_LOG_PORT_NAME = "message_log";
 	static final String AM_PORT_ATTESTATION_REQUEST_NAME = "am_request";
 	static final String AM_PORT_ATTESTATION_RESPONSE_NAME = "am_response";
 	public static final String AM_IMPL_NAME = "AM";
@@ -97,31 +99,20 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 		// Check if the selected subcomponent already has an attestation manager connected
 		// If there is, ask the user if they would like to associate the attestation manager with another requirement
-		boolean associateWithNewRequirement = false;
 		Subcomponent attestationManager = getAttestationManager(selectedSubcomponent);
-//		if (hasAttestationManager(selectedSubcomponent)) {
 		if (attestationManager != null) {
-			Dialog.showError("Add Attestation Manager",
-					"Component " + selectedSubcomponent.getName() + " already has an associated attestation manager.");
-// TODO: associate AM with requirement
-//			if (Dialog.askQuestion("Add Attestation Manager", "Component " + selectedSubcomponent.getName()
-//					+ " already has an associated attestation manager. Would you like to associate it with a new requirement?")) {
-//				associateWithNewRequirement = true;
-//			} else {
+			if (!Dialog.askQuestion("Add Attestation Manager", "Component " + selectedSubcomponent.getName()
+					+ " already has an associated attestation manager. Would you like to associate it with a new requirement?")) {
 				return;
-//			}
+			}
 		}
 
 		// Open wizard to enter filter info
 		final AddAttestationManagerDialog wizard = new AddAttestationManagerDialog(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		String amName = AM_IMPL_NAME;
-		if (attestationManager != null) {
-			amName = attestationManager.getName();
-		}
 		List<String> importedRequirements = new ArrayList<>();
 		RequirementsManager.getInstance().getImportedRequirements().forEach(r -> importedRequirements.add(r.getId()));
-		wizard.create(selectedSubcomponent.getName(), importedRequirements, associateWithNewRequirement, amName);
+		wizard.create(selectedSubcomponent.getName(), importedRequirements, attestationManager);
 		if (wizard.open() == Window.OK) {
 			implementationName = wizard.getImplementationName();
 			implementationLanguage = wizard.getImplementationLanguage();
@@ -142,15 +133,9 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		}
 
 		// Insert the attestation manager
-		if (associateWithNewRequirement) {
+		if (attestationManager != null) {
 
-			// Add add_attestation claims to resolute prove statement, if applicable
-			// TODO: Test after requirements import has been updated
-//			if (!attestationRequirement.isEmpty()) {
-//				RequirementsManager.getInstance().modifyRequirement(attestationRequirement,
-//						new AddAttestationManagerClaim(selectedSubcomponent, attestationManager));
-//
-//			}
+			associateNewRequirement(EcoreUtil.getURI(selectedSubcomponent), EcoreUtil.getURI(attestationManager));
 
 		} else {
 			insertAttestationManager(uri);
@@ -158,6 +143,26 @@ public class AddAttestationManagerHandler extends AadlHandler {
 
 		return;
 
+	}
+
+	private void associateNewRequirement(URI commDriverUri, URI attestationManagerUri) {
+		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+
+		xtextEditor.getDocument().modify(resource -> {
+
+			Subcomponent commDriver = (Subcomponent) resource.getEObject(commDriverUri.fragment());
+			Subcomponent attestationManager = (Subcomponent) resource.getEObject(attestationManagerUri.fragment());
+
+			// Add add_attestation claims to resolute prove statement, if applicable
+			// TODO: Test after requirements import has been updated
+			if (!attestationRequirement.isEmpty()) {
+				RequirementsManager.getInstance().modifyRequirement(attestationRequirement, resource,
+						new AddAttestationManagerClaim(commDriver, attestationManager));
+
+			}
+
+			return null;
+		});
 	}
 
 	/**
@@ -261,8 +266,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Put just above it's containing implementation
 				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
 						pkgSection.getOwnedClassifiers().size() - 1);
-//				// Move extended comm driver to top of file
-//				pkgSection.getOwnedClassifiers().move(0, pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create extended comm driver implementation
 				final ComponentImplementation commDriverImpl = (ComponentImplementation) pkgSection
@@ -286,12 +289,16 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				// Create Attestation Manager ports
 				// To do this we need to look at the current connections of the comm driver in the implementation
 				// However, we do not want to consider the outports that lead to the comm bus
+				// We also only want to consider a connection once (in the case of fan out)
 				// Also, save the port names, for use later
 				List<String> amPortNames = new ArrayList<>();
 				List<DataImplementation> amPortTypes = new ArrayList<>();
 				for (PortConnection conn : ci.getOwnedPortConnections()) {
 					if (conn.getSource().getContext() == commDriver && conn.getDestination().getContext() != null) {
 						final Port commPort = (Port) conn.getSource().getConnectionEnd();
+						if (amPortNames.contains(commPort.getName())) {
+							continue;
+						}
 						Port portIn = null;
 						Port portOut = null;
 						DataSubcomponentType dataFeatureClassifier = null;
@@ -352,18 +359,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					logPort.setName(AM_LOG_PORT_NAME);
 				}
 
-//				// Add attestation request/response ports on comm driver (or create new comm driver component?)
-//				final ComponentType commDriverType = commDriver.getComponentType();
-//				final EventDataPort commReq = (EventDataPort) ComponentCreateHelper
-//						.createOwnedEventDataPort(commDriverType);
-//				final EventDataPort commRes = (EventDataPort) ComponentCreateHelper
-//						.createOwnedEventDataPort(commDriverType);
-//				commReq.setDataFeatureClassifier(requestMsgImpl);
-//				commRes.setDataFeatureClassifier(responseMsgImpl);
-//				commReq.setName(AM_PORT_ATTESTATION_REQUEST_NAME);
-//				commReq.setIn(true);
-//				commRes.setName(AM_PORT_ATTESTATION_RESPONSE_NAME);
-//				commRes.setOut(true);
 
 				// Add Attestation Manager properties
 				// CASE_Properties::COMP_TYPE Property
@@ -391,21 +386,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 				}
 
-//				// Put Attestation Manager in proper location (just after the extended comm driver)
-//				String destName = "";
-//				if (commDriver.getSubcomponentType() instanceof ComponentImplementation) {
-//					// Get the component type implementation name
-//					destName = commDriver.getComponentImplementation().getName();
-//				} else {
-//					// Get the component type name
-//					destName = commDriver.getComponentImplementation().getType().getName();
-//				}
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 1,
-//						pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
 				// Move filter to top of file
 				pkgSection.getOwnedClassifiers().move(0, pkgSection.getOwnedClassifiers().size() - 1);
 
@@ -416,12 +396,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				final Realization r = attestationManagerImpl.createOwnedRealization();
 				r.setImplemented(attestationManagerType);
 
-//				// Add it to proper place
-//				pkgSection.getOwnedClassifiers().move(getIndex(destName, pkgSection.getOwnedClassifiers()) + 2,
-//						pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(ci.getTypeName(), pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
 				// Add it to proper place (just below component type)
 				pkgSection.getOwnedClassifiers().move(1, pkgSection.getOwnedClassifiers().size() - 1);
 
@@ -447,69 +421,80 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					}
 				}
 
-//				// Get the parent component implementation
-//				final ComponentImplementation containingImpl = commDriver.getContainingComponentImpl();
-
 				// Replace the comm driver with the extended comm driver
 				for (Subcomponent sub : ci.getOwnedSubcomponents()) {
 					if (sub.getName().equalsIgnoreCase(commDriver.getName())) {
 						ComponentCreateHelper.setSubcomponentType(sub, commDriverImpl);
+						break;
 					}
 				}
 
 				// Insert attestation manager in process component implementation
-//				final Subcomponent attestationManagerSubcomp = ComponentCreateHelper
-//						.createOwnedSubcomponent(containingImpl, compCategory);
 				final Subcomponent attestationManagerSubcomp = ComponentCreateHelper
 						.createOwnedSubcomponent(ci, compCategory);
 
 				// Give it a unique name
-//				attestationManagerSubcomp
-//						.setName(getUniqueName(implementationName, true, containingImpl.getOwnedSubcomponents()));
 				attestationManagerSubcomp
 						.setName(getUniqueName(implementationName, true, ci.getOwnedSubcomponents()));
 				// Assign thread implementation
 				ComponentCreateHelper.setSubcomponentType(attestationManagerSubcomp, attestationManagerImpl);
 
 				List<PortConnection> newPortConns = new ArrayList<>();
-
 				// Create new connections between comm driver / attestation manager / destination components
-				String connName = "";
-//				for (PortConnection conn : containingImpl.getOwnedPortConnections()) {
-				for (PortConnection conn : ci.getOwnedPortConnections()) {
+				int connIdx = -1;
+				for (int i = 0; i < ci.getOwnedPortConnections().size(); i++) {
+					PortConnection conn = ci.getOwnedPortConnections().get(i);
 					// Ignore bus connections (destination context not null)
 					if (conn.getSource().getContext() == commDriver && conn.getDestination().getContext() != null) {
-						// Create connection from attestation manager to destination components
-						final PortConnection portConnOut = Aadl2Factory.eINSTANCE.createPortConnection();
-						// Give it a unique name
-						portConnOut.setBidirectional(false);
-						final ConnectedElement connSrc = portConnOut.createSource();
-						connSrc.setContext(attestationManagerSubcomp);
+
+						// In order to put new connections in right place, keep track of
+						// the first relevant comm driver connection name
+						if (connIdx < 0) {
+							connIdx = i;
+						}
+
+						// Rewire existing connection sources to be attestation manager
+						String featureName = conn.getSource().getConnectionEnd().getName();
+						ConnectionEnd connEnd = conn.getSource().getConnectionEnd();
+						conn.getSource().setContext(attestationManagerSubcomp);
 						for (Feature feature : attestationManagerType.getAllFeatures()) {
-							if (feature.getName()
-									.equalsIgnoreCase("am_" + conn.getSource().getConnectionEnd().getName() + "_out")) {
-								connSrc.setConnectionEnd(feature);
+							if (feature.getName().equalsIgnoreCase("am_" + featureName + "_out")) {
+								conn.getSource().setConnectionEnd(feature);
 								break;
 							}
 						}
+
+						// Create connections from comm driver to attestation manager
+						// Don't create extra connections if a comm driver feature is fan out
+						boolean connExists = false;
+						for (PortConnection pc : newPortConns) {
+							if (pc.getSource().getConnectionEnd().getName()
+									.equalsIgnoreCase(featureName)) {
+								connExists = true;
+								break;
+							}
+						}
+						if (connExists) {
+							continue;
+						}
+
+						final PortConnection portConnOut = Aadl2Factory.eINSTANCE.createPortConnection();
+						portConnOut.setBidirectional(false);
+						final ConnectedElement connSrc = portConnOut.createSource();
+						connSrc.setContext(commDriver);
+						connSrc.setConnectionEnd(connEnd);
+
 						final ConnectedElement connDst = portConnOut.createDestination();
-						connDst.setContext(conn.getDestination().getContext());
-						connDst.setConnectionEnd(conn.getDestination().getConnectionEnd());
-
-						newPortConns.add(portConnOut);
-
-						// Rewire connections from comm driver into attestation manager
-						conn.getDestination().setContext(attestationManagerSubcomp);
+						connDst.setContext(attestationManagerSubcomp);
 						for (Feature feature : attestationManagerType.getAllFeatures()) {
 							if (feature.getName()
-									.equalsIgnoreCase("am_" + conn.getSource().getConnectionEnd().getName() + "_in")) {
-								conn.getDestination().setConnectionEnd(feature);
+									.equalsIgnoreCase("am_" + featureName + "_in")) {
+								connDst.setConnectionEnd(feature);
+								break;
 							}
 						}
 
-						// In order to put new connections in right place, keep track of
-						// the last relevant comm driver connection name
-						connName = conn.getName();
+						newPortConns.add(portConnOut);
 
 					}
 				}
@@ -537,21 +522,13 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				resDst.setConnectionEnd(commRes);
 				newPortConns.add(portConnRes);
 
-				int idxOffset = 1;
+				int idxOffset = 0;
 				for (PortConnection newPortConn : newPortConns) {
 					// Make sure each new connection has a unique name
-//					newPortConn.setName(
-//							getUniqueName(CONNECTION_IMPL_NAME, false, containingImpl.getOwnedPortConnections()));
-					newPortConn.setName(
-							getUniqueName(CONNECTION_IMPL_NAME, false, ci.getOwnedPortConnections()));
-//					containingImpl.getOwnedPortConnections().add(newPortConn);
+					newPortConn.setName(getUniqueName(CONNECTION_IMPL_NAME, false, ci.getOwnedPortConnections()));
 					ci.getOwnedPortConnections().add(newPortConn);
 					// Move to right place
-//					containingImpl.getOwnedPortConnections().move(
-//							getIndex(connName, containingImpl.getOwnedPortConnections()) + idxOffset,
-//							containingImpl.getOwnedPortConnections().size() - 1);
-					ci.getOwnedPortConnections().move(getIndex(connName, ci.getOwnedPortConnections()) + idxOffset,
-							ci.getOwnedPortConnections().size() - 1);
+					ci.getOwnedPortConnections().move(connIdx + idxOffset, ci.getOwnedPortConnections().size() - 1);
 					idxOffset++;
 				}
 
@@ -675,7 +652,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	}
 
 	private Subcomponent getAttestationManager(Subcomponent comp) {
-//	private boolean hasAttestationManager(Subcomponent comp) {
 
 		ComponentImplementation ci = comp.getContainingComponentImpl();
 
@@ -693,14 +669,12 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					// Check if it's an attestation manager
 					if (isCompType(dst, "ATTESTATION")) {
 						return dst;
-//						return true;
 					}
 				}
 			}
 
 		}
 
-//		return false;
 		return null;
 	}
 
