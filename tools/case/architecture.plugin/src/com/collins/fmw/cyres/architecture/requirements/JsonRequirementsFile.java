@@ -64,7 +64,10 @@ public class JsonRequirementsFile {
 				if (this.requirements == null) {
 					this.requirements = new ArrayList<CyberRequirement>();
 				}
-				this.requirements.add(new CyberRequirement(this.date, this.tool, r.getStatus(), r.getType(), r.getId(),
+				final long date = (r.getDate() == 0L ? this.date : r.getDate());
+				final String tool = (r.getTool().isEmpty() || r.getTool() == CyberRequirement.unknown ? this.tool
+						: r.getTool());
+				this.requirements.add(new CyberRequirement(date, tool, r.getStatus(), r.getType(), r.getId(),
 						r.getText(), r.getContext(), r.getRationale()));
 			});
 		} catch (Exception e) {

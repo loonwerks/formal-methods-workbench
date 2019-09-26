@@ -354,8 +354,7 @@ public class CaseUtils {
 			String tab = "\t";
 			String contents = "package CASE_Requirements" + newline + "private" + newline + tab
 //					+ "with CASE_Model_Transformations;" + newline
-					+ "annex resolute" + "{** **};" + newline
-					+ "end CASE_Requirements;" + newline;
+					+ "annex resolute" + "{** **};" + newline + "end CASE_Requirements;" + newline;
 			InputStream source = new ByteArrayInputStream(contents.getBytes());
 			try {
 				caseReqFile.create(source, false, new NullProgressMonitor());
@@ -365,7 +364,7 @@ public class CaseUtils {
 		}
 
 //		// Create CASE_REQUIREMENTS_NAME package
-//		AadlPackage pkg = TraverseProject.getPackageInFile(caseReqFile);
+//		AadlPackage pkg = TraverseProject.getPackageInFile(getCaseRequirementsFile());
 //		if (pkg == null) {
 //			// Create a new package
 //			pkg = Aadl2Factory.eINSTANCE.createAadlPackage();
