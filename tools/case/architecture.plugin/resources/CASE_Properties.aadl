@@ -32,7 +32,7 @@ property set CASE_Properties is
 	-- BOUNDARY INDICATIONS
 	
 	-- BOUNDARY is depricated (see TRUST_BOUNDARY and SECURITY_PERIMETER)
-	BOUNDARY: list of enumeration(TRUSTED, PHYSICAL) applies to (system, process, thread, device, abstract);
+	BOUNDARY: list of enumeration(TRUSTED, SECURE, PHYSICAL, UNCONTROLLED) applies to (system, process, thread, thread group, device, bus, feature, connection, memory, abstract);
 	
 	--Apply the trust boundary at the edge a system, device, or process should treat as 
 	--having an untrusted system, device, or process interfacing to it.  A trust boundary
