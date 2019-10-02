@@ -34,6 +34,7 @@
 	<modules>
 		<module>aadl2sexp</module>
 		<module>case</module>
+		<module>../../CRA</module>
 		<module>tcg</module>
 		<module>simulator</module>
 		<module>feature</module>
