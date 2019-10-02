@@ -12,12 +12,14 @@ import java.util.TreeSet;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance;
 
 import com.rockwellcollins.atc.resolute.analysis.values.BoolValue;
 import com.rockwellcollins.atc.resolute.analysis.values.IntValue;
@@ -145,6 +147,11 @@ public class ResoluteEvaluator extends ResoluteSwitch<ResoluteValue> {
 					} else if (val instanceof RealValue) {
 						val = new RealValue(((RealValue) val).getScaledReal(claimArgUnit));
 					}
+				}
+				// print out connection names correctly
+				if (val instanceof NamedElementValue && val.getNamedElement() instanceof ConnectionInstance) {
+					ConnectionInstance ci = (ConnectionInstance) val.getNamedElement();
+					val = new NamedElementValue(ci.getConnectionReferences().get(0).getConnection());
 				}
 				text.append(val);
 				if (claimArgUnit != null) {
@@ -373,7 +380,11 @@ public class ResoluteEvaluator extends ResoluteSwitch<ResoluteValue> {
 	public ResoluteValue caseThisExpr(ThisExpr object) {
 		ComponentInstance curr = context.getThisInstance();
 		for (NestedDotID id = object.getSub(); id != null; id = id.getSub()) {
-			curr = getInstanceChild(curr, id.getBase());
+			if (id.getBase() instanceof Connection) {
+				return new NamedElementValue(getConnectionInstance(curr, id.getBase()));
+			} else {
+				curr = getInstanceChild(curr, id.getBase());
+			}
 		}
 		return new NamedElementValue(curr);
 	}
@@ -385,6 +396,16 @@ public class ResoluteEvaluator extends ResoluteSwitch<ResoluteValue> {
 			}
 		}
 		throw new IllegalArgumentException("Unable to find subcomponent " + subcomponent.getName() + " in instance of "
+				+ instance.getComponentClassifier().getName());
+	}
+
+	public ConnectionInstance getConnectionInstance(ComponentInstance instance, NamedElement connection) {
+		for (ConnectionInstance child : instance.getConnectionInstances()) {
+			if (child.getConnectionReferences().get(0).getConnection().equals(connection)) {
+				return child;
+			}
+		}
+		throw new IllegalArgumentException("Unable to find connection " + connection.getName() + " in instance of "
 				+ instance.getComponentClassifier().getName());
 	}
 
