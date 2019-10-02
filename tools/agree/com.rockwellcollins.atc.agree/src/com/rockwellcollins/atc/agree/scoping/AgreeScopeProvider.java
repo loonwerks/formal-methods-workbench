@@ -61,7 +61,6 @@ import com.rockwellcollins.atc.agree.agree.ForallExpr;
 import com.rockwellcollins.atc.agree.agree.GetPropertyExpr;
 import com.rockwellcollins.atc.agree.agree.InputStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
@@ -105,6 +104,38 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 		return nelms;
 	}
 
+	private Set<NamedElement> getNamedElementsFromClassifier(Classifier ctx, boolean fromCompImpl) {
+
+		Set<NamedElement> components = new HashSet<>();
+
+		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(ctx,
+				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
+			AgreeContract contract = (AgreeContract) ((AgreeContractSubclause) annex).getContract();
+			components.addAll(getNamedElementsFromSpecs(contract.getSpecs()));
+
+		}
+
+		if (ctx instanceof ComponentImplementation) {
+			components.addAll(((ComponentImplementation) ctx).getAllSubcomponents());
+			components.addAll(((ComponentImplementation) ctx).getAllConnections());
+			components.addAll(getNamedElementsFromClassifier(((ComponentImplementation) ctx).getType(), true));
+
+		} else if (ctx instanceof ComponentType) {
+			if (fromCompImpl) {
+				List<Feature> fs = ((ComponentType) ctx).getAllFeatures();
+				components.addAll(fs);
+			} else {
+				List<Feature> fs = ((ComponentType) ctx).getOwnedFeatures();
+
+				components.addAll(fs);
+			}
+
+		}
+
+		components.addAll(getNamedElements(getAadlContainer(ctx)));
+		return components;
+
+	}
 
 	private Set<NamedElement> getNamedElements(EObject ctx) {
 
@@ -129,25 +160,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 		} else {
 
-			for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses((Classifier) ctx,
-					AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
-				AgreeContract contract = (AgreeContract) ((AgreeContractSubclause) annex).getContract();
-				components.addAll(getNamedElementsFromSpecs(contract.getSpecs()));
-
-			}
-
-			if (ctx instanceof ComponentImplementation) {
-				components.addAll(((ComponentImplementation) ctx).getAllSubcomponents());
-				components.addAll(((ComponentImplementation) ctx).getAllConnections());
-				components.addAll(getNamedElements(((ComponentImplementation) ctx).getType()));
-
-			} else if (ctx instanceof ComponentType) {
-				List<Feature> fs = ((ComponentType) ctx).getAllFeatures();
-				components.addAll(fs);
-
-			}
-
-			components.addAll(getNamedElements(getAadlContainer(ctx)));
+			components.addAll(getNamedElementsFromClassifier((Classifier) ctx, false));
 
 		}
 
@@ -566,14 +579,6 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 		return IScope.NULLSCOPE;
 
-	}
-
-
-
-	IScope scope_LiftStatement_subcomp(LiftStatement ctx, EReference ref) {
-		IScope prevScope = prevScope(ctx, ref);
-		ComponentImplementation container = ctx.getContainingComponentImpl();
-		return Scopes.scopeFor(container.getAllSubcomponents(), prevScope);
 	}
 
 

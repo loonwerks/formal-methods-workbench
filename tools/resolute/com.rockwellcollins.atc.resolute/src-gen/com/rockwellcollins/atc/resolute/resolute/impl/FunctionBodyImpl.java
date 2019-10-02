@@ -65,6 +65,7 @@ public class FunctionBodyImpl extends DefinitionBodyImpl implements FunctionBody
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Type getType()
   {
     return type;
@@ -92,6 +93,7 @@ public class FunctionBodyImpl extends DefinitionBodyImpl implements FunctionBody
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setType(Type newType)
   {
     if (newType != type)

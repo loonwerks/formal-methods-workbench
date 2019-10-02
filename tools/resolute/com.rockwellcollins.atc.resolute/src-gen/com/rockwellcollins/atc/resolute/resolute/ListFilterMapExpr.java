@@ -27,10 +27,6 @@ public interface ListFilterMapExpr extends Expr
   /**
    * Returns the value of the '<em><b>Map</b></em>' containment reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Map</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Map</em>' containment reference.
    * @see #setMap(Expr)
@@ -54,10 +50,6 @@ public interface ListFilterMapExpr extends Expr
    * Returns the value of the '<em><b>Args</b></em>' containment reference list.
    * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.Arg}.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Args</em>' containment reference list isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Args</em>' containment reference list.
    * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getListFilterMapExpr_Args()
@@ -69,10 +61,6 @@ public interface ListFilterMapExpr extends Expr
   /**
    * Returns the value of the '<em><b>Filter</b></em>' containment reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Filter</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Filter</em>' containment reference.
    * @see #setFilter(Expr)

@@ -55,7 +55,7 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 		try {
 			agreeLogResults = AgreeFileUtil.readAgreeLog();
 			if (agreeLogResults.size() == 0) {
-				return new BoolValue(false);
+				throw new ResoluteFailException("[ERROR] AGREE results log is empty", evalContext.getThisInstance());
 			}
 		} catch (Exception e) {
 			throw new ResoluteFailException(e.getMessage(), evalContext.getThisInstance());
@@ -77,11 +77,13 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 			verificationName = verificationName.concat(si.getComponentImplementation().getName());
 		} else {
 			throw new ResoluteFailException(
-					"Resolute AgreeCheck can only be called from a component or component implementation.",
+					"[ERROR] Resolute AgreeCheck can only be called from a component or component implementation.",
 					evalContext.getThisInstance());
 		}
 
-		return new BoolValue(checkAgreeVerification(verificationName));
+		checkAgreeVerification(verificationName);
+
+		return new BoolValue(true);
 
 	}
 
@@ -89,19 +91,21 @@ public class ResoluteAgreeCheck implements ResoluteExternalAnalysis {
 	 * Checks that AGREE was run on the current version of the model and the contracts are valid.
 	 * @param verificationName - The name of the top-level AGREE verification run in the log file.
 	 */
-	private boolean checkAgreeVerification(String verificationName) {
-		boolean agreeCheck = false;
+	private void checkAgreeVerification(String verificationName) {
 		for (AgreeLogResult logResult : agreeLogResults) {
 			if (logResult.getName().contentEquals(verificationName)) {
-				// Check status and hashcode
-				if (logResult.getResult().equalsIgnoreCase(Status.VALID.toString())
-						&& logResult.getHashcode().contentEquals(modelHashcode)) {
-					agreeCheck = true;
+				// Check hashcode
+				if (!logResult.getHashcode().contentEquals(modelHashcode)) {
+					throw new ResoluteFailException("AGREE analysis was run on the current version of the model",
+							evalContext.getThisInstance());
+				}
+				// Check status
+				if (!logResult.getResult().equalsIgnoreCase(Status.VALID.toString())) {
+					throw new ResoluteFailException("AGREE analysis passed", evalContext.getThisInstance());
 				}
 				break;
 			}
 		}
-		return agreeCheck;
 	}
 
 }

@@ -13,7 +13,6 @@ public
 		subcomponents
 			src: data Base_Types::Integer;
 			dst: data Base_Types::Integer;
---			msg_type: data Base_Types::Integer;
 			trusted: data Base_Types::Boolean;
 			HMAC: data Base_Types::Boolean;
 	end CASE_MsgHeader.Impl;
@@ -320,14 +319,19 @@ public
 		---------------------------
 		
 		-- Top-level claim for proper insertion of a filter
-		add_filter(context : component, filter : component, conn_name : string, msg_type : data) <=
-			** "Filter " filter " is properly added to component " context **
-			filter_exists(filter, context, conn_name) and filter_not_bypassed(filter, context, msg_type) and filter_prop_checked()
+		add_filter(comp_context : component, filter : component, conn_name : string, msg_type : data) <=
+			** "Filter " filter " is properly added to component " comp_context **
+			filter_exists(filter, comp_context, conn_name) and filter_not_bypassed(filter, comp_context, msg_type) and filter_implemented(filter)
 			
 		-- Top-level claim for proper insertion of attestation manager
 		add_attestation_manager(comm_driver : component, attestation_manager : component) <=
 			** "Attestation Manager added for communications driver " comm_driver **
-			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager) and attestation_manager_prop_checked()			
+			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager)			
+		
+		-- Top-level claim for proper insertion of an isolator
+		add_isolator(c : component, isolated_components : {component}, isolator : component) <=
+			** isolated_components " isolated in VM " isolator **
+			isolator_bound_to_processor(isolator) and components_bound_to_vm(isolated_components, isolator) and subcomponents_not_bound_to_other_processors(isolated_components, isolator)
 		
 		-- Top-level claim for proper insertion of a router
 		add_router(c : component) <=
@@ -337,11 +341,6 @@ public
 		-- Top-level claim for proper insertion of a monitor
 		add_monitor(c : component) <=
 			** "Monitor inserted on " c **
-			true
-		
-		-- Top-level claim for proper insertion of an isolator
-		add_isolator(c : component) <=
-			** "Isolator added to " c **
 			true
 			
 		--------------------------
@@ -367,16 +366,16 @@ public
 		
 		-- Check to see if there is a filter immediately before 
 		-- the component on the communication pathway.
-		filter_exists(filter : component, context : component, conn_name : string) <=
-			** "Filter " filter " is connected to component " context " by connection " conn_name **
-			let conns : {connection} = {c for (c : connections(context)) | destination_component(c) = context and source_component(c) = filter};
+		filter_exists(filter : component, comp_context : component, conn_name : string) <=
+			** "A CASE_Filter " filter " is connected to component " comp_context " by connection " conn_name **
+			let conns : {connection} = {c for (c : connections(comp_context)) | destination_component(c) = comp_context and source_component(c) = filter};
 			is_filter(filter) and exists(c : conns) . name(c) = conn_name
 	
 		-- Make sure there is no communication pathway that avoids the filter
-		filter_not_bypassed(filter : component, context : component, msg_type : data) <=
+		filter_not_bypassed(filter : component, comp_context : component, msg_type : data) <=
 			** "Filter " filter " cannot be bypassed" **
-			let filter_srcs : {component} = get_filter_sources(context, filter, msg_type); 
-			let non_filter_srcs : {component} = get_non_filter_sources(context, filter, msg_type); 
+			let filter_srcs : {component} = get_filter_sources(comp_context, filter, msg_type); 
+			let non_filter_srcs : {component} = get_non_filter_sources(comp_context, filter, msg_type); 
 			length(intersect(filter_srcs, non_filter_srcs)) = 0
 		
 		get_non_filter_sources(target : component, filter : component, msg_type : data) : {component} = 
@@ -384,7 +383,7 @@ public
 			recursive_backwards_reach(srcs)
 		
 		get_filter_sources(target : component, filter : component, msg_type : data) : {component} = 
-			let srcs : {component} = { c for (conn : connections(target)) (c : source_component(conn)) | has_type(conn) and type(conn) = msg_type and name(source_component(conn)) = name(filter)};
+			let srcs : {component} = {c for (conn : connections(target)) (c : source_component(conn)) | has_type(conn) and type(conn) = msg_type and name(source_component(conn)) = name(filter)};
 			prev_reach(srcs)
 		
 		recursive_backwards_reach(curr : {component}) : {component} = 
@@ -409,14 +408,11 @@ public
 			else 
 				{}
 	
-	    -- This should connect to some evidence that the filter was correctly generated
+	    -- This provides evidence that the filter was correctly generated for the appropriate os
 	    -- and that the proof was emitted and checked.
-	    -- However, this funcionality has not yet been implemented
-	    filter_prop_checked() <=
-		    ** "Filter property implemented by CakeML" **
-		    forall (c : component) . is_filter(c)
-		       => has_property(c, CASE_Properties::COMP_IMPL) and property(c, CASE_Properties::COMP_IMPL) = "CAKEML"
-		       and filter_proof_checked()
+	    filter_implemented(filter : component) <=
+		    ** "Filter property implemented" **
+		   implementation_language_assurance(filter) and filter_proof_checked()
 		       
 		-- Checks if the specified component is a filter
 		is_filter(c : component) : bool =
@@ -467,6 +463,53 @@ public
 		is_comm_driver(c : component) : bool =
 			has_property(c, CASE_Properties::COMP_TYPE) and property(c, CASE_Properties::COMP_TYPE) = "COMM_DRIVER"
 	
+		-- Checks if the specified virtual processor is a CASE Isolator and is bound to a processor
+		isolator_bound_to_processor(isolator : component) <=
+			** isolator " is bound to a processor" **
+			is_isolator(isolator) and exists(p : processor) . is_bound_to(isolator, p)
+			
+		-- Checks if specified component is a CASE isolator
+		is_isolator(c : component) : bool =
+			has_property(c, CASE_Properties::COMP_TYPE) and property(c, CASE_Properties::COMP_TYPE) = "ISOLATOR"
+		
+		-- Checks that bindings exist between specified isolated components and virtual processor
+		components_bound_to_vm(isolated_components : {component}, isolator : component) <=
+			** "Isolated components are bound to virtual processor " isolator **
+			forall (c : isolated_components) . check_vm_binding(c, isolator)
+			
+		-- Checks that the specified component is bound to the specified virtual processor
+		check_vm_binding(c : component, vm : component) <=
+			** "Component " c " is bound to virtual processor " vm **
+			is_bound_to(c, vm)
+		
+		-- Checks that subcomponents of specified isolated components are not bound to processors other than the 
+		-- specified VM
+		subcomponents_not_bound_to_other_processors(isolated_components : {component}, isolator : component) <=
+			** "Subcomponents are not bound to other processors" **
+			let subs : {component} = get_subcomponents(next_subcomponent(isolated_components));
+			forall (s : subs) . not exists (i : component) . (is_bound_to(s, i) and not (i = isolator))
+			
+		-- Get set of descendants
+		get_subcomponents(curr : {component}) : {component} =
+			let next : {component} = union(curr, next_subcomponent(curr));
+			if next = curr then
+				curr
+			else
+				get_subcomponents(next)
+			
+		next_subcomponent(curr : {component}) : {component} =
+			{y for (x : curr) (y : subcomponents(x))}
+			
+		implementation_language_assurance(comp : component) <=
+			** comp " implementation is appropriate for OS" **
+			is_seL4_component(comp) => (has_property(comp, CASE_Properties::COMP_IMPL) and property(comp, CASE_Properties::COMP_IMPL) = "CakeML")
+			
+		-- checks that a component will run on seL4 by checking that the processors it is bound to have the seL4 OS property
+		is_seL4_component(comp : component) : bool =
+			let proc : {component} = {c for (c : component) | (is_processor(c) or is_virtual_processor(c)) and is_bound_to(comp, c)};
+			(size(proc) > 0) and forall (p : proc) . (has_property(p, CASE_Properties::OS) and property(p, CASE_Properties::OS) = "seL4")
+		
+		
 	**};
 	
 end CASE_Model_Transformations;

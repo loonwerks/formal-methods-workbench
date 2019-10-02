@@ -276,9 +276,9 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
         return createParamStatementAdapter();
       }
       @Override
-      public Adapter caseLiftStatement(LiftStatement object)
+      public Adapter caseLiftContractStatement(LiftContractStatement object)
       {
-        return createLiftStatementAdapter();
+        return createLiftContractStatementAdapter();
       }
       @Override
       public Adapter caseConnectionStatement(ConnectionStatement object)
@@ -1208,16 +1208,16 @@ public class AgreeAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.LiftStatement <em>Lift Statement</em>}'.
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.agree.agree.LiftContractStatement <em>Lift Contract Statement</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see com.rockwellcollins.atc.agree.agree.LiftStatement
+   * @see com.rockwellcollins.atc.agree.agree.LiftContractStatement
    * @generated
    */
-  public Adapter createLiftStatementAdapter()
+  public Adapter createLiftContractStatementAdapter()
   {
     return null;
   }

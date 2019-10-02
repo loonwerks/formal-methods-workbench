@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.TextSelection;
@@ -34,7 +35,6 @@ import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.Realization;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ge.BusinessObjectSelection;
 
 public abstract class AadlHandler extends AbstractHandler {
@@ -80,7 +80,7 @@ public abstract class AadlHandler extends AbstractHandler {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				if (xtextEditor == null) {
-					return getWorker(uri, monitor).apply(OsateResourceUtil.getResourceSet());
+					return getWorker(uri, monitor).apply(new ResourceSetImpl());
 				} else {
 					return xtextEditor.getDocument().readOnly(getUnitOfWork(uri, monitor));
 				}
@@ -177,4 +177,5 @@ public abstract class AadlHandler extends AbstractHandler {
 	protected IWorkbenchWindow getWindow() {
 		return window;
 	}
+
 }

@@ -66,6 +66,7 @@ public class StringExprImpl extends ExprImpl implements StringExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public StringLiteral getVal()
   {
     return val;
@@ -93,6 +94,7 @@ public class StringExprImpl extends ExprImpl implements StringExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setVal(StringLiteral newVal)
   {
     if (newVal != val)

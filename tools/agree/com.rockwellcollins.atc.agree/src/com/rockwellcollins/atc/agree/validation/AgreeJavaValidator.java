@@ -46,7 +46,6 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.impl.SubcomponentImpl;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.annexsupport.AnnexUtil;
 
@@ -95,7 +94,7 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
+import com.rockwellcollins.atc.agree.agree.LiftContractStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -784,22 +783,173 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 	}
 
 	@Check(CheckType.FAST)
-	public void checkLift(LiftStatement lift) {
+	public void checkLiftContract(LiftContractStatement lcst) {
+		Classifier comp = lcst.getContainingClassifier();
+
+		if (comp instanceof ComponentImplementation) {
 
 
-		if (!(lift.getSubcomp() instanceof NamedElement)) {
-			error(lift, "Lift statements can be applied only to direct subcomponents."
-					+ "Place a lift statement in the subcomponents contract for heavy lifting");
-		}
+			ComponentType ct = ((ComponentImplementation) comp).getType();
+			List<AnnexSubclause> agreeAnnexes = AnnexUtil.getAllAnnexSubclauses(ct,
+					AgreePackage.eINSTANCE.getAgreeContractSubclause());
+			if (agreeAnnexes.size() > 0) {
+				error(lcst,
+						"'lift contract;' statement is not allowed in component implementation whose type has an AGREE annex.");
 
-		NamedElement namedEl = lift.getSubcomp();
-
-		if (namedEl != null) {
-			if (!(namedEl instanceof SubcomponentImpl)) {
-				error(lift, "Lift statements must apply to subcomponent implementations. '" + namedEl.getName()
-				+ "' is not a subcomponent.");
 			}
+
+			List<Subcomponent> subcomps = ((ComponentImplementation) comp).getAllSubcomponents();
+
+			if (subcomps.size() == 1) {
+
+				Subcomponent subcomp = subcomps.get(0);
+				Classifier subCls = subcomp.getClassifier();
+				ComponentType subCt = null;
+				if (subCls instanceof ComponentImplementation) {
+					subCt = ((ComponentImplementation) subCls).getType();
+				} else if (subCls instanceof ComponentType) {
+					subCt = (ComponentType) subCls;
+				} else {
+					throw new RuntimeException();
+				}
+
+				{
+					Set<String> usedParentInPorts = new HashSet<>();
+					Set<String> usedParentOutPorts = new HashSet<>();
+
+					Set<String> usedChildInPorts = new HashSet<>();
+					Set<String> usedChildOutPorts = new HashSet<>();
+
+					for (Connection conn : ((ComponentImplementation) comp).getAllConnections()) {
+						{
+							NamedElement sourceNe = conn.getSource().getConnectionEnd();
+							if (sourceNe.getContainingClassifier() == subCt) {
+
+								if (usedChildOutPorts.contains(sourceNe.getName())) {
+									error(lcst,
+											"'lift contract;' statement is not allowed in component implementation whith more than one connection out of same output "
+													+ sourceNe.getQualifiedName() + ".");
+								}
+
+								usedChildOutPorts.add(sourceNe.getName());
+							}
+
+							if (sourceNe.getContainingClassifier() == ct) {
+								if (usedParentInPorts.contains(sourceNe.getName())) {
+									error(lcst,
+											"'lift contract;' statement is not allowed in component implementation whith more than one connection out of same input "
+													+ sourceNe.getQualifiedName() + ".");
+								}
+
+								usedParentInPorts.add(sourceNe.getName());
+
+							}
+
+						}
+
+						{
+							NamedElement destNe = conn.getDestination().getConnectionEnd();
+							if (destNe.getContainingClassifier() == subCt) {
+
+								if (usedChildInPorts.contains(destNe.getName())) {
+									error(lcst,
+											"'lift contract;' statement is not allowed in component implementation whith more than one connection into same input "
+													+ destNe.getQualifiedName() + ".");
+								}
+
+								usedChildInPorts.add(destNe.getName());
+							}
+
+							if (destNe.getContainingClassifier() == ct) {
+
+								if (usedParentOutPorts.contains(destNe.getName())) {
+									error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whith more than one connection into same output "
+												+ destNe.getQualifiedName() + ".");
+								}
+								usedParentOutPorts.add(destNe.getName());
+							}
+						}
+
+					}
+
+					for (Feature feat : comp.getAllFeatures()) {
+
+						boolean isIn = false;
+						if (feat instanceof DataPort) {
+							isIn = ((DataPort) feat).isIn();
+						} else if (feat instanceof EventDataPort) {
+							isIn = ((EventDataPort) feat).isIn();
+						} else if (feat instanceof EventPort) {
+							isIn = ((EventPort) feat).isIn();
+						}
+
+						if (isIn) {
+							if (!usedParentInPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection from input "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						} else {
+							if (!usedParentOutPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection to output "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						}
+
+					}
+
+					for (Feature feat : subCt.getAllFeatures()) {
+
+						boolean isIn = false;
+						if (feat instanceof DataPort) {
+							isIn = ((DataPort) feat).isIn();
+						} else if (feat instanceof EventDataPort) {
+							isIn = ((EventDataPort) feat).isIn();
+						} else if (feat instanceof EventPort) {
+							isIn = ((EventPort) feat).isIn();
+						}
+
+
+						if (isIn) {
+							if (!usedChildInPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection into "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						} else {
+							if (!usedChildOutPorts.contains(feat.getName())) {
+								error(lcst,
+										"'lift contract;' statement is not allowed in component implementation whithout connection out of "
+												+ feat.getQualifiedName() + ".");
+
+							}
+						}
+
+					}
+
+
+
+				}
+
+
+			} else {
+
+				error(lcst,
+						"'lift contract;' statement is not allowed in component implementation whithout exactly one subcomponent.");
+
+
+			}
+
+
+		} else {
+			error(lcst, "'lift contract;' statement is not allowed in component interface.");
 		}
+
 	}
 
 	@Check(CheckType.FAST)

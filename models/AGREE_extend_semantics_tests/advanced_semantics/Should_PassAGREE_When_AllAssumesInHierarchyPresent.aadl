@@ -1,0 +1,42 @@
+package Should_PassAGREE_When_AllAssumesInHierarchyPresent
+public
+    with Base_Types;
+    
+    system Base
+        features
+            A : in data port Base_Types::Integer;
+        annex agree {**
+            assume A_is_zero "A = 0" : A = 0;
+        **};
+    end Base;
+    
+    system implementation Base.i
+    end Base.i;
+    
+    system Subclass extends Base
+        features
+            B : in data port Base_Types::Integer;
+        annex agree {**
+            assume B_is_A_plus_1 "B = A + 1" : B = A + 1;
+        **};
+    end Subclass;
+    
+    system implementation Subclass.i extends Base.i
+    end Subclass.i;
+
+    system Subsubclass extends Subclass
+        features
+            C : in data port Base_Types::Integer;
+        annex agree {**
+            assume C_is_B_plus_1 "C = B + 1" : C = B + 1;
+            eq C_is_2 : bool;
+            guarantee C_is_2_true "C = 2" : C_is_2;
+        **};
+    end Subsubclass;
+
+    system implementation Subsubclass.i extends Subclass.i
+        annex agree {**
+            assign C_is_2 = (C = 2);
+        **};
+    end Subsubclass.i;
+end Should_PassAGREE_When_AllAssumesInHierarchyPresent;

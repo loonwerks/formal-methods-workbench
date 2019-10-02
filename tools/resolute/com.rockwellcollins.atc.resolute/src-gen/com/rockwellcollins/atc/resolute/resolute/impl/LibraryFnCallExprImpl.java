@@ -114,6 +114,7 @@ public class LibraryFnCallExprImpl extends ExprImpl implements LibraryFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getLibName()
   {
     return libName;
@@ -124,6 +125,7 @@ public class LibraryFnCallExprImpl extends ExprImpl implements LibraryFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setLibName(String newLibName)
   {
     String oldLibName = libName;
@@ -137,6 +139,7 @@ public class LibraryFnCallExprImpl extends ExprImpl implements LibraryFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getFnName()
   {
     return fnName;
@@ -147,6 +150,7 @@ public class LibraryFnCallExprImpl extends ExprImpl implements LibraryFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setFnName(String newFnName)
   {
     String oldFnName = fnName;
@@ -160,6 +164,7 @@ public class LibraryFnCallExprImpl extends ExprImpl implements LibraryFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Expr> getArgs()
   {
     if (args == null)
@@ -283,7 +288,7 @@ public class LibraryFnCallExprImpl extends ExprImpl implements LibraryFnCallExpr
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
+    StringBuilder result = new StringBuilder(super.toString());
     result.append(" (libName: ");
     result.append(libName);
     result.append(", fnName: ");

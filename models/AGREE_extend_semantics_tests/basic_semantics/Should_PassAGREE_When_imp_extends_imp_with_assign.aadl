@@ -1,0 +1,31 @@
+package Should_PassAGREE_When_imp_extends_imp_with_assign
+public
+	with Base_Types;
+    
+    system Base
+        features
+            A : in data port Base_Types::Integer;
+        annex agree {**
+        	eq xyz : bool;
+            assume A_not_zero "A != 0" : A != 0;
+            guarantee xyz_assigned "xyz_assigned" : xyz;
+        **};
+    end Base;
+    
+    system implementation Base.i
+    	annex agree {**
+            assign xyz = true;
+       **};
+    end Base.i;
+    
+    system Subclass extends Base
+        annex agree {**
+        **};
+    end Subclass;
+    
+    system implementation Subclass.i extends Base.i
+       annex agree {**
+       **};
+    end Subclass.i;
+    
+end Should_PassAGREE_When_imp_extends_imp_with_assign;

@@ -65,6 +65,7 @@ public class ThisExprImpl extends ExprImpl implements ThisExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public NestedDotID getSub()
   {
     return sub;
@@ -92,6 +93,7 @@ public class ThisExprImpl extends ExprImpl implements ThisExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setSub(NestedDotID newSub)
   {
     if (newSub != sub)

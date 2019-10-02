@@ -65,6 +65,7 @@ public class RulesetImpl extends DefinitionImpl implements Ruleset
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public RulesetBody getBody()
   {
     return body;
@@ -92,6 +93,7 @@ public class RulesetImpl extends DefinitionImpl implements Ruleset
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setBody(RulesetBody newBody)
   {
     if (newBody != body)

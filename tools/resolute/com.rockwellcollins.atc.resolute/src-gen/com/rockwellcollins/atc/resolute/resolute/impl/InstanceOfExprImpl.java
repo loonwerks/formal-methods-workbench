@@ -77,6 +77,7 @@ public class InstanceOfExprImpl extends ExprImpl implements InstanceOfExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getExpr()
   {
     return expr;
@@ -104,6 +105,7 @@ public class InstanceOfExprImpl extends ExprImpl implements InstanceOfExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)
@@ -125,6 +127,7 @@ public class InstanceOfExprImpl extends ExprImpl implements InstanceOfExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public BaseType getType()
   {
     return type;
@@ -152,6 +155,7 @@ public class InstanceOfExprImpl extends ExprImpl implements InstanceOfExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setType(BaseType newType)
   {
     if (newType != type)

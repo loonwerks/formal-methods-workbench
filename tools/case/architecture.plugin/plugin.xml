@@ -553,6 +553,10 @@
             file="resources/CASE_Model_Transformations.aadl"
             id="com.collins.fmw.cyres.architecture.aadlcontribution.casemodeltransformations">
       </aadlcontribution>
+      <aadlcontribution
+            file="resources/CASE_Modeling_Guidelines.aadl"
+            id="com.collins.fmw.cyres.architecture.aadlcontribution.casemodelingguidelines">
+      </aadlcontribution>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

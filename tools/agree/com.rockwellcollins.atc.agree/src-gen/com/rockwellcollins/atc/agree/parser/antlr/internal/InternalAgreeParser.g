@@ -453,7 +453,7 @@ ruleSpecStatement returns [EObject current=null]
     |((
     {
         $current = forceCreateModelElement(
-            grammarAccess.getSpecStatementAccess().getLiftStatementAction_3_0(),
+            grammarAccess.getSpecStatementAccess().getLiftContractStatementAction_3_0(),
             $current);
     }
 )
@@ -461,20 +461,12 @@ ruleSpecStatement returns [EObject current=null]
     {
     	newLeafNode(otherlv_13, grammarAccess.getSpecStatementAccess().getLiftKeyword_3_1());
     }
-(
-(
-		{
-			if ($current==null) {
-	            $current = createModelElement(grammarAccess.getSpecStatementRule());
-	        }
-        }
-	otherlv_14=RULE_ID
-	{
-		newLeafNode(otherlv_14, grammarAccess.getSpecStatementAccess().getSubcompNamedElementCrossReference_3_2_0()); 
-	}
 
-)
-)
+	otherlv_14=Contract
+    {
+    	newLeafNode(otherlv_14, grammarAccess.getSpecStatementAccess().getContractKeyword_3_2());
+    }
+
 	otherlv_15=Semicolon
     {
     	newLeafNode(otherlv_15, grammarAccess.getSpecStatementAccess().getSemicolonKeyword_3_3());

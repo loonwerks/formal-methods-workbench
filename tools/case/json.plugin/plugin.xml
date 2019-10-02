@@ -4,7 +4,7 @@
 
    <extension point="org.eclipse.ui.commands">
 
-     <command categoryId="com.collins.fmw.cyres.json.commands"
+     <command
            id="com.collins.fmw.cyres.json.commands.translate"
            name="Export to JSON">
      </command>
@@ -51,24 +51,12 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:#TextEditorContext?after=additions">
-         <menu
-               id="com.collins.fmw.cyres.json.popups.texteditor"
-               label="AGREE"
-               mnemonic="g">          
-            <command
-                  commandId="com.collins.fmw.cyres.json.commands.translate"
-                  id="com.collins.fmw.cyres.json.menus.translate"
-                  mnemonic="s"
-                  style="push">
-            </command>
-           
-   <visibleWhen
-         checkEnabled="false">
-      <reference
-            definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
-      </reference>
-   </visibleWhen>
-         </menu>
+         <command
+               commandId="com.collins.fmw.cyres.json.commands.translate"
+               id="com.collins.fmw.cyres.json.menus.translate"
+               mnemonic="s"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension

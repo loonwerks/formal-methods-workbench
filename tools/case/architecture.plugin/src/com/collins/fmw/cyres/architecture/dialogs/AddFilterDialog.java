@@ -3,6 +3,7 @@ package com.collins.fmw.cyres.architecture.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -18,13 +19,27 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DataPort;
+import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.EventPort;
+import org.osate.aadl2.Feature;
 import org.osate.aadl2.PortCategory;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.StringLiteral;
+import org.osate.aadl2.Subcomponent;
+import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.architecture.handlers.AddFilterHandler;
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 /**
  * This class creates the Add Filter wizard
  */
 public class AddFilterDialog extends TitleAreaDialog {
 
+	private Subcomponent compoundFilter = null;
 	private Text txtFilterImplementationName;
 	private Text txtFilterImplementationLanguage;
 	private List<Button> btnLogPortType = new ArrayList<>();
@@ -40,6 +55,9 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> sourceGuarantees = new ArrayList<>();
 	private List<String> propagateGuarantees = new ArrayList<>();
 	private List<String> requirements = new ArrayList<>();
+
+	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
+	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddFilterDialog(Shell parentShell) {
 		super(parentShell);
@@ -74,9 +92,17 @@ public class AddFilterDialog extends TitleAreaDialog {
 		createFilterImplementationNameField(container);
 		createImplementationLanguageField(container);
 		createLogPortField(container);
+
 		createRequirementField(container);
-		createGuaranteeSelectionField(container);
+		if (compoundFilter == null) {
+			// Don't show the propagate guarantees field if we're adding a spec to an existing filter.
+			// Too complicated to figure out at this time
+			createGuaranteeSelectionField(container);
+		}
 		createAgreeField(container);
+
+		// set focus
+		parent.forceFocus();
 
 		return area;
 	}
@@ -94,7 +120,12 @@ public class AddFilterDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtFilterImplementationName = new Text(container, SWT.BORDER);
 		txtFilterImplementationName.setLayoutData(dataInfoField);
-		txtFilterImplementationName.setText("FLT");
+		if (compoundFilter == null) {
+			txtFilterImplementationName.setText(AddFilterHandler.FILTER_IMPL_NAME);
+		} else {
+			txtFilterImplementationName.setText(compoundFilter.getName());
+			txtFilterImplementationName.setEnabled(false);
+		}
 	}
 
 	/**
@@ -110,6 +141,20 @@ public class AddFilterDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtFilterImplementationLanguage = new Text(container, SWT.BORDER);
 		txtFilterImplementationLanguage.setLayoutData(dataInfoField);
+		if (compoundFilter != null) {
+			ComponentImplementation ci = compoundFilter.getComponentImplementation();
+			EList<PropertyExpression> propVals = ci.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_IMPL");
+			if (!propVals.isEmpty()) {
+				// There should be only one property value
+				PropertyExpression expr = propVals.get(0);
+				if (expr instanceof StringLiteral) {
+					txtFilterImplementationLanguage.setText(((StringLiteral) expr).getValue());
+				}
+			}
+			txtFilterImplementationLanguage.setEnabled(false);
+		} else {
+			txtFilterImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
+		}
 	}
 
 	/**
@@ -145,6 +190,27 @@ public class AddFilterDialog extends TitleAreaDialog {
 		btnEventDataLogPort.setText("Event Data");
 		btnEventDataLogPort.setSelection(false);
 
+		if (compoundFilter != null) {
+			ComponentType ct = compoundFilter.getComponentType();
+			for (Feature f : ct.getOwnedFeatures()) {
+				if (f.getName().equalsIgnoreCase(AddFilterHandler.FILTER_LOG_PORT_NAME)) {
+					btnNoLogPort.setSelection(false);
+					if (f instanceof DataPort) {
+						btnDataLogPort.setSelection(true);
+					} else if (f instanceof EventPort) {
+						btnEventLogPort.setSelection(true);
+					} else if (f instanceof EventDataPort) {
+						btnEventDataLogPort.setSelection(true);
+					}
+					break;
+				}
+			}
+			btnDataLogPort.setEnabled(false);
+			btnEventLogPort.setEnabled(false);
+			btnEventDataLogPort.setEnabled(false);
+			btnNoLogPort.setEnabled(false);
+		}
+
 		btnLogPortType.add(btnDataLogPort);
 		btnLogPortType.add(btnEventLogPort);
 		btnLogPortType.add(btnEventDataLogPort);
@@ -164,11 +230,12 @@ public class AddFilterDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboFilterRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboFilterRequirement = new Combo(container, SWT.BORDER);
 		cboFilterRequirement.setLayoutData(dataInfoField);
-		for (String clause : requirements) {
-			cboFilterRequirement.add(clause);
-		}
+		cboFilterRequirement.add(NO_REQUIREMENT_SELECTED);
+		requirements.forEach(r -> cboFilterRequirement.add(r));
+		cboFilterRequirement.setText(NO_REQUIREMENT_SELECTED);
+
 	}
 
 	/**
@@ -216,6 +283,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 				selectGuarantee.setText(formattedGuarantee);
 				selectGuarantee.setSelection(true);
 				selectGuarantee.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
 				btnPropagateGuarantees.add(selectGuarantee);
 			}
 
@@ -225,9 +293,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	/**
 	 * Saves information entered into the text fields.  This is needed because the
 	 * text fields are disposed when the dialog closes.
-	 * @param container
 	 */
-	private void saveInput() {
+	private boolean saveInput() {
 		filterImplementationLanguage = txtFilterImplementationLanguage.getText();
 		filterImplementationName = txtFilterImplementationName.getText();
 		logPortType = null;
@@ -237,7 +304,17 @@ public class AddFilterDialog extends TitleAreaDialog {
 				break;
 			}
 		}
+
 		filterRequirement = cboFilterRequirement.getText();
+		if (filterRequirement.equals(NO_REQUIREMENT_SELECTED)) {
+			filterRequirement = "";
+		} else if (!requirements.contains(filterRequirement)) {
+			Dialog.showError("Add Filter",
+					"Filter requirement " + filterRequirement
+							+ " does not exist in the model.  Select a requirement from the list, or choose "
+							+ NO_REQUIREMENT_SELECTED + ".");
+			return false;
+		}
 		agreeProperty = txtAgreeProperty.getText();
 		propagateGuarantees.clear();
 		for (int i = 0; i < btnPropagateGuarantees.size(); i++) {
@@ -267,11 +344,14 @@ public class AddFilterDialog extends TitleAreaDialog {
 				propagateGuarantees.add(guarantee);
 			}
 		}
+		return true;
 	}
 
 	@Override
 	protected void okPressed() {
-		saveInput();
+		if (!saveInput()) {
+			return;
+		}
 		super.okPressed();
 	}
 
@@ -306,6 +386,10 @@ public class AddFilterDialog extends TitleAreaDialog {
 
 	public void setRequirements(List<String> requirements) {
 		this.requirements = requirements;
+	}
+
+	public void createCompoundFilter(Subcomponent comp) {
+		this.compoundFilter = comp;
 	}
 
 }

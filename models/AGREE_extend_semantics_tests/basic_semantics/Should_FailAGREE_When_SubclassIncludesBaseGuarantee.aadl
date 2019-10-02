@@ -1,0 +1,27 @@
+package Should_FailAgree_When_SubclassIncludesBaseGuarantee
+public
+	with Base_Types;
+    
+    system Base
+        features
+            A : out data port Base_Types::Integer;
+        annex agree {**
+            guarantee A_not_zero "A != 0" : A != 0;
+        **};
+    end Base;
+    
+    system implementation Base.i
+    end Base.i;
+    
+    system Subclass extends Base
+        annex agree {**
+        **};
+    end Subclass;
+    
+    system implementation Subclass.i extends Base.i
+       annex agree {**
+            assign A = 0;
+       **};
+    end Subclass.i;
+    
+end Should_FailAgree_When_SubclassIncludesBaseGuarantee;

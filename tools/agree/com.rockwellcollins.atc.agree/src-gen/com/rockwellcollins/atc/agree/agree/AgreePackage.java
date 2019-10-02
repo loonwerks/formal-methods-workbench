@@ -2321,14 +2321,14 @@ public interface AgreePackage extends EPackage
   int PARAM_STATEMENT_FEATURE_COUNT = SPEC_STATEMENT_FEATURE_COUNT + 2;
 
   /**
-   * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.LiftStatementImpl <em>Lift Statement</em>}' class.
+   * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.LiftContractStatementImpl <em>Lift Contract Statement</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see com.rockwellcollins.atc.agree.agree.impl.LiftStatementImpl
-   * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getLiftStatement()
+   * @see com.rockwellcollins.atc.agree.agree.impl.LiftContractStatementImpl
+   * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getLiftContractStatement()
    * @generated
    */
-  int LIFT_STATEMENT = 39;
+  int LIFT_CONTRACT_STATEMENT = 39;
 
   /**
    * The feature id for the '<em><b>Owned Element</b></em>' reference list.
@@ -2337,7 +2337,7 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int LIFT_STATEMENT__OWNED_ELEMENT = SPEC_STATEMENT__OWNED_ELEMENT;
+  int LIFT_CONTRACT_STATEMENT__OWNED_ELEMENT = SPEC_STATEMENT__OWNED_ELEMENT;
 
   /**
    * The feature id for the '<em><b>Owned Comment</b></em>' containment reference list.
@@ -2346,25 +2346,16 @@ public interface AgreePackage extends EPackage
    * @generated
    * @ordered
    */
-  int LIFT_STATEMENT__OWNED_COMMENT = SPEC_STATEMENT__OWNED_COMMENT;
+  int LIFT_CONTRACT_STATEMENT__OWNED_COMMENT = SPEC_STATEMENT__OWNED_COMMENT;
 
   /**
-   * The feature id for the '<em><b>Subcomp</b></em>' reference.
+   * The number of structural features of the '<em>Lift Contract Statement</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int LIFT_STATEMENT__SUBCOMP = SPEC_STATEMENT_FEATURE_COUNT + 0;
-
-  /**
-   * The number of structural features of the '<em>Lift Statement</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int LIFT_STATEMENT_FEATURE_COUNT = SPEC_STATEMENT_FEATURE_COUNT + 1;
+  int LIFT_CONTRACT_STATEMENT_FEATURE_COUNT = SPEC_STATEMENT_FEATURE_COUNT + 0;
 
   /**
    * The meta object id for the '{@link com.rockwellcollins.atc.agree.agree.impl.ConnectionStatementImpl <em>Connection Statement</em>}' class.
@@ -6703,25 +6694,14 @@ public interface AgreePackage extends EPackage
   EReference getParamStatement_Type();
 
   /**
-   * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.LiftStatement <em>Lift Statement</em>}'.
+   * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.LiftContractStatement <em>Lift Contract Statement</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Lift Statement</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.LiftStatement
+   * @return the meta object for class '<em>Lift Contract Statement</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.LiftContractStatement
    * @generated
    */
-  EClass getLiftStatement();
-
-  /**
-   * Returns the meta object for the reference '{@link com.rockwellcollins.atc.agree.agree.LiftStatement#getSubcomp <em>Subcomp</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the reference '<em>Subcomp</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.LiftStatement#getSubcomp()
-   * @see #getLiftStatement()
-   * @generated
-   */
-  EReference getLiftStatement_Subcomp();
+  EClass getLiftContractStatement();
 
   /**
    * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.ConnectionStatement <em>Connection Statement</em>}'.
@@ -9152,22 +9132,14 @@ public interface AgreePackage extends EPackage
     EReference PARAM_STATEMENT__TYPE = eINSTANCE.getParamStatement_Type();
 
     /**
-     * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.LiftStatementImpl <em>Lift Statement</em>}' class.
+     * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.LiftContractStatementImpl <em>Lift Contract Statement</em>}' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see com.rockwellcollins.atc.agree.agree.impl.LiftStatementImpl
-     * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getLiftStatement()
+     * @see com.rockwellcollins.atc.agree.agree.impl.LiftContractStatementImpl
+     * @see com.rockwellcollins.atc.agree.agree.impl.AgreePackageImpl#getLiftContractStatement()
      * @generated
      */
-    EClass LIFT_STATEMENT = eINSTANCE.getLiftStatement();
-
-    /**
-     * The meta object literal for the '<em><b>Subcomp</b></em>' reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference LIFT_STATEMENT__SUBCOMP = eINSTANCE.getLiftStatement_Subcomp();
+    EClass LIFT_CONTRACT_STATEMENT = eINSTANCE.getLiftContractStatement();
 
     /**
      * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.ConnectionStatementImpl <em>Connection Statement</em>}' class.

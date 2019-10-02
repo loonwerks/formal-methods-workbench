@@ -11,14 +11,14 @@ public class TouchHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		// UofM
-		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/Test_Input_Prioritization.txt");
-		// Marabou
-		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/NN_Formal_Analysis.txt");
-		// ?
-		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/Safety_Aware_Constrained_Learning.txt");
-		// APT
-		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/APT.txt");
+//		// UofM
+//		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/Test_Input_Prioritization.txt");
+//		// Marabou
+//		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/NN_Formal_Analysis.txt");
+//		// ?
+//		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/Safety_Aware_Constrained_Learning.txt");
+//		// APT
+//		touch("C:/Users/ieamunds/Desktop/AAHAA/Demo/APT.txt");
 
 		return null;
 	}

@@ -93,6 +93,7 @@ public class BuiltInFnCallExprImpl extends ExprImpl implements BuiltInFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getFn()
   {
     return fn;
@@ -103,6 +104,7 @@ public class BuiltInFnCallExprImpl extends ExprImpl implements BuiltInFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setFn(String newFn)
   {
     String oldFn = fn;
@@ -116,6 +118,7 @@ public class BuiltInFnCallExprImpl extends ExprImpl implements BuiltInFnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Expr> getArgs()
   {
     if (args == null)
@@ -229,7 +232,7 @@ public class BuiltInFnCallExprImpl extends ExprImpl implements BuiltInFnCallExpr
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
+    StringBuilder result = new StringBuilder(super.toString());
     result.append(" (fn: ");
     result.append(fn);
     result.append(')');

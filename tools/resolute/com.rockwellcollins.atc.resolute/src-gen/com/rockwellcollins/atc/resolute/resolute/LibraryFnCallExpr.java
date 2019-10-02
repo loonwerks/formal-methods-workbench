@@ -27,10 +27,6 @@ public interface LibraryFnCallExpr extends Expr
   /**
    * Returns the value of the '<em><b>Lib Name</b></em>' attribute.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Lib Name</em>' attribute isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Lib Name</em>' attribute.
    * @see #setLibName(String)
@@ -53,10 +49,6 @@ public interface LibraryFnCallExpr extends Expr
   /**
    * Returns the value of the '<em><b>Fn Name</b></em>' attribute.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Fn Name</em>' attribute isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Fn Name</em>' attribute.
    * @see #setFnName(String)
@@ -80,10 +72,6 @@ public interface LibraryFnCallExpr extends Expr
    * Returns the value of the '<em><b>Args</b></em>' containment reference list.
    * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.Expr}.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Args</em>' containment reference list isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Args</em>' containment reference list.
    * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getLibraryFnCallExpr_Args()

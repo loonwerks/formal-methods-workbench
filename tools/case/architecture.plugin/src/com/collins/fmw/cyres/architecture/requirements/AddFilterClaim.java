@@ -39,7 +39,7 @@ public class AddFilterClaim extends BuiltInClaim {
 	@Override
 	public List<Arg> getDefinitionParams() {
 		List<Arg> defParams = new ArrayList<>();
-		defParams.add(Create.arg("context", Create.baseType("component")));
+		defParams.add(Create.arg("comp_context", Create.baseType("component")));
 		defParams.add(Create.arg("filter", Create.baseType("component")));
 		defParams.add(Create.arg("connection_name", Create.baseType("string")));
 		defParams.add(Create.arg("message_type", Create.baseType("data")));

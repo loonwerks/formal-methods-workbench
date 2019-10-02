@@ -27,17 +27,17 @@ def manage_daily_builds():
     # get list of releases
     releases = repository.releases()
     # extract keys and sort by build date
-    release_keys = {x.id : x.created_at  for x in releases}
-    sorted_keys = {k: v for k, v in sorted(release_keys.items(), key=lambda x: x[1])}
+    release_keys = {x.id : x.created_at for x in releases if "Nightly development build" in x.title} 
+    sorted_keys = sorted(release_keys.items(), reverse=True, key=lambda x: x[1])
     print('%s' % (pformat(sorted_keys)))
     # filter to obtain the keys to delete
-    delete_keys = [x for x in sorted_keys.keys()][2:]
+    delete_keys = [v[0] for v in sorted_keys[2:]]
     print('Deleting releases: %s' % (pformat(delete_keys)))
     # iterate, deleting the releases and corresponding tags
     for rel in releases:
         print('examining rel %d from %s...' % (rel.id, str(rel.created_at)))
         if rel.id in delete_keys:
-            print(' deleting %d.' % (rel.id))
+            print(' deleting release id %d and tag %s.' % (rel.id, rel.tag_name))
             rel_tag_ref = repository.ref('tags/%s' % (rel.tag_name))
             rel.delete()
             if rel_tag_ref is not None:

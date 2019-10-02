@@ -17,9 +17,9 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.ModelUnit;
-import org.osate.aadl2.impl.AadlPackageImpl;
 
 public class ModelHashcode {
 
@@ -88,12 +88,12 @@ public class ModelHashcode {
 		// Get the resources that are referred to (via the 'with' statement)
 		EList<EObject> resourceContents = resource.getContents();
 		for (EObject eObj : resourceContents) {
-			if (eObj instanceof AadlPackageImpl) {
-				AadlPackageImpl aadlPackageImpl = (AadlPackageImpl) eObj;
+			if (eObj instanceof AadlPackage) {
+				AadlPackage aadlPackage = (AadlPackage) eObj;
 
 				// Resources included in the public section
-				if (aadlPackageImpl.getOwnedPublicSection() != null) {
-					final EList<ModelUnit> importedUnits = aadlPackageImpl.getPublicSection().getImportedUnits();
+				if (aadlPackage.getOwnedPublicSection() != null) {
+					final EList<ModelUnit> importedUnits = aadlPackage.getPublicSection().getImportedUnits();
 					for (ModelUnit mUnit : importedUnits) {
 						IFile resourceFile = workspaceRoot
 								.getFile(new Path(mUnit.eResource().getURI().toPlatformString(true)));
@@ -103,8 +103,8 @@ public class ModelHashcode {
 					}
 				}
 				// Resources included in the private section
-				if (aadlPackageImpl.getOwnedPrivateSection() != null) {
-					final EList<ModelUnit> importedUnits = aadlPackageImpl.getPrivateSection().getImportedUnits();
+				if (aadlPackage.getOwnedPrivateSection() != null) {
+					final EList<ModelUnit> importedUnits = aadlPackage.getPrivateSection().getImportedUnits();
 					for (ModelUnit mUnit : importedUnits) {
 						IFile resourceFile = workspaceRoot
 								.getFile(new Path(mUnit.eResource().getURI().toPlatformString(true)));

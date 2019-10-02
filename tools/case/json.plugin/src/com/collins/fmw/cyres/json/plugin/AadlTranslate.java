@@ -2,6 +2,7 @@ package com.collins.fmw.cyres.json.plugin;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
+import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AadlReal;
@@ -9,6 +10,7 @@ import org.osate.aadl2.AadlString;
 import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.BasicProperty;
 import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.BusAccess;
 import org.osate.aadl2.BusFeatureClassifier;
@@ -52,6 +54,8 @@ import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.RangeType;
 import org.osate.aadl2.RangeValue;
 import org.osate.aadl2.RealLiteral;
+import org.osate.aadl2.RecordType;
+import org.osate.aadl2.ReferenceType;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
@@ -67,6 +71,16 @@ import com.google.gson.JsonPrimitive;
 public class AadlTranslate extends Aadl2Switch<JsonElement> {
 
 	AgreeTranslate agreeTranslate = new AgreeTranslate();
+
+	public enum AgreePrintOption {
+		PARSE, UNPARSE, BOTH
+	};
+
+	private AgreePrintOption agreePrintOption = AgreePrintOption.PARSE;
+
+	public AadlTranslate(AgreePrintOption agreePrintOption) {
+		this.agreePrintOption = agreePrintOption;
+	}
 
 	@Override
 	public JsonObject casePackageRename(PackageRename packageRename) {
@@ -185,7 +199,8 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		result.add("category", new JsonPrimitive(ct.getCategory().getName()));
 		TypeExtension te = ct.getOwnedExtension();
 		if (te != null) {
-			result.add("extends", doSwitch(te.getExtended()));
+//			result.add("extends", doSwitch(te.getExtended()));
+			result.add("extends", new JsonPrimitive(te.getExtended().getQualifiedName()));
 		}
 
 		JsonArray features = new JsonArray();
@@ -227,7 +242,8 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		result.add("category", new JsonPrimitive(ci.getCategory().getName()));
 		ImplementationExtension ie = ci.getOwnedExtension();
 		if (ie != null) {
-			result.add("extends", doSwitch(ie.getExtended()));
+//			result.add("extends", doSwitch(ie.getExtended()));
+			result.add("extends", new JsonPrimitive(ie.getExtended().getQualifiedName()));
 		}
 
 		JsonArray subcomponents = new JsonArray();
@@ -295,13 +311,21 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		JsonObject result = new JsonObject();
 		result.add("name", new JsonPrimitive(al.getName()));
 		result.add("kind", new JsonPrimitive("AnnexLibrary"));
+
 		if (al.getName().equalsIgnoreCase("agree")) {
-			// AGREE annex will be parsed
-			result.add("parsedAnnexLibrary", agreeTranslate.genAnnexLibrary(al));
+			if (this.agreePrintOption == AgreePrintOption.PARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
+				// AGREE annex will be parsed
+				result.add("parsedAnnexLibrary", agreeTranslate.genAnnexLibrary(al));
+			}
+			if (this.agreePrintOption == AgreePrintOption.UNPARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
+				DefaultAnnexLibrary defaultAnnexLib = (DefaultAnnexLibrary) al;
+				result.add("sourceText", new JsonPrimitive(defaultAnnexLib.getSourceText().replace("\"", "\\\"")));
+			}
 		} else {
 			DefaultAnnexLibrary defaultAnnexLib = (DefaultAnnexLibrary) al;
 			result.add("sourceText", new JsonPrimitive(defaultAnnexLib.getSourceText().replace("\"", "\\\"")));
 		}
+
 		return result;
 	}
 
@@ -311,13 +335,22 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		JsonObject result = new JsonObject();
 		result.add("name", new JsonPrimitive(as.getName()));
 		result.add("kind", new JsonPrimitive("AnnexSubclause"));
+
 		if (as.getName().equalsIgnoreCase("agree")) {
-			// AGREE annex will be parsed
-			result.add("parsedAnnexSubclause", agreeTranslate.genAnnexSubclause(as));
+			if (this.agreePrintOption == AgreePrintOption.PARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
+				// AGREE annex will be parsed
+				result.add("parsedAnnexSubclause", agreeTranslate.genAnnexSubclause(as));
+			}
+			if (this.agreePrintOption == AgreePrintOption.UNPARSE || this.agreePrintOption == AgreePrintOption.BOTH) {
+				DefaultAnnexSubclause defaultAnnexSubclause = (DefaultAnnexSubclause) as;
+				result.add("sourceText",
+						new JsonPrimitive(defaultAnnexSubclause.getSourceText().replace("\"", "\\\"")));
+			}
 		} else {
 			DefaultAnnexSubclause defaultAnnexSubclause = (DefaultAnnexSubclause) as;
 			result.add("sourceText", new JsonPrimitive(defaultAnnexSubclause.getSourceText().replace("\"", "\\\"")));
 		}
+
 		return result;
 	}
 
@@ -333,6 +366,13 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 			result.add("classifier", JsonNull.INSTANCE);
 		} else {
 			result.add("classifier", new JsonPrimitive(sc.getClassifier().getQualifiedName()));
+		}
+		JsonArray properties = new JsonArray();
+		for (PropertyAssociation pa : sc.getOwnedPropertyAssociations()) {
+			properties.add(doSwitch(pa));
+		}
+		if (properties.size() > 0) {
+			result.add("properties", properties);
 		}
 		return result;
 	}
@@ -495,7 +535,11 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 		result.add("name", new JsonPrimitive(p.getQualifiedName()));
 		result.add("kind", new JsonPrimitive("Property"));
 		result.add("inherit", new JsonPrimitive(p.isInherit()));
-		result.add("propertyType", doSwitch(p.getPropertyType()));
+		PropertyType pt = p.getPropertyType();
+		if (pt == null) {
+			pt = p.getReferencedPropertyType();
+		}
+		result.add("propertyType", doSwitch(pt));
 		JsonArray appliesTo = new JsonArray();
 		for (MetaclassReference ref : p.getAppliesToMetaclasses()) {
 			String name = "";
@@ -515,11 +559,14 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	public JsonElement buildProperty(Property p) {
 		JsonObject result = new JsonObject();
 
-//		result.add("name", p.getName()));
 		result.add("name", new JsonPrimitive(p.getQualifiedName()));
 		result.add("kind", new JsonPrimitive("Property"));
 		result.add("inherit", new JsonPrimitive(p.isInherit()));
-		result.add("propertyType", doSwitch(p.getPropertyType()));
+		PropertyType pt = p.getPropertyType();
+		if (pt == null) {
+			pt = p.getReferencedPropertyType();
+		}
+		result.add("propertyType", doSwitch(pt));
 		JsonArray appliesTo = new JsonArray();
 		for (MetaclassReference ref : p.getAppliesToMetaclasses()) {
 			String name = "";
@@ -538,17 +585,19 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	@Override
 	public JsonElement casePropertyConstant(PropertyConstant p) {
 		JsonObject result = new JsonObject();
-//		result.add("name", p.getName()));
 		result.add("name", new JsonPrimitive(p.getQualifiedName()));
 		result.add("kind", new JsonPrimitive("PropertyConstant"));
-		result.add("propertyType", doSwitch(p.getPropertyType()));
+		PropertyType pt = p.getPropertyType();
+		if (pt == null) {
+			pt = p.getReferencedPropertyType();
+		}
+		result.add("propertyType", doSwitch(pt));
 		result.add("value", genPropertyExpression(p.getConstantValue()));
 		return result;
 	}
 
 	public JsonElement buildPropertyType(PropertyType p) {
 		JsonObject result = new JsonObject();
-//		result.add("name", p.getName()));
 		result.add("name", new JsonPrimitive(p.getQualifiedName()));
 		result.add("kind", new JsonPrimitive("PropertyType"));
 		result.add("type", doSwitch(p));
@@ -571,12 +620,45 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	public JsonElement caseListType(ListType lt) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("ListType"));
-		PropertyType pt = lt.getOwnedElementType();
+		PropertyType pt = lt.getElementType();
 		if (pt == null) {
 			pt = lt.getReferencedElementType();
 		}
-		result.add("elementType", doSwitch(pt));
+		if (pt.hasName()) {
+			result.add("propertyType", new JsonPrimitive(pt.getQualifiedName()));
+		} else {
+			result.add("propertyType", doSwitch(pt));
+		}
+		return result;
+	}
 
+	@Override
+	public JsonElement caseRecordType(RecordType rt) {
+		JsonObject result = new JsonObject();
+		result.add("kind", new JsonPrimitive("RecordType"));
+		JsonArray fields = new JsonArray();
+		for (BasicProperty bp : rt.getOwnedFields()) {
+			fields.add(doSwitch(bp));
+		}
+		result.add("fields", fields);
+		return result;
+	}
+
+	@Override
+	public JsonElement caseBasicProperty(BasicProperty bp) {
+		JsonObject result = new JsonObject();
+		result.add("name", new JsonPrimitive(bp.getName()));
+		PropertyType pt = bp.getPropertyType();
+		if (pt == null) {
+			pt = bp.getReferencedPropertyType();
+		}
+		if (pt.hasName()) {
+			JsonObject kind = new JsonObject();
+			kind.add("kind", new JsonPrimitive(pt.getQualifiedName()));
+			result.add("propertyType", kind);
+		} else {
+			result.add("propertyType", doSwitch(pt));
+		}
 		return result;
 	}
 
@@ -584,7 +666,7 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	public JsonElement caseRangeType(RangeType rt) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("RangeType"));
-		NumberType nt = rt.getOwnedNumberType();
+		NumberType nt = rt.getNumberType();
 		if (nt == null) {
 			nt = rt.getReferencedNumberType();
 		}
@@ -604,7 +686,23 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 			}
 			classifierReferences.add(new JsonPrimitive(name.trim()));
 		}
-		result.add("name", classifierReferences);
+		result.add("classifiers", classifierReferences);
+		return result;
+	}
+
+	@Override
+	public JsonElement caseReferenceType(ReferenceType rt) {
+		JsonObject result = new JsonObject();
+		result.add("kind", new JsonPrimitive("ReferenceType"));
+		JsonArray refs = new JsonArray();
+		for (MetaclassReference mr : rt.getNamedElementReferences()) {
+			String name = "";
+			for (String n : mr.getMetaclassNames()) {
+				name = name + n + " ";
+			}
+			refs.add(new JsonPrimitive(name.trim()));
+		}
+		result.add("references", refs);
 		return result;
 	}
 
@@ -612,6 +710,13 @@ public class AadlTranslate extends Aadl2Switch<JsonElement> {
 	public JsonElement caseAadlString(AadlString s) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("AadlString"));
+		return result;
+	}
+
+	@Override
+	public JsonElement caseAadlBoolean(AadlBoolean b) {
+		JsonObject result = new JsonObject();
+		result.add("kind", new JsonPrimitive("AadlBoolean"));
 		return result;
 	}
 

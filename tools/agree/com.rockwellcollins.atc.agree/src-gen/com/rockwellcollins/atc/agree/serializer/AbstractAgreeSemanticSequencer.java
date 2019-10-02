@@ -48,7 +48,7 @@ import com.rockwellcollins.atc.agree.agree.LatchedExpr;
 import com.rockwellcollins.atc.agree.agree.LatchedStatement;
 import com.rockwellcollins.atc.agree.agree.LemmaStatement;
 import com.rockwellcollins.atc.agree.agree.LibraryFnDef;
-import com.rockwellcollins.atc.agree.agree.LiftStatement;
+import com.rockwellcollins.atc.agree.agree.LiftContractStatement;
 import com.rockwellcollins.atc.agree.agree.LinearizationDef;
 import com.rockwellcollins.atc.agree.agree.LinearizationInterval;
 import com.rockwellcollins.atc.agree.agree.MNSynchStatement;
@@ -360,8 +360,8 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 			case AgreePackage.LIBRARY_FN_DEF:
 				sequence_LibraryFnDef(context, (LibraryFnDef) semanticObject); 
 				return; 
-			case AgreePackage.LIFT_STATEMENT:
-				sequence_SpecStatement(context, (LiftStatement) semanticObject); 
+			case AgreePackage.LIFT_CONTRACT_STATEMENT:
+				sequence_SpecStatement(context, (LiftContractStatement) semanticObject); 
 				return; 
 			case AgreePackage.LINEARIZATION_DEF:
 				sequence_LinearizationDef(context, (LinearizationDef) semanticObject); 
@@ -1912,20 +1912,14 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 	
 	/**
 	 * Contexts:
-	 *     Element returns LiftStatement
-	 *     SpecStatement returns LiftStatement
+	 *     Element returns LiftContractStatement
+	 *     SpecStatement returns LiftContractStatement
 	 *
 	 * Constraint:
-	 *     subcomp=[NamedElement|ID]
+	 *     {LiftContractStatement}
 	 */
-	protected void sequence_SpecStatement(ISerializationContext context, LiftStatement semanticObject) {
-		if (errorAcceptor != null) {
-			if (transientValues.isValueTransient(semanticObject, AgreePackage.Literals.LIFT_STATEMENT__SUBCOMP) == ValueTransient.YES)
-				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, AgreePackage.Literals.LIFT_STATEMENT__SUBCOMP));
-		}
-		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
-		feeder.accept(grammarAccess.getSpecStatementAccess().getSubcompNamedElementIDTerminalRuleCall_3_2_0_1(), semanticObject.eGet(AgreePackage.Literals.LIFT_STATEMENT__SUBCOMP, false));
-		feeder.finish();
+	protected void sequence_SpecStatement(ISerializationContext context, LiftContractStatement semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
 	}
 	
 	

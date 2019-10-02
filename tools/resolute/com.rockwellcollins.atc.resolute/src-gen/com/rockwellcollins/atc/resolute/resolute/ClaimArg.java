@@ -26,10 +26,6 @@ public interface ClaimArg extends ClaimText
   /**
    * Returns the value of the '<em><b>Arg</b></em>' reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Arg</em>' reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Arg</em>' reference.
    * @see #setArg(ClaimTextVar)
@@ -52,10 +48,6 @@ public interface ClaimArg extends ClaimText
   /**
    * Returns the value of the '<em><b>Unit</b></em>' reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Unit</em>' reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Unit</em>' reference.
    * @see #setUnit(UnitLiteral)

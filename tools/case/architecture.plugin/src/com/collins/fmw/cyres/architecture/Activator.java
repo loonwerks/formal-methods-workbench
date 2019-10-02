@@ -8,6 +8,8 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 
+	public static final String PLUGIN_ID = "com.collins.fmw.cyres.architecture.plugin";
+
 	/**
 	 * The constructor
 	 */

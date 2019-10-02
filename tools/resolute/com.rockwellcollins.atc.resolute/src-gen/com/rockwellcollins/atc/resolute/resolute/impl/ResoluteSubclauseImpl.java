@@ -71,6 +71,7 @@ public class ResoluteSubclauseImpl extends AnnexSubclauseImpl implements Resolut
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<AnalysisStatement> getProves()
   {
     if (proves == null)

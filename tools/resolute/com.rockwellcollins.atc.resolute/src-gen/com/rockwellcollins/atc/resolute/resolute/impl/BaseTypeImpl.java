@@ -86,6 +86,7 @@ public class BaseTypeImpl extends TypeImpl implements BaseType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Type getParamType()
   {
     return paramType;
@@ -113,6 +114,7 @@ public class BaseTypeImpl extends TypeImpl implements BaseType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setParamType(Type newParamType)
   {
     if (newParamType != paramType)
@@ -134,6 +136,7 @@ public class BaseTypeImpl extends TypeImpl implements BaseType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public String getType()
   {
     return type;
@@ -144,6 +147,7 @@ public class BaseTypeImpl extends TypeImpl implements BaseType
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setType(String newType)
   {
     String oldType = type;
@@ -254,7 +258,7 @@ public class BaseTypeImpl extends TypeImpl implements BaseType
   {
     if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
+    StringBuilder result = new StringBuilder(super.toString());
     result.append(" (type: ");
     result.append(type);
     result.append(')');

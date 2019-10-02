@@ -24,10 +24,6 @@ public interface LintExpr extends Expr
   /**
    * Returns the value of the '<em><b>Lint Stmt</b></em>' containment reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Lint Stmt</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Lint Stmt</em>' containment reference.
    * @see #setLintStmt(LintStatement)

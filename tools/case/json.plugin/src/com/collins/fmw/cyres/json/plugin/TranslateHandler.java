@@ -13,16 +13,15 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
-import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Realization;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ge.BusinessObjectSelection;
 import org.osate.ui.dialogs.Dialog;
 
+import com.collins.fmw.cyres.json.plugin.AadlTranslate.AgreePrintOption;
 import com.collins.fmw.cyres.util.plugin.ModelHashcode;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
 import com.google.gson.JsonObject;
@@ -32,30 +31,28 @@ public class TranslateHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
+		final URI uri = getSelectionURI(HandlerUtil.getCurrentSelection(event));
 		if (uri == null) {
 			return null;
 		}
 
-		XtextResourceSet resourceSet = OsateResourceUtil.getResourceSet();
-		EObject eObj = resourceSet.getEObject(uri, true);
+		final EObject eObj = getEObject(uri);
 
 		ComponentImplementation ci = null;
 		if (eObj instanceof ComponentImplementation) {
 			ci = (ComponentImplementation) eObj;
 		}
 
-		IProject project = TraverseProject.getCurrentProject();
+		final IProject project = TraverseProject.getCurrentProject();
 
 		String hashcode = null;
 		try {
 			hashcode = ModelHashcode.getHashcode(ci);
 		} catch (Exception e) {
-			;
 			hashcode = null;
 		}
 
-		JsonObject header = new JsonObject();
+		final JsonObject header = new JsonObject();
 		if (project != null) {
 			header.addProperty("project", project.getName());
 		}
@@ -69,9 +66,9 @@ public class TranslateHandler extends AbstractHandler {
 
 		try {
 			// Generate json
-			Aadl2Json.createJson(header);
+			Aadl2Json.createJson(header, AgreePrintOption.BOTH);
 		} catch (Exception e) {
-			Dialog.showError("JSON Generator", "Unable to export model to JSON format.");
+			Dialog.showError("JSON Generator", "Unable to export model to JSON format");
 			return null;
 		}
 
@@ -108,6 +105,11 @@ public class TranslateHandler extends AbstractHandler {
 		return null;
 	}
 
-
+	private EObject getEObject(URI uri) {
+		XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
+		return xtextEditor.getDocument().readOnly(resource -> {
+			return resource.getResourceSet().getEObject(uri, true);
+		});
+	}
 
 }

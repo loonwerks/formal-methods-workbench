@@ -1,0 +1,33 @@
+package Should_FailToGenerateModel_When_SubsubclassRedefiningAssumeOnExistingFeature
+public
+	with Base_Types;
+	
+	system Base
+        features
+            A : in data port Base_Types::Integer;
+        annex agree {**
+            assume A_not_zero "A != 0" : A != 0;
+        **};
+    end Base;
+    
+    system implementation Base.i    
+    end Base.i;
+    
+    system Subclass extends Base
+    end Subclass;
+    
+    system implementation Subclass.i extends Base.i
+    end Subclass.i;
+    
+    system Subsubclass extends Subclass
+        annex agree {**
+            assume A_greater_zero "A > 0" : A > 0;
+        **};
+    end Subsubclass;
+    
+    system implementation Subsubclass.i extends Subclass.i
+        annex agree {**
+        **};
+    end Subsubclass.i;
+    
+end Should_FailToGenerateModel_When_SubsubclassRedefiningAssumeOnExistingFeature;

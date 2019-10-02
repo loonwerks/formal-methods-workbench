@@ -1,0 +1,30 @@
+package Should_PassAGREE_When_SubclassIncludesBaseAssume
+public
+	with Base_Types;
+    
+    system Base
+        features
+            A : in data port Base_Types::Integer;
+        annex agree {**
+        	eq xyz : bool;
+            assume A_not_zero "A != 0" : A != 0;
+        **};
+    end Base;
+    
+    system implementation Base.i
+    end Base.i;
+    
+    system Subclass extends Base
+        annex agree {**
+            eq test : bool;
+            guarantee base_assume_present "Base assume present: A != 0" : test;
+        **};
+    end Subclass;
+    
+    system implementation Subclass.i extends Base.i
+       annex agree {**
+            assign test = (A != 0);
+       **};
+    end Subclass.i;
+    
+end Should_PassAGREE_When_SubclassIncludesBaseAssume;
