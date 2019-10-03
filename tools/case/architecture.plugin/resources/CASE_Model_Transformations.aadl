@@ -368,7 +368,7 @@ public
 		-- Check to see if there is a filter immediately before 
 		-- the component on the communication pathway.
 		filter_exists(filter : component, comp_context : component, conn : connection) <=
-			** "A CASE_Filter " filter " is connected to component " comp_context " by connection " conn_name **
+			** "A CASE_Filter " filter " is connected to component " comp_context " by connection " conn **
 			let conns : {connection} = {c for (c : connections(comp_context)) | destination_component(c) = comp_context and source_component(c) = filter};
 			is_filter(filter) and exists(c : conns) . c = conn
 	
