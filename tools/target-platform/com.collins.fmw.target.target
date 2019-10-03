@@ -97,7 +97,7 @@
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
       <unit id="com.rockwellcollins.atc.darpacase.requirements.feature.feature.group" version="0.0.0"/>
       <unit id="com.rockwellcollins.atc.darpacase.requirements.feature.source.feature.group" version="0.0.0"/>
-      <repository location="file:/home/kfhoech/git/CRA/CRA/case/TA1/repository/target/repository/"/>
+      <repository location="file:/home/kfhoech/git/CRA/CRA/case-ta1-gearcase/TA1/repository/target/repository/"/>
     </location>
   </locations>
 </target>
