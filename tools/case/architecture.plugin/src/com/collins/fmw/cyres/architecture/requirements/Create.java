@@ -127,11 +127,11 @@ public class Create {
 		return thisExpr;
 	}
 
-	public static ThisExpr THIS(Subcomponent comp) {
+	public static ThisExpr THIS(NamedElement ne) {
 		ThisExpr thisExpr = factory.createThisExpr();
-		if (comp != null) {
+		if (ne != null) {
 			NestedDotID id = factory.createNestedDotID();
-			id.setBase(comp);
+			id.setBase(ne);
 			thisExpr.setSub(id);
 		}
 		return thisExpr;

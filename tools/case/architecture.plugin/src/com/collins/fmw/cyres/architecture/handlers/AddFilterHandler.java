@@ -436,7 +436,7 @@ public class AddFilterHandler extends AadlHandler {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
 					RequirementsManager.getInstance().modifyRequirement(filterRequirement, resource,
 							new AddFilterClaim(req.getContext(), filterSubcomp,
-									portConnOut.getName(), dataFeatureClassifier));
+									portConnOut, dataFeatureClassifier));
 
 				}
 
@@ -658,7 +658,7 @@ public class AddFilterHandler extends AadlHandler {
 				if (!filterRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
 					RequirementsManager.getInstance().modifyRequirement(filterRequirement, resource, new AddFilterClaim(
-							req.getContext(), subcomponent, connection.getName(), dataFeatureClassifier));
+							req.getContext(), subcomponent, connection, dataFeatureClassifier));
 
 				}
 			}
