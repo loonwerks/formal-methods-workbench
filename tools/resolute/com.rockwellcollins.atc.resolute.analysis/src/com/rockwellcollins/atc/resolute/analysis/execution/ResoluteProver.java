@@ -336,10 +336,12 @@ public class ResoluteProver extends ResoluteSwitch<ResoluteResult> {
 						val = new RealValue(((RealValue) val).getScaledReal(claimArgUnit));
 					}
 				}
-				// print out connection names correctly
+				// print out port connection names correctly
 				if (val instanceof NamedElementValue && val.getNamedElement() instanceof ConnectionInstance) {
 					ConnectionInstance ci = (ConnectionInstance) val.getNamedElement();
-					val = new NamedElementValue(ci.getConnectionReferences().get(0).getConnection());
+					if (ci.getConnectionReferences().size() == 1) {
+						val = new NamedElementValue(ci.getConnectionReferences().get(0).getConnection());
+					}
 				}
 				text.append(val);
 				if (claimArgUnit != null) {
