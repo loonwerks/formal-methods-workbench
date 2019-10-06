@@ -184,7 +184,7 @@ public class ImportRequirementsGUI extends Dialog {
 
 		Label lblContext = new Label(composite, SWT.CENTER);
 		lblContext.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
-		lblContext.setText("Component(s)");
+		lblContext.setText("Component");
 
 		lblContext2 = new Label(composite, SWT.BORDER);
 		lblContext2.setBackground(SWTResourceManager.getColor(255, 240, 245));

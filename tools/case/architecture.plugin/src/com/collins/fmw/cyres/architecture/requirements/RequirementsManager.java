@@ -3,7 +3,6 @@ package com.collins.fmw.cyres.architecture.requirements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -46,7 +45,7 @@ public class RequirementsManager {
 		return instance;
 	}
 
-	private static void closeEditor(XtextEditor editor, boolean save) {
+	public static void closeEditor(XtextEditor editor, boolean save) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (save) {
 			page.saveEditor(editor, false);
@@ -59,7 +58,7 @@ public class RequirementsManager {
 		}
 	}
 
-	private static XtextEditor getEditor(IFile file) {
+	public static XtextEditor getEditor(IFile file) {
 		IWorkbenchPage page = null;
 		IEditorPart part = null;
 
@@ -153,6 +152,21 @@ public class RequirementsManager {
 //		}
 	}
 
+//	public void importRequirement(CyberRequirement req, boolean formalize) {
+//		if (req == null) {
+//			return;
+//		}
+//
+//		req.insert();
+//
+//		if (formalize) {
+//			insertAgree(req);
+//		}
+//
+//		// Add the requirement to the imported requirements list
+//		importedRequirements.add(req);
+//	}
+
 	public void removeRequirement(String reqId, boolean removeAgree) {
 		CyberRequirement req = getRequirement(reqId);
 		if (req == null) {
@@ -233,7 +247,7 @@ public class RequirementsManager {
 							ClaimBody cb = (ClaimBody) db;
 							for (ClaimText ct : cb.getClaim()) {
 								if (ct instanceof ClaimString) {
-									reqClaimString += ct;
+									reqClaimString += ((ClaimString) ct).getStr();
 								}
 							}
 							// Annotate claim with requirement information
@@ -313,24 +327,22 @@ public class RequirementsManager {
 	}
 
 	protected void insertClaim(CyberRequirement req, BuiltInClaim claim) {
-		Map.Entry<BuiltInClaim, FunctionDefinition> ret = insertClaimDefinition(req, claim);
-		if (ret != null) {
-			insertClaimCall(req, ret.getKey(), ret.getValue());
-		}
+		insertClaimDefinition(req, claim);
+		insertClaimCall(req, claim);
 	}
 
 	protected boolean removeClaim(CyberRequirement req, BuiltInClaim claim) {
 //		return removeClaimDefinition(req, claim);
-		FunctionDefinition fd = removeClaimDefinition(req, claim);
 		if (claim instanceof BaseClaim) {
-			return fd == null ? false : removeClaimCall(req, fd);
+			removeClaimCall(req);
 		}
+		removeClaimDefinition(req, claim);
 		// TODO: poorly written; meaning of return value is not clear; rewrite
 		return true;
 	}
 
-	protected void insertClaimCall(CyberRequirement req, BuiltInClaim claim, FunctionDefinition fd) {
-		if (req == null || claim == null || fd == null) {
+	protected void insertClaimCall(CyberRequirement req, BuiltInClaim claim) {
+		if (req == null || claim == null) {
 			return;
 		}
 
@@ -343,18 +355,19 @@ public class RequirementsManager {
 		}
 
 		editor.getDocument().modify(resource -> {
-			req.insertClaimCall(claim, fd, resource);
+			req.insertClaimCall(claim, resource);
 			return null;
 		});
+
+		editor.forceReconcile();
 
 		// Close editor, if necessary
 		closeEditor(editor, true);
 	}
 
-	protected Map.Entry<BuiltInClaim, FunctionDefinition> insertClaimDefinition(CyberRequirement req,
-			BuiltInClaim claim) {
+	protected void insertClaimDefinition(CyberRequirement req, BuiltInClaim claim) {
 		if (req == null || claim == null) {
-			return null;
+			throw new RuntimeException("Cannot insert claim definition. Requirement: " + req + " Claim: " + claim);
 		}
 
 		// Get the file to insert into
@@ -362,17 +375,18 @@ public class RequirementsManager {
 		XtextEditor editor = getEditor(file);
 
 		if (editor == null) {
-			return null;
+			throw new RuntimeException("Cannot open claim definition file: " + file);
 		}
 
-		Map.Entry<BuiltInClaim, FunctionDefinition> ret = editor.getDocument().modify(resource -> {
-			return req.insertClaimDef(claim, resource);
+		editor.getDocument().modify(resource -> {
+			req.insertClaimDef(claim, resource);
+			return null;
 		});
+
+		editor.forceReconcile();
 
 		// Close editor, if necessary
 		closeEditor(editor, true);
-
-		return ret;
 	}
 
 	protected FunctionDefinition removeClaimDefinition(CyberRequirement req,
@@ -399,8 +413,8 @@ public class RequirementsManager {
 		return fd;
 	}
 
-	protected boolean removeClaimCall(CyberRequirement req, FunctionDefinition fd) {
-		if (req == null || fd == null) {
+	protected boolean removeClaimCall(CyberRequirement req) {
+		if (req == null) {
 			return false;
 		}
 
@@ -413,7 +427,7 @@ public class RequirementsManager {
 		}
 
 		boolean success = editor.getDocument().modify(resource -> {
-			return req.removeClaimCall(fd, resource);
+			return req.removeClaimCall(resource);
 		});
 
 		// Close editor, if necessary

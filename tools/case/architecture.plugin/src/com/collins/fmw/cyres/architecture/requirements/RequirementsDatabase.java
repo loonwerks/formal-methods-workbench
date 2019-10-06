@@ -50,7 +50,7 @@ public class RequirementsDatabase {
 		// Read database from the physical requirements database file
 		final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
 		JsonRequirementsFile jsonReqFile = new JsonRequirementsFile();
-		if (!jsonReqFile.importFile(reqFile)) {
+		if (!reqFile.exists() || !jsonReqFile.importFile(reqFile)) {
 			Dialog.showInfo("Missing requirements database",
 					"No requirements database found. Starting a new database.");
 		} else {
