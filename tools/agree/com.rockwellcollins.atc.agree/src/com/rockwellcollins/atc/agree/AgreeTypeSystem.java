@@ -452,6 +452,12 @@ public class AgreeTypeSystem {
 								TypeDef typeDef = typeDefFromNE(arg);
 								fields.putIfAbsent(fieldName, typeDef);
 							}
+
+							if (spec instanceof ConstStatement) {
+								String fieldName = ((ConstStatement) spec).getName();
+								TypeDef typeDef = AgreeTypeSystem.typeDefFromType(((ConstStatement) spec).getType());
+								fields.putIfAbsent(fieldName, typeDef);
+							}
 						}
 
 					}
