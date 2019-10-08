@@ -397,7 +397,11 @@ public class CaseUtils {
 	}
 
 	public static IFile getCaseRequirementsFile() {
-		return TraverseProject.getCurrentProject().getFile(CASE_REQUIREMENTS_FILE);
+		final IFile caseReqFile = TraverseProject.getCurrentProject().getFile(CASE_REQUIREMENTS_FILE);
+		if (!caseReqFile.exists()) {
+			initCaseRequirementsPackage();
+		}
+		return caseReqFile;
 	}
 
 }

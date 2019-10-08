@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 
@@ -398,7 +397,7 @@ public class CyberRequirement {
 	//		subclause.setParsedAnnexSubclause(resclause);
 	//	}
 
-		public void insertClaimDef(BuiltInClaim claim, Resource resource) {
+		public void insertClaimDef(Resource resource, BuiltInClaim claim) {
 			if (claim == null) {
 				throw new RuntimeException("NULL claim.");
 			}
@@ -484,88 +483,7 @@ public class CyberRequirement {
 			defResLib.setParsedAnnexLibrary(resLib);
 		}
 
-	public void insertClaimDef(List<BuiltInClaim> claims, Resource resource) {
-
-			if (claims == null || claims.isEmpty()) {
-				throw new RuntimeException("NULL claim.");
-			}
-
-			// Get modification context
-			AadlPackage pkg = getClaimDefinitionPackage(resource);
-
-			FunctionDefinition currentClaimDefinition = getClaimDefinition(pkg);
-
-			boolean setClaimsContext = false;
-			for (BuiltInClaim claim : claims) {
-				currentClaimDefinition = claim.buildClaimDefinition(currentClaimDefinition);
-				if (claim instanceof BaseClaim || claim instanceof AgreePropCheckedClaim) {
-					setClaimsContext = true;
-				}
-			}
-
-			if (currentClaimDefinition == null) {
-				throw new RuntimeException(
-						"Null claim definition cannnot be inserted into package (" + pkg.getQualifiedName() + ").");
-			}
-
-			if (setClaimsContext) {
-				ClaimBody claimBody = (ClaimBody) currentClaimDefinition.getBody();
-				setClaimContexts(claimBody);
-			}
-
-			PrivatePackageSection priv8 = pkg.getOwnedPrivateSection();
-			if (priv8 == null) {
-				priv8 = pkg.createOwnedPrivateSection();
-			}
-
-			DefaultAnnexLibrary defResLib = null;
-			ResoluteLibrary resLib = null;
-			for (AnnexLibrary library : priv8.getOwnedAnnexLibraries()) {
-				if (library instanceof DefaultAnnexLibrary && library.getName().equalsIgnoreCase("resolute")) {
-					defResLib = (DefaultAnnexLibrary) library;
-					resLib = EcoreUtil.copy((ResoluteLibrary) defResLib.getParsedAnnexLibrary());
-					break;
-				}
-			}
-
-			if (defResLib == null) {
-				defResLib = (DefaultAnnexLibrary) priv8
-						.createOwnedAnnexLibrary(Aadl2Package.eINSTANCE.getDefaultAnnexLibrary());
-				defResLib.setName("resolute");
-				defResLib.setSourceText("{** **}");
-				resLib = ResoluteFactory.eINSTANCE.createResoluteLibrary();
-			}
-
-			// If this function definition already exists, remove it
-	//		savedClaimDefinition = null;
-	//		for (Iterator<Definition> i = resLib.getDefinitions().iterator(); i.hasNext();) {
-	//			Definition def = i.next();
-	//			if (def != null && def instanceof FunctionDefinition && def.hasName()
-	//					&& def.getName().equalsIgnoreCase(currentClaimDefinition.getName())) {
-	//				savedClaimDefinition = (FunctionDefinition) def;
-	//				break;
-	//			}
-	//		}
-	//
-	//
-	//		if (savedClaimDefinition != null) {
-	//			resLib.getDefinitions().remove(savedClaimDefinition);
-	//		}
-
-			for (Iterator<Definition> i = resLib.getDefinitions().iterator(); i.hasNext();) {
-				Definition def = i.next();
-				if (def != null && def instanceof FunctionDefinition && def.hasName()
-						&& def.getName().equalsIgnoreCase(currentClaimDefinition.getName())) {
-					i.remove();
-					break;
-				}
-			}
-
-			resLib.getDefinitions().add(currentClaimDefinition);
-			defResLib.setParsedAnnexLibrary(resLib);
-		}
-
-	public void insertClaimCall(BuiltInClaim claim, Resource resource) {
+	public void insertClaimCall(Resource resource, BuiltInClaim claim) {
 		if (claim == null) {
 			return;
 		}
@@ -648,12 +566,12 @@ public class CyberRequirement {
 	}
 
 	public void insertAgree(Resource resource) {
-		insertAgree(getSubcomponentQualifiedName(), resource);
+		insertAgree(resource, getSubcomponentQualifiedName());
 	}
 
-	public void insertAgree(String qualifiedComponentName, Resource resource) {
+	public void insertAgree(Resource resource, String qualifiedComponentName) {
 
-		Classifier modificationContext = getModificationContext(qualifiedComponentName, resource);
+		Classifier modificationContext = getModificationContext(resource, qualifiedComponentName);
 		if (modificationContext == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
@@ -707,7 +625,7 @@ public class CyberRequirement {
 		subclause.setParsedAnnexSubclause(agreeSubclause);
 	}
 
-	public FunctionDefinition removeClaimDef(BuiltInClaim claim, Resource resource) {
+	public FunctionDefinition removeClaimDef(Resource resource, BuiltInClaim claim) {
 		if (claim == null) {
 			throw new RuntimeException("Cannot remove claim definition for a NULL claim.");
 		}
@@ -717,7 +635,7 @@ public class CyberRequirement {
 		}
 
 		// Get modification context
-		AadlPackage aadlPkg = getResoluteModificationContext(CaseUtils.CASE_REQUIREMENTS_NAME, resource);
+		AadlPackage aadlPkg = getResoluteModificationContext(resource, CaseUtils.CASE_REQUIREMENTS_NAME);
 		if (aadlPkg == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
@@ -743,8 +661,8 @@ public class CyberRequirement {
 			if (implementationContext == null) {
 				throw new RuntimeException("Unable to determine requirement context.");
 			}
-			Classifier claimCallModificationContext = getModificationContext(implementationContext.getQualifiedName(),
-					resource);
+			Classifier claimCallModificationContext = getModificationContext(resource,
+					implementationContext.getQualifiedName());
 			if (claimCallModificationContext == null) {
 				throw new RuntimeException("Unable to determine requirement context.");
 			}
@@ -811,12 +729,12 @@ public class CyberRequirement {
 		}
 
 	public boolean removeAgree(Resource resource) {
-		return removeAgree(getSubcomponentQualifiedName(), resource);
+		return removeAgree(resource, getSubcomponentQualifiedName());
 	}
 
-	public boolean removeAgree(String qualifiedComponentName, Resource resource) {
+	public boolean removeAgree(Resource resource, String qualifiedComponentName) {
 
-		Classifier modificationContext = getModificationContext(qualifiedComponentName, resource);
+		Classifier modificationContext = getModificationContext(resource, qualifiedComponentName);
 		if (modificationContext == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
@@ -858,43 +776,14 @@ public class CyberRequirement {
 		return context;
 	}
 
-//	private ProveStatement getClaimCall(Classifier modificationContext) {
-//		if (modificationContext == null) {
-//			return null;
-//		}
-//		for (AnnexSubclause annexSubclause : modificationContext.getOwnedAnnexSubclauses()) {
-//			DefaultAnnexSubclause defaultSubclause = (DefaultAnnexSubclause) annexSubclause;
-//			// See if there's a resolute annex
-//			if (defaultSubclause.getParsedAnnexSubclause() instanceof ResoluteSubclause) {
-//				ResoluteSubclause resoluteClause = (ResoluteSubclause) defaultSubclause.getParsedAnnexSubclause();
-//				// See if there are any 'prove' clauses
-//				for (AnalysisStatement as : resoluteClause.getProves()) {
-//					if (as instanceof ProveStatement) {
-//						ProveStatement prove = (ProveStatement) as;
-//						Expr expr = prove.getExpr();
-//						if (expr instanceof FnCallExpr) {
-//							FnCallExpr fnCall = (FnCallExpr) expr;
-//							FunctionDefinition fd = fnCall.getFn();
-//							if (fd != null && fd.hasName() && fd.getName().equalsIgnoreCase(getId())) {
-//								return prove;
-//							}
-//						}
-//					}
-//				}
-//				break;
-//			}
-//		}
-//		return null;
-//	}
-
 	private Classifier getClaimCallModificationContext(Resource resource) {
 		// Get modification context
 		Classifier implementationContext = getImplementationClassifier(context);
 		if (implementationContext == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
-		Classifier claimCallModificationContext = getModificationContext(implementationContext.getQualifiedName(),
-				resource);
+		Classifier claimCallModificationContext = getModificationContext(resource,
+				implementationContext.getQualifiedName());
 		if (claimCallModificationContext == null) {
 			throw new RuntimeException("Unable to determine requirement context.");
 		}
@@ -921,7 +810,7 @@ public class CyberRequirement {
 
 private AadlPackage getClaimDefinitionPackage(Resource resource) {
 		AadlPackage claimsPackage;
-		claimsPackage = getResoluteModificationContext(CaseUtils.CASE_REQUIREMENTS_NAME, resource);
+		claimsPackage = getResoluteModificationContext(resource, CaseUtils.CASE_REQUIREMENTS_NAME);
 		if (claimsPackage == null) {
 			throw new RuntimeException("Unable to determine claims definitions resolute package.");
 		}
@@ -1142,7 +1031,7 @@ private AadlPackage getClaimDefinitionPackage(Resource resource) {
 			return classifier;
 		}
 
-	static Classifier getModificationContext(String qualifiedName, Resource resource) {
+	static Classifier getModificationContext(Resource resource, String qualifiedName) {
 		// Get modification context
 		Classifier modificationContext = null;
 		TreeIterator<EObject> x = EcoreUtil.getAllContents(resource, true);
@@ -1192,7 +1081,7 @@ private AadlPackage getClaimDefinitionPackage(Resource resource) {
 		return getResoluteLibrary(getResoluteDefaultAnnexLibrary(pkg), true);
 	}
 
-	static AadlPackage getResoluteModificationContext(String qualifiedName, Resource resource) {
+	static AadlPackage getResoluteModificationContext(Resource resource, String qualifiedName) {
 		// Get modification context
 		AadlPackage modificationContext = null;
 		TreeIterator<EObject> x = EcoreUtil.getAllContents(resource, true);
@@ -1213,38 +1102,9 @@ private AadlPackage getClaimDefinitionPackage(Resource resource) {
 	}
 
 	/**
-	 * Claim String expected format: [status, date, tool, type, context] description
+	 * Claim String expected format: [type] description
+	 * @param id
 	 * @param claimString
-	 * @return
-	 */
-	static CyberRequirement parseClaimString(String id, String claimString) {
-		if (claimString == null || !claimString.matches(".+\\[.+\\]\\s.+")) {
-			return null;
-		}
-
-		int start = claimString.indexOf('[');
-		int end = claimString.indexOf(']');
-		String text = claimString.substring(end + 1);
-		String part1 = claimString.substring(start + 1, end);
-		String[] parts = part1.replaceAll("\\s", "").split(",");
-		String status = parts[0];
-		String tool = parts[2];
-		String type = parts[3];
-		String context = parts[4];
-		String rationale = "N/A";
-		long date;
-
-		try {
-			date = DateFormat.getDateInstance().parse(parts[1]).getTime();
-		} catch (ParseException e) {
-			e.printStackTrace();
-			date = 0L;
-		}
-		return new CyberRequirement(date, tool, status, type, id, text, context, rationale);
-	}
-
-	/**
-	 * Claim String expected format: [status, date, tool, type, context] description
 	 * @param claimBody
 	 * @return
 	 */

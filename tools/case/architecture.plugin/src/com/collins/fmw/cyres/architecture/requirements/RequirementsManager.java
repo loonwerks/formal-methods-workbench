@@ -1,11 +1,19 @@
 package com.collins.fmw.cyres.architecture.requirements;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -15,6 +23,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.AadlPackage;
+import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
@@ -34,14 +43,13 @@ public class RequirementsManager {
 	private static IProject currentProject = null;
 	// Singleton instance
 	private static RequirementsManager instance = null;
-	private List<CyberRequirement> importedRequirements = new ArrayList<>();
+//	private final List<CyberRequirement> importedRequirements = new ArrayList<>();
+	private final RequirementsDatabaseHelper reqDb = new RequirementsDatabaseHelper();
 
 	public static RequirementsManager getInstance() {
-
 		if (instance == null || currentProject == null) {
 			instance = new RequirementsManager();
 		}
-
 		return instance;
 	}
 
@@ -90,15 +98,23 @@ public class RequirementsManager {
 		}
 
 		// Read in any existing imported requirements
-		findImportedRequirements();
+		reqDb.importRequirements(findImportedRequirements());
+
+//		importedRequirements.clear();
+//		importedRequirements.addAll(findImportedRequirements());
 
 //		// Read in any existing omitted requirements
 //		readOmittedRequirements();
 	}
 
-//	public void addOmittedRequirements(List<CyberRequirement> omittedReqs, String implementation) {
-//		omittedRequirements.addAll(omittedReqs);
-//	}
+//	private void reset() {
+//			currentProject = null;
+//			reqDb.reset();
+//
+////			importedRequirements.clear();
+////			importedRequirements.addAll(findImportedRequirements());
+////			omittedRequirements.clear();
+//		}
 
 	public boolean formalizeRequirement(String reqId) {
 		CyberRequirement req = getRequirement(reqId);
@@ -121,77 +137,50 @@ public class RequirementsManager {
 	}
 
 	public List<CyberRequirement> getImportedRequirements() {
-		return importedRequirements;
+//		return importedRequirements;
+		return reqDb.getImportedRequirements();
 	}
-
-//	public List<CyberRequirement> getOmittedRequirements() {
-//		return omittedRequirements;
-//	}
 
 	public CyberRequirement getRequirement(String requirementId) {
-		for (CyberRequirement req : importedRequirements) {
-			if (req.getId().equalsIgnoreCase(requirementId)) {
-				return req;
-			}
-		}
-		return null;
-	}
-
-	public void importRequirement(CyberRequirement req) {
-		if (req == null) {
-			return;
-		}
-
-		insertClaim(req, new BaseClaim(req));
-
-		// Add the requirement to the imported requirements list
-		importedRequirements.add(req);
-
-//		if (req.hasAgree()) {
-//			formalizeRequirement(req.getId());
+//		for (CyberRequirement req : importedRequirements) {
+//			if (req.getId().equalsIgnoreCase(requirementId)) {
+//				return req;
+//			}
 //		}
+//		return null;
+		return reqDb.get(requirementId);
 	}
 
-//	public void importRequirement(CyberRequirement req, boolean formalize) {
+	public List<CyberRequirement> getRequirements() {
+		return reqDb.getRequirements();
+	}
+
+//	public void removeRequirement(String reqId, boolean removeAgree) {
+//		CyberRequirement req = getRequirement(reqId);
 //		if (req == null) {
 //			return;
 //		}
-//
-//		req.insert();
-//
-//		if (formalize) {
-//			insertAgree(req);
+//		if (req.hasAgree()) {
+//			if (!removeAgree) {
+//				throw new RuntimeException(
+//						"Formalized requirement can only be removed after removing the formalization.");
+//			}
+//			unformalizeRequirement(reqId);
 //		}
 //
+//		removeClaim(req, new BaseClaim(req));
+//
 //		// Add the requirement to the imported requirements list
-//		importedRequirements.add(req);
+//		importedRequirements.remove(req);
 //	}
 
-	public void removeRequirement(String reqId, boolean removeAgree) {
-		CyberRequirement req = getRequirement(reqId);
-		if (req == null) {
-			return;
-		}
-		if (req.hasAgree()) {
-			if (!removeAgree) {
-				throw new RuntimeException(
-						"Formalized requirement can only be removed after removing the formalization.");
-			}
-//			removeAgree(req);
-			unformalizeRequirement(reqId);
-		}
-
-		removeClaim(req, new BaseClaim(req));
-
-		// Add the requirement to the imported requirements list
-		importedRequirements.remove(req);
-	}
-
-	public void importRequirements(List<CyberRequirement> reqs) {
-		for (CyberRequirement req : reqs) {
-			importRequirement(req);
-		}
-	}
+//	public void importRequirements(List<CyberRequirement> reqs) {
+//		for (CyberRequirement req : reqs) {
+//			// Insert base claim for requirement and add the requirement to the imported requirements list
+//			insertClaim(req, new BaseClaim(req));
+//			importedRequirements.add(req);
+//		}
+//	}
 
 	public void modifyRequirement(String reqId, BuiltInClaim claim) {
 		CyberRequirement req = getRequirement(reqId);
@@ -200,33 +189,105 @@ public class RequirementsManager {
 		}
 	}
 
-	public void reset() {
-		currentProject = null;
-		importedRequirements.clear();
-		findImportedRequirements();
-//		omittedRequirements.clear();
+	public void updateRequirements(List<CyberRequirement> updatedReqs) {
+		BatchUpdateHelper helper = new BatchUpdateHelper();
+
+		for (CyberRequirement r : updatedReqs) {
+			CyberRequirement existing = reqDb.get(r);
+			if (existing == null) {
+				// not possible; signal error
+				throw new RuntimeException("Updated requirement not found in requirements database : " + r);
+			} else {
+				if (existing.getStatus() == CyberRequirement.toDo || existing.getStatus() == CyberRequirement.omit) {
+					switch (r.getStatus()) {
+					case CyberRequirement.toDo:
+					case CyberRequirement.omit:
+						// do nothing
+						break;
+					case CyberRequirement.add:
+						// add to model
+						helper.insertRequirement(r, true, false);
+						break;
+					case CyberRequirement.addPlusAgree:
+						// add to model and formalize
+						helper.insertRequirement(r, true, true);
+						break;
+					default:
+						// Unknown status; signal error
+						throw new RuntimeException("Updated requirement has invalid status : " + r);
+					}
+				} else if (existing.getStatus() == CyberRequirement.add) {
+					switch (r.getStatus()) {
+					case CyberRequirement.toDo:
+					case CyberRequirement.omit:
+						// remove resolute claim definition and claim call
+						helper.removeRequirement(r, false, true);
+						break;
+					case CyberRequirement.add:
+						// no change permitted
+						break;
+					case CyberRequirement.addPlusAgree:
+						// formalize
+						helper.insertRequirement(r, false, true);
+						break;
+					default:
+						// Unknown status; signal error
+						throw new RuntimeException("Updated requirement has invalid status : " + r);
+					}
+				} else if (existing.getStatus() == CyberRequirement.addPlusAgree) {
+					switch (r.getStatus()) {
+					case CyberRequirement.toDo:
+					case CyberRequirement.omit:
+						// remove resolute claim definition, claim call and agree call
+						helper.removeRequirement(r, true, true);
+						break;
+					case CyberRequirement.add:
+						// remove agree call
+						helper.removeRequirement(r, true, false);
+						break;
+					case CyberRequirement.addPlusAgree:
+						// no change permitted
+						break;
+					default:
+						// Unknown status; signal error
+						throw new RuntimeException("Updated requirement has invalid status : " + r);
+					}
+				} else {
+					// Unknown status; signal error
+					throw new RuntimeException("Existing requirement has invalid status : " + existing);
+				}
+			}
+		}
+
+		helper.commitChanges();
+		updatedReqs.forEach(r -> reqDb.updateRequirement(r));
+		reqDb.saveRequirementsDatabase();
 	}
 
-//	public void saveOmittedRequirements(String filename) {
-//		// TODO: Write to file
-//		JsonRequirementsFile jsonFile = new JsonRequirementsFile("", System.currentTimeMillis(), "", "",
-//				omittedRequirements);
-//		jsonFile.exportFile(new File(filename));
-//	}
+	public void readRequirementFiles(String filename) {
+//		reqDb.reset();
+//		reqDb.readRequirementsDatabase();
+		final List<CyberRequirement> existingReqs = findImportedRequirements();
+		final List<JsonRequirementsFile> jsonReqFiles = readInputFiles(filename);
+		if (!jsonReqFiles.isEmpty()) {
+			reqDb.reset();
+			reqDb.importJsonRequrementsFiles(jsonReqFiles);
+		}
+		reqDb.importRequirements(existingReqs);
+	}
 
-	protected void findImportedRequirements() {
+	protected List<CyberRequirement> findImportedRequirements() {
 
-		// TODO: this call is necessary to initialize the resolute requirements file (if it hasn't been initialized).
-		CaseUtils.getCaseRequirementsPackage();
+//		CaseUtils.getCaseRequirementsPackage();
 		IFile file = CaseUtils.getCaseRequirementsFile();
 		XtextEditor editor = getEditor(file);
 
 		if (editor != null) {
-			importedRequirements = editor.getDocument().readOnly(resource -> {
+			List<CyberRequirement> embeddedRequirements = editor.getDocument().readOnly(resource -> {
 
 				// Get modification context
-				AadlPackage aadlPkg = CyberRequirement.getResoluteModificationContext(CaseUtils.CASE_REQUIREMENTS_NAME,
-						resource);
+				AadlPackage aadlPkg = CyberRequirement.getResoluteModificationContext(resource,
+						CaseUtils.CASE_REQUIREMENTS_NAME);
 				if (aadlPkg == null) {
 					return Collections.emptyList();
 				}
@@ -264,12 +325,15 @@ public class RequirementsManager {
 
 			// Close editor, if necessary (no saving, read-only)
 			closeEditor(editor, false);
+
+			return embeddedRequirements;
 		}
+
+		return new ArrayList<CyberRequirement>();
 	}
 
 	protected void formalizeRequirement(CyberRequirement req) {
 		insertClaim(req, new AgreePropCheckedClaim(req.getId(), req.getContext()));
-		// TODO: make it more efficient by pushing this inside the insertClaimCall?
 		insertAgree(req);
 	}
 
@@ -292,7 +356,7 @@ public class RequirementsManager {
 		}
 
 		String compQualifiedName = editor.getDocument().readOnly(resource -> {
-			return CyberRequirement.getModificationContext(req.getContext(), resource).getQualifiedName();
+			return CyberRequirement.getModificationContext(resource, req.getContext()).getQualifiedName();
 		});
 
 		closeEditor(editor, false);
@@ -307,9 +371,9 @@ public class RequirementsManager {
 
 		editor.getDocument().modify(resource -> {
 			if (insert) {
-				req.insertAgree(compQualifiedName, resource);
+				req.insertAgree(resource, compQualifiedName);
 			} else {
-				req.removeAgree(compQualifiedName, resource);
+				req.removeAgree(resource, compQualifiedName);
 			}
 			return null;
 		});
@@ -332,12 +396,10 @@ public class RequirementsManager {
 	}
 
 	protected boolean removeClaim(CyberRequirement req, BuiltInClaim claim) {
-//		return removeClaimDefinition(req, claim);
 		if (claim instanceof BaseClaim) {
 			removeClaimCall(req);
 		}
 		removeClaimDefinition(req, claim);
-		// TODO: poorly written; meaning of return value is not clear; rewrite
 		return true;
 	}
 
@@ -355,13 +417,13 @@ public class RequirementsManager {
 		}
 
 		editor.getDocument().modify(resource -> {
-			req.insertClaimCall(claim, resource);
+			req.insertClaimCall(resource, claim);
 			return null;
 		});
 
 		editor.forceReconcile();
 
-		// Close editor, if necessary
+		// Close editor
 		closeEditor(editor, true);
 	}
 
@@ -379,13 +441,13 @@ public class RequirementsManager {
 		}
 
 		editor.getDocument().modify(resource -> {
-			req.insertClaimDef(claim, resource);
+			req.insertClaimDef(resource, claim);
 			return null;
 		});
 
 		editor.forceReconcile();
 
-		// Close editor, if necessary
+		// Close editor
 		closeEditor(editor, true);
 	}
 
@@ -404,7 +466,7 @@ public class RequirementsManager {
 		}
 
 		FunctionDefinition fd = editor.getDocument().modify(resource -> {
-			return req.removeClaimDef(claim, resource);
+			return req.removeClaimDef(resource, claim);
 		});
 
 		// Close editor, if necessary
@@ -436,4 +498,411 @@ public class RequirementsManager {
 		return success;
 	}
 
+	protected List<JsonRequirementsFile> readInputFiles(String filename) {
+		List<JsonRequirementsFile> reqs = new ArrayList<>();
+
+		// If a filename was passed to this command, open the file.
+		// Otherwise, prompt the user for the file
+		if (filename == null || filename.isEmpty()) {
+
+			FileDialog dlgReqFile = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					SWT.MULTI);
+			dlgReqFile.setText("Select requirements file to import.");
+
+			dlgReqFile.open();
+			String[] filenames = dlgReqFile.getFileNames();
+			String filterPath = dlgReqFile.getFilterPath();
+
+			for (String fn : filenames) {
+				File reqFile = new File(filterPath, fn);
+				if (!reqFile.exists()) {
+					Dialog.showError("File not found",
+							"Cannot find the requirements file " + reqFile.getAbsolutePath() + ".");
+					continue;
+				}
+				JsonRequirementsFile jsonFile = new JsonRequirementsFile();
+				if (!jsonFile.importFile(reqFile)) {
+					Dialog.showError("Problem with " + reqFile.getName(),
+							"Could not load cyber requirements file " + reqFile.getName() + ".");
+					continue;
+				}
+				// Alert user if there aren't any requirements to import
+				if (jsonFile.getRequirements().isEmpty()) {
+					Dialog.showError("No new requirements to import", reqFile.getName()
+							+ " does not contain any requirements that are not already present in this model.");
+					continue;
+				}
+				// Add the requirements in this file to the accumulated list of requirements
+				reqs.add(jsonFile);
+			}
+
+		}
+		return reqs;
+	}
+
+	class BatchUpdateHelper {
+		private Set<CyberRequirement> addBaseClaimDefinition = new HashSet<CyberRequirement>();
+		private Set<CyberRequirement> addAgreeCheckClaimDefinition = new HashSet<CyberRequirement>();
+		private Map<IFile, HashSet<CyberRequirement>> addBaseClaimProveStatement = new HashMap<IFile, HashSet<CyberRequirement>>();
+		private Map<IFile, HashSet<CyberRequirement>> addAgreeCheckClaimProveStatement = new HashMap<IFile, HashSet<CyberRequirement>>();
+		private Map<IFile, HashSet<CyberRequirement>> addAgreeAssumption = new HashMap<IFile, HashSet<CyberRequirement>>();
+		private Map<IFile, HashSet<CyberRequirement>> removeAgreeAssumption = new HashMap<IFile, HashSet<CyberRequirement>>();
+		private Map<IFile, HashSet<CyberRequirement>> removeProveStatement = new HashMap<IFile, HashSet<CyberRequirement>>();
+		private Set<CyberRequirement> removeAgreeCheckFromClaimDefinition = new HashSet<CyberRequirement>();
+		private Set<CyberRequirement> removeClaimDefinition = new HashSet<CyberRequirement>();
+
+		private Map<CyberRequirement, BaseClaim> baseClaims = new HashMap<CyberRequirement, BaseClaim>();
+		private Map<CyberRequirement, AgreePropCheckedClaim> agreePropCheckedClaims = new HashMap<CyberRequirement, AgreePropCheckedClaim>();
+
+		private void resetChanges() {
+			addBaseClaimDefinition.clear();
+			addAgreeCheckClaimDefinition.clear();
+			addBaseClaimProveStatement.clear();
+			addAgreeCheckClaimProveStatement.clear();
+			addAgreeAssumption.clear();
+			removeAgreeAssumption.clear();
+			removeProveStatement.clear();
+			removeAgreeCheckFromClaimDefinition.clear();
+			removeClaimDefinition.clear();
+
+			baseClaims.clear();
+			agreePropCheckedClaims.clear();
+		}
+
+		private void insert(Set<CyberRequirement> s, CyberRequirement r) {
+			s.add(r);
+		}
+
+		private void insert(Map<IFile, HashSet<CyberRequirement>> map, IFile key, CyberRequirement r) {
+			Set<CyberRequirement> s = map.get(key);
+			if (s == null) {
+				map.put(key, new HashSet<CyberRequirement>());
+				s = map.get(key);
+			}
+			s.add(r);
+		}
+
+		public void insertRequirement(CyberRequirement r, boolean define, boolean formalize) {
+			if (define) {
+				insert(addBaseClaimDefinition, r);
+				insert(addBaseClaimProveStatement, r.getContainingFile(), r);
+			}
+			if (formalize) {
+				insert(addAgreeCheckClaimDefinition, r);
+				insert(addAgreeCheckClaimProveStatement, r.getContainingFile(), r);
+				insert(addAgreeAssumption, r.getSubcomponentContainingFile(), r);
+			}
+		}
+
+		public void removeRequirement(CyberRequirement r, boolean removeFormalization, boolean removeDefinition) {
+			if (removeDefinition) {
+				insert(removeProveStatement, r.getContainingFile(), r);
+				insert(removeClaimDefinition, r);
+				if (removeFormalization) {
+					insert(removeAgreeAssumption, r.getSubcomponentContainingFile(), r);
+				}
+			} else if (removeFormalization) {
+				insert(removeAgreeAssumption, r.getSubcomponentContainingFile(), r);
+				insert(removeAgreeCheckFromClaimDefinition, r);
+			}
+		}
+
+		public void commitChanges() {
+			// List of files to be modified
+			Set<IFile> files = new HashSet<IFile>();
+			files.addAll(addBaseClaimProveStatement.keySet());
+			files.addAll(addAgreeCheckClaimProveStatement.keySet());
+			files.addAll(addAgreeAssumption.keySet());
+			files.addAll(removeAgreeAssumption.keySet());
+			files.addAll(removeProveStatement.keySet());
+
+			// Remove prove statements before removing claim definitions in the main claims file
+			// to avoid null cross references.
+
+			for (IFile file : files) {
+				removeProveStatements(file);
+			}
+
+			// Modify claim definitions
+			commitChangesToClaimsFile();
+
+			// Make the rest of the changes: adding prove calls, adding/removing agree statements
+			for (IFile file : files) {
+				commitChangestoFile(file);
+			}
+
+			resetChanges();
+		}
+
+		private void commitChangesToClaimsFile() {
+			// Get the file to insert into
+			IFile file = CaseUtils.getCaseRequirementsFile();
+			XtextEditor editor = RequirementsManager.getEditor(file);
+
+			if (editor == null) {
+				throw new RuntimeException("Cannot open claim definition file: " + file);
+			}
+
+			editor.getDocument().modify(resource -> {
+				for (CyberRequirement req : addBaseClaimDefinition) {
+					BaseClaim c = new BaseClaim(req);
+					req.insertClaimDef(resource, c);
+					baseClaims.put(req, c);
+				}
+
+				for (CyberRequirement req : addAgreeCheckClaimDefinition) {
+					AgreePropCheckedClaim c = new AgreePropCheckedClaim(req.getId(), req.getContext());
+					req.insertClaimDef(resource, c);
+					agreePropCheckedClaims.put(req, c);
+				}
+
+				removeAgreeCheckFromClaimDefinition.removeAll(removeClaimDefinition);
+				for (CyberRequirement req : removeAgreeCheckFromClaimDefinition) {
+					req.removeClaimDef(resource, new AgreePropCheckedClaim(req.getId(), req.getContext()));
+				}
+
+				for (CyberRequirement req : removeClaimDefinition) {
+					req.removeClaimDef(resource, new BaseClaim(req));
+				}
+
+				return null;
+			});
+
+			// Close editor
+			RequirementsManager.closeEditor(editor, true);
+		}
+
+		private void removeProveStatements(IFile file) {
+			// Remove prove calls before removing claim definitions in the main claims file
+			// to avoid null cross references.
+
+			// Get the file to insert into
+			XtextEditor editor = RequirementsManager.getEditor(file);
+
+			if (editor == null) {
+				throw new RuntimeException("Cannot open claim definition file: " + file);
+			}
+
+			editor.getDocument().modify(resource -> {
+				if (removeProveStatement.containsKey(file)) {
+					for (CyberRequirement req : removeProveStatement.get(file)) {
+						req.removeClaimCall(resource);
+					}
+				}
+
+				return null;
+			});
+
+			// Close editor
+			RequirementsManager.closeEditor(editor, true);
+		}
+
+		private void commitChangestoFile(IFile file) {
+			// Get the file to insert into
+			XtextEditor editor = RequirementsManager.getEditor(file);
+
+			if (editor == null) {
+				throw new RuntimeException("Cannot open claim definition file: " + file);
+			}
+
+			editor.getDocument().modify(resource -> {
+				if (addBaseClaimProveStatement.containsKey(file)) {
+					for (CyberRequirement req : addBaseClaimProveStatement.get(file)) {
+						BaseClaim c = baseClaims.get(req);
+						req.insertClaimCall(resource, c);
+					}
+				}
+
+				if (addAgreeCheckClaimProveStatement.containsKey(file)) {
+					for (CyberRequirement req : addAgreeCheckClaimProveStatement.get(file)) {
+						AgreePropCheckedClaim c = agreePropCheckedClaims.get(req);
+						req.insertClaimCall(resource, c);
+					}
+				}
+
+				if (addAgreeAssumption.containsKey(file)) {
+					for (CyberRequirement req : addAgreeAssumption.get(file)) {
+						req.insertAgree(resource);
+					}
+				}
+
+				if (removeAgreeAssumption.containsKey(file)) {
+					for (CyberRequirement req : removeAgreeAssumption.get(file)) {
+						req.removeAgree(resource);
+					}
+				}
+
+				return null;
+			});
+
+			// Close editor
+			RequirementsManager.closeEditor(editor, true);
+		}
+	}
+
+	/**
+	 * Requirements Database helper class.
+	 *
+	 * <p>Its purpose is to provide a central entity to keep track of
+	 * requirements generated via TA1 tools,
+	 * requirements imported into the AADL models,
+	 * and requirements saved to the disk.
+	 *
+	 * <p>It provides quick insertion, searching and updating of requirements,
+	 * as well a mechanism to modify a set of requirements in the AADL model.
+	 *
+	 * <p>It is expected to be used as a singleton class by the enclosing RequirementsManager singleton instance.
+	 *
+	 * @author Junaid Babar
+	 *
+	 */
+	class RequirementsDatabaseHelper {
+
+		private HashMap<String, CyberRequirement> requirements;
+		private HashMap<String, String> idToKey;
+
+		private String makeKey(CyberRequirement req) {
+			return req.getType() + req.getContext();
+		}
+
+		private String makeKey(String type, String context) {
+			return type + context;
+		}
+
+		public RequirementsDatabaseHelper() {
+			requirements = new HashMap<String, CyberRequirement>();
+			idToKey = new HashMap<String, String>();
+			readRequirementsDatabase();
+		}
+
+		public void reset() {
+			requirements.clear();
+			idToKey.clear();
+		}
+
+		public void readRequirementsDatabase() {
+			// Read database from the physical requirements database file
+			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
+			JsonRequirementsFile jsonReqFile = new JsonRequirementsFile();
+			if (!reqFile.exists() || !jsonReqFile.importFile(reqFile)) {
+				Dialog.showInfo("Missing requirements database",
+						"No requirements database found. Starting a new database.");
+			} else {
+				// Add the requirements in this file to the accumulated list of requirements
+				importRequirements(jsonReqFile.getRequirements());
+			}
+		}
+
+		public void saveRequirementsDatabase() {
+			// Write database to physical requirements database file
+			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
+			JsonRequirementsFile jsonReqFile = new JsonRequirementsFile(CyberRequirement.notApplicable,
+					new Date().getTime(), CyberRequirement.notApplicable, CyberRequirement.notApplicable,
+					getRequirements());
+			if (!jsonReqFile.exportFile(reqFile)) {
+				throw new RuntimeException("Could not save cyber requirements file " + reqFile.getName() + ".");
+			}
+		}
+
+		public void importJsonRequrementsFiles(List<JsonRequirementsFile> reqFiles) {
+			reqFiles.forEach(file -> {
+				importRequirements(file.getRequirements());
+			});
+		}
+
+		public void importRequirements(List<CyberRequirement> reqs) {
+			// Add reqs to the database of requirements
+			// Note: if requirement already exists, it will get updated
+			reqs.forEach(e -> importRequirement(e));
+		}
+
+		public void importRequirement(CyberRequirement req) {
+			// Add req to the database of requirements
+			// Note: if requirement already exists, it will get updated
+			updateRequirement(req);
+		}
+
+		public void removeToDos() {
+			getToDoRequirements().forEach(req -> {
+				requirements.remove(makeKey(req));
+				if (req.getId() != null && !req.getId().isEmpty()) {
+					idToKey.remove(req.getId());
+				}
+			});
+		}
+
+		public void updateRequirement(CyberRequirement req) {
+			final String key = makeKey(req);
+			requirements.put(key, req);
+			if (req.getId() != null && !req.getId().isEmpty()) {
+				idToKey.put(req.getId(), key);
+			}
+		}
+
+		public boolean contains(CyberRequirement req) {
+			return requirements.containsKey(makeKey(req));
+		}
+
+		public boolean contains(String type, String context) {
+			return requirements.containsKey(makeKey(type, context));
+		}
+
+		public boolean contains(String reqId) {
+			return idToKey.containsKey(reqId);
+		}
+
+		public CyberRequirement get(CyberRequirement req) {
+			return requirements.get(makeKey(req));
+		}
+
+		public CyberRequirement get(String type, String context) {
+			return requirements.get(makeKey(type, context));
+		}
+
+		public CyberRequirement get(String reqId) {
+			if (contains(reqId)) {
+				return requirements.get(idToKey.get(reqId));
+			}
+			return null;
+		}
+
+		public List<CyberRequirement> getRequirements() {
+			List<CyberRequirement> list = new ArrayList<CyberRequirement>();
+			requirements.values().forEach(e -> list.add(new CyberRequirement(e)));
+			return list;
+		}
+
+		public List<CyberRequirement> getRequirements(final String filterString) {
+			List<CyberRequirement> list = new ArrayList<CyberRequirement>();
+			requirements.values().forEach(r -> {
+				// Note: using "==" instead of equals since filter strings are constants defined in CyberRequirement
+				if (r.getId() == filterString) {
+					list.add(new CyberRequirement(r));
+				}
+			});
+			return list;
+		}
+
+		public final List<CyberRequirement> getOmittedRequirements() {
+			return getRequirements(CyberRequirement.omit);
+		}
+
+		public List<CyberRequirement> getToDoRequirements() {
+			return getRequirements(CyberRequirement.toDo);
+		}
+
+		public List<CyberRequirement> getAddRequirements() {
+			return getRequirements(CyberRequirement.add);
+		}
+
+		public List<CyberRequirement> getAddPlusAgreeRequirements() {
+			return getRequirements(CyberRequirement.addPlusAgree);
+		}
+
+		public List<CyberRequirement> getImportedRequirements() {
+			List<CyberRequirement> list = getAddRequirements();
+			list.addAll(getAddPlusAgreeRequirements());
+			return list;
+		}
+	}
 }
