@@ -43,7 +43,6 @@ public class RequirementsManager {
 	private static IProject currentProject = null;
 	// Singleton instance
 	private static RequirementsManager instance = null;
-//	private final List<CyberRequirement> importedRequirements = new ArrayList<>();
 	private final RequirementsDatabaseHelper reqDb = new RequirementsDatabaseHelper();
 
 	public static RequirementsManager getInstance() {
@@ -53,13 +52,15 @@ public class RequirementsManager {
 		return instance;
 	}
 
+	private static XtextEditor activeEditor = null;
+
 	public static void closeEditor(XtextEditor editor, boolean save) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (save) {
 			page.saveEditor(editor, false);
 		}
 
-		if (editor.equals(EditorUtils.getActiveXtextEditor())) {
+		if (editor.equals(activeEditor)) {
 			return;
 		} else {
 			page.closeEditor(editor, false);
@@ -69,6 +70,8 @@ public class RequirementsManager {
 	public static XtextEditor getEditor(IFile file) {
 		IWorkbenchPage page = null;
 		IEditorPart part = null;
+
+		activeEditor = EditorUtils.getActiveXtextEditor();
 
 		if (file.exists()) {
 			page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -99,22 +102,7 @@ public class RequirementsManager {
 
 		// Read in any existing imported requirements
 		reqDb.importRequirements(findImportedRequirements());
-
-//		importedRequirements.clear();
-//		importedRequirements.addAll(findImportedRequirements());
-
-//		// Read in any existing omitted requirements
-//		readOmittedRequirements();
 	}
-
-//	private void reset() {
-//			currentProject = null;
-//			reqDb.reset();
-//
-////			importedRequirements.clear();
-////			importedRequirements.addAll(findImportedRequirements());
-////			omittedRequirements.clear();
-//		}
 
 	public boolean formalizeRequirement(String reqId) {
 		CyberRequirement req = getRequirement(reqId);
@@ -137,17 +125,11 @@ public class RequirementsManager {
 	}
 
 	public List<CyberRequirement> getImportedRequirements() {
-//		return importedRequirements;
 		return reqDb.getImportedRequirements();
+//		return findImportedRequirements();
 	}
 
 	public CyberRequirement getRequirement(String requirementId) {
-//		for (CyberRequirement req : importedRequirements) {
-//			if (req.getId().equalsIgnoreCase(requirementId)) {
-//				return req;
-//			}
-//		}
-//		return null;
 		return reqDb.get(requirementId);
 	}
 
@@ -265,8 +247,6 @@ public class RequirementsManager {
 	}
 
 	public void readRequirementFiles(String filename) {
-//		reqDb.reset();
-//		reqDb.readRequirementsDatabase();
 		final List<CyberRequirement> existingReqs = findImportedRequirements();
 		final List<JsonRequirementsFile> jsonReqFiles = readInputFiles(filename);
 		if (!jsonReqFiles.isEmpty()) {
@@ -278,7 +258,6 @@ public class RequirementsManager {
 
 	protected List<CyberRequirement> findImportedRequirements() {
 
-//		CaseUtils.getCaseRequirementsPackage();
 		IFile file = CaseUtils.getCaseRequirementsFile();
 		XtextEditor editor = getEditor(file);
 
@@ -875,8 +854,7 @@ public class RequirementsManager {
 		public List<CyberRequirement> getRequirements(final String filterString) {
 			List<CyberRequirement> list = new ArrayList<CyberRequirement>();
 			requirements.values().forEach(r -> {
-				// Note: using "==" instead of equals since filter strings are constants defined in CyberRequirement
-				if (r.getId() == filterString) {
+				if (r.getStatus() == filterString) {
 					list.add(new CyberRequirement(r));
 				}
 			});

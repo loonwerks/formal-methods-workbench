@@ -265,6 +265,10 @@ public class ImportRequirementsGUI extends Dialog {
 	}
 
 	private boolean saveReqChanges() {
+		if (cmbStatus.getSelectionIndex() == -1) {
+			return true; // nothing selected; therefore, nothing to be saved
+		}
+
 		String newStatus = getStatusString(cmbStatus.getSelectionIndex());
 		String newId = txtID.getText();
 		String newDesc = txtDesc.getText();
