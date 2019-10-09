@@ -336,24 +336,11 @@ public class CaseUtils {
 	private static AadlPackage initCaseRequirementsPackage() {
 		// Create CASE_REQUIREMENTS_FILE
 
-//		Old version
-//		IFile caseReqFile = TraverseProject.getCurrentProject().getFile(CASE_REQUIREMENTS_FILE);
-//		if (!caseReqFile.exists()) {
-//		String newline = System.lineSeparator();
-//		String tab = "\t";
-//		String contents = "package CASE_Requirements" + newline
-//				+ tab + "with CASE_Model_Transformations;" + newline
-//				+ "end CASE_Requirements;" + newline;
-//	    InputStream source = new ByteArrayInputStream(contents.getBytes());
-//		caseReqFile.create(source, false, null);
-//		}
-
-		IFile caseReqFile = getCaseRequirementsFile();
+		final IFile caseReqFile = TraverseProject.getCurrentProject().getFile(CASE_REQUIREMENTS_FILE);
 		if (!caseReqFile.exists()) {
 			String newline = System.lineSeparator();
 			String tab = "\t";
 			String contents = "package CASE_Requirements" + newline + "private" + newline + tab
-//					+ "with CASE_Model_Transformations;" + newline
 					+ "annex resolute" + "{** **};" + newline + "end CASE_Requirements;" + newline;
 			InputStream source = new ByteArrayInputStream(contents.getBytes());
 			try {
