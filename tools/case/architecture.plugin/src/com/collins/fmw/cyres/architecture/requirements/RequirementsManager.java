@@ -851,9 +851,10 @@ public class RequirementsManager {
 			return list;
 		}
 
-		public List<CyberRequirement> getRequirements(final String filterString) {
+		private List<CyberRequirement> getRequirements(final String filterString) {
 			List<CyberRequirement> list = new ArrayList<CyberRequirement>();
 			requirements.values().forEach(r -> {
+				// Using "==" instead of equals because filterString is one of four constants
 				if (r.getStatus() == filterString) {
 					list.add(new CyberRequirement(r));
 				}
