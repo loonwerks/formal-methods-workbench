@@ -465,6 +465,13 @@ public class ResoluteFormatter extends PropertiesFormatter {
   }
   
   protected void _format(final NestedDotID nesteddotid, @Extension final IFormattableDocument document) {
+    final Consumer<ISemanticRegion> _function = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_1 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.surround(it, _function_1);
+    };
+    this.textRegionExtensions.regionFor(nesteddotid).keywords(".").forEach(_function);
     this.format(nesteddotid.getSub(), document);
   }
   
@@ -501,6 +508,20 @@ public class ResoluteFormatter extends PropertiesFormatter {
       it.noSpace();
     };
     document.prepend(this.textRegionExtensions.regionFor(expr).keyword("}"), _function_5);
+    final Consumer<ISemanticRegion> _function_6 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_7 = (IHiddenRegionFormatter it_1) -> {
+        it_1.oneSpace();
+      };
+      document.append(it, _function_7);
+    };
+    this.textRegionExtensions.regionFor(expr).keywords(",").forEach(_function_6);
+    final Consumer<ISemanticRegion> _function_7 = (ISemanticRegion it) -> {
+      final Procedure1<IHiddenRegionFormatter> _function_8 = (IHiddenRegionFormatter it_1) -> {
+        it_1.noSpace();
+      };
+      document.prepend(it, _function_8);
+    };
+    this.textRegionExtensions.regionFor(expr).keywords(",").forEach(_function_7);
     this.format(expr, document);
   }
   

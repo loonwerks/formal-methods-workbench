@@ -48,6 +48,7 @@ import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.AssignStatement;
 import com.rockwellcollins.atc.agree.agree.ComponentRef;
 import com.rockwellcollins.atc.agree.agree.ConnectionStatement;
+import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
@@ -95,6 +96,11 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 			if (spec instanceof EqStatement) {
 				EqStatement eq = (EqStatement) spec;
 				nelms.addAll(eq.getLhs());
+
+			} else if (spec instanceof ConstStatement) {
+				ConstStatement c = (ConstStatement) spec;
+				nelms.add(c);
+
 			} else if (spec instanceof InputStatement) {
 				nelms.addAll(((InputStatement) spec).getLhs());
 			} else if (spec instanceof EnumStatement) {

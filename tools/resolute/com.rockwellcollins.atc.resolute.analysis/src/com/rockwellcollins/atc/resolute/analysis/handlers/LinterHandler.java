@@ -12,7 +12,6 @@ import java.util.TreeSet;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -178,8 +177,9 @@ public class LinterHandler extends AadlHandler {
 							marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberFor(ref));
 						}
 					}
-				} catch (CoreException exception) {
-					exception.printStackTrace();
+				} catch (Exception e) {
+//					e.printStackTrace();
+					continue;
 				}
 			}
 		}

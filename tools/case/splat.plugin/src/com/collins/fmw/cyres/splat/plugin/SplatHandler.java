@@ -83,7 +83,7 @@ public class SplatHandler extends AbstractHandler {
 
 			MessageConsole console = findConsole("HOL Proof of Filter Claims");
 			MessageConsoleStream out = console.newMessageStream();
-
+			out.println(splatPath + " " + fullpath + " LD_LIBRARY_PATH=" + splatDir);
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			IWorkbenchPage page = window.getActivePage();
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;

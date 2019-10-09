@@ -18,6 +18,7 @@ Import-Package: com.collins.fmw.cyres.util.plugin,
  org.eclipse.ui.console,
  org.osate.aadl2.instantiation,
  org.osate.aadl2.modelsupport.resources,
+ org.osate.aadl2.modelsupport.util,
  org.osate.annexsupport,
  org.osate.ge
 Bundle-ClassPath: .,

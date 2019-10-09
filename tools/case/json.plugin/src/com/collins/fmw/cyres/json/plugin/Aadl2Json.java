@@ -9,6 +9,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
@@ -16,6 +19,7 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.modelsupport.util.AadlUtil;
 
 import com.collins.fmw.cyres.json.plugin.AadlTranslate.AgreePrintOption;
 import com.collins.fmw.cyres.util.plugin.Filesystem;
@@ -117,6 +121,8 @@ public class Aadl2Json {
 			// Get (recursively) the set of models referenced in this file
 			List<ModelUnit> modelUnits = new ArrayList<>();
 			getModelDependencies(model, modelUnits);
+			// Add AADL Predeclared property sets
+			getPredeclaredPropertySets(modelUnits);
 
 			JsonArray modelsJson = new JsonArray();
 
@@ -671,6 +677,23 @@ public class Aadl2Json {
 					getModelDependencies(mu, modelUnits);
 				}
 			}
+		}
+
+	}
+
+	static private void getPredeclaredPropertySets(List<ModelUnit> modelUnits) {
+
+		for (String s : AadlUtil.getPredeclaredPropertySetNames()) {
+
+			final String pathName = "org.osate.workspace/resources/properties/Predeclared_Property_Sets/";
+			final ResourceSet resourceSet = new ResourceSetImpl();
+			String propSetFileName = pathName + s + ".aadl";
+			final Resource r = resourceSet.getResource(URI.createPlatformPluginURI(propSetFileName, true), true);
+			final EObject eObj = r.getContents().get(0);
+			if (eObj instanceof PropertySet) {
+				modelUnits.add((PropertySet) eObj);
+			}
+
 		}
 
 	}

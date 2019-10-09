@@ -54,7 +54,7 @@ import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
 public class AddIsolatorHandler extends AadlHandler {
 
 	static final String VIRTUAL_PROCESSOR_TYPE_NAME = "CASE_Virtual_Processor";
-	static final String VIRTUAL_PROCESSOR_IMPL_NAME = "VPROC";
+	public static final String VIRTUAL_PROCESSOR_IMPL_NAME = "VPROC";
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String virtualProcessorName;
@@ -120,8 +120,6 @@ public class AddIsolatorHandler extends AadlHandler {
 		} else {
 			return;
 		}
-
-
 
 		// create set of bound processors
 		Set<String> boundProcessors = new HashSet<>();
@@ -271,7 +269,7 @@ public class AddIsolatorHandler extends AadlHandler {
 									while (i.hasNext()) {
 										ContainedNamedElement containedNamedElement = i.next();
 										ContainmentPathElement containmentPathElement = containedNamedElement.getPath();
-										String appliesTo = containmentPathElement.getNamedElement().getName();
+										String appliesTo = containmentPathElement.getNamedElement().getQualifiedName();
 										// If an entire subcomponent (including its subcomponents) is selected, remove
 										// any of its subcomponent bindings to this processor
 										if (isolatedComponents.contains(appliesTo)) {
@@ -331,9 +329,9 @@ public class AddIsolatorHandler extends AadlHandler {
 					ContainedNamedElement cne = pa.createAppliesTo();
 					cpe = cne.createPath();
 					cpe.setNamedElement(selectedSub);
-					if (!s.equalsIgnoreCase(selectedSub.getName())) {
+					if (!s.equalsIgnoreCase(selectedSub.getQualifiedName())) {
 						for (Subcomponent sub : selectedSub.getComponentImplementation().getOwnedSubcomponents()) {
-							if (s.equalsIgnoreCase(selectedSub.getName() + "." + sub.getName())) {
+							if (s.equalsIgnoreCase(selectedSub.getQualifiedName() + "." + sub.getName())) {
 								cpe = cpe.createPath();
 								cpe.setNamedElement(sub);
 								break;
@@ -345,7 +343,7 @@ public class AddIsolatorHandler extends AadlHandler {
 				// Add add_isolator claims to resolute prove statement, if applicable
 				if (!isolatorRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(isolatorRequirement);
-					return new AddIsolatorClaim(req.getContext(), vpSub);
+					return new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub);
 				}
 
 				return null;

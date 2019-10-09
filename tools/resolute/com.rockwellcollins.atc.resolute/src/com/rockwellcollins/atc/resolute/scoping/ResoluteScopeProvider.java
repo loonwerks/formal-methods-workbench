@@ -162,6 +162,7 @@ public class ResoluteScopeProvider extends PropertiesScopeProvider {
 			result.addAll(compImpl.getAllModes());
 			if (compImpl instanceof ComponentImplementation) {
 				result.addAll(((ComponentImplementation) compImpl).getAllSubcomponents());
+				result.addAll(((ComponentImplementation) compImpl).getAllConnections());
 			}
 
 		} else {

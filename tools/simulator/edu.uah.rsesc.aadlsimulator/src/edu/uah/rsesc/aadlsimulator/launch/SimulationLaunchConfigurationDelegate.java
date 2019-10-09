@@ -52,7 +52,6 @@ import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osgi.framework.FrameworkUtil;
 
 import com.google.inject.Injector;
@@ -159,7 +158,7 @@ public class SimulationLaunchConfigurationDelegate implements ILaunchConfigurati
 
 	private ComponentImplementation refreshComponentImplementation(final ComponentImplementation ci) {
 		final URI uri = EcoreUtil.getURI(ci);
-		final ResourceSet rs = OsateResourceUtil.createResourceSet();
+		final ResourceSet rs = new XtextResourceSet();
 		final EObject newEObject = rs.getEObject(uri, true);
 		if(!(newEObject instanceof ComponentImplementation)) {
 			throw new RuntimeException("Unable to refresh component implementation");
