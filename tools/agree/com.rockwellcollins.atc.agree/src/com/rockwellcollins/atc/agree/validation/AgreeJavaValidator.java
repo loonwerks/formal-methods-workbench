@@ -500,8 +500,16 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 			return;
 		}
 
-		NamedElement namedEl = event.getId();
-		if (!(namedEl instanceof EventPort || namedEl instanceof EventDataPort)) {
+		Expr expr = event.getPort();
+
+		NamedElement namedEl = null;
+		if (expr instanceof NamedElmExpr) {
+			namedEl = ((NamedElmExpr) expr).getElm();
+		} else if (expr instanceof SelectionExpr) {
+			namedEl = ((SelectionExpr) expr).getField();
+		}
+
+		if (namedEl == null || !(namedEl instanceof EventPort || namedEl instanceof EventDataPort)) {
 			error(event, "Argument of event expression must be an event port or event data port");
 		}
 	}
@@ -536,16 +544,22 @@ public class AgreeJavaValidator extends AbstractAgreeJavaValidator {
 		}
 
 		Expr expr = latched.getExpr();
-		NamedElmExpr nestId = null;
+		Expr nestId = null;
 		if (expr instanceof NamedElmExpr) {
 			nestId = (NamedElmExpr) expr;
 		} else if (expr instanceof EventExpr) {
 			EventExpr eventExpr = (EventExpr) expr;
-			nestId = (NamedElmExpr) eventExpr.getId();
+			nestId = eventExpr.getPort();
 		}
 
 		if (nestId != null) {
-			NamedElement namedEl = nestId.getElm();
+			NamedElement namedEl = null;
+			if (nestId instanceof NamedElmExpr) {
+				namedEl = ((NamedElmExpr) nestId).getElm();
+			} else if (nestId instanceof SelectionExpr) {
+				namedEl = ((SelectionExpr) nestId).getField();
+			}
+			
 			if ((namedEl instanceof DataPort) && ((DataPort) namedEl).isIn()) {
 				return;
 			} else if ((namedEl instanceof EventDataPort) && ((EventDataPort) namedEl).isIn()) {
