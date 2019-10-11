@@ -4585,9 +4585,8 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		private final Action cEventExprAction_9_0 = (Action)cGroup_9.eContents().get(0);
 		private final Keyword cEventKeyword_9_1 = (Keyword)cGroup_9.eContents().get(1);
 		private final Keyword cLeftParenthesisKeyword_9_2 = (Keyword)cGroup_9.eContents().get(2);
-		private final Assignment cIdAssignment_9_3 = (Assignment)cGroup_9.eContents().get(3);
-		private final CrossReference cIdNamedElementCrossReference_9_3_0 = (CrossReference)cIdAssignment_9_3.eContents().get(0);
-		private final RuleCall cIdNamedElementIDTerminalRuleCall_9_3_0_1 = (RuleCall)cIdNamedElementCrossReference_9_3_0.eContents().get(1);
+		private final Assignment cPortAssignment_9_3 = (Assignment)cGroup_9.eContents().get(3);
+		private final RuleCall cPortExprParserRuleCall_9_3_0 = (RuleCall)cPortAssignment_9_3.eContents().get(0);
 		private final Keyword cRightParenthesisKeyword_9_4 = (Keyword)cGroup_9.eContents().get(4);
 		private final Group cGroup_10 = (Group)cAlternatives.eContents().get(10);
 		private final Action cLatchedExprAction_10_0 = (Action)cGroup_10.eContents().get(0);
@@ -4657,7 +4656,7 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//	| ArrayLiteralExpr
 		//	| {IntLitExpr} val=INTEGER_LIT
 		//	| {PreExpr} 'pre' '(' expr=Expr ')'
-		//	| {EventExpr} 'event' '(' id=[aadl2::NamedElement] ')'
+		//	| {EventExpr} 'event' '(' port=Expr ')'
 		//	| {LatchedExpr} 'latched' '(' expr=Expr ')'
 		//	| {TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')'
 		//	| {TimeRiseExpr} 'timerise' '(' id=[aadl2::NamedElement] ')'
@@ -4673,11 +4672,10 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//({CallExpr} ref=DoubleDotRef '(') (args+=Expr (',' args+=Expr)*)? ')' | => ({RecordLitExpr} recordType=DoubleDotRef '{'
 		//args+=[aadl2::NamedElement] '=') argExpr+=Expr (';' args+=[aadl2::NamedElement] '=' argExpr+=Expr)* '}' | =>
 		//({EnumLitExpr} 'enum' '(') enumType=DoubleDotRef ',' value=ID ')' | ArrayLiteralExpr | {IntLitExpr} val=INTEGER_LIT |
-		//{PreExpr} 'pre' '(' expr=Expr ')' | {EventExpr} 'event' '(' id=[aadl2::NamedElement] ')' | {LatchedExpr} 'latched' '('
-		//expr=Expr ')' | {TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')' | {TimeRiseExpr} 'timerise' '('
-		//id=[aadl2::NamedElement] ')' | {TimeFallExpr} 'timefall' '(' id=[aadl2::NamedElement] ')' | {RealLitExpr} val=REAL_LIT
-		//| {BoolLitExpr} val=BooleanLiteral | {FloorCast} 'floor' '(' expr=Expr ')' | {RealCast} 'real' '(' expr=Expr ')' | '('
-		//Expr ')'
+		//{PreExpr} 'pre' '(' expr=Expr ')' | {EventExpr} 'event' '(' port=Expr ')' | {LatchedExpr} 'latched' '(' expr=Expr ')' |
+		//{TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')' | {TimeRiseExpr} 'timerise' '(' id=[aadl2::NamedElement] ')' |
+		//{TimeFallExpr} 'timefall' '(' id=[aadl2::NamedElement] ')' | {RealLitExpr} val=REAL_LIT | {BoolLitExpr}
+		//val=BooleanLiteral | {FloorCast} 'floor' '(' expr=Expr ')' | {RealCast} 'real' '(' expr=Expr ')' | '(' Expr ')'
 		public Alternatives getAlternatives() { return cAlternatives; }
 
 		//=> ({NamedElmExpr} elm=[aadl2::NamedElement|DCID])
@@ -4912,7 +4910,7 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//')'
 		public Keyword getRightParenthesisKeyword_8_4() { return cRightParenthesisKeyword_8_4; }
 
-		//{EventExpr} 'event' '(' id=[aadl2::NamedElement] ')'
+		//{EventExpr} 'event' '(' port=Expr ')'
 		public Group getGroup_9() { return cGroup_9; }
 
 		//{EventExpr}
@@ -4924,14 +4922,11 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 		//'('
 		public Keyword getLeftParenthesisKeyword_9_2() { return cLeftParenthesisKeyword_9_2; }
 
-		//id=[aadl2::NamedElement]
-		public Assignment getIdAssignment_9_3() { return cIdAssignment_9_3; }
+		//port=Expr
+		public Assignment getPortAssignment_9_3() { return cPortAssignment_9_3; }
 
-		//[aadl2::NamedElement]
-		public CrossReference getIdNamedElementCrossReference_9_3_0() { return cIdNamedElementCrossReference_9_3_0; }
-
-		//ID
-		public RuleCall getIdNamedElementIDTerminalRuleCall_9_3_0_1() { return cIdNamedElementIDTerminalRuleCall_9_3_0_1; }
+		//Expr
+		public RuleCall getPortExprParserRuleCall_9_3_0() { return cPortExprParserRuleCall_9_3_0; }
 
 		//')'
 		public Keyword getRightParenthesisKeyword_9_4() { return cRightParenthesisKeyword_9_4; }
@@ -6254,7 +6249,7 @@ public class AgreeGrammarAccess extends AbstractGrammarElementFinder {
 	//	| ArrayLiteralExpr
 	//	| {IntLitExpr} val=INTEGER_LIT
 	//	| {PreExpr} 'pre' '(' expr=Expr ')'
-	//	| {EventExpr} 'event' '(' id=[aadl2::NamedElement] ')'
+	//	| {EventExpr} 'event' '(' port=Expr ')'
 	//	| {LatchedExpr} 'latched' '(' expr=Expr ')'
 	//	| {TimeOfExpr} 'timeof' '(' id=[aadl2::NamedElement] ')'
 	//	| {TimeRiseExpr} 'timerise' '(' id=[aadl2::NamedElement] ')'

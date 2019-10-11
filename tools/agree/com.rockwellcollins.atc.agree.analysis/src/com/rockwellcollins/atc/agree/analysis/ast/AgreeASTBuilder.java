@@ -2442,9 +2442,22 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		return new UnaryExpr(UnaryOp.PRE, res);
 	}
 
+	private String getDottedId(com.rockwellcollins.atc.agree.agree.Expr expr) {
+		if (expr instanceof NamedElmExpr) {
+			return ((NamedElmExpr) expr).getElm().getName();
+		} else if (expr instanceof SelectionExpr) {
+			String targetString = getDottedId(((SelectionExpr) expr).getTarget());
+			String fieldString = ((SelectionExpr) expr).getField().getName();
+			return targetString + dotChar + fieldString;
+		}
+
+
+		throw new RuntimeException();
+	}
+
 	@Override
 	public Expr caseEventExpr(EventExpr expr) {
-		String eventStr = expr.getId().getName() + eventSuffix;
+		String eventStr = getDottedId(expr.getPort()) + eventSuffix;
 		return new IdExpr(eventStr);
 	}
 

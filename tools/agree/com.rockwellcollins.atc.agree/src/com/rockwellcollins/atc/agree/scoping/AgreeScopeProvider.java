@@ -52,7 +52,6 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumStatement;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
-import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.ExistsExpr;
 import com.rockwellcollins.atc.agree.agree.FlatmapExpr;
 import com.rockwellcollins.atc.agree.agree.FnDef;
@@ -307,10 +306,10 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 		return components;
 	}
 
-	IScope scope_NamedElement(EventExpr ctx, EReference ref) {
-		EObject container = ctx.getContainingClassifier();
-		return Scopes.scopeFor(getAadlComponentElements(container));
-	}
+//	IScope scope_NamedElement(EventExpr ctx, EReference ref) {
+//		EObject container = ctx.getContainingClassifier();
+//		return Scopes.scopeFor(getAadlComponentElements(container));
+//	}
 
 	IScope scope_NamedElement(TimeOfExpr ctx, EReference ref) {
 		EObject container = ctx.getContainingClassifier();

@@ -13,3 +13,5 @@ Import-Package: com.collins.fmw.cyres.json.plugin,
  org.eclipse.ui.console,
  org.osate.ui.dialogs
 Bundle-ClassPath: .
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.collins.fmw.cyres.splat.Activator

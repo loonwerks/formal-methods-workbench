@@ -74,5 +74,20 @@
          </command>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
+            class="com.collins.fmw.cyres.splat.preferences.SplatPreferencePage"
+            id="com.collins.fmw.cyres.splat.preferences.SplatPreferencePage"
+            name="SPLAT">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.collins.fmw.cyres.splat.preferences.SplatPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

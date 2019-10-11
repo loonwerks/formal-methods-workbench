@@ -3,7 +3,6 @@ package com.collins.fmw.cyres.architecture.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -19,20 +18,16 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.PortCategory;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.handlers.AddFilterHandler;
-import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 
 /**
  * This class creates the Add Filter wizard
@@ -41,12 +36,12 @@ public class AddFilterDialog extends TitleAreaDialog {
 
 	private Subcomponent compoundFilter = null;
 	private Text txtFilterImplementationName;
-	private Text txtFilterImplementationLanguage;
+//	private Text txtFilterImplementationLanguage;
 	private List<Button> btnLogPortType = new ArrayList<>();
 	private Combo cboFilterRequirement;
 	private Text txtAgreeProperty;
 	private List<Button> btnPropagateGuarantees = new ArrayList<>();
-	private String filterImplementationLanguage = "";
+//	private String filterImplementationLanguage = "";
 	private String filterImplementationName = "";
 	private PortCategory logPortType = null;
 	private String filterRequirement = "";
@@ -56,7 +51,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private List<String> propagateGuarantees = new ArrayList<>();
 	private List<String> requirements = new ArrayList<>();
 
-	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
+//	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddFilterDialog(Shell parentShell) {
@@ -90,7 +85,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 
 		// Add filter information fields
 		createFilterImplementationNameField(container);
-		createImplementationLanguageField(container);
+//		createImplementationLanguageField(container);
 		createLogPortField(container);
 
 		createRequirementField(container);
@@ -128,34 +123,34 @@ public class AddFilterDialog extends TitleAreaDialog {
 		}
 	}
 
-	/**
-	 * Creates the input text field for specifying the filter implementation language
-	 * @param container
-	 */
-	private void createImplementationLanguageField(Composite container) {
-		Label lblImplLangField = new Label(container, SWT.NONE);
-		lblImplLangField.setText("Filter implementation language");
-
-		GridData dataInfoField = new GridData();
-		dataInfoField.grabExcessHorizontalSpace = true;
-		dataInfoField.horizontalAlignment = SWT.FILL;
-		txtFilterImplementationLanguage = new Text(container, SWT.BORDER);
-		txtFilterImplementationLanguage.setLayoutData(dataInfoField);
-		if (compoundFilter != null) {
-			ComponentImplementation ci = compoundFilter.getComponentImplementation();
-			EList<PropertyExpression> propVals = ci.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_IMPL");
-			if (!propVals.isEmpty()) {
-				// There should be only one property value
-				PropertyExpression expr = propVals.get(0);
-				if (expr instanceof StringLiteral) {
-					txtFilterImplementationLanguage.setText(((StringLiteral) expr).getValue());
-				}
-			}
-			txtFilterImplementationLanguage.setEnabled(false);
-		} else {
-			txtFilterImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
-		}
-	}
+//	/**
+//	 * Creates the input text field for specifying the filter implementation language
+//	 * @param container
+//	 */
+//	private void createImplementationLanguageField(Composite container) {
+//		Label lblImplLangField = new Label(container, SWT.NONE);
+//		lblImplLangField.setText("Filter implementation language");
+//
+//		GridData dataInfoField = new GridData();
+//		dataInfoField.grabExcessHorizontalSpace = true;
+//		dataInfoField.horizontalAlignment = SWT.FILL;
+//		txtFilterImplementationLanguage = new Text(container, SWT.BORDER);
+//		txtFilterImplementationLanguage.setLayoutData(dataInfoField);
+//		if (compoundFilter != null) {
+//			ComponentImplementation ci = compoundFilter.getComponentImplementation();
+//			EList<PropertyExpression> propVals = ci.getPropertyValues(CaseUtils.CASE_PROPSET_NAME, "COMP_IMPL");
+//			if (!propVals.isEmpty()) {
+//				// There should be only one property value
+//				PropertyExpression expr = propVals.get(0);
+//				if (expr instanceof StringLiteral) {
+//					txtFilterImplementationLanguage.setText(((StringLiteral) expr).getValue());
+//				}
+//			}
+//			txtFilterImplementationLanguage.setEnabled(false);
+//		} else {
+//			txtFilterImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
+//		}
+//	}
 
 	/**
 	 * Creates the input field for specifying if the filter should contain
@@ -295,7 +290,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 * text fields are disposed when the dialog closes.
 	 */
 	private boolean saveInput() {
-		filterImplementationLanguage = txtFilterImplementationLanguage.getText();
+//		filterImplementationLanguage = txtFilterImplementationLanguage.getText();
 		filterImplementationName = txtFilterImplementationName.getText();
 		logPortType = null;
 		for (int i = 0; i < btnLogPortType.size(); i++) {
@@ -359,9 +354,9 @@ public class AddFilterDialog extends TitleAreaDialog {
 		return filterImplementationName;
 	}
 
-	public String getFilterImplementationLanguage() {
-		return filterImplementationLanguage;
-	}
+//	public String getFilterImplementationLanguage() {
+//		return filterImplementationLanguage;
+//	}
 
 	public PortCategory getLogPortType() {
 		return logPortType;
