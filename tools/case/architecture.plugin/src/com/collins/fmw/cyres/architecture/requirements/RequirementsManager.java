@@ -111,6 +111,8 @@ public class RequirementsManager {
 		}
 		req.setAgree();
 		formalizeRequirement(req);
+		reqDb.updateRequirement(req);
+		reqDb.saveRequirementsDatabase();
 		return true;
 	}
 
@@ -121,6 +123,8 @@ public class RequirementsManager {
 		}
 		req.setStatus(CyberRequirement.add);
 		unformalizeRequirement(req);
+		reqDb.updateRequirement(req);
+		reqDb.saveRequirementsDatabase();
 		return true;
 	}
 
@@ -246,14 +250,18 @@ public class RequirementsManager {
 		reqDb.saveRequirementsDatabase();
 	}
 
-	public void readRequirementFiles(String filename) {
-		final List<CyberRequirement> existingReqs = findImportedRequirements();
-		final List<JsonRequirementsFile> jsonReqFiles = readInputFiles(filename);
-		if (!jsonReqFiles.isEmpty()) {
+	public boolean readRequirementFiles(boolean importRequirements, String filename) {
+		if (importRequirements) {
+			final List<JsonRequirementsFile> jsonReqFiles = readInputFiles(filename);
+			if (jsonReqFiles.isEmpty()) {
+				return false;
+			}
 			reqDb.reset();
 			reqDb.importJsonRequrementsFiles(jsonReqFiles);
 		}
-		reqDb.importRequirements(existingReqs);
+		reqDb.importRequirements(findImportedRequirements());
+		reqDb.saveRequirementsDatabase();
+		return true;
 	}
 
 	protected List<CyberRequirement> findImportedRequirements() {
@@ -764,8 +772,8 @@ public class RequirementsManager {
 			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
 			JsonRequirementsFile jsonReqFile = new JsonRequirementsFile();
 			if (!reqFile.exists() || !jsonReqFile.importFile(reqFile)) {
-				Dialog.showInfo("Missing requirements database",
-						"No requirements database found. Starting a new database.");
+//				Dialog.showInfo("Missing requirements database",
+//						"No requirements database found. Starting a new database.");
 			} else {
 				// Add the requirements in this file to the accumulated list of requirements
 				importRequirements(jsonReqFile.getRequirements());
@@ -774,6 +782,10 @@ public class RequirementsManager {
 
 		public void saveRequirementsDatabase() {
 			// Write database to physical requirements database file
+			if (requirements.isEmpty()) {
+				return;
+			}
+
 			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
 			JsonRequirementsFile jsonReqFile = new JsonRequirementsFile(CyberRequirement.notApplicable,
 					new Date().getTime(), CyberRequirement.notApplicable, CyberRequirement.notApplicable,

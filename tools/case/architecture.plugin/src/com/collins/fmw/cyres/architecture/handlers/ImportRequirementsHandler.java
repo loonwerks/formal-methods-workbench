@@ -21,6 +21,9 @@ public class ImportRequirementsHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
+		// Determine if this should run in "Requirements Manager" mode or "Import Requirements" mode.
+		final boolean importRequirements = (event.getCommand().getId().indexOf("Import") != -1);
+
 		// Get the current project
 		IProject project = TraverseProject.getCurrentProject();
 		if (project == null) {
@@ -49,13 +52,18 @@ public class ImportRequirementsHandler extends AbstractHandler {
 		 */
 
 		RequirementsManager reqMgr = RequirementsManager.getInstance();
-		reqMgr.readRequirementFiles(event.getParameter("filename"));
+		if (!reqMgr.readRequirementFiles(importRequirements, event.getParameter("filename"))) {
+			// No requirement files were read
+			return null;
+		}
 
 		ImportRequirementsGUI wizard = new ImportRequirementsGUI(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		wizard.setRequirements(reqMgr.getRequirements());
 
-		if (wizard.open() == SWT.OK) {
+		if (wizard.getRequirements().isEmpty()) {
+			Dialog.showInfo("Missig Requirements", "No requirements found.");
+		} else if (wizard.open() == SWT.OK) {
 			List<CyberRequirement> updatedReqs = wizard.getRequirements();
 			reqMgr.updateRequirements(updatedReqs);
 		}

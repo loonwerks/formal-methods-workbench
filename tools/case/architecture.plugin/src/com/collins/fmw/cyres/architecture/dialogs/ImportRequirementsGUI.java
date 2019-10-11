@@ -314,20 +314,20 @@ public class ImportRequirementsGUI extends Dialog {
 //		tblReqBrowser.setSortDirection(SWT.UP);
 
 		if (requirements.isEmpty()) {
-			cmbStatus.select(0);
-			lblGenTool2.setText("GearCASE");
-			lblType2.setText("well_formed");
-			txtID.setText("Req_002");
-			txtDesc.setText("UXAS shall only accept well-formed messages from the GroundStation");
-			lblContext2.setText("SW::SW.Impl.UXAS");
-			textReason.setText("N/A");
-		}
-
-		shlReqManager.open();
-		Display display = getParent().getDisplay();
-		while (!shlReqManager.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
+//			cmbStatus.select(0);
+//			lblGenTool2.setText("GearCASE");
+//			lblType2.setText("well_formed");
+//			txtID.setText("Req_002");
+//			txtDesc.setText("UXAS shall only accept well-formed messages from the GroundStation");
+//			lblContext2.setText("SW::SW.Impl.UXAS");
+//			textReason.setText("N/A");
+		} else {
+			shlReqManager.open();
+			Display display = getParent().getDisplay();
+			while (!shlReqManager.isDisposed()) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
 			}
 		}
 		return returnCode;

@@ -36,6 +36,12 @@
                   </command>
                </menu>
                <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.outline.requirements.manage"
+                     label="Open Requirements Manager..."
+                     style="push">
+               </command>
+               <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.outline.requirements.import"
                      label="Import Requirements..."
@@ -166,6 +172,12 @@
                      </parameter>
                   </command>
                </menu>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.manage"
+                     label="Open Requirements Manager..."
+                     style="push">
+               </command>
                <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.menubar.requirements.import"
@@ -318,6 +330,12 @@
                   </command>
                </menu>
                <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.editor.requirements.manage"
+                     label="Open Requirements Manager..."
+                     style="push">
+               </command>
+               <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.editor.requirements.import"
                      label="Import Requirements..."
@@ -444,6 +462,10 @@
             name="Import Requirements">
       </command>
       <command
+            id="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+            name="Open Requirements Manager">
+      </command>
+      <command
             id="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
             name="Add Attestation Manager">
       </command>
@@ -529,6 +551,10 @@
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.VerifyLegacyImplementationHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.ImportRequirementsHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.ImportRequirementsHandler"
