@@ -81,7 +81,7 @@ public class SplatHandler extends AbstractHandler {
 
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-			MessageConsole console = findConsole("HOL Proof of Filter Claims");
+			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
 			out.println(splatPath + " " + fullpath + " LD_LIBRARY_PATH=" + splatDir);
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
@@ -94,7 +94,11 @@ public class SplatHandler extends AbstractHandler {
 			while ((s = stdErr.readLine()) != null) {
 				out.println(s);
 			}
-			out.println("Done with HOL proof of filter properties.");
+
+			// Insert the location of the source code into the filter component implementations in the model
+			insertSourceCodeLocation();
+
+			out.println("Done running SPLAT");
 
 		} catch (Exception e) {
 			Dialog.showError("SPLAT", "SPLAT has encountered an error and was unable to complete.");
@@ -103,6 +107,18 @@ public class SplatHandler extends AbstractHandler {
 		}
 
 		return null;
+	}
+
+	private void insertSourceCodeLocation() {
+
+		// Look in the SPLAT output directory for filters (each will be in its own folder)
+
+		// Find the filter in the model
+
+		// Add the source code location
+
+		// Add implementation language?
+
 	}
 
 }

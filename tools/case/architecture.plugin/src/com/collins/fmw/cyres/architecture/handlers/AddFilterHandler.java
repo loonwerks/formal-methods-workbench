@@ -65,7 +65,7 @@ public class AddFilterHandler extends AadlHandler {
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String filterImplementationName;
-	private String filterImplementationLanguage;
+//	private String filterImplementationLanguage;
 	private PortCategory logPortType;
 	private String filterRequirement;
 	private String filterAgreeProperty;
@@ -180,7 +180,7 @@ public class AddFilterHandler extends AadlHandler {
 		}
 		wizard.create();
 		if (wizard.open() == Window.OK) {
-			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
+//			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
 			filterImplementationName = wizard.getFilterImplementationName();
 			if (filterImplementationName == "") {
 				filterImplementationName = FILTER_IMPL_NAME;
@@ -351,26 +351,9 @@ public class AddFilterHandler extends AadlHandler {
 				}
 
 				final ComponentImplementation containingImpl = selectedConnection.getContainingComponentImpl();
-//				final Subcomponent subcomponent = (Subcomponent) selectedConnection.getDestination().getContext();
-//				String destName1 = "";
-//				if (subcomponent.getSubcomponentType() instanceof ComponentImplementation) {
-//					// Get the component type name
-//					destName1 = subcomponent.getComponentImplementation().getType().getName();
-//					destName1 = subcomponent.getContainingComponentImpl().getTypeName();
-//				} else {
-//					destName1 = subcomponent.getName();
-//				}
 
 				// Move filter to top of file
 				pkgSection.getOwnedClassifiers().move(0, pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers()
-////						.move(getIndex(subcomponent.getContainingComponentImpl().getTypeName(), pkgSection.getOwnedClassifiers()),
-//						.move(getIndex(containingImpl.getTypeName(), pkgSection.getOwnedClassifiers()),
-//								pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(destName1, pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create Filter implementation
 				final ComponentImplementation filterImpl = (ComponentImplementation) pkgSection
@@ -379,23 +362,15 @@ public class AddFilterHandler extends AadlHandler {
 				final Realization r = filterImpl.createOwnedRealization();
 				r.setImplemented(filterType);
 
-				// CASE::COMP_IMPL property
-				if (!filterImplementationLanguage.isEmpty()) {
-					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl)) {
-//						return;
-					}
-				}
+//				// CASE::COMP_IMPL property
+//				if (!filterImplementationLanguage.isEmpty()) {
+//					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl)) {
+////						return;
+//					}
+//				}
 
 				// Add it to proper place (just below component type)
 				pkgSection.getOwnedClassifiers().move(1, pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(destName1, pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers()
-////						.move(getIndex(subcomponent.getContainingComponentImpl().getTypeName(),
-//						.move(getIndex(containingImpl.getTypeName(), pkgSection.getOwnedClassifiers()),
-//								pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Insert filter feature in process component implementation
 				final Subcomponent filterSubcomp = ComponentCreateHelper.createOwnedSubcomponent(containingImpl,
