@@ -29,6 +29,9 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.Connection;
+import org.osate.aadl2.Subcomponent;
 
 import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
 
@@ -358,28 +361,28 @@ public class ImportRequirementsGUI extends Dialog {
 		}
 	}
 
-	private void addSampleEntries(Table t) {
-		TableItem t0 = new TableItem(t, SWT.NONE);
-		TableItem t1 = new TableItem(t, SWT.NONE);
-		TableItem t2 = new TableItem(t, SWT.NONE);
-		TableItem t3 = new TableItem(t, SWT.NONE);
-		TableItem t4 = new TableItem(t, SWT.NONE);
-
-		t0.setText(new String[] { "ToDo", "trusted_source", "Req_001",
-				"UXAS shall only accept messages from a trusted GroundStation" });
-		t1.setText(new String[] { "Add+Agree", "well_formed", "Req_002",
-				"UXAS shall only accept well-formed messages from the GroundStation" });
-		t2.setText(new String[] { "Add", "isolated", "Req_003",
-				"Third-party software shall be isolated from critical components" });
-		t3.setText(new String[] { "Add", "monitored", "Req_004",
-				"The output of Third-party software shall be monitored for correct behavior" });
-		t4.setText(new String[] { "Ignore", "not_hackable", "Req_005",
-				"The WaypointPlanManagerService shall not be hackable by anyone ever" });
-	}
+//	private void addSampleEntries(Table t) {
+//		TableItem t0 = new TableItem(t, SWT.NONE);
+//		TableItem t1 = new TableItem(t, SWT.NONE);
+//		TableItem t2 = new TableItem(t, SWT.NONE);
+//		TableItem t3 = new TableItem(t, SWT.NONE);
+//		TableItem t4 = new TableItem(t, SWT.NONE);
+//
+//		t0.setText(new String[] { "ToDo", "trusted_source", "Req_001",
+//				"UXAS shall only accept messages from a trusted GroundStation" });
+//		t1.setText(new String[] { "Add+Agree", "well_formed", "Req_002",
+//				"UXAS shall only accept well-formed messages from the GroundStation" });
+//		t2.setText(new String[] { "Add", "isolated", "Req_003",
+//				"Third-party software shall be isolated from critical components" });
+//		t3.setText(new String[] { "Add", "monitored", "Req_004",
+//				"The output of Third-party software shall be monitored for correct behavior" });
+//		t4.setText(new String[] { "Ignore", "not_hackable", "Req_005",
+//				"The WaypointPlanManagerService shall not be hackable by anyone ever" });
+//	}
 
 	private void populateTable(Table t) {
 		if (requirements.isEmpty()) {
-			addSampleEntries(t);
+//			addSampleEntries(t);
 			return;
 		}
 
@@ -464,9 +467,32 @@ public class ImportRequirementsGUI extends Dialog {
 
 				// Find the context (component, connection, etc) in the model
 				Classifier contextClassifier = CyberRequirement.getImplementationClassifier(req.getContext());
-
+				boolean contextFound = false;
+				if (contextClassifier instanceof ComponentImplementation) {
+					ComponentImplementation ci = (ComponentImplementation) contextClassifier;
+					for (Subcomponent sub : ci.getOwnedSubcomponents()) {
+						if (sub.getQualifiedName().equalsIgnoreCase(req.getContext())) {
+							contextFound = true;
+							break;
+						}
+					}
+					for (Connection conn : ci.getOwnedConnections()) {
+						if (conn.getQualifiedName().equalsIgnoreCase(req.getContext())) {
+							contextFound = true;
+							// Make sure connection isn't being formalized
+							if (req.getStatus() == CyberRequirement.addPlusAgree) {
+								org.osate.ui.dialogs.Dialog.showError("Import requirements",
+										req.getContext() + ": Requirements on connections cannot be formalized.");
+								req.setStatus(CyberRequirement.toDo);
+								updateTableItem(i);
+								return false;
+							}
+							break;
+						}
+					}
+				}
 				// Check for invalid context
-				if (contextClassifier == null) {
+				if (contextClassifier == null || !contextFound) {
 					org.osate.ui.dialogs.Dialog.showError("Unknown context for " + req.getType(), req.getContext()
 							+ " could not be found in any AADL file in the project. A requirement context must be valid in order to import requirements into model. This requirement will be de-selected.");
 					req.setStatus(CyberRequirement.toDo);
