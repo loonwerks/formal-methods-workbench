@@ -48,7 +48,8 @@ public class CaseUtils {
 	public static final String CASE_MODEL_TRANSFORMATIONS_FILE = "CASE_Model_Transformations.aadl";
 	public static final String CASE_REQUIREMENTS_NAME = "CASE_Requirements";
 	public static final String CASE_REQUIREMENTS_FILE = "CASE_Requirements.aadl";
-	public static final String CASE_REQUIREMENTS_DATABASE_FILE = "CASE_Requirements_Database.json";
+//	public static final String CASE_REQUIREMENTS_DATABASE_FILE = "CASE_Requirements_Database.json";
+	public static final String CASE_REQUIREMENTS_DATABASE_FILE = ".reqdb";
 
 	/**
 	 * Adds the CASE_Properties file to the list of imported model units via the 'with' statement

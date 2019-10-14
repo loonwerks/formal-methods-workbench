@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorDescriptor;
@@ -47,6 +48,8 @@ public class RequirementsManager {
 
 	public static RequirementsManager getInstance() {
 		if (instance == null || currentProject == null) {
+			instance = new RequirementsManager();
+		} else if (currentProject != TraverseProject.getCurrentProject()) {
 			instance = new RequirementsManager();
 		}
 		return instance;
@@ -769,7 +772,13 @@ public class RequirementsManager {
 
 		public void readRequirementsDatabase() {
 			// Read database from the physical requirements database file
-			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
+//			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
+			final IPath reqFilePath = TraverseProject.getCurrentProject()
+					.getFile(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE).getLocation();
+			File reqFile = null;
+			if (reqFilePath != null) {
+				reqFile = reqFilePath.toFile();
+			}
 			JsonRequirementsFile jsonReqFile = new JsonRequirementsFile();
 			if (!reqFile.exists() || !jsonReqFile.importFile(reqFile)) {
 //				Dialog.showInfo("Missing requirements database",
@@ -785,8 +794,13 @@ public class RequirementsManager {
 			if (requirements.isEmpty()) {
 				return;
 			}
-
-			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
+//			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
+			final IPath reqFilePath = TraverseProject.getCurrentProject()
+					.getFile(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE).getLocation();
+			File reqFile = null;
+			if (reqFilePath != null) {
+				reqFile = reqFilePath.toFile();
+			}
 			JsonRequirementsFile jsonReqFile = new JsonRequirementsFile(CyberRequirement.notApplicable,
 					new Date().getTime(), CyberRequirement.notApplicable, CyberRequirement.notApplicable,
 					getRequirements());

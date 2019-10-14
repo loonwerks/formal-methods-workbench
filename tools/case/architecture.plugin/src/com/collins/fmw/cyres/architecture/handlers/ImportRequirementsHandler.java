@@ -27,7 +27,7 @@ public class ImportRequirementsHandler extends AbstractHandler {
 		// Get the current project
 		IProject project = TraverseProject.getCurrentProject();
 		if (project == null) {
-			Dialog.showError("Could not determine current project",
+			Dialog.showError("Requirements Manager",
 					"Unable to determine current project.  Open a project file in the editor.");
 			return null;
 		}
@@ -62,7 +62,7 @@ public class ImportRequirementsHandler extends AbstractHandler {
 		wizard.setRequirements(reqMgr.getRequirements());
 
 		if (wizard.getRequirements().isEmpty()) {
-			Dialog.showInfo("Missig Requirements", "No requirements found.");
+			Dialog.showInfo("Requirements Manager", "No requirements found in model.");
 		} else if (wizard.open() == SWT.OK) {
 			List<CyberRequirement> updatedReqs = wizard.getRequirements();
 			reqMgr.updateRequirements(updatedReqs);
