@@ -36,15 +36,19 @@
                   </command>
                </menu>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
-                     id="com.collins.fmw.cyres.menus.outline.requirements.manage"
-                     label="Open Requirements Manager..."
-                     style="push">
-               </command>
-               <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.outline.requirements.import"
                      label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="com.collins.fmw.cyres.architecture.plugin.separator3"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.outline.requirements.manage"
+                     label="Open Requirements Manager..."
                      style="push">
                </command>
             </menu>
@@ -163,15 +167,19 @@
                   </command>
                </menu>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.manage"
-                     label="Open Requirements Manager..."
-                     style="push">
-               </command>
-               <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.menubar.requirements.import"
                      label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="com.collins.fmw.cyres.architecture.plugin.separator1"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.manage"
+                     label="Open Requirements Manager..."
                      style="push">
                </command>
             </menu>
@@ -310,15 +318,19 @@
                   </command>
                </menu>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
-                     id="com.collins.fmw.cyres.menus.editor.requirements.manage"
-                     label="Open Requirements Manager..."
-                     style="push">
-               </command>
-               <command
                      commandId="com.collins.fmw.cyres.architecture.commands.ImportRequirements"
                      id="com.collins.fmw.cyres.menus.editor.requirements.import"
                      label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="com.collins.fmw.cyres.architecture.plugin.separator2"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.editor.requirements.manage"
+                     label="Open Requirements Manager..."
                      style="push">
                </command>
             </menu>

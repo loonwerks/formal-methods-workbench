@@ -990,46 +990,48 @@ private AadlPackage getClaimDefinitionPackage(Resource resource) {
 	}
 
 	/**
-		 * Return the component implementation referred to by the qualified name
-		 * @param qualifiedName
-		 * @return
-		 */
-		public static Classifier getImplementationClassifier(String qualifiedName) {
-			Classifier classifier = null;
-			if (!qualifiedName.contains("::")) {
-				return null;
-			}
-			String pkgName = Aadl2Util.getPackageName(qualifiedName);
-
-			// The qualified name should either refer to a component implementation
-			// or a component implementation's subcomponent or connection
-			// A component implementation qualified name will appear as <Package>::<Component Implementation>
-			// A subcomponent/connection qualified name will appear as <Package>::<Component Implementation>.<Subcomponent/Connection>
-			// Since we want to return the component implementation, we want to truncate the subcomponent from the qualified name
-
-	//		String[] parts = qualifiedName.split("\\.");
-	//		String compImplName = "";
-	//		if (parts.length > 0) {
-	//			compImplName = parts[0] + "." + parts[1];
-	//		}
-
-			int lastDot = qualifiedName.lastIndexOf('.');
-			String compImplName = qualifiedName.substring(0, (lastDot == -1 ? qualifiedName.length() : lastDot));
-
-			for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
-				if (pkg.getName().equalsIgnoreCase(pkgName)) {
-					for (Classifier c : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {
-						if (c.getQualifiedName().equalsIgnoreCase(compImplName)) {
-							classifier = c;
-							break;
-						}
-					}
-					break;
-				}
-			}
-
-			return classifier;
+	 * Return the containing component implementation referred to in the qualified name
+	 * @param qualifiedName
+	 * @return
+	 */
+	public static Classifier getImplementationClassifier(String qualifiedName) {
+		Classifier classifier = null;
+		if (!qualifiedName.contains("::")) {
+			return null;
 		}
+		String pkgName = Aadl2Util.getPackageName(qualifiedName);
+
+		// The qualified name should either refer to a component implementation
+		// or a component implementation's subcomponent or connection
+		// A component implementation qualified name will appear as <Package>::<Component Implementation>
+		// A subcomponent/connection qualified name will appear as <Package>::<Component Implementation>.<Subcomponent/Connection>
+		// Note that there can be multiple nested subcomponents, such as <Package>::<Component Implementation>.<Subcomponent>.<Subcomponent
+		// Since we want to return the component implementation, we want to remove the subcomponent(s) from the qualified name
+
+		String[] parts = qualifiedName.split("\\.");
+		// Capture just the implementation name
+		String compImplName = parts[0];
+		if (parts.length > 0) {
+			compImplName += "." + parts[1];
+		}
+
+//		int lastDot = qualifiedName.lastIndexOf('.');
+//		String compImplName = qualifiedName.substring(0, (lastDot == -1 ? qualifiedName.length() : lastDot));
+
+		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
+			if (pkg.getName().equalsIgnoreCase(pkgName)) {
+				for (Classifier c : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {
+					if (c.getQualifiedName().equalsIgnoreCase(compImplName)) {
+						classifier = c;
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		return classifier;
+	}
 
 	static Classifier getModificationContext(Resource resource, String qualifiedName) {
 		// Get modification context
