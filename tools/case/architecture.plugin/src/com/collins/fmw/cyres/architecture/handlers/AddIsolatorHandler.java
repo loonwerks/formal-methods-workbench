@@ -343,7 +343,8 @@ public class AddIsolatorHandler extends AadlHandler {
 				// Add add_isolator claims to resolute prove statement, if applicable
 				if (!isolatorRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(isolatorRequirement);
-					return new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub);
+//					return new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub);
+					return new AddIsolatorClaim(isolatedComponents, vpSub);
 				}
 
 				return null;
