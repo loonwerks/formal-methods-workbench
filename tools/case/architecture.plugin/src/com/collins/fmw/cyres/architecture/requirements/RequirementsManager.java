@@ -254,6 +254,16 @@ public class RequirementsManager {
 	}
 
 	public boolean readRequirementFiles(boolean importRequirements, String filename) {
+		final List<CyberRequirement> existing = findImportedRequirements();
+		Set<String> reqIds = new HashSet<String>();
+		for (CyberRequirement r : existing) {
+			if (r.getId() != null && !r.getId().isEmpty() && !reqIds.add(r.getId())) {
+				Dialog.showError("Error in Claims file",
+						"Duplicate requirement ID found in claims file " + r.getId() + ".");
+				return false;
+			}
+		}
+
 		if (importRequirements) {
 			final List<JsonRequirementsFile> jsonReqFiles = readInputFiles(filename);
 			if (jsonReqFiles.isEmpty()) {
@@ -262,8 +272,9 @@ public class RequirementsManager {
 			reqDb.reset();
 			reqDb.importJsonRequrementsFiles(jsonReqFiles);
 		}
-		reqDb.importRequirements(findImportedRequirements());
+		reqDb.importRequirements(existing);
 		reqDb.saveRequirementsDatabase();
+
 		return true;
 	}
 
@@ -654,6 +665,8 @@ public class RequirementsManager {
 				for (CyberRequirement req : removeClaimDefinition) {
 					req.removeClaimDef(resource, new BaseClaim(req));
 				}
+
+				CyberRequirement.sortClaimDefinitions(resource);
 
 				return null;
 			});

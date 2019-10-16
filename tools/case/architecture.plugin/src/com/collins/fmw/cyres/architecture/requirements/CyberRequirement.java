@@ -2,8 +2,11 @@ package com.collins.fmw.cyres.architecture.requirements;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 
@@ -397,7 +400,44 @@ public class CyberRequirement {
 	//		subclause.setParsedAnnexSubclause(resclause);
 	//	}
 
-		public void insertClaimDef(Resource resource, BuiltInClaim claim) {
+	public static void sortClaimDefinitions(Resource resource) {
+		// Get modification context
+		AadlPackage pkg = getClaimDefinitionPackage(resource);
+		if (pkg == null) {
+			return;
+		}
+
+		PrivatePackageSection priv8 = pkg.getOwnedPrivateSection();
+		if (priv8 == null) {
+			return;
+		}
+
+		DefaultAnnexLibrary defResLib = null;
+		ResoluteLibrary resLib = null;
+		for (AnnexLibrary library : priv8.getOwnedAnnexLibraries()) {
+			if (library instanceof DefaultAnnexLibrary && library.getName().equalsIgnoreCase("resolute")) {
+				defResLib = (DefaultAnnexLibrary) library;
+				resLib = EcoreUtil.copy((ResoluteLibrary) defResLib.getParsedAnnexLibrary());
+				break;
+			}
+		}
+
+		if (defResLib == null || resLib == null) {
+			return;
+		}
+
+		Comparator<Definition> cyreqComp = (o1, o2) -> o1.getName().compareTo(o2.getName());
+		List<Definition> list = new ArrayList<Definition>();
+		list.addAll(resLib.getDefinitions());
+		list.sort(cyreqComp);
+		resLib.getDefinitions().clear();
+		for (Definition d : list) {
+			resLib.getDefinitions().add(d);
+		}
+		defResLib.setParsedAnnexLibrary(resLib);
+	}
+
+	public void insertClaimDef(Resource resource, BuiltInClaim claim) {
 			if (claim == null) {
 				throw new RuntimeException("NULL claim.");
 			}
@@ -808,7 +848,7 @@ public class CyberRequirement {
 		return null;
 	}
 
-private AadlPackage getClaimDefinitionPackage(Resource resource) {
+	private static AadlPackage getClaimDefinitionPackage(Resource resource) {
 		AadlPackage claimsPackage;
 		claimsPackage = getResoluteModificationContext(resource, CaseUtils.CASE_REQUIREMENTS_NAME);
 		if (claimsPackage == null) {
@@ -1011,12 +1051,9 @@ private AadlPackage getClaimDefinitionPackage(Resource resource) {
 		String[] parts = qualifiedName.split("\\.");
 		// Capture just the implementation name
 		String compImplName = parts[0];
-		if (parts.length > 0) {
+		if (parts.length > 1) {
 			compImplName += "." + parts[1];
 		}
-
-//		int lastDot = qualifiedName.lastIndexOf('.');
-//		String compImplName = qualifiedName.substring(0, (lastDot == -1 ? qualifiedName.length() : lastDot));
 
 		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
 			if (pkg.getName().equalsIgnoreCase(pkgName)) {

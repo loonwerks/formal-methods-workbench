@@ -5,7 +5,9 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -50,6 +52,8 @@ public class ImportRequirementsGUI extends Dialog {
 	final Label lblContext2;
 	final Label lblGenTool2;
 	final Label lblType2;
+
+	final Set<String> reqIds = new HashSet<String>();
 
 	final List<String> status = Arrays.asList(CyberRequirement.toDo, CyberRequirement.add,
 			CyberRequirement.addPlusAgree,
@@ -244,18 +248,23 @@ public class ImportRequirementsGUI extends Dialog {
 				}
 
 				// Update requirement dialog
-				CyberRequirement r = requirements.get(index);
+				final CyberRequirement r = requirements.get(index);
+				final String reqId = r.getId();
 				cmbStatus.select(getStatusIndex(r.getStatus()));
 				lblGenTool2.setText(r.getTool());
 				lblType2.setText(r.getType());
-				txtID.setText(r.getId());
-				txtID.setEditable(r.getId().isEmpty());
+				txtID.setText(reqId);
+				txtID.setEditable(reqId.isEmpty());
 				txtDesc.setText(r.getText());
-				txtDesc.setEditable(r.getId().isEmpty());
+				txtDesc.setEditable(reqId.isEmpty());
 				lblContext2.setText(r.getContext());
 				textReason.setText(r.getRationale());
 
 				oldIndex = index;
+
+				if (reqId != null && !reqId.isEmpty()) {
+					reqIds.remove(reqId);
+				}
 			}
 
 			@Override
@@ -290,6 +299,13 @@ public class ImportRequirementsGUI extends Dialog {
 						"Requirement IDs must be assigned before requirements can be imported into the model.");
 				return false;
 			}
+		}
+
+		if (!newId.isEmpty() && reqIds.contains(newId)) {
+			org.osate.ui.dialogs.Dialog.showError("Duplicate requirement ID", "Requirement IDs must be unique.");
+			return false;
+		} else {
+			reqIds.add(newId);
 		}
 
 		CyberRequirement req = requirements.get(oldIndex);
@@ -428,7 +444,9 @@ public class ImportRequirementsGUI extends Dialog {
 			// error in saving changes
 			return;
 		}
-		saveInput();
+		if (!saveInput()) {
+			return;
+		}
 		returnCode = SWT.OK;
 		shlReqManager.close();
 	}
@@ -439,7 +457,9 @@ public class ImportRequirementsGUI extends Dialog {
 			// error in saving changes
 			return;
 		}
-		saveInput();
+		if (!saveInput()) {
+			return;
+		}
 	}
 
 	protected void cancelPressed() {
@@ -518,8 +538,15 @@ public class ImportRequirementsGUI extends Dialog {
 	public void setRequirements(List<CyberRequirement> newRequirements) {
 		if (!this.requirements.isEmpty()) {
 			this.requirements.clear();
+			this.reqIds.clear();
 		}
 		this.requirements.addAll(newRequirements);
+		this.requirements.forEach(r -> {
+			final String id = r.getId();
+			if (id != null && !id.isEmpty()) {
+				this.reqIds.add(id);
+			}
+		});
 	}
 
 	public List<CyberRequirement> getRequirements() {
