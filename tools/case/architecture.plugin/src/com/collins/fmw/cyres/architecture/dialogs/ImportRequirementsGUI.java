@@ -48,7 +48,7 @@ public class ImportRequirementsGUI extends Dialog {
 	final Combo cmbStatus;
 	final Text txtID;
 	final Text txtDesc;
-	final Text textReason;
+	final Text txtReason;
 	final Label lblContext2;
 	final Label lblGenTool2;
 	final Label lblType2;
@@ -202,8 +202,8 @@ public class ImportRequirementsGUI extends Dialog {
 		// lblReason.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblReason.setText("Reason for omission");
 
-		textReason = new Text(composite, SWT.BORDER | SWT.MULTI);
-		textReason.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 3));
+		txtReason = new Text(composite, SWT.BORDER | SWT.MULTI);
+		txtReason.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 3));
 		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);
 		scrolledComposite.setContent(composite);
@@ -218,21 +218,12 @@ public class ImportRequirementsGUI extends Dialog {
 		// createButton(cmpButtonBar, SWT.SAVE, " Save ", false);
 		createButton(cmpButtonBar, SWT.OK, "        OK        ", false);
 		createButton(cmpButtonBar, SWT.CANCEL, "        Cancel        ", true);
-//		Button btnApply = new Button(cmpButtonBar, SWT.NONE);
-//		btnApply.setText("        Apply        ");
-//		Button btnOk = new Button(cmpButtonBar, SWT.NONE);
-//		btnOk.setText("        OK        ");
-//		Button btnCancel = new Button(cmpButtonBar, SWT.NONE);
-//		btnCancel.setText("        Cancel        ");
-
-		// Your code goes here (widget creation, set result, etc).
 
 		tblReqBrowser.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				int index = tblReqBrowser.getSelectionIndex();
-				System.out.println("Table Selection: oldindex " + oldIndex + " newindex " + index);
 
 				if (oldIndex == index) {
 					return;
@@ -258,7 +249,7 @@ public class ImportRequirementsGUI extends Dialog {
 				txtDesc.setText(r.getText());
 				txtDesc.setEditable(reqId.isEmpty());
 				lblContext2.setText(r.getContext());
-				textReason.setText(r.getRationale());
+				txtReason.setText(r.getRationale());
 
 				oldIndex = index;
 
@@ -284,25 +275,34 @@ public class ImportRequirementsGUI extends Dialog {
 		String newStatus = getStatusString(cmbStatus.getSelectionIndex());
 		String newId = txtID.getText();
 		String newDesc = txtDesc.getText();
-		String newReason = textReason.getText();
+		String newReason = txtReason.getText();
 
 		if (newStatus.equalsIgnoreCase(CyberRequirement.omit)
 				&& (newReason.isEmpty() || newReason.equalsIgnoreCase(CyberRequirement.notApplicable))) {
-			org.osate.ui.dialogs.Dialog.showError("Missing Requirement Information",
+			org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
 					"Requirements that are marked as omitted must provide a rationale for the omission.");
 			return false;
 		}
 
 		if ((newStatus.equalsIgnoreCase(CyberRequirement.add) || newStatus.equalsIgnoreCase(CyberRequirement.addPlusAgree))) {
 			if (newId.isEmpty()) {
-				org.osate.ui.dialogs.Dialog.showError("Missing requirement ID",
+				org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
 						"Requirement IDs must be assigned before requirements can be imported into the model.");
 				return false;
 			}
 		}
 
+		// Make sure requirement ID starts with a letter and only contains letters, numbers, and underscores
+		// (this is for compliance with Resolute)
+		if (!newId.matches("^[A-Za-z][A-Za-z0-9_]*")) {
+			org.osate.ui.dialogs.Dialog.showError("Requirements Manager", newId
+					+ ": Invalid requirement ID. Requirement IDs must begin with a letter and contain only letters, numbers, and underscores.");
+			return false;
+		}
+
 		if (!newId.isEmpty() && reqIds.contains(newId)) {
-			org.osate.ui.dialogs.Dialog.showError("Duplicate requirement ID", "Requirement IDs must be unique.");
+			org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
+					"Duplicate requirement ID: " + newId + ". Requirement IDs must be unique.");
 			return false;
 		} else {
 			reqIds.add(newId);
@@ -329,18 +329,8 @@ public class ImportRequirementsGUI extends Dialog {
 	public int open() {
 
 		populateTable(tblReqBrowser);
-//		tblReqBrowser.setSortColumn(tblclmnId);
-//		tblReqBrowser.setSortDirection(SWT.UP);
 
-		if (requirements.isEmpty()) {
-//			cmbStatus.select(0);
-//			lblGenTool2.setText("GearCASE");
-//			lblType2.setText("well_formed");
-//			txtID.setText("Req_002");
-//			txtDesc.setText("UXAS shall only accept well-formed messages from the GroundStation");
-//			lblContext2.setText("SW::SW.Impl.UXAS");
-//			textReason.setText("N/A");
-		} else {
+		if (!requirements.isEmpty()) {
 			shlReqManager.open();
 			Display display = getParent().getDisplay();
 			while (!shlReqManager.isDisposed()) {
@@ -372,33 +362,11 @@ public class ImportRequirementsGUI extends Dialog {
 			okPressed();
 		} else if (intValue == SWT.CANCEL) {
 			cancelPressed();
-		} else if (intValue == SWT.SAVE) {
-			applyPressed();
 		}
 	}
 
-//	private void addSampleEntries(Table t) {
-//		TableItem t0 = new TableItem(t, SWT.NONE);
-//		TableItem t1 = new TableItem(t, SWT.NONE);
-//		TableItem t2 = new TableItem(t, SWT.NONE);
-//		TableItem t3 = new TableItem(t, SWT.NONE);
-//		TableItem t4 = new TableItem(t, SWT.NONE);
-//
-//		t0.setText(new String[] { "ToDo", "trusted_source", "Req_001",
-//				"UXAS shall only accept messages from a trusted GroundStation" });
-//		t1.setText(new String[] { "Add+Agree", "well_formed", "Req_002",
-//				"UXAS shall only accept well-formed messages from the GroundStation" });
-//		t2.setText(new String[] { "Add", "isolated", "Req_003",
-//				"Third-party software shall be isolated from critical components" });
-//		t3.setText(new String[] { "Add", "monitored", "Req_004",
-//				"The output of Third-party software shall be monitored for correct behavior" });
-//		t4.setText(new String[] { "Ignore", "not_hackable", "Req_005",
-//				"The WaypointPlanManagerService shall not be hackable by anyone ever" });
-//	}
-
 	private void populateTable(Table t) {
 		if (requirements.isEmpty()) {
-//			addSampleEntries(t);
 			return;
 		}
 
@@ -411,33 +379,6 @@ public class ImportRequirementsGUI extends Dialog {
 		}
 	}
 
-
-	/*
-	 * private void sortRequirements(Table t, int column) {
-	 * Comparator<CyReq> byCol = null;
-	 * switch (column) {
-	 * case 0: // status
-	 * byCol = (CyReq r1, CyReq r2) -> r1.type.compareTo(r2.status);
-	 * break;
-	 * case 1: // type
-	 * byCol = (CyReq r1, CyReq r2) -> r1.type.compareTo(r2.type);
-	 * break;
-	 * case 2: // id
-	 * byCol = (CyReq r1, CyReq r2) -> r1.id.compareTo(r2.id);
-	 * break;
-	 * case 3: // desc
-	 * byCol = (CyReq r1, CyReq r2) -> r1.desc.compareTo(r2.desc);
-	 * break;
-	 * default:
-	 * break;
-	 * }
-	 *
-	 * List<CyReq> sorter = new ArrayList<CyReq>();
-	 * for (TableItem item : t.getItems()) {
-	 *
-	 * }
-	 * }
-	 */
 	protected void okPressed() {
 		// Save changes and exit dialog
 		if (!saveReqChanges()) {
@@ -451,16 +392,6 @@ public class ImportRequirementsGUI extends Dialog {
 		shlReqManager.close();
 	}
 
-	protected void applyPressed() {
-		// Save changes and stay in dialog
-		if (!saveReqChanges()) {
-			// error in saving changes
-			return;
-		}
-		if (!saveInput()) {
-			return;
-		}
-	}
 
 	protected void cancelPressed() {
 		// Exit dialog without saving
@@ -501,7 +432,7 @@ public class ImportRequirementsGUI extends Dialog {
 							contextFound = true;
 							// Make sure connection isn't being formalized
 							if (req.getStatus() == CyberRequirement.addPlusAgree) {
-								org.osate.ui.dialogs.Dialog.showError("Import requirements",
+								org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
 										req.getContext() + ": Requirements on connections cannot be formalized.");
 								req.setStatus(CyberRequirement.toDo);
 								updateTableItem(i);
@@ -513,7 +444,7 @@ public class ImportRequirementsGUI extends Dialog {
 				}
 				// Check for invalid context
 				if (contextClassifier == null || !contextFound) {
-					org.osate.ui.dialogs.Dialog.showError("Unknown context for " + req.getType(), req.getContext()
+					org.osate.ui.dialogs.Dialog.showError("Requirements Manager", req.getContext()
 							+ " could not be found in any AADL file in the project. A requirement context must be valid in order to import requirements into model. This requirement will be de-selected.");
 					req.setStatus(CyberRequirement.toDo);
 					updateTableItem(i);
@@ -522,13 +453,14 @@ public class ImportRequirementsGUI extends Dialog {
 
 				// Check for missing requirement ID
 				if (req.getId().isEmpty() && req.getStatus() != CyberRequirement.omit) {
-					org.osate.ui.dialogs.Dialog.showError("Missing requirement ID", req.getType()
+					org.osate.ui.dialogs.Dialog.showError("Requirements Manager", req.getType()
 							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model. This requirement will be de-selected.");
 					// Uncheck this requirement
 					req.setStatus(CyberRequirement.toDo);
 					updateTableItem(i);
 					return false;
 				}
+
 			}
 		}
 
@@ -553,23 +485,4 @@ public class ImportRequirementsGUI extends Dialog {
 		return requirements;
 	}
 
-//	// Used for sorting requirements table
-//	private class CyReq {
-//		String status;
-//		String type;
-//		String id;
-//		String desc;
-//
-//		public CyReq(String status, String type, String id, String desc) {
-//			this.status = status;
-//			this.type = type;
-//			this.id = id;
-//			this.desc = desc;
-//		}
-//
-//		@Override
-//		public String toString() {
-//			return this.status + "-" + this.type + "-" + this.id + "-" + this.desc;
-//		}
-//	}
 }
