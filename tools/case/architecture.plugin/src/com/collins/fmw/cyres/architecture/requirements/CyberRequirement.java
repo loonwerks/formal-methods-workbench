@@ -61,14 +61,12 @@ import com.rockwellcollins.atc.resolute.resolute.ResoluteSubclause;
  */
 public class CyberRequirement {
 
-	// Requirement status
-	// TODO: change them to enum
-	public static final String addPlusAgree = "Formalize";
-	public static final String toDo = "ToDo";
-	public static final String add = "Import";
-	public static final String omit = "Omit";
 	public static final String unknown = "Unknown";
 	public static final String notApplicable = "N/A";
+
+	public static enum Status {
+		ToDo, Import, Omit
+	};
 	private static final boolean addQuotes = true;
 
 	private String type = ""; // this is the requirement classification type as defined by the TA1 tool
@@ -78,60 +76,42 @@ public class CyberRequirement {
 	private String rationale = "";
 	private long date = 0L;
 	private String tool = "";
-	private String status = toDo;
+	private Status status = Status.ToDo;
+	private boolean formalized = false;
 
 	transient private String subcomponentQualifiedName = null;
 
-//	transient private FunctionDefinition savedClaimDefinition = null;
-
-	public static String False() {
-		return "False";
-	}
-
-	public static String formalized() {
-		return "Formalized";
-	}
-
-	public static String generatedBy() {
-		return "Generated_By";
-	}
-
-	public static String generatedOn() {
-		return "Generated_On";
-	}
-
-	public static String reqComponent() {
-		return "Req_Component";
-	}
-
-	public static String True() {
-		return "True";
-	}
+	public static final String FALSE = "False";
+	public static final String TRUE = "True";
+	public static final String FORMALIZED = "Formalized";
+	public static final String GENERATED_BY = "Generated_By";
+	public static final String GENERATED_ON = "Generated_On";
+	public static final String REQ_COMPONENT = "Req_Component";
 
 	public CyberRequirement(CyberRequirement req) {
 		this(req.getDate(), req.getTool(), req.getStatus(), req.getType(), req.getId(), req.getText(), req.getContext(),
-				req.getRationale());
+				req.hasAgree(), req.getRationale());
 	}
 
-	public CyberRequirement(long date, String tool, String status, String type, String id, String text, String context,
-			String rationale) {
+	public CyberRequirement(long date, String tool, Status status, String type, String id, String text, String context,
+			boolean formalized, String rationale) {
 		this.date = date;
 		this.tool = (tool == null ? unknown : tool);
 		this.type = (type == null ? unknown : type);
 		this.id = (id == null ? "" : id);
 		this.text = (text == null ? "" : text);
 		this.context = (context == null ? "" : context);
+		this.formalized = formalized;
 		this.rationale = (rationale == null ? notApplicable : rationale);
-		this.status = ((status == null || toDo.equals(status)) ? toDo
-				: add.equals(status) ? add : addPlusAgree.equals(status) ? addPlusAgree : omit);
+		this.status = (status == null || status == Status.ToDo) ? Status.ToDo : status;
 	}
 
 	public CyberRequirement(String type) {
-		this(0L, null, null, type, null, null, null, null);
+		this(0L, null, null, type, null, null, null, false, null);
 	}
 
 	protected CyberRequirement() {
-		this(0L, null, null, null, null, null, null, null);
+		this(0L, null, null, null, null, null, null, false, null);
 	}
 
 	public boolean completelyEqual(Object obj) {
@@ -148,7 +128,7 @@ public class CyberRequirement {
 		return Objects.equals(context, other.context) && date == other.date && Objects.equals(id, other.id)
 				&& Objects.equals(rationale, other.rationale) && Objects.equals(status, other.status)
 				&& Objects.equals(text, other.text) && Objects.equals(tool, other.tool)
-				&& Objects.equals(type, other.type);
+				&& Objects.equals(type, other.type) && formalized == other.formalized;
 	}
 
 	@Override
@@ -183,10 +163,6 @@ public class CyberRequirement {
 		return rationale;
 	}
 
-	//	public Classifier getImplementationClassifier() {
-//		return getImplementationClassifier(this.context);
-//	}
-//
 	public FunctionDefinition getResoluteClaim() {
 		// Get AADL Package
 		AadlPackage aadlPkg = CaseUtils.getCaseRequirementsPackage();
@@ -220,7 +196,7 @@ public class CyberRequirement {
 		return fnDef;
 	}
 
-	public String getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 
@@ -237,7 +213,7 @@ public class CyberRequirement {
 	}
 
 	public boolean hasAgree() {
-		return status == addPlusAgree;
+		return formalized;
 	}
 
 	@Override
@@ -245,54 +221,8 @@ public class CyberRequirement {
 		return Objects.hash(context, type);
 	}
 
-//	public void insert() {
-//		final boolean formalize = hasAgree();
-//		List<BuiltInClaim> claims = new ArrayList<>();
-//		BaseClaim baseClaim = new BaseClaim(this);
-//		AgreePropCheckedClaim agreeClaim = new AgreePropCheckedClaim(getId(), getContext());
-//		claims.add(baseClaim);
-//		if (formalize) {
-//			claims.add(agreeClaim);
-//		}
-//
-//		// Insert claim definition
-//		// Get the file to insert into
-//		IFile file = CaseUtils.getCaseRequirementsFile();
-//		XtextEditor editor = RequirementsManager.getEditor(file);
-//
-//		if (editor == null) {
-//			throw new RuntimeException("Cannot open claim definition file: " + file);
-//		}
-//
-//		editor.getDocument().modify(resource -> {
-//			insertClaimDef(claims, resource);
-//			return null;
-//		});
-//
-//		// Close editor, if necessary
-//		RequirementsManager.closeEditor(editor, true);
-//
-//		// Insert claim call (prove statement)
-//		// Get the file to insert into
-//		file = getContainingFile();
-//		editor = RequirementsManager.getEditor(file);
-//
-//		if (editor == null) {
-//			return;
-//		}
-//
-//		editor.getDocument().modify(resource -> {
-//			insertClaimCall(claims, resource);
-////			insertClaimCall(agreeClaim, resource);
-//			return null;
-//		});
-//
-//		// Close editor, if necessary
-//		RequirementsManager.closeEditor(editor, true);
-//	}
-
-	public void setAgree() {
-		status = addPlusAgree;
+	public void setAgree(boolean agree) {
+		formalized = agree;
 	}
 
 	public void setContext(String context) {
@@ -311,7 +241,7 @@ public class CyberRequirement {
 		this.rationale = rationale;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 
@@ -342,63 +272,6 @@ public class CyberRequirement {
 		}
 		return subcomponentQualifiedName;
 	}
-
-	//	public void insertClaimCall(List<BuiltInClaim> claims, Resource resource) {
-	//
-	//		if (claims == null || claims.isEmpty()) {
-	//			return;
-	//		}
-	//
-	//		Classifier modificationContext = getClaimCallModificationContext(resource);
-	//
-	//		// Build Claim Call
-	//		ProveStatement currentClaimCall = getClaimCall(modificationContext);
-	//
-	//		for (BuiltInClaim claim : claims) {
-	//			currentClaimCall = claim.buildClaimCall(currentClaimCall);
-	//		}
-	//
-	//		if (currentClaimCall == null) {
-	//			throw new RuntimeException("Unable to generate the claim call.");
-	//		}
-	//
-	//		DefaultAnnexSubclause subclause = null;
-	//		ResoluteSubclause resclause = null;
-	//		for (AnnexSubclause sc : modificationContext.getOwnedAnnexSubclauses()) {
-	//			if (sc instanceof DefaultAnnexSubclause && sc.getName().equalsIgnoreCase("resolute")) {
-	//				subclause = (DefaultAnnexSubclause) sc;
-	//				resclause = EcoreUtil.copy((ResoluteSubclause) subclause.getParsedAnnexSubclause());
-	//				break;
-	//			}
-	//		}
-	//
-	//		if (subclause == null) {
-	//			subclause = (DefaultAnnexSubclause) modificationContext
-	//					.createOwnedAnnexSubclause(Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
-	//			subclause.setName("resolute");
-	//			subclause.setSourceText("{** **}");
-	//
-	//			resclause = ResoluteFactory.eINSTANCE.createResoluteSubclause();
-	//		}
-	//
-	//		// If the prove statement already exists, remove it
-	//		for (Iterator<AnalysisStatement> i = resclause.getProves().iterator(); i.hasNext();) {
-	//			AnalysisStatement as = i.next();
-	//			if (as instanceof ProveStatement) {
-	//				Expr expr = ((ProveStatement) as).getExpr();
-	//				if (expr instanceof FnCallExpr) {
-	//					FunctionDefinition fd = ((FnCallExpr) expr).getFn();
-	//					if (fd != null && fd.getName() != null && fd.getName().equalsIgnoreCase(getId())) {
-	//						i.remove();
-	//						break;
-	//					}
-	//				}
-	//			}
-	//		}
-	//
-	//		resclause.getProves().add(currentClaimCall);
-	//		subclause.setParsedAnnexSubclause(resclause);
-	//	}
 
 	public static void sortClaimDefinitions(Resource resource) {
 		// Get modification context
@@ -481,35 +354,6 @@ public class CyberRequirement {
 				resLib = ResoluteFactory.eINSTANCE.createResoluteLibrary();
 			}
 
-	//		// If this function definition already exists, remove it
-	//		Iterator<Definition> i = resLib.getDefinitions().iterator();
-	//		while (i.hasNext()) {
-	//			Definition def = i.next();
-	//			if (def.getName().equalsIgnoreCase(currentClaimDefinition.getName())) {
-	//				for (Iterator<EObject> iterator = def.eCrossReferences().iterator(); iterator
-	//								.hasNext();) {
-	//					EObject eObject = iterator.next();
-	//					System.out.println(eObject);
-	//				}
-	//				i.remove();
-	//				break;
-	//			}
-	//		}
-
-	//		savedClaimDefinition = null;
-	//		for (Iterator<Definition> i = resLib.getDefinitions().iterator(); i.hasNext();) {
-	//			Definition def = i.next();
-	//			if (def != null && def instanceof FunctionDefinition && def.hasName()
-	//					&& def.getName().equalsIgnoreCase(currentClaimDefinition.getName())) {
-	//				savedClaimDefinition = (FunctionDefinition) def;
-	//				break;
-	//			}
-	//		}
-	//
-	//		if (savedClaimDefinition != null) {
-	//			resLib.getDefinitions().remove(savedClaimDefinition);
-	//		}
-
 			for (Iterator<Definition> i = resLib.getDefinitions().iterator(); i.hasNext();) {
 				Definition def = i.next();
 				if (def != null && def instanceof FunctionDefinition && def.hasName()
@@ -548,11 +392,11 @@ public class CyberRequirement {
 
 		ResoluteSubclause resclause = EcoreUtil.copy((ResoluteSubclause) subclause.getParsedAnnexSubclause());
 
-		final boolean debug = true;
+//		final boolean debug = true;
 
-		if (debug) {
-			System.out.println("Statements in resclause before changes: " + resclause);
-		}
+//		if (debug) {
+//			System.out.println("Statements in resclause before changes: " + resclause);
+//		}
 
 		// If the prove statement already exists, remove it
 		ProveStatement oldClaimCall = null;
@@ -563,11 +407,9 @@ public class CyberRequirement {
 				Expr expr = ((ProveStatement) as).getExpr();
 				if (expr instanceof FnCallExpr) {
 					FunctionDefinition fd = ((FnCallExpr) expr).getFn();
-					if (debug) {
-						System.out.println(fd.toString());
-					}
-//					if (fd != null && (fd == savedClaimDefinition
-//							|| (fd.hasName() && fd.getName().equalsIgnoreCase(getId())))) {
+//					if (debug) {
+//						System.out.println(fd.toString());
+//					}
 					if (fd != null && fd.hasName() && fd.getName().equalsIgnoreCase(getId())) {
 						oldClaimCall = (ProveStatement) as;
 						break;
@@ -589,20 +431,20 @@ public class CyberRequirement {
 		}
 		subclause.setParsedAnnexSubclause(resclause);
 
-		if (debug) {
-			System.out.println("Statements in resclause after changes: " + resclause);
-			for (Iterator<AnalysisStatement> i = resclause.getProves().iterator(); i.hasNext();) {
-				AnalysisStatement as = i.next();
-				System.out.println(as);
-				if (as instanceof ProveStatement) {
-					Expr expr = ((ProveStatement) as).getExpr();
-					if (expr instanceof FnCallExpr) {
-						FunctionDefinition fd = ((FnCallExpr) expr).getFn();
-						System.out.println(fd.toString());
-					}
-				}
-			}
-		}
+//		if (debug) {
+//			System.out.println("Statements in resclause after changes: " + resclause);
+//			for (Iterator<AnalysisStatement> i = resclause.getProves().iterator(); i.hasNext();) {
+//				AnalysisStatement as = i.next();
+//				System.out.println(as);
+//				if (as instanceof ProveStatement) {
+//					Expr expr = ((ProveStatement) as).getExpr();
+//					if (expr instanceof FnCallExpr) {
+//						FunctionDefinition fd = ((FnCallExpr) expr).getFn();
+//						System.out.println(fd.toString());
+//					}
+//				}
+//			}
+//		}
 	}
 
 	public void insertAgree(Resource resource) {
@@ -743,29 +585,6 @@ public class CyberRequirement {
 			}
 			return updated;
 
-	//		// If the prove statement exists, remove it.
-	//		int oldSize = resclause.getProves().size();
-	//		resclause.getProves().removeIf(as -> {
-	//			if (as instanceof ProveStatement) {
-	//				ProveStatement prove = (ProveStatement) as;
-	//				Expr expr = prove.getExpr();
-	//				if (expr instanceof FnCallExpr) {
-	//					FnCallExpr fnCallExpr = (FnCallExpr) expr;
-	//					FunctionDefinition fd = fnCallExpr.getFn();
-	//					if (fd != null && fd.getName() != null && fd.getName().equalsIgnoreCase(getId())) {
-	//						return true;
-	//					}
-	//				}
-	//			}
-	//			return false;
-	//		});
-	//
-	//		if (resclause.getProves().size() != oldSize) {
-	//			subclause.setParsedAnnexSubclause(resclause);
-	//			return true;
-	//		}
-	//		return false;
-
 		}
 
 	public boolean removeAgree(Resource resource) {
@@ -904,9 +723,9 @@ public class CyberRequirement {
 				if (body instanceof ClaimBody) {
 					ClaimBody claimBody = (ClaimBody) body;
 					for (ClaimContext context : claimBody.getContext()) {
-						if (context.getName().equalsIgnoreCase(formalized())) {
+						if (context.getName().equalsIgnoreCase(FORMALIZED)) {
 							StringLiteral s = Aadl2Factory.eINSTANCE.createStringLiteral();
-							s.setValue(getStringLiteral(False()));
+							s.setValue(getStringLiteral(FALSE));
 							context.setVal(s);
 							break;
 						}
@@ -982,12 +801,12 @@ public class CyberRequirement {
 		// Annotate claim with requirement information
 		EList<ClaimContext> contexts = claimBody.getContext();
 		contexts.clear();
-		contexts.add(createResoluteContext(generatedBy(), getTool()));
+		contexts.add(createResoluteContext(GENERATED_BY, getTool()));
 		contexts.add(
-				createResoluteContext(generatedOn(), DateFormat.getDateInstance().format(new Date(getDate() * 1000))));
-		contexts.add(createResoluteContext(reqComponent(), this.getContext()));
+				createResoluteContext(GENERATED_ON, DateFormat.getDateInstance().format(new Date(getDate() * 1000))));
+		contexts.add(createResoluteContext(REQ_COMPONENT, this.getContext()));
 		contexts.add(
-				createResoluteContext(formalized(), (getStatus() == CyberRequirement.addPlusAgree ? True() : False())));
+				createResoluteContext(FORMALIZED, (formalized ? TRUE : FALSE)));
 	}
 
 	public static IFile getContainingFile(String context) {
@@ -1153,7 +972,7 @@ public class CyberRequirement {
 					+ ") (claimBody : " + claimBody + ")");
 		}
 
-		String dateString = getContext(claimBody, generatedOn());
+		String dateString = getContext(claimBody, GENERATED_ON);
 		long date;
 		try {
 			date = DateFormat.getDateInstance().parse(dateString).getTime() / 1000;
@@ -1163,16 +982,17 @@ public class CyberRequirement {
 			date = 0L;
 		}
 
-		String tool = getContext(claimBody, generatedBy());
-		String component = getContext(claimBody, reqComponent());
-		String status = getContext(claimBody, formalized()).equalsIgnoreCase(True()) ? CyberRequirement.addPlusAgree
-				: CyberRequirement.add;
+		String tool = getContext(claimBody, GENERATED_BY);
+		String component = getContext(claimBody, REQ_COMPONENT);
+		Status status = Status.Import;
+		boolean formalized = getContext(claimBody, FORMALIZED).equalsIgnoreCase(TRUE);
 
 		int start = claimString.indexOf('[');
 		int end = claimString.indexOf(']');
 		String text = claimString.substring(end + 1).trim();
 		String type = claimString.substring(start + 1, end).trim();
 
-		return new CyberRequirement(date, tool, status, type, id, text, component, CyberRequirement.notApplicable);
+		return new CyberRequirement(date, tool, status, type, id, text, component, formalized,
+				CyberRequirement.notApplicable);
 	}
 }

@@ -4,7 +4,6 @@ package com.collins.fmw.cyres.architecture.dialogs;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +35,7 @@ import org.osate.aadl2.Connection;
 import org.osate.aadl2.Subcomponent;
 
 import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
+import com.collins.fmw.cyres.architecture.requirements.CyberRequirement.Status;
 
 public class ImportRequirementsGUI extends Dialog {
 
@@ -48,16 +48,13 @@ public class ImportRequirementsGUI extends Dialog {
 	final Combo cmbStatus;
 	final Text txtID;
 	final Text txtDesc;
+	final Button btnFormalize;
 	final Text txtReason;
 	final Label lblContext2;
 	final Label lblGenTool2;
 	final Label lblType2;
 
 	final Set<String> reqIds = new HashSet<String>();
-
-	final List<String> status = Arrays.asList(CyberRequirement.toDo, CyberRequirement.add,
-			CyberRequirement.addPlusAgree,
-			CyberRequirement.omit);
 
 	private int oldIndex = -1;
 
@@ -113,6 +110,11 @@ public class ImportRequirementsGUI extends Dialog {
 		TableColumn tblclmnShortDesciption = new TableColumn(tblReqBrowser, SWT.LEFT);
 		tblclmnShortDesciption.setWidth(309);
 		tblclmnShortDesciption.setText("Short Desciption");
+
+		TableColumn tblclmnFormalize = new TableColumn(tblReqBrowser, SWT.CENTER);
+		tblclmnFormalize.setWidth(60);
+		tblclmnFormalize.setText("AGREE");
+
 		reqBrowser.setContent(tblReqBrowser);
 		reqBrowser.setMinSize(tblReqBrowser.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
@@ -139,7 +141,9 @@ public class ImportRequirementsGUI extends Dialog {
 
 		cmbStatus = new Combo(composite, SWT.NONE);
 		cmbStatus.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		cmbStatus.setItems(this.status.toArray(new String[0]));
+		for (Status s : Status.values()) {
+			cmbStatus.add(s.toString());
+		}
 		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);
@@ -197,6 +201,15 @@ public class ImportRequirementsGUI extends Dialog {
 		lblContext2.setBackground(SWTResourceManager.getColor(255, 240, 245));
 		lblContext2.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
 
+		Label lblFormalize = new Label(composite, SWT.CENTER);
+		lblFormalize.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblFormalize.setText("Formalize in AGREE");
+
+		btnFormalize = new Button(composite, SWT.CHECK);
+		btnFormalize.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		btnFormalize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
+		btnFormalize.setSelection(false);
+
 		Label lblReason = new Label(composite, SWT.NONE);
 		lblReason.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		// lblReason.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -241,7 +254,7 @@ public class ImportRequirementsGUI extends Dialog {
 				// Update requirement dialog
 				final CyberRequirement r = requirements.get(index);
 				final String reqId = r.getId();
-				cmbStatus.select(getStatusIndex(r.getStatus()));
+				cmbStatus.setText(r.getStatus().toString());
 				lblGenTool2.setText(r.getTool());
 				lblType2.setText(r.getType());
 				txtID.setText(reqId);
@@ -249,6 +262,7 @@ public class ImportRequirementsGUI extends Dialog {
 				txtDesc.setText(r.getText());
 				txtDesc.setEditable(reqId.isEmpty());
 				lblContext2.setText(r.getContext());
+				btnFormalize.setSelection(r.hasAgree());
 				txtReason.setText(r.getRationale());
 
 				oldIndex = index;
@@ -260,7 +274,6 @@ public class ImportRequirementsGUI extends Dialog {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -272,19 +285,19 @@ public class ImportRequirementsGUI extends Dialog {
 			return true; // nothing selected; therefore, nothing to be saved
 		}
 
-		String newStatus = getStatusString(cmbStatus.getSelectionIndex());
+		Status newStatus = Status.valueOf(cmbStatus.getText());
 		String newId = txtID.getText();
 		String newDesc = txtDesc.getText();
 		String newReason = txtReason.getText();
 
-		if (newStatus.equalsIgnoreCase(CyberRequirement.omit)
+		if (newStatus == Status.Omit
 				&& (newReason.isEmpty() || newReason.equalsIgnoreCase(CyberRequirement.notApplicable))) {
 			org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
 					"Requirements that are marked as omitted must provide a rationale for the omission.");
 			return false;
 		}
 
-		if ((newStatus.equalsIgnoreCase(CyberRequirement.add) || newStatus.equalsIgnoreCase(CyberRequirement.addPlusAgree))) {
+		if (newStatus == Status.Import) {
 			if (newId.isEmpty()) {
 				org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
 						"Requirement IDs must be assigned before requirements can be imported into the model.");
@@ -294,7 +307,7 @@ public class ImportRequirementsGUI extends Dialog {
 
 		// Make sure requirement ID starts with a letter and only contains letters, numbers, and underscores
 		// (this is for compliance with Resolute)
-		if (!newId.matches("^[A-Za-z][A-Za-z0-9_]*")) {
+		if (newStatus == Status.Import && !newId.matches("^[A-Za-z][A-Za-z0-9_]*")) {
 			org.osate.ui.dialogs.Dialog.showError("Requirements Manager", newId
 					+ ": Invalid requirement ID. Requirement IDs must begin with a letter and contain only letters, numbers, and underscores.");
 			return false;
@@ -313,18 +326,12 @@ public class ImportRequirementsGUI extends Dialog {
 		req.setId(newId);
 		req.setText(newDesc);
 		req.setRationale(newReason);
+		req.setAgree(btnFormalize.getSelection());
 		updateTableItem(oldIndex);
 
 		return true;
 	}
 
-	private String getStatusString(int index) {
-		return this.status.get(index);
-	}
-
-	private int getStatusIndex(String status) {
-		return this.status.indexOf(status);
-	}
 
 	public int open() {
 
@@ -372,10 +379,8 @@ public class ImportRequirementsGUI extends Dialog {
 
 		for (CyberRequirement r : requirements) {
 			TableItem tItem = new TableItem(t, SWT.NONE);
-			if (r.getStatus().isEmpty()) {
-				r.setStatus(CyberRequirement.toDo);
-			}
-			tItem.setText(new String[] { r.getStatus(), r.getType(), r.getId(), r.getText() });
+			String formalize = r.hasAgree() ? "x" : "";
+			tItem.setText(new String[] { r.getStatus().toString(), r.getType(), r.getId(), r.getText(), formalize });
 		}
 	}
 
@@ -405,7 +410,9 @@ public class ImportRequirementsGUI extends Dialog {
 		}
 		CyberRequirement req = requirements.get(index);
 		TableItem tItem = tblReqBrowser.getItem(index);
-		tItem.setText(new String[] { req.getStatus(), req.getType(), req.getId(), req.getText() });
+		String formalize = req.hasAgree() ? "x" : "";
+		tItem.setText(
+				new String[] { req.getStatus().toString(), req.getType(), req.getId(), req.getText(), formalize });
 		return true;
 	}
 
@@ -414,7 +421,7 @@ public class ImportRequirementsGUI extends Dialog {
 			CyberRequirement req = requirements.get(i);
 
 			// Check for invalid requirement
-			if (req.getStatus() != CyberRequirement.toDo) {
+			if (req.getStatus() != Status.ToDo) {
 
 				// Find the context (component, connection, etc) in the model
 				Classifier contextClassifier = CyberRequirement.getImplementationClassifier(req.getContext());
@@ -431,10 +438,10 @@ public class ImportRequirementsGUI extends Dialog {
 						if (conn.getQualifiedName().equalsIgnoreCase(req.getContext())) {
 							contextFound = true;
 							// Make sure connection isn't being formalized
-							if (req.getStatus() == CyberRequirement.addPlusAgree) {
+							if (req.getStatus() == Status.Import && req.hasAgree()) {
 								org.osate.ui.dialogs.Dialog.showError("Requirements Manager",
 										req.getContext() + ": Requirements on connections cannot be formalized.");
-								req.setStatus(CyberRequirement.toDo);
+								req.setStatus(Status.ToDo);
 								updateTableItem(i);
 								return false;
 							}
@@ -446,17 +453,17 @@ public class ImportRequirementsGUI extends Dialog {
 				if (contextClassifier == null || !contextFound) {
 					org.osate.ui.dialogs.Dialog.showError("Requirements Manager", req.getContext()
 							+ " could not be found in any AADL file in the project. A requirement context must be valid in order to import requirements into model. This requirement will be de-selected.");
-					req.setStatus(CyberRequirement.toDo);
+					req.setStatus(Status.ToDo);
 					updateTableItem(i);
 					return false;
 				}
 
 				// Check for missing requirement ID
-				if (req.getId().isEmpty() && req.getStatus() != CyberRequirement.omit) {
+				if (req.getId().isEmpty() && req.getStatus() != Status.Omit) {
 					org.osate.ui.dialogs.Dialog.showError("Requirements Manager", req.getType()
 							+ " is missing a requirement ID. Requirement IDs must be assigned before requirements can be imported into model. This requirement will be de-selected.");
 					// Uncheck this requirement
-					req.setStatus(CyberRequirement.toDo);
+					req.setStatus(Status.ToDo);
 					updateTableItem(i);
 					return false;
 				}

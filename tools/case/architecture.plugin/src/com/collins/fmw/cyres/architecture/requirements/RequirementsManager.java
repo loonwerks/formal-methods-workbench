@@ -26,6 +26,7 @@ import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.AadlPackage;
 import org.osate.ui.dialogs.Dialog;
 
+import com.collins.fmw.cyres.architecture.requirements.CyberRequirement.Status;
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
@@ -112,8 +113,8 @@ public class RequirementsManager {
 		if (req == null) {
 			return false;
 		}
-		req.setAgree();
 		formalizeRequirement(req);
+		req.setAgree(true);
 		reqDb.updateRequirement(req);
 		reqDb.saveRequirementsDatabase();
 		return true;
@@ -124,8 +125,8 @@ public class RequirementsManager {
 		if (req == null) {
 			return false;
 		}
-		req.setStatus(CyberRequirement.add);
 		unformalizeRequirement(req);
+		req.setAgree(false);
 		reqDb.updateRequirement(req);
 		reqDb.saveRequirementsDatabase();
 		return true;
@@ -133,7 +134,6 @@ public class RequirementsManager {
 
 	public List<CyberRequirement> getImportedRequirements() {
 		return reqDb.getImportedRequirements();
-//		return findImportedRequirements();
 	}
 
 	public CyberRequirement getRequirement(String requirementId) {
@@ -143,33 +143,6 @@ public class RequirementsManager {
 	public List<CyberRequirement> getRequirements() {
 		return reqDb.getRequirements();
 	}
-
-//	public void removeRequirement(String reqId, boolean removeAgree) {
-//		CyberRequirement req = getRequirement(reqId);
-//		if (req == null) {
-//			return;
-//		}
-//		if (req.hasAgree()) {
-//			if (!removeAgree) {
-//				throw new RuntimeException(
-//						"Formalized requirement can only be removed after removing the formalization.");
-//			}
-//			unformalizeRequirement(reqId);
-//		}
-//
-//		removeClaim(req, new BaseClaim(req));
-//
-//		// Add the requirement to the imported requirements list
-//		importedRequirements.remove(req);
-//	}
-
-//	public void importRequirements(List<CyberRequirement> reqs) {
-//		for (CyberRequirement req : reqs) {
-//			// Insert base claim for requirement and add the requirement to the imported requirements list
-//			insertClaim(req, new BaseClaim(req));
-//			importedRequirements.add(req);
-//		}
-//	}
 
 	public void modifyRequirement(String reqId, BuiltInClaim claim) {
 		CyberRequirement req = getRequirement(reqId);
@@ -187,55 +160,33 @@ public class RequirementsManager {
 				// not possible; signal error
 				throw new RuntimeException("Updated requirement not found in requirements database : " + r);
 			} else {
-				if (existing.getStatus() == CyberRequirement.toDo || existing.getStatus() == CyberRequirement.omit) {
+				if (existing.getStatus() == Status.ToDo || existing.getStatus() == Status.Omit) {
 					switch (r.getStatus()) {
-					case CyberRequirement.toDo:
-					case CyberRequirement.omit:
+					case ToDo:
+					case Omit:
 						// do nothing
 						break;
-					case CyberRequirement.add:
+					case Import:
 						// add to model
-						helper.insertRequirement(r, true, false);
-						break;
-					case CyberRequirement.addPlusAgree:
-						// add to model and formalize
-						helper.insertRequirement(r, true, true);
+						helper.insertRequirement(r, true, r.hasAgree());
 						break;
 					default:
 						// Unknown status; signal error
 						throw new RuntimeException("Updated requirement has invalid status : " + r);
 					}
-				} else if (existing.getStatus() == CyberRequirement.add) {
+				} else if (existing.getStatus() == Status.Import) {
 					switch (r.getStatus()) {
-					case CyberRequirement.toDo:
-					case CyberRequirement.omit:
+					case ToDo:
+					case Omit:
 						// remove resolute claim definition and claim call
-						helper.removeRequirement(r, false, true);
+						helper.removeRequirement(r, existing.hasAgree(), true);
 						break;
-					case CyberRequirement.add:
-						// no change permitted
-						break;
-					case CyberRequirement.addPlusAgree:
-						// formalize
-						helper.insertRequirement(r, false, true);
-						break;
-					default:
-						// Unknown status; signal error
-						throw new RuntimeException("Updated requirement has invalid status : " + r);
-					}
-				} else if (existing.getStatus() == CyberRequirement.addPlusAgree) {
-					switch (r.getStatus()) {
-					case CyberRequirement.toDo:
-					case CyberRequirement.omit:
-						// remove resolute claim definition, claim call and agree call
-						helper.removeRequirement(r, true, true);
-						break;
-					case CyberRequirement.add:
-						// remove agree call
-						helper.removeRequirement(r, true, false);
-						break;
-					case CyberRequirement.addPlusAgree:
-						// no change permitted
+					case Import:
+						if (!existing.hasAgree() && r.hasAgree()) {
+							helper.insertRequirement(r, false, true);
+						} else if (existing.hasAgree() && !r.hasAgree()) {
+							helper.removeRequirement(r, true, false);
+						}
 						break;
 					default:
 						// Unknown status; signal error
@@ -785,7 +736,6 @@ public class RequirementsManager {
 
 		public void readRequirementsDatabase() {
 			// Read database from the physical requirements database file
-//			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
 			final IPath reqFilePath = TraverseProject.getCurrentProject()
 					.getFile(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE).getLocation();
 			File reqFile = null;
@@ -807,7 +757,6 @@ public class RequirementsManager {
 			if (requirements.isEmpty()) {
 				return;
 			}
-//			final File reqFile = new File(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE);
 			final IPath reqFilePath = TraverseProject.getCurrentProject()
 					.getFile(CaseUtils.CASE_REQUIREMENTS_DATABASE_FILE).getLocation();
 			File reqFile = null;
@@ -890,11 +839,10 @@ public class RequirementsManager {
 			return list;
 		}
 
-		private List<CyberRequirement> getRequirements(final String filterString) {
+		private List<CyberRequirement> getRequirements(final Status filter) {
 			List<CyberRequirement> list = new ArrayList<CyberRequirement>();
 			requirements.values().forEach(r -> {
-				// Using "==" instead of equals because filterString is one of four constants
-				if (r.getStatus() == filterString) {
+				if (r.getStatus() == filter) {
 					list.add(new CyberRequirement(r));
 				}
 			});
@@ -902,25 +850,16 @@ public class RequirementsManager {
 		}
 
 		public final List<CyberRequirement> getOmittedRequirements() {
-			return getRequirements(CyberRequirement.omit);
+			return getRequirements(Status.Omit);
 		}
 
 		public List<CyberRequirement> getToDoRequirements() {
-			return getRequirements(CyberRequirement.toDo);
-		}
-
-		public List<CyberRequirement> getAddRequirements() {
-			return getRequirements(CyberRequirement.add);
-		}
-
-		public List<CyberRequirement> getAddPlusAgreeRequirements() {
-			return getRequirements(CyberRequirement.addPlusAgree);
+			return getRequirements(Status.ToDo);
 		}
 
 		public List<CyberRequirement> getImportedRequirements() {
-			List<CyberRequirement> list = getAddRequirements();
-			list.addAll(getAddPlusAgreeRequirements());
-			return list;
+			return getRequirements(Status.Import);
 		}
+
 	}
 }

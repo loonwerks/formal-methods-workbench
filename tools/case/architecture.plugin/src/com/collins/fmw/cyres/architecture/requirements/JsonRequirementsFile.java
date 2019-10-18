@@ -68,7 +68,7 @@ public class JsonRequirementsFile {
 				final String tool = (r.getTool().isEmpty() || r.getTool() == CyberRequirement.unknown ? this.tool
 						: r.getTool());
 				this.requirements.add(new CyberRequirement(date, tool, r.getStatus(), r.getType(), r.getId(),
-						r.getText(), r.getContext(), r.getRationale()));
+						r.getText(), r.getContext(), r.hasAgree(), r.getRationale()));
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
