@@ -294,10 +294,13 @@ public class ImportRequirementsGUI extends Dialog {
 
 		// Make sure requirement ID starts with a letter and only contains letters, numbers, and underscores
 		// (this is for compliance with Resolute)
-		if (!newId.matches("^[A-Za-z][A-Za-z0-9_]*")) {
-			org.osate.ui.dialogs.Dialog.showError("Requirements Manager", newId
-					+ ": Invalid requirement ID. Requirement IDs must begin with a letter and contain only letters, numbers, and underscores.");
-			return false;
+		if ((newStatus.equalsIgnoreCase(CyberRequirement.add)
+				|| newStatus.equalsIgnoreCase(CyberRequirement.addPlusAgree))) {
+			if (!newId.matches("^[A-Za-z][A-Za-z0-9_]*")) {
+				org.osate.ui.dialogs.Dialog.showError("Requirements Manager", newId
+						+ ": Invalid requirement ID. Requirement IDs must begin with a letter and contain only letters, numbers, and underscores.");
+				return false;
+			}
 		}
 
 		if (!newId.isEmpty() && reqIds.contains(newId)) {
