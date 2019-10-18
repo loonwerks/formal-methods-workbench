@@ -125,11 +125,6 @@
             <menu
                   id="com.collins.fmw.cyres.menus.outline.build"
                   label="System Build">
-               <command
-                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
-                     label="Build..."
-                     style="push">
-               </command>
             </menu>
          </menu>
       </menuContribution>
@@ -256,11 +251,6 @@
             <menu
                   id="com.collins.fmw.cyres.menus.menubar.build"
                   label="System Build">
-               <command
-                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
-                     label="Build..."
-                     style="push">
-               </command>
             </menu>
          </menu>
       </menuContribution>
@@ -407,11 +397,6 @@
             <menu
                   id="com.collins.fmw.cyres.menus.editor.build"
                   label="System Build">
-               <command
-                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
-                     label="Build..."
-                     style="push">
-               </command>
             </menu>
          </menu>
       </menuContribution>
