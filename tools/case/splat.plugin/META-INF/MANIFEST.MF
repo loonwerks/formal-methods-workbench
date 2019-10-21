@@ -7,11 +7,16 @@ Automatic-Module-Name: com.collins.fmw.cyres.splat.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.osate.aadl2,
  org.eclipse.xtext.ui,
- org.eclipse.ui.console
-Import-Package: com.collins.fmw.cyres.json.plugin,
+ org.eclipse.ui.console,
+ org.eclipse.ui.workbench
+Import-Package: com.collins.fmw.cyres.architecture.utils,
+ com.collins.fmw.cyres.json.plugin,
+ com.collins.fmw.cyres.util.plugin,
  org.eclipse.ui,
  org.eclipse.ui.console,
- org.osate.ui.dialogs
+ org.eclipse.ui.part,
+ org.osate.ui.dialogs,
+ org.osate.xtext.aadl2.properties.util
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.collins.fmw.cyres.splat.Activator

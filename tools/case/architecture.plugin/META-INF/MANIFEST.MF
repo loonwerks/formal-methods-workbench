@@ -38,5 +38,6 @@ Import-Package: com.collins.fmw.cyres.util.plugin,
 Bundle-Activator: com.collins.fmw.cyres.architecture.Activator
 Export-Package: com.collins.fmw.cyres.architecture,
  com.collins.fmw.cyres.architecture.preferences,
- com.collins.fmw.cyres.architecture.requirements
+ com.collins.fmw.cyres.architecture.requirements,
+ com.collins.fmw.cyres.architecture.utils
 Bundle-ActivationPolicy: lazy

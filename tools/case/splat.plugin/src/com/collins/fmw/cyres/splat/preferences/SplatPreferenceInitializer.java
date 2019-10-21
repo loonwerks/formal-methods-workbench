@@ -10,13 +10,22 @@ public class SplatPreferenceInitializer extends AbstractPreferenceInitializer {
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		store.setDefault(SplatPreferenceConstants.PROVE_REGEXP_PROPERTIES, true);
-		store.setDefault(SplatPreferenceConstants.COMPILATION_ASSURANCE_LEVEL,
-				SplatPreferenceConstants.COMPILATION_ASSURANCE_LEVEL_HIGH);
-		store.setDefault(SplatPreferenceConstants.COMPILATION_ASSURANCE_LEVEL_STANDARD, false);
-		store.setDefault(SplatPreferenceConstants.COMPILATION_ASSURANCE_LEVEL_HIGH, true);
-		store.setDefault(SplatPreferenceConstants.COMPILATION_ASSURANCE_LEVEL_FANATIC, false);
-		store.setDefault(SplatPreferenceConstants.GENERATE_BITCODEC_FILE, false);
+		store.setDefault(SplatPreferenceConstants.CHECK_PROPERTIES, false);
+		store.setDefault(SplatPreferenceConstants.ASSURANCE_LEVEL, SplatPreferenceConstants.ASSURANCE_LEVEL_BASIC);
+		store.setDefault(SplatPreferenceConstants.ASSURANCE_LEVEL_BASIC, true);
+		store.setDefault(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE, false);
+		store.setDefault(SplatPreferenceConstants.ASSURANCE_LEVEL_HOL, false);
+		store.setDefault(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL, false);
+		store.setDefault(SplatPreferenceConstants.INTEGER_WIDTH, 32);
+		store.setDefault(SplatPreferenceConstants.OPTIMIZE, false);
+		store.setDefault(SplatPreferenceConstants.ENDIAN, SplatPreferenceConstants.ENDIAN_LITTLE);
+		store.setDefault(SplatPreferenceConstants.ENDIAN_LITTLE, true);
+		store.setDefault(SplatPreferenceConstants.ENDIAN_BIG, false);
+		store.setDefault(SplatPreferenceConstants.ENCODING, SplatPreferenceConstants.ENCODING_TWOS_COMP);
+		store.setDefault(SplatPreferenceConstants.ENCODING_UNSIGNED, false);
+		store.setDefault(SplatPreferenceConstants.ENCODING_TWOS_COMP, true);
+		store.setDefault(SplatPreferenceConstants.ENCODING_SIGN_MAG, false);
+		store.setDefault(SplatPreferenceConstants.ENCODING_ZIGZAG, false);
 		store.setDefault(SplatPreferenceConstants.OUTPUT_DIRECTORY,
 				ResourcesPlugin.getWorkspace().getRoot().getLocation().toString());
 	}

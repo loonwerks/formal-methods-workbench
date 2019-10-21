@@ -102,8 +102,8 @@
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.cyres.menus.outline.resiliency.proofs"
-                     label="Proofs">
+                     id="com.collins.fmw.cyres.menus.outline.resiliency.synthesis"
+                     label="Synthesis Tools">
                </menu>
             </menu>
             <menu
@@ -228,8 +228,8 @@
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.cyres.menus.menubar.resiliency.proofs"
-                     label="Proofs">
+                     id="com.collins.fmw.cyres.menus.menubar.resiliency.synthesis"
+                     label="Synthesis Tools">
                </menu>
             </menu>
             <menu
@@ -374,8 +374,8 @@
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.cyres.menus.editor.resiliency.proofs"
-                     label="Proofs">
+                     id="com.collins.fmw.cyres.menus.editor.resiliency.synthesis"
+                     label="Synthesis Tools">
                </menu>
             </menu>
             <menu
