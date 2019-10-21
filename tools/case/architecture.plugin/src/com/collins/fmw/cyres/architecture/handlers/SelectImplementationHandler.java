@@ -1,15 +1,18 @@
 package com.collins.fmw.cyres.architecture.handlers;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork;
+import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
@@ -17,17 +20,19 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.PrivatePackageSection;
+import org.osate.aadl2.Property;
 import org.osate.aadl2.PublicPackageSection;
+import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
-
-import com.collins.fmw.cyres.architecture.dialogs.SelectImplementationDialog;
-import com.collins.fmw.cyres.architecture.utils.CaseUtils;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.xtext.aadl2.properties.util.ProgrammingProperties;
 
 public class SelectImplementationHandler extends AadlHandler {
 
+	FileDialog dlgImplementationLocation;
 //	private String legacyComponentImplementationType;
 	private String legacyComponentImplementationLocation;
-	private String legacyComponentImplementationEntryFunction;
+//	private String legacyComponentImplementationEntryFunction;
 //	private String legacyComponentImplementationFunctionAddress;
 
 	static final String RESOLUTE_CLAUSE = "prove (legacy_component_verification(this))";
@@ -44,21 +49,31 @@ public class SelectImplementationHandler extends AadlHandler {
 		}
 
 		// Get location of legacy source or binary
-		// Open wizard to input implementation info
-		SelectImplementationDialog wizard = new SelectImplementationDialog(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		wizard.create();
-		if (wizard.open() == Window.OK) {
-//			legacyComponentImplementationType = wizard.getImplementationType();
-			legacyComponentImplementationLocation = wizard.getImplementationLocation();
-			// AADL doesn't like backslashes
-			// We can replace with forward slashes
-			legacyComponentImplementationLocation = legacyComponentImplementationLocation.replace("\\", "/");
-			legacyComponentImplementationEntryFunction = wizard.getImplementationEntryFunction();
-//			legacyComponentImplementationFunctionAddress = wizard.getImplementationFunctionAddress();
-		} else {
-			return;
+		dlgImplementationLocation = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		dlgImplementationLocation.setText("Select Implementation");
+		dlgImplementationLocation.open();
+		legacyComponentImplementationLocation = dlgImplementationLocation.getFilterPath();
+		if (!legacyComponentImplementationLocation.isEmpty()) {
+			legacyComponentImplementationLocation += "/";
 		}
+		legacyComponentImplementationLocation += dlgImplementationLocation.getFileName();
+		legacyComponentImplementationLocation = legacyComponentImplementationLocation.replace("\\", "/");
+
+//		// Open wizard to input implementation info
+//		SelectImplementationDialog wizard = new SelectImplementationDialog(
+//				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+//		wizard.create();
+//		if (wizard.open() == Window.OK) {
+////			legacyComponentImplementationType = wizard.getImplementationType();
+//			legacyComponentImplementationLocation = wizard.getImplementationLocation();
+//			// AADL doesn't like backslashes
+//			// We can replace with forward slashes
+//			legacyComponentImplementationLocation = legacyComponentImplementationLocation.replace("\\", "/");
+////			legacyComponentImplementationEntryFunction = wizard.getImplementationEntryFunction();
+////			legacyComponentImplementationFunctionAddress = wizard.getImplementationFunctionAddress();
+//		} else {
+//			return;
+//		}
 
 		// Add Legacy Component Properties
 		addLegacyComponentProperties(uri);
@@ -108,23 +123,31 @@ public class SelectImplementationHandler extends AadlHandler {
 					return;
 				}
 
-				// Import CASE_Properties file
-				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
-					return;
-				}
-				// Import CASE_Model_Transformations file
-				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
-					return;
-				}
+//				// Import CASE_Properties file
+//				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
+//					return;
+//				}
+//				// Import CASE_Model_Transformations file
+//				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
+//					return;
+//				}
 
-				if (!CaseUtils.addCasePropertyAssociation("Source_Text", legacyComponentImplementationLocation,
-						selectedComponent)) {
+//				if (!CaseUtils.addCasePropertyAssociation("Source_Text", legacyComponentImplementationLocation,
+//						selectedComponent)) {
 //					return;
-				}
-				if (!CaseUtils.addCasePropertyAssociation("Compute_Entrypoint_Source_Text",
-						legacyComponentImplementationEntryFunction, selectedComponent)) {
+//				}
+//				if (!CaseUtils.addCasePropertyAssociation("Compute_Entrypoint_Source_Text",
+//						legacyComponentImplementationEntryFunction, selectedComponent)) {
 //					return;
-				}
+//				}
+
+				Property sourceTextProp = GetProperties.lookupPropertyDefinition(selectedComponent,
+						ProgrammingProperties._NAME, ProgrammingProperties.SOURCE_TEXT);
+				StringLiteral sourceTextLit = Aadl2Factory.eINSTANCE.createStringLiteral();
+				sourceTextLit.setValue(legacyComponentImplementationLocation);
+				List<StringLiteral> listVal = new ArrayList<>();
+				listVal.add(sourceTextLit);
+				selectedComponent.setPropertyValue(sourceTextProp, listVal);
 
 				// Add Resolute check clause
 				Iterator<AnnexSubclause> subclause = selectedComponent.getOwnedAnnexSubclauses().iterator();
