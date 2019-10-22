@@ -82,7 +82,7 @@ public class Aadl2Json {
 			je = header;
 		}
 
-		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+		Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().setPrettyPrinting().create();
 
 		URI jsonURI = null;
 		try {
