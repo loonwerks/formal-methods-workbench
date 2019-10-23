@@ -380,6 +380,8 @@ public class ImportRequirementsGUI extends Dialog {
 			}
 			tItem.setText(new String[] { r.getStatus(), r.getType(), r.getId(), r.getText() });
 		}
+
+		packTable();
 	}
 
 	protected void okPressed() {
@@ -402,6 +404,12 @@ public class ImportRequirementsGUI extends Dialog {
 		shlReqManager.close();
 	}
 
+	private void packTable() {
+		for (TableColumn col : tblReqBrowser.getColumns()) {
+			col.pack();
+		}
+	}
+
 	private boolean updateTableItem(int index) {
 		if (index < 0 || index >= tblReqBrowser.getItemCount()) {
 			return false;
@@ -409,6 +417,7 @@ public class ImportRequirementsGUI extends Dialog {
 		CyberRequirement req = requirements.get(index);
 		TableItem tItem = tblReqBrowser.getItem(index);
 		tItem.setText(new String[] { req.getStatus(), req.getType(), req.getId(), req.getText() });
+		packTable();
 		return true;
 	}
 
