@@ -16,16 +16,6 @@
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.outline.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.outline.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
@@ -140,16 +130,6 @@
                <menu
                      id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
                      label="Generate Requirements">
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
@@ -286,16 +266,6 @@
                <menu
                      id="com.collins.fmw.cyres.menus.editor.requirements.generate"
                      label="Generate Requirements">
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.editor.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.editor.requirements.generate.dcrypps"

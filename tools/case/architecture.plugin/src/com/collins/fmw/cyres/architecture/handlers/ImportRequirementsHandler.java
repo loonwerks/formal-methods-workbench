@@ -23,6 +23,12 @@ public class ImportRequirementsHandler extends AbstractHandler {
 
 		// Determine if this should run in "Requirements Manager" mode or "Import Requirements" mode.
 		final boolean importRequirements = (event.getCommand().getId().indexOf("Import") != -1);
+		final String filename = event.getParameter("filename");
+
+		return run(importRequirements, filename);
+	}
+
+	public Object run(final boolean importRequirements, final String filename) {
 
 		// Get the current project
 		IProject project = TraverseProject.getCurrentProject();
@@ -52,7 +58,7 @@ public class ImportRequirementsHandler extends AbstractHandler {
 		 */
 
 		RequirementsManager reqMgr = RequirementsManager.getInstance();
-		if (!reqMgr.readRequirementFiles(importRequirements, event.getParameter("filename"))) {
+		if (!reqMgr.readRequirementFiles(importRequirements, filename)) {
 			// No requirement files were read
 			return null;
 		}
