@@ -71,7 +71,7 @@ public class ImportRequirementsGUI extends Dialog {
 		shlReqManager = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 
 		shlReqManager.setMinimumSize(new Point(1200, 400));
-		shlReqManager.setSize(1200, 450);
+		shlReqManager.setSize(1045, 450);
 		shlReqManager.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		shlReqManager.setText("Import Cyber Security Requirements");
 		shlReqManager.setLayout(new GridLayout(1, true));
@@ -88,12 +88,12 @@ public class ImportRequirementsGUI extends Dialog {
 		// fl_grpReqBrowser.marginHeight = 10;
 		grpReqBrowser.setLayout(fl_grpReqBrowser);
 
-		ScrolledComposite reqBrowser = new ScrolledComposite(grpReqBrowser, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		ScrolledComposite reqBrowser = new ScrolledComposite(grpReqBrowser, SWT.BORDER);
 		reqBrowser.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		reqBrowser.setExpandHorizontal(true);
 		reqBrowser.setExpandVertical(true);
 
-		tblReqBrowser = new Table(reqBrowser, SWT.BORDER | SWT.FULL_SELECTION);
+		tblReqBrowser = new Table(reqBrowser, SWT.FULL_SELECTION);
 		tblReqBrowser.setHeaderBackground(SWTResourceManager.getColor(248, 248, 255));
 		tblReqBrowser.setLinesVisible(true);
 		tblReqBrowser.setHeaderVisible(true);
@@ -113,8 +113,8 @@ public class ImportRequirementsGUI extends Dialog {
 		TableColumn tblclmnShortDesciption = new TableColumn(tblReqBrowser, SWT.LEFT);
 		tblclmnShortDesciption.setWidth(309);
 		tblclmnShortDesciption.setText("Short Desciption");
+		reqBrowser.setMinSize(new Point(600, 50));
 		reqBrowser.setContent(tblReqBrowser);
-		reqBrowser.setMinSize(tblReqBrowser.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		Group grpViewEditReq = new Group(cmpReqManager, SWT.NONE);
 		grpViewEditReq.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
@@ -123,7 +123,7 @@ public class ImportRequirementsGUI extends Dialog {
 		grpViewEditReq.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		ScrolledComposite scrolledComposite = new ScrolledComposite(grpViewEditReq,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+				SWT.BORDER);
 		scrolledComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
@@ -153,7 +153,6 @@ public class ImportRequirementsGUI extends Dialog {
 		lblGenTool2.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
 
 		scrolledComposite.setContent(composite);
-		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		Label lblType = new Label(composite, SWT.CENTER);
 		lblType.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
@@ -164,7 +163,7 @@ public class ImportRequirementsGUI extends Dialog {
 		lblType2.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
 
 		scrolledComposite.setContent(composite);
-		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scrolledComposite.setMinSize(new Point(600, 50));
 
 		Label lblID = new Label(composite, SWT.CENTER);
 		lblID.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
