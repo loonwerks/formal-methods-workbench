@@ -223,6 +223,7 @@ implements AgreeASTVisitor<AgreeASTElement> {
 		builder.addTimeFall(e.timeFallMap);
 		builder.addTimeRise(e.timeRiseMap);
 		builder.addTimeOf(e.timeOfMap);
+		builder.setFaultTreeFlag(e.faultTreeFlag);
 
 		AgreeNode result = builder.build();
 		visitedNodes.put(e.compInst, result);
