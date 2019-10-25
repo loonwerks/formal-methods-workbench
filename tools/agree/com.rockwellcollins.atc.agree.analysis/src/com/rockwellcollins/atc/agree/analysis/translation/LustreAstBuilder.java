@@ -188,7 +188,17 @@ public class LustreAstBuilder {
 			IdExpr assumId = new IdExpr(assumName);
 			equations.add(new Equation(assumId, assumption.expr));
 			assertions.add(assumId);
-			ivcs.add(assumId.id);
+			// If ivc elements is empty, add ivcs from assumptions and guarantees.
+			// Else add the defined ivc list.
+			if (flatNode.getFaultTreeFlag() == false) {
+				ivcs.add(assumId.id);
+			}
+			// temporarily comment out the code to add assumption to top level
+//			// If the fault analysis is running or we are at the top level system instance
+//			// (the "real" top node), then add assumptions to IVC list.
+//			if ((flatNode.getFaultTreeFlag() == false) || (flatNode.compInst instanceof SystemInstanceImpl)) {
+//				ivcs.add(assumId.id);
+//			}
 		}
 
 		for (AgreeStatement assertion : flatNode.assertions) {
@@ -235,6 +245,10 @@ public class LustreAstBuilder {
 			locals.add(new AgreeVar(guarName, NamedType.BOOL, guarantee.reference, flatNode.compInst, null));
 			equations.add(new Equation(new IdExpr(guarName), guarantee.expr));
 			properties.add(guarName);
+		}
+
+		if (flatNode.getFaultTreeFlag()) {
+			ivcs.addAll(agreeProgram.topNode.getivcElements());
 		}
 
 		for (AgreeVar var : flatNode.inputs) {
@@ -551,7 +565,17 @@ public class LustreAstBuilder {
 			locals.add(new AgreeVar(inputName, NamedType.BOOL, statement.reference, agreeNode.compInst, null));
 			IdExpr guarId = new IdExpr(inputName);
 			equations.add(new Equation(guarId, statement.expr));
-			ivcs.add(guarId.id);
+
+			if (agreeNode.getFaultTreeFlag() == false) {
+				ivcs.add(guarId.id);
+			} else {
+				// check if it's leaf node
+				// note to use getComponentInstances() instead of getAllComponentInstances()
+				if (!agreeNode.compInst.getComponentInstances().isEmpty()) {
+					ivcs.add(guarId.id);
+				}
+			}
+
 			guarConjExpr = LustreExprFactory.makeANDExpr(guarId, guarConjExpr);
 		}
 		for (AgreeStatement statement : agreeNode.lemmas) {
@@ -683,6 +707,8 @@ public class LustreAstBuilder {
 		builder.setTiming(null);
 		builder.addEventTime(timeEvents);
 		builder.setCompInst(agreeNode.compInst);
+		builder.addIvcElements(agreeNode.getivcElements());
+		builder.setFaultTreeFlag(agreeNode.faultTreeFlag);
 
 		return builder.build();
 	}

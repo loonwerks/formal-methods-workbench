@@ -19,7 +19,6 @@ import jkind.api.JRealizabilityApi;
 import jkind.api.Kind2Api;
 import jkind.api.Kind2WebApi;
 import jkind.api.KindApi;
-import jkind.api.SallyApi;
 
 public class PreferencesUtil {
 	public static KindApi getKindApi() {
@@ -52,8 +51,8 @@ public class PreferencesUtil {
 			return getKind2Api();
 		case PreferenceConstants.MODEL_CHECKER_KIND2WEB:
 			return getKind2WebApi(remoteUrl);
-		case PreferenceConstants.MODEL_CHECKER_SALLY:
-			return getSallyApi();
+//		case PreferenceConstants.MODEL_CHECKER_SALLY:
+//			return getSallyApi();
 		default:
 			throw new IllegalArgumentException("Unknown model checker setting: " + modelChecker);
 		}
@@ -156,10 +155,10 @@ public class PreferencesUtil {
 		return api;
 	}
 
-	private static SallyApi getSallyApi() {
-		IPreferenceStore prefs = getPreferenceStore();
-		SallyApi api = new SallyApi();
-		api.setTimeout(prefs.getInt(PreferenceConstants.PREF_TIMEOUT));
-		return api;
-	}
+//	private static SallyApi getSallyApi() {
+//		IPreferenceStore prefs = getPreferenceStore();
+//		SallyApi api = new SallyApi();
+//		api.setTimeout(prefs.getInt(PreferenceConstants.PREF_TIMEOUT));
+//		return api;
+//	}
 }
