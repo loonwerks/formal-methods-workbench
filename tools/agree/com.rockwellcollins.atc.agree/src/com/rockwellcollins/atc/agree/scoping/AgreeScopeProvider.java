@@ -4,9 +4,11 @@
 package com.rockwellcollins.atc.agree.scoping;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
@@ -28,7 +30,6 @@ import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.Element;
-import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PackageRename;
 import org.osate.aadl2.Property;
@@ -85,71 +86,94 @@ import com.rockwellcollins.atc.agree.agree.TimeRiseExpr;
  */
 public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping.PropertiesScopeProvider {
 
-	private Set<NamedElement> getNamedElementsFromSpecs(EList<SpecStatement> specs) {
-		Set<NamedElement> nelms = new HashSet<>();
+	private Map<String, NamedElement> toNamedElementMap(List<NamedElement> nes) {
+		Map<String, NamedElement> map = new HashMap<>();
+		for (NamedElement ne : nes) {
+			map.put(ne.getName(), ne);
+		}
+		return map;
+	}
+	private Map<String, NamedElement> getNamedElementsFromSpecs(EList<SpecStatement> specs) {
+		Map<String, NamedElement> nelms = new HashMap<>();
 		for (SpecStatement spec : specs) {
 			if (spec instanceof NamedElement) {
-				nelms.add((NamedElement) spec);
+				nelms.put(((NamedElement) spec).getName(), (NamedElement) spec);
 			}
 
 			if (spec instanceof EqStatement) {
 				EqStatement eq = (EqStatement) spec;
-				nelms.addAll(eq.getLhs());
+				ArrayList<NamedElement> nes = new ArrayList<>();
+				nes.addAll(eq.getLhs());
+				nelms.putAll(toNamedElementMap(nes));
 
 			} else if (spec instanceof ConstStatement) {
 				ConstStatement c = (ConstStatement) spec;
-				nelms.add(c);
+				nelms.put(c.getName(), c);
 
 			} else if (spec instanceof InputStatement) {
-				nelms.addAll(((InputStatement) spec).getLhs());
+				ArrayList<NamedElement> nes = new ArrayList<>();
+				nes.addAll(((InputStatement) spec).getLhs());
+				nelms.putAll(toNamedElementMap(nes));
 			} else if (spec instanceof EnumStatement) {
-				nelms.addAll(((EnumStatement) spec).getEnums());
+				ArrayList<NamedElement> nes = new ArrayList<>();
+				nes.addAll(((EnumStatement) spec).getEnums());
+				nelms.putAll(toNamedElementMap(nes));
 			}
 		}
 		return nelms;
 	}
 
-	private Set<NamedElement> getNamedElementsFromClassifier(Classifier ctx, boolean fromCompImpl) {
+	private Map<String, NamedElement> getNamedElementsFromClassifier(Classifier ctx, boolean fromCompImpl) {
 
-		Set<NamedElement> components = new HashSet<>();
+		Map<String, NamedElement> components = new HashMap<>();
+
+		components.putAll(getNamedElements(getAadlContainer(ctx)));
 
 		for (AnnexSubclause annex : AnnexUtil.getAllAnnexSubclauses(ctx,
 				AgreePackage.eINSTANCE.getAgreeContractSubclause())) {
 			AgreeContract contract = (AgreeContract) ((AgreeContractSubclause) annex).getContract();
-			components.addAll(getNamedElementsFromSpecs(contract.getSpecs()));
+
+			components.putAll(getNamedElementsFromSpecs(contract.getSpecs()));
 
 		}
 
 		if (ctx instanceof ComponentImplementation) {
-			components.addAll(((ComponentImplementation) ctx).getAllSubcomponents());
-			components.addAll(((ComponentImplementation) ctx).getAllConnections());
-			components.addAll(getNamedElementsFromClassifier(((ComponentImplementation) ctx).getType(), true));
+
+			components.putAll(getNamedElementsFromClassifier(((ComponentImplementation) ctx).getType(), true));
+
+			ArrayList<NamedElement> nes = new ArrayList<>();
+			nes.addAll(((ComponentImplementation) ctx).getAllSubcomponents());
+			nes.addAll(((ComponentImplementation) ctx).getAllConnections());
+			components.putAll(toNamedElementMap(nes));
 
 		} else if (ctx instanceof ComponentType) {
 			if (fromCompImpl) {
-				List<Feature> fs = ((ComponentType) ctx).getAllFeatures();
-				components.addAll(fs);
+				ArrayList<NamedElement> nes = new ArrayList<>();
+				nes.addAll(((ComponentType) ctx).getAllFeatures());
+				components.putAll(toNamedElementMap(nes));
 			} else {
-				List<Feature> fs = ((ComponentType) ctx).getOwnedFeatures();
-
-				components.addAll(fs);
+				ArrayList<NamedElement> nes = new ArrayList<>();
+				nes.addAll(((ComponentType) ctx).getOwnedFeatures());
+				components.putAll(toNamedElementMap(nes));
 			}
 
 		}
 
-		components.addAll(getNamedElements(getAadlContainer(ctx)));
 		return components;
 
 	}
 
-	private Set<NamedElement> getNamedElements(EObject ctx) {
+	private Map<String, NamedElement> getNamedElements(EObject ctx) {
 
-		Set<NamedElement> components = new HashSet<>();
+		Map<String, NamedElement> components = new HashMap<>();
 		if (ctx instanceof AadlPackage) {
+
+			components.put(((AadlPackage) ctx).getName(), (AadlPackage) ctx);
+
 			PublicPackageSection pubSec = ((AadlPackage) ctx).getPublicSection();
 			for (Element el : pubSec.getOwnedElements()) {
 				if (el instanceof DataImplementation || el instanceof DataType) {
-					components.add((NamedElement) el);
+					components.put(((NamedElement) el).getName(), (NamedElement) el);
 				}
 			}
 
@@ -157,15 +181,14 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 					AgreePackage.eINSTANCE.getAgreeContractLibrary())) {
 
 				AgreeContract contract = (AgreeContract) ((AgreeContractLibrary) annex).getContract();
-				components.addAll(getNamedElementsFromSpecs(contract.getSpecs()));
+				components.putAll(getNamedElementsFromSpecs(contract.getSpecs()));
 
 			}
 
-			components.add((AadlPackage) ctx);
 
 		} else {
 
-			components.addAll(getNamedElementsFromClassifier((Classifier) ctx, false));
+			components.putAll(getNamedElementsFromClassifier((Classifier) ctx, false));
 
 		}
 
@@ -205,18 +228,18 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 		EObject container = getAadlContainer(ctx);
 		AadlPackage pkg = getContainingPackage(container);
 
-		List<NamedElement> elems = new ArrayList<>();
+		Map<String, NamedElement> elems = new HashMap<>();
 
 		for (PackageRename rename : EcoreUtil2.getAllContentsOfType(pkg, PackageRename.class)) {
 			if (rename.isRenameAll()) {
 				AadlPackage renamedPackage = rename.getRenamedPackage();
-				elems.addAll(getNamedElements(renamedPackage));
+				elems.putAll(getNamedElements(renamedPackage));
 			}
 		}
 
-		elems.addAll(getNamedElements(container));
+		elems.putAll(getNamedElements(container));
 
-		return Scopes.scopeFor(elems, getScope(ctx.eContainer().eContainer(), ref));
+		return Scopes.scopeFor(elems.values(), getScope(ctx.eContainer().eContainer(), ref));
 	}
 
 	IScope scope_NamedElement(NodeDef ctx, EReference ref) {
@@ -525,7 +548,7 @@ public class AgreeScopeProvider extends org.osate.xtext.aadl2.properties.scoping
 
 		} else {
 
-			return new ArrayList<NamedElement>(getNamedElements(leaf));
+			return new ArrayList<NamedElement>(getNamedElements(leaf).values());
 
 		}
 
