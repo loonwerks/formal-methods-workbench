@@ -25,10 +25,6 @@ public interface RealExpr extends Expr
   /**
    * Returns the value of the '<em><b>Val</b></em>' containment reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Val</em>' containment reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Val</em>' containment reference.
    * @see #setVal(RealLiteral)

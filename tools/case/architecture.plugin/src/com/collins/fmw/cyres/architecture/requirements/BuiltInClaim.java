@@ -8,7 +8,6 @@ import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.PrivatePackageSection;
 import org.osate.aadl2.PublicPackageSection;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
 
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.rockwellcollins.atc.resolute.analysis.execution.ExprComparator;
@@ -106,7 +105,8 @@ public abstract class BuiltInClaim {
 			return null;
 		}
 
-		AadlPackage contextPkg = AadlUtil.getContainingPackage(reqClaimDef);
+//		AadlPackage contextPkg = AadlUtil.getContainingPackage(reqClaimDef);
+		AadlPackage contextPkg = CaseUtils.getCaseRequirementsPackage();
 		if (contextPkg == null) {
 			throw new RuntimeException("Could not find containing package for " + reqClaimDef.getName());
 		}

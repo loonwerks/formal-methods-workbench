@@ -3374,7 +3374,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
    * @generated
    */
   @Override
-  public EReference getEventExpr_Id()
+  public EReference getEventExpr_Port()
   {
     return (EReference)eventExprEClass.getEStructuralFeatures().get(0);
   }
@@ -3902,7 +3902,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     createEReference(preExprEClass, PRE_EXPR__EXPR);
 
     eventExprEClass = createEClass(EVENT_EXPR);
-    createEReference(eventExprEClass, EVENT_EXPR__ID);
+    createEReference(eventExprEClass, EVENT_EXPR__PORT);
 
     latchedExprEClass = createEClass(LATCHED_EXPR);
     createEReference(latchedExprEClass, LATCHED_EXPR__EXPR);
@@ -4392,7 +4392,7 @@ public class AgreePackageImpl extends EPackageImpl implements AgreePackage
     initEReference(getPreExpr_Expr(), this.getExpr(), null, "expr", null, 0, 1, PreExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(eventExprEClass, EventExpr.class, "EventExpr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getEventExpr_Id(), theAadl2Package.getNamedElement(), null, "id", null, 0, 1, EventExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getEventExpr_Port(), this.getExpr(), null, "port", null, 0, 1, EventExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(latchedExprEClass, LatchedExpr.class, "LatchedExpr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getLatchedExpr_Expr(), this.getExpr(), null, "expr", null, 0, 1, LatchedExpr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

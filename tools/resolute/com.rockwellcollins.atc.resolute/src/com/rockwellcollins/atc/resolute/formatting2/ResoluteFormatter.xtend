@@ -46,6 +46,8 @@ import org.osate.xtext.aadl2.properties.formatting2.PropertiesFormatter
 import com.rockwellcollins.atc.resolute.resolute.AnalysisStatement
 import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import java.util.List
+import com.rockwellcollins.atc.resolute.resolute.ClaimContext
+import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption
 
 class ResoluteFormatter extends PropertiesFormatter {
 	
@@ -116,6 +118,14 @@ class ResoluteFormatter extends PropertiesFormatter {
 		
 		for (ClaimText claim : claimbody.getClaim()) {
 			format(claim, document);
+		}
+		
+		for (ClaimContext context : claimbody.getContext()) {
+			context.prepend[newLines = 1].surround[indent];
+		}
+		
+		for (ClaimAssumption assumption : claimbody.getAssumptions()) {
+			assumption.prepend[newLines = 1].surround[indent];
 		}
 		
 		claimbody.getExpr().prepend[newLines = 1].surround[indent];
@@ -268,6 +278,7 @@ class ResoluteFormatter extends PropertiesFormatter {
 	}
 
 	def dispatch void format(NestedDotID nesteddotid, extension IFormattableDocument document) {
+		nesteddotid.regionFor.keywords(".").forEach[surround[noSpace]];
 		format(nesteddotid.getSub(), document);
 	}
 
@@ -288,6 +299,10 @@ class ResoluteFormatter extends PropertiesFormatter {
 		// { }
 		expr.regionFor.keyword("{").append[noSpace];
 		expr.regionFor.keyword("}").prepend[noSpace];
+		
+		// ,
+		expr.regionFor.keywords(",").forEach[append[oneSpace]];
+		expr.regionFor.keywords(",").forEach[prepend[noSpace]];
 		
 		format(expr, document);
 	}

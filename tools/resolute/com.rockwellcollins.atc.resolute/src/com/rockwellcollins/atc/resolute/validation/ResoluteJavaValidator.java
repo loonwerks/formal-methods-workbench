@@ -23,6 +23,7 @@ import org.osate.aadl2.ClassifierType;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.EnumerationType;
@@ -192,8 +193,8 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 			while (subThis.getSub() != null) {
 				subThis = subThis.getSub();
 			}
-			if (!(subThis.getBase() instanceof Subcomponent)) {
-				error(thisExpr, "ID '" + subThis.getBase().getName() + "' is not a subcomponent");
+			if (!(subThis.getBase() instanceof Subcomponent) && !(subThis.getBase() instanceof Connection)) {
+				error(thisExpr, "ID '" + subThis.getBase().getName() + "' is not a subcomponent or connection");
 			}
 
 		}
@@ -836,6 +837,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		case "is_device":
 		case "is_memory":
 		case "is_thread":
+		case "is_thread_group":
 		case "is_process":
 		case "is_data":
 		case "is_event_port":
@@ -1096,6 +1098,8 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 						if (type != null) {
 							return type;
 						}
+					} else if (subExpr.getBase() instanceof Connection) {
+						return BaseType.CONNECTION;
 					}
 				}
 
@@ -1393,6 +1397,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 		case "is_device":
 		case "is_memory":
 		case "is_thread":
+		case "is_thread_group":
 		case "is_process":
 		case "is_data":
 		case "is_of_type":

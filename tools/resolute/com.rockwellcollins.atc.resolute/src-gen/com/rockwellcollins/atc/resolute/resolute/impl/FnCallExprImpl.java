@@ -84,6 +84,7 @@ public class FnCallExprImpl extends ExprImpl implements FnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public FunctionDefinition getFn()
   {
     if (fn != null && fn.eIsProxy())
@@ -114,6 +115,7 @@ public class FnCallExprImpl extends ExprImpl implements FnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setFn(FunctionDefinition newFn)
   {
     FunctionDefinition oldFn = fn;
@@ -127,6 +129,7 @@ public class FnCallExprImpl extends ExprImpl implements FnCallExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public EList<Expr> getArgs()
   {
     if (args == null)

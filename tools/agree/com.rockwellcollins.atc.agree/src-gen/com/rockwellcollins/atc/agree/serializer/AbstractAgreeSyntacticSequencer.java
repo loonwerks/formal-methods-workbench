@@ -105,7 +105,7 @@ public abstract class AbstractAgreeSyntacticSequencer extends AbstractSyntacticS
 	 *     (rule start) (ambiguity) 'Get_Property' '(' componentRef=ComponentRef
 	 *     (rule start) (ambiguity) '[|' elems+=Expr
 	 *     (rule start) (ambiguity) 'enum' '(' enumType=DoubleDotRef
-	 *     (rule start) (ambiguity) 'event' '(' id=[NamedElement|ID]
+	 *     (rule start) (ambiguity) 'event' '(' port=Expr
 	 *     (rule start) (ambiguity) 'exists' binding=NamedID
 	 *     (rule start) (ambiguity) 'flatmap' binding=NamedID
 	 *     (rule start) (ambiguity) 'floor' '(' expr=Expr

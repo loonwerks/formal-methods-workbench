@@ -28,10 +28,6 @@ public interface RulesetBody extends EObject
    * Returns the value of the '<em><b>Lint Statements</b></em>' containment reference list.
    * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.LintStatement}.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Lint Statements</em>' containment reference list isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Lint Statements</em>' containment reference list.
    * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getRulesetBody_LintStatements()

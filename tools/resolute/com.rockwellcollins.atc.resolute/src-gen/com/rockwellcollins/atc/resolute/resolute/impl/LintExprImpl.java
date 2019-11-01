@@ -65,6 +65,7 @@ public class LintExprImpl extends ExprImpl implements LintExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LintStatement getLintStmt()
   {
     return lintStmt;
@@ -92,6 +93,7 @@ public class LintExprImpl extends ExprImpl implements LintExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setLintStmt(LintStatement newLintStmt)
   {
     if (newLintStmt != lintStmt)

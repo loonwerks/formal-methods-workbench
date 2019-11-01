@@ -1,21 +1,17 @@
 package com.collins.fmw.cyres.architecture.handlers;
 
-import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.dialogs.ImportRequirementsDialog;
+import com.collins.fmw.cyres.architecture.dialogs.ImportRequirementsGUI;
 import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
-import com.collins.fmw.cyres.architecture.requirements.JsonRequirementsFile;
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
 import com.collins.fmw.cyres.util.plugin.TraverseProject;
 
@@ -25,92 +21,60 @@ public class ImportRequirementsHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
+		// Determine if this should run in "Requirements Manager" mode or "Import Requirements" mode.
+		final boolean importRequirements = (event.getCommand().getId().indexOf("Import") != -1);
+		final String filename = event.getParameter("filename");
+
+		return run(importRequirements, filename);
+	}
+
+	public Object run(final boolean importRequirements, final String filename) {
+
 		// Get the current project
 		IProject project = TraverseProject.getCurrentProject();
 		if (project == null) {
-			Dialog.showError("Could not determine current project",
+			Dialog.showError("Requirements Manager",
 					"Unable to determine current project.  Open a project file in the editor.");
 			return null;
 		}
 
-		// If a filename was passed to this command, open the file.
-		// Otherwise, prompt the user for the file
-		String filename = event.getParameter("filename");
-		File reqFile = null;
-		if (filename == null || filename.isEmpty()) {
 
-			FileDialog dlgReqFile = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-			dlgReqFile.setText("Select requirements file to import.");
+		/*
+		 * Steps for requirements manager:
+		 * (1) Accept requirement input files from user.
+		 * (2) Filter requirement input files: select those that match the hashcode of the AADL model.
+		 * (3) Remove from the requirements database all "ToDo" requirements that do not match the hashcode of the current AADL model.
+		 * (4) Read requirements from the filtered files and add them to the requirements database.
+		 * (5) Collect the list of requirements from the current AADL model.
+		 * (6) Display to the user the requirements database and from the AADL model.
+		 * (7) User can reclassify these requirements with the following restrictions:
+		 * (7a) "Omit" with old hashcode: cannot be modified.
+		 * (7b) "ToDo" to "Add" or "Add+Agree": add requirement to the AADL model.
+		 * (7c) "ToDo" to "Omit": add requirement to the requirements database as an omitted requirement.
+		 * (7d) "Add" or "Add+Agree" to "Omit": remove from AADL model and add to requirements database as omitted requirement (note hashcode of the model).
+		 * (7e) "Add" or "Add+Agree" to "ToDo": not allowed.
+		 * (7f) "Add+Agree" to "Add": not allowed.
+		 * (8) "ToDo" and "Omit" requirements stay in the requirements database, "Add" and "Add+Agree" go into the AADL model.
+		 */
 
-			filename = dlgReqFile.open();
-			if (filename == null) {
-				return null;
-			}
-			reqFile = new File(filename);
-		}
-		if (!reqFile.exists()) {
-			Dialog.showError("File not found", "Cannot find the requirements file " + reqFile.getName() + ".");
+		RequirementsManager reqMgr = RequirementsManager.getInstance();
+		if (!reqMgr.readRequirementFiles(importRequirements, filename)) {
+			// No requirement files were read
 			return null;
 		}
 
-		JsonRequirementsFile jsonFile = new JsonRequirementsFile();
-		if (!jsonFile.importFile(reqFile)) {
-			Dialog.showError("Problem with " + reqFile.getName(),
-					"Could not load cyber requirements file " + reqFile.getName() + ".");
-			return null;
-		}
-		RequirementsManager.getInstance().reset();
-		// Compare new requirements with existing requirements and ignore the existing ones
-		removeExistingRequirements(jsonFile, RequirementsManager.getInstance().getImportedRequirements());
-		removeExistingRequirements(jsonFile, RequirementsManager.getInstance().getOmittedRequirements());
-
-		// Alert user if there aren't any requirements to import
-		if (jsonFile.getRequirements().isEmpty()) {
-			Dialog.showError("No new requirements to import", reqFile.getName()
-					+ " does not contain any requirements that are not already present in this model.");
-			return null;
-		}
-
-		// Open wizard to enter filter info
-		ImportRequirementsDialog wizard = new ImportRequirementsDialog(
+		ImportRequirementsGUI wizard = new ImportRequirementsGUI(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		wizard.setRequirements(reqMgr.getRequirements());
 
-		wizard.setRequirements(jsonFile.getRequirements());
-		wizard.create();
-		if (wizard.open() == Window.OK) {
-
-			List<CyberRequirement> importedReqs = wizard.getImportedRequirements();
-			List<CyberRequirement> omittedReqs = wizard.getOmittedRequirements();
-
-			RequirementsManager.getInstance().importRequirements(importedReqs);
-
-			// Write omitted requirements to log
-			if (!omittedReqs.isEmpty()) {
-				RequirementsManager.getInstance().addOmittedRequirements(omittedReqs, jsonFile.getImplementation());
-			}
+		if (wizard.getRequirements().isEmpty()) {
+			Dialog.showInfo("Requirements Manager", "No requirements found in model.");
+		} else if (wizard.open() == SWT.OK) {
+			List<CyberRequirement> updatedReqs = wizard.getRequirements();
+			reqMgr.updateRequirements(updatedReqs);
 		}
 
 		return null;
-	}
-
-
-	/**
-	 * Removes requirements from jsonFile if they appear in reqList
-	 * @param jsonFile
-	 * @param reqList
-	 */
-	private void removeExistingRequirements(JsonRequirementsFile jsonFile, final List<CyberRequirement> reqList) {
-		Iterator<CyberRequirement> i = jsonFile.getRequirements().iterator();
-		while (i.hasNext()) {
-			CyberRequirement jsonReq = i.next();
-			for (CyberRequirement req : reqList) {
-				if (req.getType().equalsIgnoreCase(jsonReq.getType())
-						&& req.getContext().equalsIgnoreCase(jsonReq.getContext())) {
-					i.remove();
-					break;
-				}
-			}
-		}
 	}
 
 }

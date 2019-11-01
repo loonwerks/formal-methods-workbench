@@ -26,10 +26,6 @@ public interface FnCallExpr extends Expr
   /**
    * Returns the value of the '<em><b>Fn</b></em>' reference.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Fn</em>' reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Fn</em>' reference.
    * @see #setFn(FunctionDefinition)
@@ -53,10 +49,6 @@ public interface FnCallExpr extends Expr
    * Returns the value of the '<em><b>Args</b></em>' containment reference list.
    * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.Expr}.
    * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Args</em>' containment reference list isn't clear,
-   * there really should be more of a description here...
-   * </p>
    * <!-- end-user-doc -->
    * @return the value of the '<em>Args</em>' containment reference list.
    * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getFnCallExpr_Args()

@@ -66,6 +66,7 @@ public class RealExprImpl extends ExprImpl implements RealExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public RealLiteral getVal()
   {
     return val;
@@ -93,6 +94,7 @@ public class RealExprImpl extends ExprImpl implements RealExpr
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setVal(RealLiteral newVal)
   {
     if (newVal != val)

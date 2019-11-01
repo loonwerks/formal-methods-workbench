@@ -9,7 +9,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -19,28 +18,29 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.PortCategory;
 import org.osate.aadl2.Subcomponent;
+import org.osate.ui.dialogs.Dialog;
+
+import com.collins.fmw.cyres.architecture.handlers.AddIsolatorHandler;
 
 public class AddIsolatorDialog extends TitleAreaDialog {
 
-	private Text txtIsolatorImplementationName;
 	private Text txtVirtualProcessorName;
+	private Text txtVirtualMachineOS;
 	private List<Button> btnCompSelectionType = new ArrayList<>();
 	private List<Button> btnComponents = new ArrayList<>();
-	private List<Button> btnLogPortType = new ArrayList<>();
 	private Combo cboIsolatorRequirement;
-	private Text txtAgreeProperty;
 
-	private String isolatorImplementationName = "";
 	private String virtualProcessorName = "";
+	private String virtualMachineOS = "";
 	private List<String> components = new ArrayList<>();
-	private PortCategory logPortType = null;
 	private String isolatorRequirement = "";
-	private String agreeProperty = "";
 
 	private Subcomponent component = null;
 	private List<String> requirements = new ArrayList<>();
+
+	private static final String DEFAULT_OS = "Linux";
+	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddIsolatorDialog(Shell parentShell) {
 		super(parentShell);
@@ -72,31 +72,14 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		container.setLayout(layout);
 
 		// Add filter information fields
-		createIsolatorImplementationNameField(container);
 		createVirtualProcessorNameField(container);
+		createOSField(container);
 		createComponentSelectionField(container);
-		createLogPortField(container);
 		createRequirementField(container);
-		createAgreeField(container);
 
 		return area;
 	}
 
-	/**
-	 * Creates the input text field for specifying the isolator implementation name
-	 * @param container
-	 */
-	private void createIsolatorImplementationNameField(Composite container) {
-		Label lblIsolatorImplNameField = new Label(container, SWT.NONE);
-		lblIsolatorImplNameField.setText("Isolator implementation name");
-
-		GridData dataInfoField = new GridData();
-		dataInfoField.grabExcessHorizontalSpace = true;
-		dataInfoField.horizontalAlignment = SWT.FILL;
-		txtIsolatorImplementationName = new Text(container, SWT.BORDER);
-		txtIsolatorImplementationName.setLayoutData(dataInfoField);
-		txtIsolatorImplementationName.setText("VM");
-	}
 
 	/**
 	 * Creates the input text field for specifying the virtual processor name
@@ -111,7 +94,23 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtVirtualProcessorName = new Text(container, SWT.BORDER);
 		txtVirtualProcessorName.setLayoutData(dataInfoField);
-		txtVirtualProcessorName.setText("VPROC");
+		txtVirtualProcessorName.setText(AddIsolatorHandler.VIRTUAL_PROCESSOR_IMPL_NAME);
+	}
+
+	/**
+	 * Creates the input text field for specifying the OS on the VM
+	 * @param container
+	 */
+	private void createOSField(Composite container) {
+		Label lblOSField = new Label(container, SWT.NONE);
+		lblOSField.setText("Virtual machine OS");
+
+		GridData dataInfoField = new GridData();
+		dataInfoField.grabExcessHorizontalSpace = true;
+		dataInfoField.horizontalAlignment = SWT.FILL;
+		txtVirtualMachineOS = new Text(container, SWT.BORDER);
+		txtVirtualMachineOS.setLayoutData(dataInfoField);
+		txtVirtualMachineOS.setText(DEFAULT_OS);
 	}
 
 	/**
@@ -182,45 +181,6 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 	}
 
-	/**
-	 * Creates the input field for specifying if the isolator should contain
-	 * a port for logging messages
-	 * @param container
-	 */
-	private void createLogPortField(Composite container) {
-		Label lblLogField = new Label(container, SWT.NONE);
-		lblLogField.setText("Create log port");
-		lblLogField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-
-		// Create a group to contain the log port options
-		Group logGroup = new Group(container, SWT.NONE);
-		logGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		logGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-
-		btnLogPortType.clear();
-
-		Button btnNoLogPort = new Button(logGroup, SWT.RADIO);
-		btnNoLogPort.setText("None");
-		btnNoLogPort.setSelection(true);
-
-		Button btnEventLogPort = new Button(logGroup, SWT.RADIO);
-		btnEventLogPort.setText("Event");
-		btnEventLogPort.setSelection(false);
-
-		Button btnDataLogPort = new Button(logGroup, SWT.RADIO);
-		btnDataLogPort.setText("Data");
-		btnDataLogPort.setSelection(false);
-
-		Button btnEventDataLogPort = new Button(logGroup, SWT.RADIO);
-		btnEventDataLogPort.setText("Event Data");
-		btnEventDataLogPort.setSelection(false);
-
-		btnLogPortType.add(btnDataLogPort);
-		btnLogPortType.add(btnEventLogPort);
-		btnLogPortType.add(btnEventDataLogPort);
-		btnLogPortType.add(btnNoLogPort);
-
-	}
 
 	/**
 	 * Creates the input field for selecting the resolute clause that drives
@@ -234,26 +194,13 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboIsolatorRequirement = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+		cboIsolatorRequirement = new Combo(container, SWT.BORDER);
 		cboIsolatorRequirement.setLayoutData(dataInfoField);
-		for (String clause : requirements) {
-			cboIsolatorRequirement.add(clause);
-		}
+		cboIsolatorRequirement.add(NO_REQUIREMENT_SELECTED);
+		requirements.forEach(r -> cboIsolatorRequirement.add(r));
+		cboIsolatorRequirement.setText(NO_REQUIREMENT_SELECTED);
 	}
 
-	/**
-	 * Creates the input text field for specifying the filter agree property
-	 * @param container
-	 */
-	private void createAgreeField(Composite container) {
-		Label lblAgreeField = new Label(container, SWT.NONE);
-		lblAgreeField.setText("Isolator AGREE contract");
-
-		GridData dataInfoField = new GridData(SWT.FILL, SWT.FILL, true, false);
-		txtAgreeProperty = new Text(container, SWT.BORDER);
-		txtAgreeProperty.setLayoutData(dataInfoField);
-
-	}
 
 	@Override
 	protected void okPressed() {
@@ -277,57 +224,52 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	 * text fields are disposed when the dialog closes.
 	 * @param container
 	 */
-	private void saveInput() {
+	private boolean saveInput() {
 
-		isolatorImplementationName = txtIsolatorImplementationName.getText();
 		virtualProcessorName = txtVirtualProcessorName.getText();
+		virtualMachineOS = txtVirtualMachineOS.getText();
 
 		components.clear();
 		if (btnCompSelectionType.isEmpty()) {
-			components.add(component.getName());
+			components.add(component.getQualifiedName());
 		} else if (btnCompSelectionType.get(0).getSelection()) {
-			components.add(component.getName());
+			components.add(component.getQualifiedName());
 		} else {
 			for (Button btn : btnComponents) {
 				if (btn.getSelection()) {
-					components.add(btn.getText());
+					components.add(component.getQualifiedName() + "." + btn.getText());
 				}
 			}
 		}
-		logPortType = null;
-		for (int i = 0; i < btnLogPortType.size(); i++) {
-			if (btnLogPortType.get(i).getSelection()) {
-				logPortType = PortCategory.get(i);
-				break;
-			}
-		}
+
 		isolatorRequirement = cboIsolatorRequirement.getText();
-		agreeProperty = txtAgreeProperty.getText();
+		if (isolatorRequirement.equals(NO_REQUIREMENT_SELECTED)) {
+			isolatorRequirement = "";
+		} else if (!requirements.contains(isolatorRequirement)) {
+			Dialog.showError("Add Isolator",
+					"Isolator requirement " + isolatorRequirement
+							+ " does not exist in the model.  Select a requirement from the list, or choose "
+							+ NO_REQUIREMENT_SELECTED + ".");
+			return false;
+		}
 
-	}
-
-	public String getIsolatorImplementationName() {
-		return isolatorImplementationName;
+		return true;
 	}
 
 	public String getVirtualProcessorName() {
 		return virtualProcessorName;
 	}
 
+	public String getVirtualMachineOS() {
+		return virtualMachineOS;
+	}
+
 	public List<String> getIsolatedComponents() {
 		return components;
 	}
 
-	public PortCategory getLogPortType() {
-		return logPortType;
-	}
-
 	public String getRequirement() {
 		return isolatorRequirement;
-	}
-
-	public String getAgreeProperty() {
-		return agreeProperty;
 	}
 
 	public void setSelectedComponent(Subcomponent component) {

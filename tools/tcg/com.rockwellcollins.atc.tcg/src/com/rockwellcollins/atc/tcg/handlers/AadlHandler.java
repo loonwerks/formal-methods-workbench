@@ -44,11 +44,11 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
+import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.Element;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ge.BusinessObjectSelection;
 
 public abstract class AadlHandler extends AbstractHandler {
@@ -93,7 +93,7 @@ public abstract class AadlHandler extends AbstractHandler {
 				};
 
 				if (xtextEditor == null) {
-					return worker.apply(OsateResourceUtil.getResourceSet());
+					return worker.apply(new XtextResourceSet());
 				} else {
 					return xtextEditor.getDocument().readOnly(resource -> {
 						return worker.apply(resource.getResourceSet());

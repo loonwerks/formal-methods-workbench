@@ -44,6 +44,7 @@ public class AgreePreferencePage extends FieldEditorPreferencePage implements IW
 	}
 
 	private static final String[][] MODEL_CHECKERS = {
+			{ PreferenceConstants.MODEL_CHECKER_SALLY, PreferenceConstants.MODEL_CHECKER_SALLY },
 			{ PreferenceConstants.MODEL_CHECKER_JKIND, PreferenceConstants.MODEL_CHECKER_JKIND },
 			{ PreferenceConstants.MODEL_CHECKER_KIND2, PreferenceConstants.MODEL_CHECKER_KIND2 },
 			{ PreferenceConstants.MODEL_CHECKER_KIND2WEB, PreferenceConstants.MODEL_CHECKER_KIND2WEB } };

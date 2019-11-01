@@ -79,6 +79,7 @@ public class NestedDotIDImpl extends MinimalEObjectImpl.Container implements Nes
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public NamedElement getBase()
   {
     if (base != null && ((EObject)base).eIsProxy())
@@ -109,6 +110,7 @@ public class NestedDotIDImpl extends MinimalEObjectImpl.Container implements Nes
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setBase(NamedElement newBase)
   {
     NamedElement oldBase = base;
@@ -122,6 +124,7 @@ public class NestedDotIDImpl extends MinimalEObjectImpl.Container implements Nes
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public NestedDotID getSub()
   {
     return sub;
@@ -149,6 +152,7 @@ public class NestedDotIDImpl extends MinimalEObjectImpl.Container implements Nes
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setSub(NestedDotID newSub)
   {
     if (newSub != sub)

@@ -182,6 +182,8 @@ public class ComponentCreateHelper {
 				return ((SystemImplementation) compImpl).createOwnedAbstractSubcomponent();
 			} else if (compCategory == ComponentCategory.PROCESS) {
 				return ((SystemImplementation) compImpl).createOwnedProcessSubcomponent();
+			} else if (compCategory == ComponentCategory.VIRTUAL_PROCESSOR) {
+				return ((SystemImplementation) compImpl).createOwnedVirtualProcessorSubcomponent();
 			}
 		} else if (compImpl instanceof AbstractImplementation) {
 			if (compCategory == ComponentCategory.SYSTEM) {
@@ -205,10 +207,10 @@ public class ComponentCreateHelper {
 			} else if (compCategory == ComponentCategory.VIRTUAL_PROCESSOR) {
 				return ((ProcessorImplementation) compImpl).createOwnedVirtualProcessorSubcomponent();
 			}
-		} else {
-			Dialog.showError("Component Create Helper",
-					"Create Owned Subcomponent: unhandled component type (" + compImpl.getTypeName() + ")");
 		}
+
+		Dialog.showError("Component Create Helper",
+					"Create Owned Subcomponent: unhandled component type (" + compImpl.getTypeName() + ")");
 		return null;
 	}
 
@@ -226,6 +228,9 @@ public class ComponentCreateHelper {
 		} else if (subcomponent instanceof VirtualProcessorSubcomponent) {
 			((VirtualProcessorSubcomponent) subcomponent)
 					.setVirtualProcessorSubcomponentType((VirtualProcessorImplementation) compImpl);
+		} else {
+			Dialog.showError("Component Create Helper", "Set Subcomponent Type: unhandled subcomponent type ("
+					+ subcomponent.getSubcomponentType().getName() + ")");
 		}
 	}
 

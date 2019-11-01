@@ -72,6 +72,9 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
       case ResolutePackage.CONSTANT_DEFINITION: return createConstantDefinition();
       case ResolutePackage.FUNCTION_DEFINITION: return createFunctionDefinition();
       case ResolutePackage.DEFINITION_BODY: return createDefinitionBody();
+      case ResolutePackage.CLAIM_CONTEXT: return createClaimContext();
+      case ResolutePackage.CLAIM_ASSUMPTION: return createClaimAssumption();
+      case ResolutePackage.CLAIM_STRATEGY: return createClaimStrategy();
       case ResolutePackage.CLAIM_TEXT: return createClaimText();
       case ResolutePackage.CLAIM_TEXT_VAR: return createClaimTextVar();
       case ResolutePackage.EXPR: return createExpr();
@@ -127,6 +130,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ResoluteLibrary createResoluteLibrary()
   {
     ResoluteLibraryImpl resoluteLibrary = new ResoluteLibraryImpl();
@@ -138,6 +142,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Definition createDefinition()
   {
     DefinitionImpl definition = new DefinitionImpl();
@@ -149,6 +154,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Type createType()
   {
     TypeImpl type = new TypeImpl();
@@ -160,6 +166,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public BaseType createBaseType()
   {
     BaseTypeImpl baseType = new BaseTypeImpl();
@@ -171,6 +178,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Arg createArg()
   {
     ArgImpl arg = new ArgImpl();
@@ -182,6 +190,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ConstantDefinition createConstantDefinition()
   {
     ConstantDefinitionImpl constantDefinition = new ConstantDefinitionImpl();
@@ -193,6 +202,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public FunctionDefinition createFunctionDefinition()
   {
     FunctionDefinitionImpl functionDefinition = new FunctionDefinitionImpl();
@@ -204,6 +214,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public DefinitionBody createDefinitionBody()
   {
     DefinitionBodyImpl definitionBody = new DefinitionBodyImpl();
@@ -215,6 +226,43 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
+  public ClaimContext createClaimContext()
+  {
+    ClaimContextImpl claimContext = new ClaimContextImpl();
+    return claimContext;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public ClaimAssumption createClaimAssumption()
+  {
+    ClaimAssumptionImpl claimAssumption = new ClaimAssumptionImpl();
+    return claimAssumption;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public ClaimStrategy createClaimStrategy()
+  {
+    ClaimStrategyImpl claimStrategy = new ClaimStrategyImpl();
+    return claimStrategy;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public ClaimText createClaimText()
   {
     ClaimTextImpl claimText = new ClaimTextImpl();
@@ -226,6 +274,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ClaimTextVar createClaimTextVar()
   {
     ClaimTextVarImpl claimTextVar = new ClaimTextVarImpl();
@@ -237,6 +286,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr createExpr()
   {
     ExprImpl expr = new ExprImpl();
@@ -248,6 +298,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LetBinding createLetBinding()
   {
     LetBindingImpl letBinding = new LetBindingImpl();
@@ -259,6 +310,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ResoluteSubclause createResoluteSubclause()
   {
     ResoluteSubclauseImpl resoluteSubclause = new ResoluteSubclauseImpl();
@@ -270,6 +322,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public NestedDotID createNestedDotID()
   {
     NestedDotIDImpl nestedDotID = new NestedDotIDImpl();
@@ -281,6 +334,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LintStatement createLintStatement()
   {
     LintStatementImpl lintStatement = new LintStatementImpl();
@@ -292,6 +346,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Ruleset createRuleset()
   {
     RulesetImpl ruleset = new RulesetImpl();
@@ -303,6 +358,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public RulesetBody createRulesetBody()
   {
     RulesetBodyImpl rulesetBody = new RulesetBodyImpl();
@@ -314,6 +370,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public AnalysisStatement createAnalysisStatement()
   {
     AnalysisStatementImpl analysisStatement = new AnalysisStatementImpl();
@@ -325,6 +382,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ListType createListType()
   {
     ListTypeImpl listType = new ListTypeImpl();
@@ -336,6 +394,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public SetType createSetType()
   {
     SetTypeImpl setType = new SetTypeImpl();
@@ -347,6 +406,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LibraryFnType createLibraryFnType()
   {
     LibraryFnTypeImpl libraryFnType = new LibraryFnTypeImpl();
@@ -358,6 +418,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public QuantArg createQuantArg()
   {
     QuantArgImpl quantArg = new QuantArgImpl();
@@ -369,6 +430,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public FunctionBody createFunctionBody()
   {
     FunctionBodyImpl functionBody = new FunctionBodyImpl();
@@ -380,6 +442,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ClaimBody createClaimBody()
   {
     ClaimBodyImpl claimBody = new ClaimBodyImpl();
@@ -391,6 +454,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ClaimString createClaimString()
   {
     ClaimStringImpl claimString = new ClaimStringImpl();
@@ -402,6 +466,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ClaimArg createClaimArg()
   {
     ClaimArgImpl claimArg = new ClaimArgImpl();
@@ -413,6 +478,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public BinaryExpr createBinaryExpr()
   {
     BinaryExprImpl binaryExpr = new BinaryExprImpl();
@@ -424,6 +490,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public InstanceOfExpr createInstanceOfExpr()
   {
     InstanceOfExprImpl instanceOfExpr = new InstanceOfExprImpl();
@@ -435,6 +502,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public UnaryExpr createUnaryExpr()
   {
     UnaryExprImpl unaryExpr = new UnaryExprImpl();
@@ -446,6 +514,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public CastExpr createCastExpr()
   {
     CastExprImpl castExpr = new CastExprImpl();
@@ -457,6 +526,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public IdExpr createIdExpr()
   {
     IdExprImpl idExpr = new IdExprImpl();
@@ -468,6 +538,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ThisExpr createThisExpr()
   {
     ThisExprImpl thisExpr = new ThisExprImpl();
@@ -479,6 +550,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public FailExpr createFailExpr()
   {
     FailExprImpl failExpr = new FailExprImpl();
@@ -490,6 +562,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public IntExpr createIntExpr()
   {
     IntExprImpl intExpr = new IntExprImpl();
@@ -501,6 +574,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public RealExpr createRealExpr()
   {
     RealExprImpl realExpr = new RealExprImpl();
@@ -512,6 +586,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public BoolExpr createBoolExpr()
   {
     BoolExprImpl boolExpr = new BoolExprImpl();
@@ -523,6 +598,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public StringExpr createStringExpr()
   {
     StringExprImpl stringExpr = new StringExprImpl();
@@ -534,6 +610,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public IfThenElseExpr createIfThenElseExpr()
   {
     IfThenElseExprImpl ifThenElseExpr = new IfThenElseExprImpl();
@@ -545,6 +622,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public QuantifiedExpr createQuantifiedExpr()
   {
     QuantifiedExprImpl quantifiedExpr = new QuantifiedExprImpl();
@@ -556,6 +634,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LibraryFnCallExpr createLibraryFnCallExpr()
   {
     LibraryFnCallExprImpl libraryFnCallExpr = new LibraryFnCallExprImpl();
@@ -567,6 +646,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public BuiltInFnCallExpr createBuiltInFnCallExpr()
   {
     BuiltInFnCallExprImpl builtInFnCallExpr = new BuiltInFnCallExprImpl();
@@ -578,6 +658,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public FnCallExpr createFnCallExpr()
   {
     FnCallExprImpl fnCallExpr = new FnCallExprImpl();
@@ -589,6 +670,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LintExpr createLintExpr()
   {
     LintExprImpl lintExpr = new LintExprImpl();
@@ -600,6 +682,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ListFilterMapExpr createListFilterMapExpr()
   {
     ListFilterMapExprImpl listFilterMapExpr = new ListFilterMapExprImpl();
@@ -611,6 +694,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ListExpr createListExpr()
   {
     ListExprImpl listExpr = new ListExprImpl();
@@ -622,6 +706,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public SetFilterMapExpr createSetFilterMapExpr()
   {
     SetFilterMapExprImpl setFilterMapExpr = new SetFilterMapExprImpl();
@@ -633,6 +718,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public SetExpr createSetExpr()
   {
     SetExprImpl setExpr = new SetExprImpl();
@@ -644,6 +730,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public LetExpr createLetExpr()
   {
     LetExprImpl letExpr = new LetExprImpl();
@@ -655,6 +742,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public WarningStatement createWarningStatement()
   {
     WarningStatementImpl warningStatement = new WarningStatementImpl();
@@ -666,6 +754,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ErrorStatement createErrorStatement()
   {
     ErrorStatementImpl errorStatement = new ErrorStatementImpl();
@@ -677,6 +766,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public InfoStatement createInfoStatement()
   {
     InfoStatementImpl infoStatement = new InfoStatementImpl();
@@ -688,6 +778,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ProveStatement createProveStatement()
   {
     ProveStatementImpl proveStatement = new ProveStatementImpl();
@@ -699,6 +790,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public CheckStatement createCheckStatement()
   {
     CheckStatementImpl checkStatement = new CheckStatementImpl();
@@ -710,6 +802,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public ResolutePackage getResolutePackage()
   {
     return (ResolutePackage)getEPackage();

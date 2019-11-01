@@ -65,6 +65,7 @@ public class QuantArgImpl extends ArgImpl implements QuantArg
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public Expr getExpr()
   {
     return expr;
@@ -92,6 +93,7 @@ public class QuantArgImpl extends ArgImpl implements QuantArg
    * <!-- end-user-doc -->
    * @generated
    */
+  @Override
   public void setExpr(Expr newExpr)
   {
     if (newExpr != expr)

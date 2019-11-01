@@ -4,7 +4,7 @@
 
    <extension point="org.eclipse.ui.commands">
 
-     <command categoryId="com.collins.fmw.cyres.json.commands"
+     <command
            id="com.collins.fmw.cyres.json.commands.translate"
            name="Export to JSON">
      </command>
@@ -48,26 +48,38 @@
             </command>
            
       </menuContribution>
+      <!-- Modified menu follows immediately after comment block
       <menuContribution
             allPopups="false"
-            locationURI="popup:#TextEditorContext?after=additions">
+		    locationURI="popup:#TextEditorContext?after=additions">
+		 <command
+		       commandId="com.collins.fmw.cyres.json.commands.translate"
+		       id="com.collins.fmw.cyres.json.menus.translate"
+		       mnemonic="s"
+		       style="push">
+		 </command>
+      </menuContribution>
+      -->
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:com.rockwellcollins.atc.agree.analysis.popups.texteditor?after=additions">
          <menu
-               id="com.collins.fmw.cyres.json.popups.texteditor"
+               id="com.collins.fmw.cyres.json.menus.popup"
                label="AGREE"
-               mnemonic="g">          
+               mnemonic="g">
             <command
                   commandId="com.collins.fmw.cyres.json.commands.translate"
                   id="com.collins.fmw.cyres.json.menus.translate"
                   mnemonic="s"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
+                  </reference>
+               </visibleWhen>
             </command>
            
-   <visibleWhen
-         checkEnabled="false">
-      <reference
-            definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
-      </reference>
-   </visibleWhen>
          </menu>
       </menuContribution>
    </extension>

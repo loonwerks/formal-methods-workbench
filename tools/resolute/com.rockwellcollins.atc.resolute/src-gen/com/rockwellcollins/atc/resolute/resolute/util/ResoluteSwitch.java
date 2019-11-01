@@ -153,6 +153,27 @@ public class ResoluteSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
+      case ResolutePackage.CLAIM_CONTEXT:
+      {
+        ClaimContext claimContext = (ClaimContext)theEObject;
+        T result = caseClaimContext(claimContext);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.CLAIM_ASSUMPTION:
+      {
+        ClaimAssumption claimAssumption = (ClaimAssumption)theEObject;
+        T result = caseClaimAssumption(claimAssumption);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case ResolutePackage.CLAIM_STRATEGY:
+      {
+        ClaimStrategy claimStrategy = (ClaimStrategy)theEObject;
+        T result = caseClaimStrategy(claimStrategy);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
       case ResolutePackage.CLAIM_TEXT:
       {
         ClaimText claimText = (ClaimText)theEObject;
@@ -675,6 +696,54 @@ public class ResoluteSwitch<T> extends Switch<T>
    * @generated
    */
   public T caseDefinitionBody(DefinitionBody object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Claim Context</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Claim Context</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseClaimContext(ClaimContext object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Claim Assumption</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Claim Assumption</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseClaimAssumption(ClaimAssumption object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Claim Strategy</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Claim Strategy</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseClaimStrategy(ClaimStrategy object)
   {
     return null;
   }

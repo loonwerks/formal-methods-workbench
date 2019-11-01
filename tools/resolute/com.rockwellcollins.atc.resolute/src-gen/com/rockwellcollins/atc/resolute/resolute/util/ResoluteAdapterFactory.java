@@ -122,6 +122,21 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
         return createDefinitionBodyAdapter();
       }
       @Override
+      public Adapter caseClaimContext(ClaimContext object)
+      {
+        return createClaimContextAdapter();
+      }
+      @Override
+      public Adapter caseClaimAssumption(ClaimAssumption object)
+      {
+        return createClaimAssumptionAdapter();
+      }
+      @Override
+      public Adapter caseClaimStrategy(ClaimStrategy object)
+      {
+        return createClaimStrategyAdapter();
+      }
+      @Override
       public Adapter caseClaimText(ClaimText object)
       {
         return createClaimTextAdapter();
@@ -514,6 +529,51 @@ public class ResoluteAdapterFactory extends AdapterFactoryImpl
    * @generated
    */
   public Adapter createDefinitionBodyAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ClaimContext <em>Claim Context</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.ClaimContext
+   * @generated
+   */
+  public Adapter createClaimContextAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ClaimAssumption <em>Claim Assumption</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.ClaimAssumption
+   * @generated
+   */
+  public Adapter createClaimAssumptionAdapter()
+  {
+    return null;
+  }
+
+  /**
+   * Creates a new adapter for an object of class '{@link com.rockwellcollins.atc.resolute.resolute.ClaimStrategy <em>Claim Strategy</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see com.rockwellcollins.atc.resolute.resolute.ClaimStrategy
+   * @generated
+   */
+  public Adapter createClaimStrategyAdapter()
   {
     return null;
   }

@@ -147,9 +147,7 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//Definition:
 		//	ConstantDefinition
 		//	| FunctionDefinition
-		//	| Ruleset
-		//	//|	RuleDefinition
-		//;
+		//	| Ruleset;
 		@Override public ParserRule getRule() { return rule; }
 
 		//ConstantDefinition | FunctionDefinition | Ruleset
@@ -728,15 +726,23 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		private final Assignment cClaimAssignment_1_2_1 = (Assignment)cGroup_1_2.eContents().get(1);
 		private final RuleCall cClaimClaimTextParserRuleCall_1_2_1_0 = (RuleCall)cClaimAssignment_1_2_1.eContents().get(0);
 		private final Keyword cAsteriskAsteriskKeyword_1_2_2 = (Keyword)cGroup_1_2.eContents().get(2);
-		private final Assignment cExprAssignment_1_3 = (Assignment)cGroup_1.eContents().get(3);
-		private final RuleCall cExprExprParserRuleCall_1_3_0 = (RuleCall)cExprAssignment_1_3.eContents().get(0);
+		private final Assignment cContextAssignment_1_3 = (Assignment)cGroup_1.eContents().get(3);
+		private final RuleCall cContextClaimContextParserRuleCall_1_3_0 = (RuleCall)cContextAssignment_1_3.eContents().get(0);
+		private final Assignment cAssumptionsAssignment_1_4 = (Assignment)cGroup_1.eContents().get(4);
+		private final RuleCall cAssumptionsClaimAssumptionParserRuleCall_1_4_0 = (RuleCall)cAssumptionsAssignment_1_4.eContents().get(0);
+		private final Assignment cStrategiesAssignment_1_5 = (Assignment)cGroup_1.eContents().get(5);
+		private final RuleCall cStrategiesClaimStrategyParserRuleCall_1_5_0 = (RuleCall)cStrategiesAssignment_1_5.eContents().get(0);
+		private final Assignment cExprAssignment_1_6 = (Assignment)cGroup_1.eContents().get(6);
+		private final RuleCall cExprExprParserRuleCall_1_6_0 = (RuleCall)cExprAssignment_1_6.eContents().get(0);
 		
 		//DefinitionBody:
 		//	{FunctionBody} ':' type=Type '=' expr=Expr
-		//	| {ClaimBody} '<=' ('**' claim+=ClaimText+ '**') expr=Expr;
+		//	| {ClaimBody} '<=' ('**' claim+=ClaimText+ '**') context+=ClaimContext* assumptions+=ClaimAssumption*
+		//	strategies+=ClaimStrategy* expr=Expr;
 		@Override public ParserRule getRule() { return rule; }
 
-		//{FunctionBody} ':' type=Type '=' expr=Expr | {ClaimBody} '<=' ('**' claim+=ClaimText+ '**') expr=Expr
+		//{FunctionBody} ':' type=Type '=' expr=Expr | {ClaimBody} '<=' ('**' claim+=ClaimText+ '**') context+=ClaimContext*
+		//assumptions+=ClaimAssumption* strategies+=ClaimStrategy* expr=Expr
 		public Alternatives getAlternatives() { return cAlternatives; }
 
 		//{FunctionBody} ':' type=Type '=' expr=Expr
@@ -763,7 +769,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//Expr
 		public RuleCall getExprExprParserRuleCall_0_4_0() { return cExprExprParserRuleCall_0_4_0; }
 
-		//{ClaimBody} '<=' ('**' claim+=ClaimText+ '**') expr=Expr
+		//{ClaimBody} '<=' ('**' claim+=ClaimText+ '**') context+=ClaimContext* assumptions+=ClaimAssumption*
+		//strategies+=ClaimStrategy* expr=Expr
 		public Group getGroup_1() { return cGroup_1; }
 
 		//{ClaimBody}
@@ -787,11 +794,137 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//'**'
 		public Keyword getAsteriskAsteriskKeyword_1_2_2() { return cAsteriskAsteriskKeyword_1_2_2; }
 
+		//context+=ClaimContext*
+		public Assignment getContextAssignment_1_3() { return cContextAssignment_1_3; }
+
+		//ClaimContext
+		public RuleCall getContextClaimContextParserRuleCall_1_3_0() { return cContextClaimContextParserRuleCall_1_3_0; }
+
+		//assumptions+=ClaimAssumption*
+		public Assignment getAssumptionsAssignment_1_4() { return cAssumptionsAssignment_1_4; }
+
+		//ClaimAssumption
+		public RuleCall getAssumptionsClaimAssumptionParserRuleCall_1_4_0() { return cAssumptionsClaimAssumptionParserRuleCall_1_4_0; }
+
+		//strategies+=ClaimStrategy*
+		public Assignment getStrategiesAssignment_1_5() { return cStrategiesAssignment_1_5; }
+
+		//ClaimStrategy
+		public RuleCall getStrategiesClaimStrategyParserRuleCall_1_5_0() { return cStrategiesClaimStrategyParserRuleCall_1_5_0; }
+
 		//expr=Expr
-		public Assignment getExprAssignment_1_3() { return cExprAssignment_1_3; }
+		public Assignment getExprAssignment_1_6() { return cExprAssignment_1_6; }
 
 		//Expr
-		public RuleCall getExprExprParserRuleCall_1_3_0() { return cExprExprParserRuleCall_1_3_0; }
+		public RuleCall getExprExprParserRuleCall_1_6_0() { return cExprExprParserRuleCall_1_6_0; }
+	}
+
+	public class ClaimContextElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "com.rockwellcollins.atc.resolute.Resolute.ClaimContext");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Keyword cContextKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Assignment cNameAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final RuleCall cNameIDTerminalRuleCall_1_0 = (RuleCall)cNameAssignment_1.eContents().get(0);
+		private final Keyword cColonKeyword_2 = (Keyword)cGroup.eContents().get(2);
+		private final Assignment cValAssignment_3 = (Assignment)cGroup.eContents().get(3);
+		private final RuleCall cValStringTermParserRuleCall_3_0 = (RuleCall)cValAssignment_3.eContents().get(0);
+		
+		//ClaimContext:
+		//	'context' name=ID ':' val=StringTerm;
+		@Override public ParserRule getRule() { return rule; }
+
+		//'context' name=ID ':' val=StringTerm
+		public Group getGroup() { return cGroup; }
+
+		//'context'
+		public Keyword getContextKeyword_0() { return cContextKeyword_0; }
+
+		//name=ID
+		public Assignment getNameAssignment_1() { return cNameAssignment_1; }
+
+		//ID
+		public RuleCall getNameIDTerminalRuleCall_1_0() { return cNameIDTerminalRuleCall_1_0; }
+
+		//':'
+		public Keyword getColonKeyword_2() { return cColonKeyword_2; }
+
+		//val=StringTerm
+		public Assignment getValAssignment_3() { return cValAssignment_3; }
+
+		//StringTerm
+		public RuleCall getValStringTermParserRuleCall_3_0() { return cValStringTermParserRuleCall_3_0; }
+	}
+
+	public class ClaimAssumptionElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "com.rockwellcollins.atc.resolute.Resolute.ClaimAssumption");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Keyword cAssumptionKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Assignment cNameAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final RuleCall cNameIDTerminalRuleCall_1_0 = (RuleCall)cNameAssignment_1.eContents().get(0);
+		private final Keyword cColonKeyword_2 = (Keyword)cGroup.eContents().get(2);
+		private final Assignment cValAssignment_3 = (Assignment)cGroup.eContents().get(3);
+		private final RuleCall cValStringTermParserRuleCall_3_0 = (RuleCall)cValAssignment_3.eContents().get(0);
+		
+		//ClaimAssumption:
+		//	'assumption' name=ID ':' val=StringTerm;
+		@Override public ParserRule getRule() { return rule; }
+
+		//'assumption' name=ID ':' val=StringTerm
+		public Group getGroup() { return cGroup; }
+
+		//'assumption'
+		public Keyword getAssumptionKeyword_0() { return cAssumptionKeyword_0; }
+
+		//name=ID
+		public Assignment getNameAssignment_1() { return cNameAssignment_1; }
+
+		//ID
+		public RuleCall getNameIDTerminalRuleCall_1_0() { return cNameIDTerminalRuleCall_1_0; }
+
+		//':'
+		public Keyword getColonKeyword_2() { return cColonKeyword_2; }
+
+		//val=StringTerm
+		public Assignment getValAssignment_3() { return cValAssignment_3; }
+
+		//StringTerm
+		public RuleCall getValStringTermParserRuleCall_3_0() { return cValStringTermParserRuleCall_3_0; }
+	}
+
+	public class ClaimStrategyElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "com.rockwellcollins.atc.resolute.Resolute.ClaimStrategy");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Keyword cStrategyKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Assignment cNameAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final RuleCall cNameIDTerminalRuleCall_1_0 = (RuleCall)cNameAssignment_1.eContents().get(0);
+		private final Keyword cColonKeyword_2 = (Keyword)cGroup.eContents().get(2);
+		private final Assignment cValAssignment_3 = (Assignment)cGroup.eContents().get(3);
+		private final RuleCall cValStringTermParserRuleCall_3_0 = (RuleCall)cValAssignment_3.eContents().get(0);
+		
+		//ClaimStrategy:
+		//	'strategy' name=ID ':' val=StringTerm;
+		@Override public ParserRule getRule() { return rule; }
+
+		//'strategy' name=ID ':' val=StringTerm
+		public Group getGroup() { return cGroup; }
+
+		//'strategy'
+		public Keyword getStrategyKeyword_0() { return cStrategyKeyword_0; }
+
+		//name=ID
+		public Assignment getNameAssignment_1() { return cNameAssignment_1; }
+
+		//ID
+		public RuleCall getNameIDTerminalRuleCall_1_0() { return cNameIDTerminalRuleCall_1_0; }
+
+		//':'
+		public Keyword getColonKeyword_2() { return cColonKeyword_2; }
+
+		//val=StringTerm
+		public Assignment getValAssignment_3() { return cValAssignment_3; }
+
+		//StringTerm
+		public RuleCall getValStringTermParserRuleCall_3_0() { return cValStringTermParserRuleCall_3_0; }
 	}
 
 	public class ClaimTextElements extends AbstractParserRuleElementFinder {
@@ -2262,58 +2395,59 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		private final Keyword cIs_deviceKeyword_16 = (Keyword)cAlternatives.eContents().get(16);
 		private final Keyword cIs_memoryKeyword_17 = (Keyword)cAlternatives.eContents().get(17);
 		private final Keyword cIs_threadKeyword_18 = (Keyword)cAlternatives.eContents().get(18);
-		private final Keyword cIs_processKeyword_19 = (Keyword)cAlternatives.eContents().get(19);
-		private final Keyword cIs_dataKeyword_20 = (Keyword)cAlternatives.eContents().get(20);
-		private final Keyword cIs_subprogramKeyword_21 = (Keyword)cAlternatives.eContents().get(21);
-		private final Keyword cIs_of_typeKeyword_22 = (Keyword)cAlternatives.eContents().get(22);
-		private final Keyword cIs_bound_toKeyword_23 = (Keyword)cAlternatives.eContents().get(23);
-		private final Keyword cHas_memberKeyword_24 = (Keyword)cAlternatives.eContents().get(24);
-		private final Keyword cFeaturesKeyword_25 = (Keyword)cAlternatives.eContents().get(25);
-		private final Keyword cConnectionsKeyword_26 = (Keyword)cAlternatives.eContents().get(26);
-		private final Keyword cEnumerated_valuesKeyword_27 = (Keyword)cAlternatives.eContents().get(27);
-		private final Keyword cSubcomponentsKeyword_28 = (Keyword)cAlternatives.eContents().get(28);
-		private final Keyword cSourceKeyword_29 = (Keyword)cAlternatives.eContents().get(29);
-		private final Keyword cDestinationKeyword_30 = (Keyword)cAlternatives.eContents().get(30);
-		private final Keyword cIs_bidirectionalKeyword_31 = (Keyword)cAlternatives.eContents().get(31);
-		private final Keyword cDirectionKeyword_32 = (Keyword)cAlternatives.eContents().get(32);
-		private final Keyword cIs_event_portKeyword_33 = (Keyword)cAlternatives.eContents().get(33);
-		private final Keyword cIs_abstract_featureKeyword_34 = (Keyword)cAlternatives.eContents().get(34);
-		private final Keyword cIs_data_portKeyword_35 = (Keyword)cAlternatives.eContents().get(35);
-		private final Keyword cIs_portKeyword_36 = (Keyword)cAlternatives.eContents().get(36);
-		private final Keyword cIs_data_accessKeyword_37 = (Keyword)cAlternatives.eContents().get(37);
-		private final Keyword cIs_bus_accessKeyword_38 = (Keyword)cAlternatives.eContents().get(38);
-		private final Keyword cLower_boundKeyword_39 = (Keyword)cAlternatives.eContents().get(39);
-		private final Keyword cUpper_boundKeyword_40 = (Keyword)cAlternatives.eContents().get(40);
-		private final Keyword cMemberKeyword_41 = (Keyword)cAlternatives.eContents().get(41);
-		private final Keyword cLengthKeyword_42 = (Keyword)cAlternatives.eContents().get(42);
-		private final Keyword cSizeKeyword_43 = (Keyword)cAlternatives.eContents().get(43);
-		private final Keyword cSumKeyword_44 = (Keyword)cAlternatives.eContents().get(44);
-		private final Keyword cAppendKeyword_45 = (Keyword)cAlternatives.eContents().get(45);
-		private final Keyword cHeadKeyword_46 = (Keyword)cAlternatives.eContents().get(46);
-		private final Keyword cTailKeyword_47 = (Keyword)cAlternatives.eContents().get(47);
-		private final Keyword cAs_setKeyword_48 = (Keyword)cAlternatives.eContents().get(48);
-		private final Keyword cUnionKeyword_49 = (Keyword)cAlternatives.eContents().get(49);
-		private final Keyword cIntersectKeyword_50 = (Keyword)cAlternatives.eContents().get(50);
-		private final Keyword cAs_listKeyword_51 = (Keyword)cAlternatives.eContents().get(51);
-		private final Keyword cInstanceKeyword_52 = (Keyword)cAlternatives.eContents().get(52);
-		private final Keyword cInstancesKeyword_53 = (Keyword)cAlternatives.eContents().get(53);
-		private final Keyword cDebugKeyword_54 = (Keyword)cAlternatives.eContents().get(54);
-		private final Keyword cAnalysisKeyword_55 = (Keyword)cAlternatives.eContents().get(55);
-		private final Keyword cReceive_errorKeyword_56 = (Keyword)cAlternatives.eContents().get(56);
-		private final Keyword cContain_errorKeyword_57 = (Keyword)cAlternatives.eContents().get(57);
-		private final Keyword cPropagate_errorKeyword_58 = (Keyword)cAlternatives.eContents().get(58);
-		private final Keyword cError_state_reachableKeyword_59 = (Keyword)cAlternatives.eContents().get(59);
-		private final Keyword cFlow_sourceKeyword_60 = (Keyword)cAlternatives.eContents().get(60);
-		private final Keyword cFlow_destinationKeyword_61 = (Keyword)cAlternatives.eContents().get(61);
-		private final Keyword cFlow_elementsKeyword_62 = (Keyword)cAlternatives.eContents().get(62);
-		private final Keyword cFlow_specificationsKeyword_63 = (Keyword)cAlternatives.eContents().get(63);
-		private final Keyword cEnd_to_end_flowsKeyword_64 = (Keyword)cAlternatives.eContents().get(64);
+		private final Keyword cIs_thread_groupKeyword_19 = (Keyword)cAlternatives.eContents().get(19);
+		private final Keyword cIs_processKeyword_20 = (Keyword)cAlternatives.eContents().get(20);
+		private final Keyword cIs_dataKeyword_21 = (Keyword)cAlternatives.eContents().get(21);
+		private final Keyword cIs_subprogramKeyword_22 = (Keyword)cAlternatives.eContents().get(22);
+		private final Keyword cIs_of_typeKeyword_23 = (Keyword)cAlternatives.eContents().get(23);
+		private final Keyword cIs_bound_toKeyword_24 = (Keyword)cAlternatives.eContents().get(24);
+		private final Keyword cHas_memberKeyword_25 = (Keyword)cAlternatives.eContents().get(25);
+		private final Keyword cFeaturesKeyword_26 = (Keyword)cAlternatives.eContents().get(26);
+		private final Keyword cConnectionsKeyword_27 = (Keyword)cAlternatives.eContents().get(27);
+		private final Keyword cEnumerated_valuesKeyword_28 = (Keyword)cAlternatives.eContents().get(28);
+		private final Keyword cSubcomponentsKeyword_29 = (Keyword)cAlternatives.eContents().get(29);
+		private final Keyword cSourceKeyword_30 = (Keyword)cAlternatives.eContents().get(30);
+		private final Keyword cDestinationKeyword_31 = (Keyword)cAlternatives.eContents().get(31);
+		private final Keyword cIs_bidirectionalKeyword_32 = (Keyword)cAlternatives.eContents().get(32);
+		private final Keyword cDirectionKeyword_33 = (Keyword)cAlternatives.eContents().get(33);
+		private final Keyword cIs_event_portKeyword_34 = (Keyword)cAlternatives.eContents().get(34);
+		private final Keyword cIs_abstract_featureKeyword_35 = (Keyword)cAlternatives.eContents().get(35);
+		private final Keyword cIs_data_portKeyword_36 = (Keyword)cAlternatives.eContents().get(36);
+		private final Keyword cIs_portKeyword_37 = (Keyword)cAlternatives.eContents().get(37);
+		private final Keyword cIs_data_accessKeyword_38 = (Keyword)cAlternatives.eContents().get(38);
+		private final Keyword cIs_bus_accessKeyword_39 = (Keyword)cAlternatives.eContents().get(39);
+		private final Keyword cLower_boundKeyword_40 = (Keyword)cAlternatives.eContents().get(40);
+		private final Keyword cUpper_boundKeyword_41 = (Keyword)cAlternatives.eContents().get(41);
+		private final Keyword cMemberKeyword_42 = (Keyword)cAlternatives.eContents().get(42);
+		private final Keyword cLengthKeyword_43 = (Keyword)cAlternatives.eContents().get(43);
+		private final Keyword cSizeKeyword_44 = (Keyword)cAlternatives.eContents().get(44);
+		private final Keyword cSumKeyword_45 = (Keyword)cAlternatives.eContents().get(45);
+		private final Keyword cAppendKeyword_46 = (Keyword)cAlternatives.eContents().get(46);
+		private final Keyword cHeadKeyword_47 = (Keyword)cAlternatives.eContents().get(47);
+		private final Keyword cTailKeyword_48 = (Keyword)cAlternatives.eContents().get(48);
+		private final Keyword cAs_setKeyword_49 = (Keyword)cAlternatives.eContents().get(49);
+		private final Keyword cUnionKeyword_50 = (Keyword)cAlternatives.eContents().get(50);
+		private final Keyword cIntersectKeyword_51 = (Keyword)cAlternatives.eContents().get(51);
+		private final Keyword cAs_listKeyword_52 = (Keyword)cAlternatives.eContents().get(52);
+		private final Keyword cInstanceKeyword_53 = (Keyword)cAlternatives.eContents().get(53);
+		private final Keyword cInstancesKeyword_54 = (Keyword)cAlternatives.eContents().get(54);
+		private final Keyword cDebugKeyword_55 = (Keyword)cAlternatives.eContents().get(55);
+		private final Keyword cAnalysisKeyword_56 = (Keyword)cAlternatives.eContents().get(56);
+		private final Keyword cReceive_errorKeyword_57 = (Keyword)cAlternatives.eContents().get(57);
+		private final Keyword cContain_errorKeyword_58 = (Keyword)cAlternatives.eContents().get(58);
+		private final Keyword cPropagate_errorKeyword_59 = (Keyword)cAlternatives.eContents().get(59);
+		private final Keyword cError_state_reachableKeyword_60 = (Keyword)cAlternatives.eContents().get(60);
+		private final Keyword cFlow_sourceKeyword_61 = (Keyword)cAlternatives.eContents().get(61);
+		private final Keyword cFlow_destinationKeyword_62 = (Keyword)cAlternatives.eContents().get(62);
+		private final Keyword cFlow_elementsKeyword_63 = (Keyword)cAlternatives.eContents().get(63);
+		private final Keyword cFlow_specificationsKeyword_64 = (Keyword)cAlternatives.eContents().get(64);
+		private final Keyword cEnd_to_end_flowsKeyword_65 = (Keyword)cAlternatives.eContents().get(65);
 		
 		//BuiltInFn: // Primary type: aadl
 		//	'has_property' | 'property' | 'property_member' | 'has_parent' | 'parent' | 'name' | 'type' | 'has_type' |
 		//	'is_in_array' | 'has_prototypes' | 'has_modes' | 'is_processor' | 'is_virtual_processor' | 'is_system' | 'is_bus' |
-		//	'is_virtual_bus' | 'is_device' | 'is_memory' | 'is_thread' | 'is_process' | 'is_data' | 'is_subprogram' |
-		//	'is_of_type' | 'is_bound_to' | 'has_member' | 'features' | 'connections' // Primary type: property
+		//	'is_virtual_bus' | 'is_device' | 'is_memory' | 'is_thread' | 'is_thread_group' | 'is_process' | 'is_data' |
+		//	'is_subprogram' | 'is_of_type' | 'is_bound_to' | 'has_member' | 'features' | 'connections' // Primary type: property
 		//	| 'enumerated_values' // Primary type: component
 		//	| 'subcomponents' // Primary type: connection
 		//	| 'source' | 'destination' | 'is_bidirectional' // Primary type: feature
@@ -2334,8 +2468,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//// Primary type: aadl
 		//'has_property' | 'property' | 'property_member' | 'has_parent' | 'parent' | 'name' | 'type' | 'has_type' | 'is_in_array'
 		//| 'has_prototypes' | 'has_modes' | 'is_processor' | 'is_virtual_processor' | 'is_system' | 'is_bus' | 'is_virtual_bus'
-		//| 'is_device' | 'is_memory' | 'is_thread' | 'is_process' | 'is_data' | 'is_subprogram' | 'is_of_type' | 'is_bound_to'
-		//| 'has_member' | 'features' | 'connections' // Primary type: property
+		//| 'is_device' | 'is_memory' | 'is_thread' | 'is_thread_group' | 'is_process' | 'is_data' | 'is_subprogram' |
+		//'is_of_type' | 'is_bound_to' | 'has_member' | 'features' | 'connections' // Primary type: property
 		//| 'enumerated_values' // Primary type: component
 		//| 'subcomponents' // Primary type: connection
 		//| 'source' | 'destination' | 'is_bidirectional' // Primary type: feature
@@ -2411,143 +2545,146 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		//'is_thread'
 		public Keyword getIs_threadKeyword_18() { return cIs_threadKeyword_18; }
 
+		//'is_thread_group'
+		public Keyword getIs_thread_groupKeyword_19() { return cIs_thread_groupKeyword_19; }
+
 		//'is_process'
-		public Keyword getIs_processKeyword_19() { return cIs_processKeyword_19; }
+		public Keyword getIs_processKeyword_20() { return cIs_processKeyword_20; }
 
 		//'is_data'
-		public Keyword getIs_dataKeyword_20() { return cIs_dataKeyword_20; }
+		public Keyword getIs_dataKeyword_21() { return cIs_dataKeyword_21; }
 
 		//'is_subprogram'
-		public Keyword getIs_subprogramKeyword_21() { return cIs_subprogramKeyword_21; }
+		public Keyword getIs_subprogramKeyword_22() { return cIs_subprogramKeyword_22; }
 
 		//'is_of_type'
-		public Keyword getIs_of_typeKeyword_22() { return cIs_of_typeKeyword_22; }
+		public Keyword getIs_of_typeKeyword_23() { return cIs_of_typeKeyword_23; }
 
 		//'is_bound_to'
-		public Keyword getIs_bound_toKeyword_23() { return cIs_bound_toKeyword_23; }
+		public Keyword getIs_bound_toKeyword_24() { return cIs_bound_toKeyword_24; }
 
 		//'has_member'
-		public Keyword getHas_memberKeyword_24() { return cHas_memberKeyword_24; }
+		public Keyword getHas_memberKeyword_25() { return cHas_memberKeyword_25; }
 
 		//'features'
-		public Keyword getFeaturesKeyword_25() { return cFeaturesKeyword_25; }
+		public Keyword getFeaturesKeyword_26() { return cFeaturesKeyword_26; }
 
 		//'connections'
-		public Keyword getConnectionsKeyword_26() { return cConnectionsKeyword_26; }
+		public Keyword getConnectionsKeyword_27() { return cConnectionsKeyword_27; }
 
 		//'enumerated_values'
-		public Keyword getEnumerated_valuesKeyword_27() { return cEnumerated_valuesKeyword_27; }
+		public Keyword getEnumerated_valuesKeyword_28() { return cEnumerated_valuesKeyword_28; }
 
 		//'subcomponents'
-		public Keyword getSubcomponentsKeyword_28() { return cSubcomponentsKeyword_28; }
+		public Keyword getSubcomponentsKeyword_29() { return cSubcomponentsKeyword_29; }
 
 		//'source'
-		public Keyword getSourceKeyword_29() { return cSourceKeyword_29; }
+		public Keyword getSourceKeyword_30() { return cSourceKeyword_30; }
 
 		//'destination'
-		public Keyword getDestinationKeyword_30() { return cDestinationKeyword_30; }
+		public Keyword getDestinationKeyword_31() { return cDestinationKeyword_31; }
 
 		//'is_bidirectional'
-		public Keyword getIs_bidirectionalKeyword_31() { return cIs_bidirectionalKeyword_31; }
+		public Keyword getIs_bidirectionalKeyword_32() { return cIs_bidirectionalKeyword_32; }
 
 		//'direction'
-		public Keyword getDirectionKeyword_32() { return cDirectionKeyword_32; }
+		public Keyword getDirectionKeyword_33() { return cDirectionKeyword_33; }
 
 		//'is_event_port'
-		public Keyword getIs_event_portKeyword_33() { return cIs_event_portKeyword_33; }
+		public Keyword getIs_event_portKeyword_34() { return cIs_event_portKeyword_34; }
 
 		//'is_abstract_feature'
-		public Keyword getIs_abstract_featureKeyword_34() { return cIs_abstract_featureKeyword_34; }
+		public Keyword getIs_abstract_featureKeyword_35() { return cIs_abstract_featureKeyword_35; }
 
 		//'is_data_port'
-		public Keyword getIs_data_portKeyword_35() { return cIs_data_portKeyword_35; }
+		public Keyword getIs_data_portKeyword_36() { return cIs_data_portKeyword_36; }
 
 		//'is_port'
-		public Keyword getIs_portKeyword_36() { return cIs_portKeyword_36; }
+		public Keyword getIs_portKeyword_37() { return cIs_portKeyword_37; }
 
 		//'is_data_access'
-		public Keyword getIs_data_accessKeyword_37() { return cIs_data_accessKeyword_37; }
+		public Keyword getIs_data_accessKeyword_38() { return cIs_data_accessKeyword_38; }
 
 		//'is_bus_access'
-		public Keyword getIs_bus_accessKeyword_38() { return cIs_bus_accessKeyword_38; }
+		public Keyword getIs_bus_accessKeyword_39() { return cIs_bus_accessKeyword_39; }
 
 		//'lower_bound'
-		public Keyword getLower_boundKeyword_39() { return cLower_boundKeyword_39; }
+		public Keyword getLower_boundKeyword_40() { return cLower_boundKeyword_40; }
 
 		//'upper_bound'
-		public Keyword getUpper_boundKeyword_40() { return cUpper_boundKeyword_40; }
+		public Keyword getUpper_boundKeyword_41() { return cUpper_boundKeyword_41; }
 
 		//'member'
-		public Keyword getMemberKeyword_41() { return cMemberKeyword_41; }
+		public Keyword getMemberKeyword_42() { return cMemberKeyword_42; }
 
 		//'length'
-		public Keyword getLengthKeyword_42() { return cLengthKeyword_42; }
+		public Keyword getLengthKeyword_43() { return cLengthKeyword_43; }
 
 		//'size'
-		public Keyword getSizeKeyword_43() { return cSizeKeyword_43; }
+		public Keyword getSizeKeyword_44() { return cSizeKeyword_44; }
 
 		//'sum'
-		public Keyword getSumKeyword_44() { return cSumKeyword_44; }
+		public Keyword getSumKeyword_45() { return cSumKeyword_45; }
 
 		//'append'
-		public Keyword getAppendKeyword_45() { return cAppendKeyword_45; }
+		public Keyword getAppendKeyword_46() { return cAppendKeyword_46; }
 
 		//'head'
-		public Keyword getHeadKeyword_46() { return cHeadKeyword_46; }
+		public Keyword getHeadKeyword_47() { return cHeadKeyword_47; }
 
 		//'tail'
-		public Keyword getTailKeyword_47() { return cTailKeyword_47; }
+		public Keyword getTailKeyword_48() { return cTailKeyword_48; }
 
 		//'as_set'
-		public Keyword getAs_setKeyword_48() { return cAs_setKeyword_48; }
+		public Keyword getAs_setKeyword_49() { return cAs_setKeyword_49; }
 
 		//'union'
-		public Keyword getUnionKeyword_49() { return cUnionKeyword_49; }
+		public Keyword getUnionKeyword_50() { return cUnionKeyword_50; }
 
 		//'intersect'
-		public Keyword getIntersectKeyword_50() { return cIntersectKeyword_50; }
+		public Keyword getIntersectKeyword_51() { return cIntersectKeyword_51; }
 
 		//'as_list'
-		public Keyword getAs_listKeyword_51() { return cAs_listKeyword_51; }
+		public Keyword getAs_listKeyword_52() { return cAs_listKeyword_52; }
 
 		//'instance'
-		public Keyword getInstanceKeyword_52() { return cInstanceKeyword_52; }
+		public Keyword getInstanceKeyword_53() { return cInstanceKeyword_53; }
 
 		//'instances'
-		public Keyword getInstancesKeyword_53() { return cInstancesKeyword_53; }
+		public Keyword getInstancesKeyword_54() { return cInstancesKeyword_54; }
 
 		//'debug'
-		public Keyword getDebugKeyword_54() { return cDebugKeyword_54; }
+		public Keyword getDebugKeyword_55() { return cDebugKeyword_55; }
 
 		//'analysis'
-		public Keyword getAnalysisKeyword_55() { return cAnalysisKeyword_55; }
+		public Keyword getAnalysisKeyword_56() { return cAnalysisKeyword_56; }
 
 		//'receive_error'
-		public Keyword getReceive_errorKeyword_56() { return cReceive_errorKeyword_56; }
+		public Keyword getReceive_errorKeyword_57() { return cReceive_errorKeyword_57; }
 
 		//'contain_error'
-		public Keyword getContain_errorKeyword_57() { return cContain_errorKeyword_57; }
+		public Keyword getContain_errorKeyword_58() { return cContain_errorKeyword_58; }
 
 		//'propagate_error'
-		public Keyword getPropagate_errorKeyword_58() { return cPropagate_errorKeyword_58; }
+		public Keyword getPropagate_errorKeyword_59() { return cPropagate_errorKeyword_59; }
 
 		//'error_state_reachable'
-		public Keyword getError_state_reachableKeyword_59() { return cError_state_reachableKeyword_59; }
+		public Keyword getError_state_reachableKeyword_60() { return cError_state_reachableKeyword_60; }
 
 		//'flow_source'
-		public Keyword getFlow_sourceKeyword_60() { return cFlow_sourceKeyword_60; }
+		public Keyword getFlow_sourceKeyword_61() { return cFlow_sourceKeyword_61; }
 
 		//'flow_destination'
-		public Keyword getFlow_destinationKeyword_61() { return cFlow_destinationKeyword_61; }
+		public Keyword getFlow_destinationKeyword_62() { return cFlow_destinationKeyword_62; }
 
 		//'flow_elements'
-		public Keyword getFlow_elementsKeyword_62() { return cFlow_elementsKeyword_62; }
+		public Keyword getFlow_elementsKeyword_63() { return cFlow_elementsKeyword_63; }
 
 		//'flow_specifications'
-		public Keyword getFlow_specificationsKeyword_63() { return cFlow_specificationsKeyword_63; }
+		public Keyword getFlow_specificationsKeyword_64() { return cFlow_specificationsKeyword_64; }
 
 		//'end_to_end_flows'
-		public Keyword getEnd_to_end_flowsKeyword_64() { return cEnd_to_end_flowsKeyword_64; }
+		public Keyword getEnd_to_end_flowsKeyword_65() { return cEnd_to_end_flowsKeyword_65; }
 	}
 
 	public class RealTermElements extends AbstractParserRuleElementFinder {
@@ -2559,7 +2696,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		private final CrossReference cUnitUnitLiteralCrossReference_1_0 = (CrossReference)cUnitAssignment_1.eContents().get(0);
 		private final RuleCall cUnitUnitLiteralIDTerminalRuleCall_1_0_1 = (RuleCall)cUnitUnitLiteralCrossReference_1_0.eContents().get(1);
 		
-		//@ Override RealTerm aadl2::RealLiteral:
+		//@Override
+		//RealTerm aadl2::RealLiteral:
 		//	value=UnsignedReal unit=[aadl2::UnitLiteral]?;
 		@Override public ParserRule getRule() { return rule; }
 
@@ -2603,7 +2741,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		private final CrossReference cUnitUnitLiteralCrossReference_1_0 = (CrossReference)cUnitAssignment_1.eContents().get(0);
 		private final RuleCall cUnitUnitLiteralIDTerminalRuleCall_1_0_1 = (RuleCall)cUnitUnitLiteralCrossReference_1_0.eContents().get(1);
 		
-		//@ Override IntegerTerm aadl2::IntegerLiteral:
+		//@Override
+		//IntegerTerm aadl2::IntegerLiteral:
 		//	value=UnsignedInt unit=[aadl2::UnitLiteral]?;
 		@Override public ParserRule getRule() { return rule; }
 
@@ -2915,6 +3054,9 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 	private final ConstantDefinitionElements pConstantDefinition;
 	private final FunctionDefinitionElements pFunctionDefinition;
 	private final DefinitionBodyElements pDefinitionBody;
+	private final ClaimContextElements pClaimContext;
+	private final ClaimAssumptionElements pClaimAssumption;
+	private final ClaimStrategyElements pClaimStrategy;
 	private final ClaimTextElements pClaimText;
 	private final ClaimTextVarElements pClaimTextVar;
 	private final ExprElements pExpr;
@@ -2964,6 +3106,9 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		this.pConstantDefinition = new ConstantDefinitionElements();
 		this.pFunctionDefinition = new FunctionDefinitionElements();
 		this.pDefinitionBody = new DefinitionBodyElements();
+		this.pClaimContext = new ClaimContextElements();
+		this.pClaimAssumption = new ClaimAssumptionElements();
+		this.pClaimStrategy = new ClaimStrategyElements();
 		this.pClaimText = new ClaimTextElements();
 		this.pClaimTextVar = new ClaimTextVarElements();
 		this.pExpr = new ExprElements();
@@ -3088,9 +3233,7 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 	//Definition:
 	//	ConstantDefinition
 	//	| FunctionDefinition
-	//	| Ruleset
-	//	//|	RuleDefinition
-	//;
+	//	| Ruleset;
 	public DefinitionElements getDefinitionAccess() {
 		return pDefinition;
 	}
@@ -3198,13 +3341,44 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 
 	//DefinitionBody:
 	//	{FunctionBody} ':' type=Type '=' expr=Expr
-	//	| {ClaimBody} '<=' ('**' claim+=ClaimText+ '**') expr=Expr;
+	//	| {ClaimBody} '<=' ('**' claim+=ClaimText+ '**') context+=ClaimContext* assumptions+=ClaimAssumption*
+	//	strategies+=ClaimStrategy* expr=Expr;
 	public DefinitionBodyElements getDefinitionBodyAccess() {
 		return pDefinitionBody;
 	}
 	
 	public ParserRule getDefinitionBodyRule() {
 		return getDefinitionBodyAccess().getRule();
+	}
+
+	//ClaimContext:
+	//	'context' name=ID ':' val=StringTerm;
+	public ClaimContextElements getClaimContextAccess() {
+		return pClaimContext;
+	}
+	
+	public ParserRule getClaimContextRule() {
+		return getClaimContextAccess().getRule();
+	}
+
+	//ClaimAssumption:
+	//	'assumption' name=ID ':' val=StringTerm;
+	public ClaimAssumptionElements getClaimAssumptionAccess() {
+		return pClaimAssumption;
+	}
+	
+	public ParserRule getClaimAssumptionRule() {
+		return getClaimAssumptionAccess().getRule();
+	}
+
+	//ClaimStrategy:
+	//	'strategy' name=ID ':' val=StringTerm;
+	public ClaimStrategyElements getClaimStrategyAccess() {
+		return pClaimStrategy;
+	}
+	
+	public ParserRule getClaimStrategyRule() {
+		return getClaimStrategyAccess().getRule();
 	}
 
 	//ClaimText:
@@ -3381,8 +3555,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 	//BuiltInFn: // Primary type: aadl
 	//	'has_property' | 'property' | 'property_member' | 'has_parent' | 'parent' | 'name' | 'type' | 'has_type' |
 	//	'is_in_array' | 'has_prototypes' | 'has_modes' | 'is_processor' | 'is_virtual_processor' | 'is_system' | 'is_bus' |
-	//	'is_virtual_bus' | 'is_device' | 'is_memory' | 'is_thread' | 'is_process' | 'is_data' | 'is_subprogram' |
-	//	'is_of_type' | 'is_bound_to' | 'has_member' | 'features' | 'connections' // Primary type: property
+	//	'is_virtual_bus' | 'is_device' | 'is_memory' | 'is_thread' | 'is_thread_group' | 'is_process' | 'is_data' |
+	//	'is_subprogram' | 'is_of_type' | 'is_bound_to' | 'has_member' | 'features' | 'connections' // Primary type: property
 	//	| 'enumerated_values' // Primary type: component
 	//	| 'subcomponents' // Primary type: connection
 	//	| 'source' | 'destination' | 'is_bidirectional' // Primary type: feature
@@ -3406,7 +3580,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		return getBuiltInFnAccess().getRule();
 	}
 
-	//@ Override RealTerm aadl2::RealLiteral:
+	//@Override
+	//RealTerm aadl2::RealLiteral:
 	//	value=UnsignedReal unit=[aadl2::UnitLiteral]?;
 	public RealTermElements getRealTermAccess() {
 		return pRealTerm;
@@ -3426,7 +3601,8 @@ public class ResoluteGrammarAccess extends AbstractGrammarElementFinder {
 		return getUnsignedRealAccess().getRule();
 	}
 
-	//@ Override IntegerTerm aadl2::IntegerLiteral:
+	//@Override
+	//IntegerTerm aadl2::IntegerLiteral:
 	//	value=UnsignedInt unit=[aadl2::UnitLiteral]?;
 	public IntegerTermElements getIntegerTermAccess() {
 		return pIntegerTerm;

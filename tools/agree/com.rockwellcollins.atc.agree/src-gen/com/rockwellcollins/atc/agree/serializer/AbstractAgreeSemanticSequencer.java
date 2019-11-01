@@ -2282,15 +2282,15 @@ public abstract class AbstractAgreeSemanticSequencer extends PropertiesSemanticS
 	 *     TermExpr returns EventExpr
 	 *
 	 * Constraint:
-	 *     id=[NamedElement|ID]
+	 *     port=Expr
 	 */
 	protected void sequence_TermExpr(ISerializationContext context, EventExpr semanticObject) {
 		if (errorAcceptor != null) {
-			if (transientValues.isValueTransient(semanticObject, AgreePackage.Literals.EVENT_EXPR__ID) == ValueTransient.YES)
-				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, AgreePackage.Literals.EVENT_EXPR__ID));
+			if (transientValues.isValueTransient(semanticObject, AgreePackage.Literals.EVENT_EXPR__PORT) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, AgreePackage.Literals.EVENT_EXPR__PORT));
 		}
 		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
-		feeder.accept(grammarAccess.getTermExprAccess().getIdNamedElementIDTerminalRuleCall_9_3_0_1(), semanticObject.eGet(AgreePackage.Literals.EVENT_EXPR__ID, false));
+		feeder.accept(grammarAccess.getTermExprAccess().getPortExprParserRuleCall_9_3_0(), semanticObject.getPort());
 		feeder.finish();
 	}
 	

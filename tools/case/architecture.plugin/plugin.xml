@@ -16,16 +16,6 @@
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.outline.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.outline.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
@@ -42,13 +32,13 @@
                      style="push">
                </command>
                <separator
-                     name="architecture.plugin.requirements.separator1"
+                     name="com.collins.fmw.cyres.architecture.plugin.separator3"
                      visible="true">
                </separator>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
-                     id="com.collins.fmw.cyres.menus.outline.requirements.formalize"
-                     label="Formalize Requirement"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.outline.requirements.manage"
+                     label="Open Requirements Manager..."
                      style="push">
                </command>
             </menu>
@@ -102,8 +92,8 @@
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.cyres.menus.outline.resiliency.proofs"
-                     label="Proofs">
+                     id="com.collins.fmw.cyres.menus.outline.resiliency.synthesis"
+                     label="Synthesis Tools">
                </menu>
             </menu>
             <menu
@@ -125,11 +115,6 @@
             <menu
                   id="com.collins.fmw.cyres.menus.outline.build"
                   label="System Build">
-               <command
-                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
-                     label="Build..."
-                     style="push">
-               </command>
             </menu>
          </menu>
       </menuContribution>
@@ -145,16 +130,6 @@
                <menu
                      id="com.collins.fmw.cyres.menus.menubar.requirements.generate"
                      label="Generate Requirements">
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
@@ -173,13 +148,13 @@
                      style="push">
                </command>
                <separator
-                     name="architecture.plugin.requirements.separator1"
+                     name="com.collins.fmw.cyres.architecture.plugin.separator1"
                      visible="true">
                </separator>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
-                     id="com.collins.fmw.cyres.menus.menubar.requirements.formalize"
-                     label="Formalize Requirement"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.menubar.requirements.manage"
+                     label="Open Requirements Manager..."
                      style="push">
                </command>
             </menu>
@@ -233,8 +208,8 @@
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.cyres.menus.menubar.resiliency.proofs"
-                     label="Proofs">
+                     id="com.collins.fmw.cyres.menus.menubar.resiliency.synthesis"
+                     label="Synthesis Tools">
                </menu>
             </menu>
             <menu
@@ -256,11 +231,6 @@
             <menu
                   id="com.collins.fmw.cyres.menus.menubar.build"
                   label="System Build">
-               <command
-                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
-                     label="Build..."
-                     style="push">
-               </command>
             </menu>
          </menu>
       </menuContribution>
@@ -298,16 +268,6 @@
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.editor.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.editor.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
@@ -324,13 +284,13 @@
                      style="push">
                </command>
                <separator
-                     name="architecture.plugin.requirements.separator1"
+                     name="com.collins.fmw.cyres.architecture.plugin.separator2"
                      visible="true">
                </separator>
                <command
-                     commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
-                     id="com.collins.fmw.cyres.menus.editor.requirements.formalize"
-                     label="Formalize Requirement"
+                     commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+                     id="com.collins.fmw.cyres.menus.editor.requirements.manage"
+                     label="Open Requirements Manager..."
                      style="push">
                </command>
             </menu>
@@ -384,8 +344,8 @@
                   </command>
                </menu>
                <menu
-                     id="com.collins.fmw.cyres.menus.editor.resiliency.proofs"
-                     label="Proofs">
+                     id="com.collins.fmw.cyres.menus.editor.resiliency.synthesis"
+                     label="Synthesis Tools">
                </menu>
             </menu>
             <menu
@@ -407,11 +367,6 @@
             <menu
                   id="com.collins.fmw.cyres.menus.editor.build"
                   label="System Build">
-               <command
-                     commandId="com.collins.fmw.cyres.build.commands.TrustedBuild"
-                     label="Build..."
-                     style="push">
-               </command>
             </menu>
          </menu>
       </menuContribution>
@@ -444,6 +399,10 @@
             name="Import Requirements">
       </command>
       <command
+            id="com.collins.fmw.cyres.architecture.commands.ManageRequirements"
+            name="Open Requirements Manager">
+      </command>
+      <command
             id="com.collins.fmw.cyres.architecture.commands.AddAttestationManager"
             name="Add Attestation Manager">
       </command>
@@ -470,10 +429,6 @@
       <command
             id="com.collins.fmw.cyres.architecture.commands.ModelAnnotations"
             name="Model Annotations">
-      </command>
-      <command
-            id="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement"
-            name="Formalize Requirement">
       </command>
       <command
             id="com.collins.fmw.cyres.architecture.commands.SelectImplementation"
@@ -519,16 +474,16 @@
             commandId="com.collins.fmw.cyres.architecture.commands.ModelAnnotations">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.FormalizeRequirementHandler"
-            commandId="com.collins.fmw.cyres.architecture.commands.FormalizeRequirement">
-      </handler>
-      <handler
             class="com.collins.fmw.cyres.architecture.handlers.SelectImplementationHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.SelectImplementation">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.VerifyLegacyImplementationHandler"
             commandId="com.collins.fmw.cyres.architecture.commands.VerifyImplementation">
+      </handler>
+      <handler
+            class="com.collins.fmw.cyres.architecture.handlers.ImportRequirementsHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.ManageRequirements">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.ImportRequirementsHandler"
@@ -552,6 +507,10 @@
       <aadlcontribution
             file="resources/CASE_Model_Transformations.aadl"
             id="com.collins.fmw.cyres.architecture.aadlcontribution.casemodeltransformations">
+      </aadlcontribution>
+      <aadlcontribution
+            file="resources/CASE_Modeling_Guidelines.aadl"
+            id="com.collins.fmw.cyres.architecture.aadlcontribution.casemodelingguidelines">
       </aadlcontribution>
    </extension>
    <extension
