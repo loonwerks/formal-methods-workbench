@@ -370,6 +370,11 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>py4j</id>
+			<layout>p2</layout>
+			<url>http://eclipse.py4j.org</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
