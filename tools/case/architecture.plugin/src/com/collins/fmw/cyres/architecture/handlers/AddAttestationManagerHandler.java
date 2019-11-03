@@ -9,10 +9,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AbstractNamedValue;
@@ -148,7 +146,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 	private void associateNewRequirement(URI commDriverUri, URI attestationManagerUri) {
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
-		xtextEditor.getDocument().modify(resource -> {
+		AddAttestationManagerClaim claim = xtextEditor.getDocument().modify(resource -> {
 
 			Subcomponent commDriver = (Subcomponent) resource.getEObject(commDriverUri.fragment());
 			Subcomponent attestationManager = (Subcomponent) resource.getEObject(attestationManagerUri.fragment());
@@ -156,13 +154,15 @@ public class AddAttestationManagerHandler extends AadlHandler {
 			// Add add_attestation claims to resolute prove statement, if applicable
 			// TODO: Test after requirements import has been updated
 			if (!attestationRequirement.isEmpty()) {
-				RequirementsManager.getInstance().modifyRequirement(attestationRequirement, resource,
-						new AddAttestationManagerClaim(commDriver, attestationManager));
-
+				return new AddAttestationManagerClaim(commDriver, attestationManager);
 			}
 
 			return null;
 		});
+
+		if (claim != null) {
+			RequirementsManager.getInstance().modifyRequirement(attestationRequirement, claim);
+		}
 	}
 
 	/**
@@ -175,10 +175,7 @@ public class AddAttestationManagerHandler extends AadlHandler {
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
-		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
-
-			@Override
-			public void process(final XtextResource resource) throws Exception {
+		AddAttestationManagerClaim claim = xtextEditor.getDocument().modify(resource -> {
 
 				// Retrieve the model object to modify
 				Subcomponent commDriver = (Subcomponent) resource.getEObject(uri.fragment());
@@ -206,16 +203,16 @@ public class AddAttestationManagerHandler extends AadlHandler {
 				if (pkgSection == null) {
 					// Something went wrong
 					Dialog.showError("Add Attestation Manager", "No public or private package sections found.");
-					return;
+					return null;
 				}
 
 				// Import CASE_Properties file
 				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
-					return;
+					return null;
 				}
 				// Import CASE_Model_Transformations file
 				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
-					return;
+					return null;
 				}
 
 				ComponentCategory compCategory = commDriver.getCategory();
@@ -532,13 +529,6 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					idxOffset++;
 				}
 
-				// Add add_attestation claims to resolute prove statement, if applicable
-				if (!attestationRequirement.isEmpty()) {
-					RequirementsManager.getInstance().modifyRequirement(attestationRequirement, resource,
-							new AddAttestationManagerClaim(commDriver, attestationManagerSubcomp));
-
-				}
-
 				// Propagate Agree Guarantees from comm driver, if there are any
 				if (attestationAgreeProperty.length() > 0 || propagateGuarantees) {
 
@@ -620,8 +610,18 @@ public class AddAttestationManagerHandler extends AadlHandler {
 					// TODO: Bind process to processor
 				}
 
+			// Add add_attestation claims to resolute prove statement, if applicable
+			if (!attestationRequirement.isEmpty()) {
+				return new AddAttestationManagerClaim(commDriver, attestationManagerSubcomp);
 			}
+			return null;
+//			}
 		});
+
+		// Add add_attestation claims to resolute prove statement, if applicable
+		if (claim != null) {
+			RequirementsManager.getInstance().modifyRequirement(attestationRequirement, claim);
+		}
 
 	}
 

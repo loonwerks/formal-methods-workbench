@@ -162,9 +162,10 @@ public class AddIsolatorHandler extends AadlHandler {
 
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor editor = EditorUtils.getActiveXtextEditor();
+		AddIsolatorClaim claim = null;
 
 		if (editor != null) {
-			editor.getDocument().modify(resource -> {
+			claim = editor.getDocument().modify(resource -> {
 
 				final Subcomponent selectedSub = (Subcomponent) resource.getEObject(selectedComponentURI.fragment());
 				final ComponentImplementation containingImpl = selectedSub.getContainingComponentImpl();
@@ -342,13 +343,17 @@ public class AddIsolatorHandler extends AadlHandler {
 				// Add add_isolator claims to resolute prove statement, if applicable
 				if (!isolatorRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(isolatorRequirement);
-					RequirementsManager.getInstance().modifyRequirement(isolatorRequirement, resource,
-							new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub));
-
+//					return new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub);
+					return new AddIsolatorClaim(isolatedComponents, vpSub);
 				}
 
 				return null;
 			});
+		}
+
+		// Add add_isolator claims to resolute prove statement, if applicable
+		if (claim != null) {
+			RequirementsManager.getInstance().modifyRequirement(isolatorRequirement, claim);
 		}
 
 	}

@@ -16,6 +16,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link com.rockwellcollins.atc.resolute.resolute.ClaimBody#getClaim <em>Claim</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.resolute.resolute.ClaimBody#getContext <em>Context</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.resolute.resolute.ClaimBody#getAssumptions <em>Assumptions</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.resolute.resolute.ClaimBody#getStrategies <em>Strategies</em>}</li>
  * </ul>
  *
  * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getClaimBody()
@@ -59,5 +60,17 @@ public interface ClaimBody extends DefinitionBody
    * @generated
    */
   EList<ClaimAssumption> getAssumptions();
+
+  /**
+   * Returns the value of the '<em><b>Strategies</b></em>' containment reference list.
+   * The list contents are of type {@link com.rockwellcollins.atc.resolute.resolute.ClaimStrategy}.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Strategies</em>' containment reference list.
+   * @see com.rockwellcollins.atc.resolute.resolute.ResolutePackage#getClaimBody_Strategies()
+   * @model containment="true"
+   * @generated
+   */
+  EList<ClaimStrategy> getStrategies();
 
 } // ClaimBody

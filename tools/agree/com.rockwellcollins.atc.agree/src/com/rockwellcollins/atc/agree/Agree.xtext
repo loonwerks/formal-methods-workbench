@@ -306,7 +306,7 @@ TermExpr returns Expr:
 	| ArrayLiteralExpr
 	| {IntLitExpr} val=INTEGER_LIT
 	| {PreExpr} 'pre' '(' expr=Expr ')'
-	| {EventExpr} 'event' '(' id = [aadl2::NamedElement|ID] ')'
+	| {EventExpr} 'event' '(' port = Expr ')'
 	| {LatchedExpr} 'latched' '(' expr = Expr ')'
 	| {TimeOfExpr} 'timeof' '(' id = [aadl2::NamedElement|ID] ')'
 	| {TimeRiseExpr} 'timerise' '(' id = [aadl2::NamedElement|ID] ')'

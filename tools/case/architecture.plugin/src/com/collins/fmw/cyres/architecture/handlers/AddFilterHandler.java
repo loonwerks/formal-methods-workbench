@@ -11,10 +11,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AbstractNamedValue;
@@ -67,7 +65,7 @@ public class AddFilterHandler extends AadlHandler {
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String filterImplementationName;
-	private String filterImplementationLanguage;
+//	private String filterImplementationLanguage;
 	private PortCategory logPortType;
 	private String filterRequirement;
 	private String filterAgreeProperty;
@@ -182,7 +180,7 @@ public class AddFilterHandler extends AadlHandler {
 		}
 		wizard.create();
 		if (wizard.open() == Window.OK) {
-			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
+//			filterImplementationLanguage = wizard.getFilterImplementationLanguage();
 			filterImplementationName = wizard.getFilterImplementationName();
 			if (filterImplementationName == "") {
 				filterImplementationName = FILTER_IMPL_NAME;
@@ -217,10 +215,7 @@ public class AddFilterHandler extends AadlHandler {
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
-		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
-
-			@Override
-			public void process(final XtextResource resource) throws Exception {
+		AddFilterClaim claim = xtextEditor.getDocument().modify(resource -> {
 
 				// Retrieve the model object to modify
 				PortConnection selectedConnection = (PortConnection) resource.getEObject(uri.fragment());
@@ -243,16 +238,16 @@ public class AddFilterHandler extends AadlHandler {
 				if (pkgSection == null) {
 					// Something went wrong
 					Dialog.showError("Add Filter", "No public or private package sections found.");
-					return;
+				return null;
 				}
 
 				// Import CASE_Properties file
 				if (!CaseUtils.addCasePropertyImport(pkgSection)) {
-					return;
+				return null;
 				}
 				// Import CASE_Model_Transformations file
 				if (!CaseUtils.addCaseModelTransformationsImport(pkgSection, true)) {
-					return;
+				return null;
 				}
 
 				// Figure out component type by looking at the component type of the destination component
@@ -295,11 +290,11 @@ public class AddFilterHandler extends AadlHandler {
 					((DataPort) portOut).setDataFeatureClassifier(dataFeatureClassifier);
 				} else if (port instanceof EventPort) {
 					Dialog.showError("Add Filter", "Cannot connect a filter to a non-data port.");
-					return;
+				return null;
 				} else {
 					Dialog.showError("Add Filter",
 							"Could not determine the port type of the destination component.");
-					return;
+				return null;
 				}
 
 				portIn.setIn(true);
@@ -356,26 +351,9 @@ public class AddFilterHandler extends AadlHandler {
 				}
 
 				final ComponentImplementation containingImpl = selectedConnection.getContainingComponentImpl();
-//				final Subcomponent subcomponent = (Subcomponent) selectedConnection.getDestination().getContext();
-//				String destName1 = "";
-//				if (subcomponent.getSubcomponentType() instanceof ComponentImplementation) {
-//					// Get the component type name
-//					destName1 = subcomponent.getComponentImplementation().getType().getName();
-//					destName1 = subcomponent.getContainingComponentImpl().getTypeName();
-//				} else {
-//					destName1 = subcomponent.getName();
-//				}
 
 				// Move filter to top of file
 				pkgSection.getOwnedClassifiers().move(0, pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers()
-////						.move(getIndex(subcomponent.getContainingComponentImpl().getTypeName(), pkgSection.getOwnedClassifiers()),
-//						.move(getIndex(containingImpl.getTypeName(), pkgSection.getOwnedClassifiers()),
-//								pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(destName1, pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Create Filter implementation
 				final ComponentImplementation filterImpl = (ComponentImplementation) pkgSection
@@ -384,23 +362,15 @@ public class AddFilterHandler extends AadlHandler {
 				final Realization r = filterImpl.createOwnedRealization();
 				r.setImplemented(filterType);
 
-				// CASE::COMP_IMPL property
-				if (!filterImplementationLanguage.isEmpty()) {
-					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl)) {
-//						return;
-					}
-				}
+//				// CASE::COMP_IMPL property
+//				if (!filterImplementationLanguage.isEmpty()) {
+//					if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", filterImplementationLanguage, filterImpl)) {
+////						return;
+//					}
+//				}
 
 				// Add it to proper place (just below component type)
 				pkgSection.getOwnedClassifiers().move(1, pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers().move(getIndex(destName1, pkgSection.getOwnedClassifiers()),
-//						pkgSection.getOwnedClassifiers().size() - 1);
-
-//				pkgSection.getOwnedClassifiers()
-////						.move(getIndex(subcomponent.getContainingComponentImpl().getTypeName(),
-//						.move(getIndex(containingImpl.getTypeName(), pkgSection.getOwnedClassifiers()),
-//								pkgSection.getOwnedClassifiers().size() - 1);
 
 				// Insert filter feature in process component implementation
 				final Subcomponent filterSubcomp = ComponentCreateHelper.createOwnedSubcomponent(containingImpl,
@@ -430,15 +400,6 @@ public class AddFilterHandler extends AadlHandler {
 				containingImpl.getOwnedPortConnections().move(
 						getIndex(destName, containingImpl.getOwnedPortConnections()) + 1,
 						containingImpl.getOwnedPortConnections().size() - 1);
-
-				// Add add_filter claims to resolute prove statement, if applicable
-				if (!filterRequirement.isEmpty()) {
-					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
-					RequirementsManager.getInstance().modifyRequirement(filterRequirement, resource,
-							new AddFilterClaim(req.getContext(), filterSubcomp,
-									portConnOut, dataFeatureClassifier));
-
-				}
 
 				// Rewire selected connection so the filter is the destination
 				selectedConnection.getDestination().setContext(filterSubcomp);
@@ -484,9 +445,17 @@ public class AddFilterHandler extends AadlHandler {
 					// TODO: Bind process to processor
 				}
 
+			// Add add_filter claims to resolute prove statement, if applicable
+			if (!filterRequirement.isEmpty()) {
+				CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
+				return new AddFilterClaim(
+						req.getContext(), filterSubcomp, portConnOut, dataFeatureClassifier);
 			}
+
+			return null;
 		});
 
+		RequirementsManager.getInstance().modifyRequirement(filterRequirement, claim);
 	}
 
 	private String getSourceName(URI uri) {
@@ -566,10 +535,7 @@ public class AddFilterHandler extends AadlHandler {
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor xtextEditor = EditorUtils.getActiveXtextEditor();
 
-		xtextEditor.getDocument().modify(new IUnitOfWork.Void<XtextResource>() {
-
-			@Override
-			public void process(final XtextResource resource) throws Exception {
+		AddFilterClaim claim = xtextEditor.getDocument().modify(resource -> {
 
 				Subcomponent subcomponent = (Subcomponent) resource.getEObject(subURI.fragment());
 				ComponentType filter = subcomponent.getComponentType();
@@ -583,7 +549,7 @@ public class AddFilterHandler extends AadlHandler {
 					dataFeatureClassifier = ((DataPort) port).getDataFeatureClassifier();
 				} else {
 					Dialog.showError("Add Filter", "Could not determine the port type of the filter.");
-					return;
+				return null;
 				}
 
 				String filterPropId = "";
@@ -596,13 +562,13 @@ public class AddFilterHandler extends AadlHandler {
 				} catch (IndexOutOfBoundsException e) {
 					// agree property is malformed
 					Dialog.showError("Add Filter", "AGREE statement is malformed.");
-					return;
+				return null;
 				}
 
 				if (filterPropId.isEmpty()) {
 					// agree property id is missing
 					Dialog.showError("Add Filter", "AGREE statements on CASE components require a unique ID.");
-					return;
+				return null;
 				}
 
 				// Add AGREE spec
@@ -657,12 +623,15 @@ public class AddFilterHandler extends AadlHandler {
 				// Add add_filter claims to resolute prove statement, if applicable
 				if (!filterRequirement.isEmpty()) {
 					CyberRequirement req = RequirementsManager.getInstance().getRequirement(filterRequirement);
-					RequirementsManager.getInstance().modifyRequirement(filterRequirement, resource, new AddFilterClaim(
-							req.getContext(), subcomponent, connection, dataFeatureClassifier));
-
+					return new AddFilterClaim(
+							req.getContext(), subcomponent, connection, dataFeatureClassifier);
 				}
-			}
+				 return null;
 		});
+
+		if (claim != null) {
+			RequirementsManager.getInstance().modifyRequirement(filterRequirement, claim);
+		}
 	}
 
 }

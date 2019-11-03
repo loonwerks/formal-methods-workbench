@@ -48,7 +48,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:com.collins.fmw.cyres.menus.outline.resiliency.proofs?after=additions">
+            locationURI="popup:com.collins.fmw.cyres.menus.outline.resiliency.synthesis?after=additions">
          <command
                commandId="filter_checker.commads.verify"
                label="SPLAT"
@@ -57,7 +57,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:com.collins.fmw.cyres.menus.editor.resiliency.proofs?after=additions">
+            locationURI="popup:com.collins.fmw.cyres.menus.editor.resiliency.synthesis?after=additions">
          <command
                commandId="filter_checker.commads.verify"
                label="SPLAT"
@@ -66,13 +66,28 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="menu:com.collins.fmw.cyres.menus.menubar.resiliency.proofs?after=additions">
+            locationURI="menu:com.collins.fmw.cyres.menus.menubar.resiliency.synthesis?after=additions">
          <command
                commandId="filter_checker.commads.verify"
                label="SPLAT"
                style="push">
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.collins.fmw.cyres.architecture.preferences.CasePreferencePage"
+            class="com.collins.fmw.cyres.splat.preferences.SplatPreferencePage"
+            id="com.collins.fmw.cyres.splat.preferences.SplatPreferencePage"
+            name="SPLAT">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.collins.fmw.cyres.splat.preferences.SplatPreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

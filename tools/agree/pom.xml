@@ -110,6 +110,11 @@
 						<goals>
 							<goal>source-feature</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<feature id="com.collins.trustedsystems.z3.feature" />
+							</excludes>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -369,6 +374,11 @@
 		<repository>
 			<id>xtext-testing</id>
 			<url>${xtext-testing.repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>z3-plugin</id>
+			<url>https://raw.githubusercontent.com/loonwerks/z3-plugin/master/com.collins.trustedsystems.z3.updates/target/repository</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>

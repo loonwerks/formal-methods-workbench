@@ -5334,13 +5334,13 @@ public interface AgreePackage extends EPackage
   int EVENT_EXPR__OWNED_COMMENT = EXPR__OWNED_COMMENT;
 
   /**
-   * The feature id for the '<em><b>Id</b></em>' reference.
+   * The feature id for the '<em><b>Port</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int EVENT_EXPR__ID = EXPR_FEATURE_COUNT + 0;
+  int EVENT_EXPR__PORT = EXPR_FEATURE_COUNT + 0;
 
   /**
    * The number of structural features of the '<em>Event Expr</em>' class.
@@ -8116,15 +8116,15 @@ public interface AgreePackage extends EPackage
   EClass getEventExpr();
 
   /**
-   * Returns the meta object for the reference '{@link com.rockwellcollins.atc.agree.agree.EventExpr#getId <em>Id</em>}'.
+   * Returns the meta object for the containment reference '{@link com.rockwellcollins.atc.agree.agree.EventExpr#getPort <em>Port</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the reference '<em>Id</em>'.
-   * @see com.rockwellcollins.atc.agree.agree.EventExpr#getId()
+   * @return the meta object for the containment reference '<em>Port</em>'.
+   * @see com.rockwellcollins.atc.agree.agree.EventExpr#getPort()
    * @see #getEventExpr()
    * @generated
    */
-  EReference getEventExpr_Id();
+  EReference getEventExpr_Port();
 
   /**
    * Returns the meta object for class '{@link com.rockwellcollins.atc.agree.agree.LatchedExpr <em>Latched Expr</em>}'.
@@ -10308,12 +10308,12 @@ public interface AgreePackage extends EPackage
     EClass EVENT_EXPR = eINSTANCE.getEventExpr();
 
     /**
-     * The meta object literal for the '<em><b>Id</b></em>' reference feature.
+     * The meta object literal for the '<em><b>Port</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EReference EVENT_EXPR__ID = eINSTANCE.getEventExpr_Id();
+    EReference EVENT_EXPR__PORT = eINSTANCE.getEventExpr_Port();
 
     /**
      * The meta object literal for the '{@link com.rockwellcollins.atc.agree.agree.impl.LatchedExprImpl <em>Latched Expr</em>}' class.

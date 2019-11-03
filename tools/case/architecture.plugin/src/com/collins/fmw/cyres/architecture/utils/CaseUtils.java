@@ -1,5 +1,11 @@
 package com.collins.fmw.cyres.architecture.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -31,6 +37,7 @@ import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.Activator;
+import com.collins.fmw.cyres.util.plugin.TraverseProject;
 
 public class CaseUtils {
 
@@ -39,6 +46,10 @@ public class CaseUtils {
 	public static final String CASE_PROPSET_FILE = "CASE_Properties.aadl";
 	public static final String CASE_MODEL_TRANSFORMATIONS_NAME = "CASE_Model_Transformations";
 	public static final String CASE_MODEL_TRANSFORMATIONS_FILE = "CASE_Model_Transformations.aadl";
+	public static final String CASE_REQUIREMENTS_NAME = "CASE_Requirements";
+	public static final String CASE_REQUIREMENTS_FILE = "CASE_Requirements.aadl";
+//	public static final String CASE_REQUIREMENTS_DATABASE_FILE = "CASE_Requirements_Database.json";
+	public static final String CASE_REQUIREMENTS_DATABASE_FILE = ".reqdb";
 
 	/**
 	 * Adds the CASE_Properties file to the list of imported model units via the 'with' statement
@@ -302,6 +313,83 @@ public class CaseUtils {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get the AADL package for Case Resolute Requirements.
+	 * @return The AADL package representing CASE Resolute Requirements.
+	 */
+	public static AadlPackage getCaseRequirementsPackage() {
+		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
+			if (pkg.getName().equalsIgnoreCase(CASE_REQUIREMENTS_NAME)) {
+				return pkg;
+			}
+		}
+		// Cyber-security Requirements package not found.
+		// Initialize and return AADL package containing the resolute annex
+		return initCaseRequirementsPackage();
+	}
+
+	/**
+	 * Initialize the Case Requirements file and package
+	 * @return
+	 */
+	private static AadlPackage initCaseRequirementsPackage() {
+		// Create CASE_REQUIREMENTS_FILE
+
+		final IFile caseReqFile = TraverseProject.getCurrentProject().getFile(CASE_REQUIREMENTS_FILE);
+		if (!caseReqFile.exists()) {
+			String newline = System.lineSeparator();
+			String tab = "\t";
+			String contents = "package CASE_Requirements" + newline + "private" + newline + tab
+					+ "annex resolute" + "{** **};" + newline + "end CASE_Requirements;" + newline;
+			InputStream source = new ByteArrayInputStream(contents.getBytes());
+			try {
+				caseReqFile.create(source, false, new NullProgressMonitor());
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+//		// Create CASE_REQUIREMENTS_NAME package
+//		AadlPackage pkg = TraverseProject.getPackageInFile(getCaseRequirementsFile());
+//		if (pkg == null) {
+//			// Create a new package
+//			pkg = Aadl2Factory.eINSTANCE.createAadlPackage();
+//			pkg.setName(CASE_REQUIREMENTS_NAME);
+//
+//			// Create a resource for the requirements file, and add package to resource
+//			ResourceSetImpl rs = new ResourceSetImpl();
+//			Resource r = rs.createResource(URI.createFileURI(new File(CASE_REQUIREMENTS_FILE).getAbsolutePath()));
+//			r.getContents().add(pkg);
+//		}
+//
+//		assert (pkg.getName().equalsIgnoreCase(CASE_REQUIREMENTS_NAME));
+
+		// Checking if the package has been inserted into the abstract syntax tree
+		AadlPackage pkg = null;
+		for (AadlPackage reqPkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
+			if (reqPkg.getName().equalsIgnoreCase(CASE_REQUIREMENTS_NAME)) {
+				pkg = reqPkg;
+				break;
+			}
+		}
+		if (pkg == null) {
+			System.out.println("CASE_Requirements package not created successfully.");
+		} else {
+			System.out.println("CASE_Requirements package was created successfully.");
+		}
+		assert (pkg != null);
+
+		return pkg;
+	}
+
+	public static IFile getCaseRequirementsFile() {
+		final IFile caseReqFile = TraverseProject.getCurrentProject().getFile(CASE_REQUIREMENTS_FILE);
+		if (!caseReqFile.exists()) {
+			initCaseRequirementsPackage();
+		}
+		return caseReqFile;
 	}
 
 }

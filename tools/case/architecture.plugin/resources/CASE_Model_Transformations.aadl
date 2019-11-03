@@ -329,18 +329,18 @@ public
 			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager)			
 		
 		-- Top-level claim for proper insertion of an isolator
-		add_isolator(c : component, isolated_components : {component}, isolator : component) <=
+		add_isolator(isolated_components : {component}, isolator : component) <=
 			** isolated_components " isolated in VM " isolator **
 			isolator_bound_to_processor(isolator) and components_bound_to_vm(isolated_components, isolator) and subcomponents_not_bound_to_other_processors(isolated_components, isolator)
 		
 		-- Top-level claim for proper insertion of a monitor
-		add_monitor(c : component) <=
-			** "Monitor inserted on " c **
+		add_monitor(comp_context : component, monitor : component) <=
+			** "Monitor " monitor " inserted on " comp_context **
 			true
 		
 		-- Top-level claim for proper insertion of a switch
-		add_switch(c : component) <=
-			** "Switch inserted after " c **
+		add_switch(comp_context : component) <=
+			** "Switch inserted after " comp_context **
 			true
 	
 			

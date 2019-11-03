@@ -15,6 +15,7 @@ import com.rockwellcollins.atc.resolute.resolute.ClaimArg;
 import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ClaimContext;
+import com.rockwellcollins.atc.resolute.resolute.ClaimStrategy;
 import com.rockwellcollins.atc.resolute.resolute.ClaimString;
 import com.rockwellcollins.atc.resolute.resolute.ConstantDefinition;
 import com.rockwellcollins.atc.resolute.resolute.ErrorStatement;
@@ -233,6 +234,9 @@ public abstract class AbstractResoluteSemanticSequencer extends PropertiesSemant
 				return; 
 			case ResolutePackage.CLAIM_CONTEXT:
 				sequence_ClaimContext(context, (ClaimContext) semanticObject); 
+				return; 
+			case ResolutePackage.CLAIM_STRATEGY:
+				sequence_ClaimStrategy(context, (ClaimStrategy) semanticObject); 
 				return; 
 			case ResolutePackage.CLAIM_STRING:
 				sequence_ClaimText(context, (ClaimString) semanticObject); 
@@ -1322,6 +1326,27 @@ public abstract class AbstractResoluteSemanticSequencer extends PropertiesSemant
 	
 	/**
 	 * Contexts:
+	 *     ClaimStrategy returns ClaimStrategy
+	 *
+	 * Constraint:
+	 *     (name=ID val=StringTerm)
+	 */
+	protected void sequence_ClaimStrategy(ISerializationContext context, ClaimStrategy semanticObject) {
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, ResolutePackage.Literals.CLAIM_STRATEGY__NAME) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, ResolutePackage.Literals.CLAIM_STRATEGY__NAME));
+			if (transientValues.isValueTransient(semanticObject, ResolutePackage.Literals.CLAIM_STRATEGY__VAL) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, ResolutePackage.Literals.CLAIM_STRATEGY__VAL));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getClaimStrategyAccess().getNameIDTerminalRuleCall_1_0(), semanticObject.getName());
+		feeder.accept(grammarAccess.getClaimStrategyAccess().getValStringTermParserRuleCall_3_0(), semanticObject.getVal());
+		feeder.finish();
+	}
+	
+	
+	/**
+	 * Contexts:
 	 *     Element returns ClaimArg
 	 *     ClaimText returns ClaimArg
 	 *
@@ -1385,7 +1410,7 @@ public abstract class AbstractResoluteSemanticSequencer extends PropertiesSemant
 	 *     DefinitionBody returns ClaimBody
 	 *
 	 * Constraint:
-	 *     (claim+=ClaimText+ context+=ClaimContext* assumptions+=ClaimAssumption* expr=Expr)
+	 *     (claim+=ClaimText+ context+=ClaimContext* assumptions+=ClaimAssumption* strategies+=ClaimStrategy* expr=Expr)
 	 */
 	protected void sequence_DefinitionBody(ISerializationContext context, ClaimBody semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);

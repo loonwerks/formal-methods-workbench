@@ -83,4 +83,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          install-size="0"
          version="0.0.0"/>
 
+   <includes
+         id="com.collins.trustedsystems.z3.feature"
+         version="4.7.1"/>
+
 </feature>

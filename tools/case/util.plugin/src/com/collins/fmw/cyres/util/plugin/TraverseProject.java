@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.Element;
 import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.workspace.WorkspacePlugin;
@@ -91,21 +92,26 @@ public class TraverseProject {
 		HashSet<IFile> files = getAadlFilesInProject(project);
 		for (IFile file : files) {
 			ModelUnit target = (ModelUnit) AadlUtil.getElement(file);
-			result.add(target);
+			if (target != null) {
+				result.add(target);
+			}
 		}
 		return result;
 	}
 
 	public static final EList<AadlPackage> getPackagesInProject(IProject project) {
 		EList<AadlPackage> result = new BasicEList<AadlPackage>();
-		HashSet<IFile> files = getAadlFilesInProject(project);
-		for (IFile file : files) {
-			ModelUnit target = (ModelUnit) AadlUtil.getElement(file);
-			if (target instanceof AadlPackage) {
-				result.add((AadlPackage) target);
+		for (ModelUnit u : getModelUnitsInProject(project)) {
+			if (u instanceof AadlPackage) {
+				result.add((AadlPackage) u);
 			}
 		}
 		return result;
+	}
+
+	public static AadlPackage getPackageInFile(IFile file) {
+		Element target = AadlUtil.getElement(file);
+		return (target instanceof AadlPackage) ? ((AadlPackage) target) : null;
 	}
 
 	private static HashSet<IFile> getFiles(IResource[] resources, HashSet<IFile> result, String extension) {
