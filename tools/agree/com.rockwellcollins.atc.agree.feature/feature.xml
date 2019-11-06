@@ -83,6 +83,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          install-size="0"
          version="0.0.0"/>
 
+   <plugin
+         id="com.collins.trustedsystems.jkind"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.collins.trustedsystems.jkindapi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
    <includes
          id="com.collins.trustedsystems.z3.feature"
          version="4.7.1"/>

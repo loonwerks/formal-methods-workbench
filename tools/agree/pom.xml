@@ -112,6 +112,8 @@
 						</goals>
 						<configuration>
 							<excludes>
+								<plugin id="com.collins.trustedsystems.jkind" />
+								<plugin id="com.collins.trustedsystems.jkindapi" />
 								<feature id="com.collins.trustedsystems.z3.feature" />
 							</excludes>
 						</configuration>
@@ -379,6 +381,16 @@
 		<repository>
 			<id>z3-plugin</id>
 			<url>https://raw.githubusercontent.com/loonwerks/z3-plugin/master/com.collins.trustedsystems.z3.updates/target/repository</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>jkind-plugin</id>
+			<url>http://localhost/p2-repository/jkind/repository</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>jkindapi-plugin</id>
+			<url>http://localhost/p2-repository/jkind-api/repository</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
