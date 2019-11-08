@@ -112,8 +112,7 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<plugin id="com.collins.trustedsystems.jkind" />
-								<plugin id="com.collins.trustedsystems.jkindapi" />
+								<feature id="com.collins.trustedsystems.jkind.feature" />
 								<feature id="com.collins.trustedsystems.z3.feature" />
 							</excludes>
 						</configuration>
@@ -385,12 +384,7 @@
 		</repository>
 		<repository>
 			<id>jkind-plugin</id>
-			<url>http://localhost/p2-repository/jkind/repository</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>jkindapi-plugin</id>
-			<url>http://localhost/p2-repository/jkind-api/repository</url>
+			<url>http://localhost/p2-repository</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
