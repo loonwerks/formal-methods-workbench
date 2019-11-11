@@ -59,6 +59,9 @@ public
 			-- All processes must be bound to a processor
 			error (processes_bound())
 			
+			-- All ports should be connected
+			warning (ports_connected())
+			
 		}
 
 	**};
@@ -130,6 +133,10 @@ private
 		processes_bound() <=
 			** "All processes must be bound to a processor" **
 			forall (p : process) . exists (proc : component) . (is_proc(proc) and lint_check(p, is_bound_to(p, proc)))
+			
+		ports_connected() <=
+			** "All ports should be connected" **
+			forall (p : port) . lint_check(p, length(connections(p)) > 0)
 			
 		diff_proc_binding(c : connection) : bool =
 			exists(p1 : component)(p2 : component) . is_proc(p1) and is_proc(p2) and is_bound_to(source_component(c), p1) and is_bound_to(destination_component(c), p2) and not (p1 = p2)

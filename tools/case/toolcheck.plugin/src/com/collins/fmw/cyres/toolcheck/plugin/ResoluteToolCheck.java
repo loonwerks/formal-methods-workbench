@@ -52,9 +52,13 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		}
 
 		// Get the tool output file
-		String toolName = arg.getString().toLowerCase() + "OutputFileName";
+		String toolName = arg.getString().toLowerCase();
 		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
-				toolName, "", null);
+				toolName + "OutputFileName", "", null);
+
+		if (toolName.equalsIgnoreCase("APT")) {
+			return new BoolValue(true);
+		}
 
 		if (outputFileName.isEmpty()) {
 			throw new ResoluteFailException("[ERROR] ToolCheck could not determine the output file name of the "

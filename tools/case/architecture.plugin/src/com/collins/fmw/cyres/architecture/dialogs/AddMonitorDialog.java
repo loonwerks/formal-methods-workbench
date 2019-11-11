@@ -8,9 +8,12 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -23,12 +26,14 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	private Text txtMonitorImplementationName;
 	private Combo cboExpectedPort;
 	private Combo cboAlertPort;
+	private List<Button> btnDispatchProtocol = new ArrayList<>();
 	private Combo cboMonitorRequirement;
 	private Text txtAgreeProperty;
 
 	private String monitorImplementationName;
 	private String expectedPort = "";
 	private String alertPort = "";
+	private String dispatchProtocol = "";
 	private String monitorRequirement = "";
 	private String agreeProperty = "";
 
@@ -65,6 +70,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		createMonitorImplementationNameField(container);
 		createExpectedPortField(container);
 		createAlertPortField(container);
+		createDispatchProtocolField(container);
 		createRequirementField(container);
 		createAgreeField(container);
 
@@ -126,6 +132,39 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		cboAlertPort.setText(NO_PORT_SELECTED);
 	}
 
+	/**
+	 * Creates the input field for selecting the dispatch protocol
+	 * @param container
+	 */
+	private void createDispatchProtocolField(Composite container) {
+		Label lblDispatchProtocolField = new Label(container, SWT.NONE);
+		lblDispatchProtocolField.setText("Dispatch protocol");
+		lblDispatchProtocolField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+		// Create a group to contain the log port options
+		Group protocolGroup = new Group(container, SWT.NONE);
+		protocolGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		protocolGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		btnDispatchProtocol.clear();
+
+		Button btnNoProtocol = new Button(protocolGroup, SWT.RADIO);
+		btnNoProtocol.setText("None");
+		btnNoProtocol.setSelection(true);
+
+		Button btnPeriodic = new Button(protocolGroup, SWT.RADIO);
+		btnPeriodic.setText("Periodic");
+		btnPeriodic.setSelection(false);
+
+		Button btnSporadic = new Button(protocolGroup, SWT.RADIO);
+		btnSporadic.setText("Sporadic");
+		btnSporadic.setSelection(false);
+
+		btnDispatchProtocol.add(btnNoProtocol);
+		btnDispatchProtocol.add(btnPeriodic);
+		btnDispatchProtocol.add(btnSporadic);
+
+	}
 
 	/**
 	 * Creates the input field for selecting the resolute clause that drives
@@ -186,6 +225,12 @@ public class AddMonitorDialog extends TitleAreaDialog {
 					+ NO_PORT_SELECTED + ".");
 			return false;
 		}
+		for (Button b : btnDispatchProtocol) {
+			if (b.getSelection() && !b.getText().equalsIgnoreCase("None")) {
+				dispatchProtocol = b.getText();
+				break;
+			}
+		}
 		monitorRequirement = cboMonitorRequirement.getText();
 		if (monitorRequirement.equals(NO_REQUIREMENT_SELECTED)) {
 			monitorRequirement = "";
@@ -219,6 +264,10 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 	public String getAlertPort() {
 		return alertPort;
+	}
+
+	public String getDispatchProtocol() {
+		return dispatchProtocol;
 	}
 
 	public String getAgreeProperty() {
