@@ -1,7 +1,12 @@
 package com.collins.fmw.cyres.splat.plugin;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -12,8 +17,12 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleConstants;
@@ -22,17 +31,31 @@ import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.Aadl2Factory;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.xtext.aadl2.properties.util.ProgrammingProperties;
 import org.osgi.framework.Bundle;
 
+import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.json.plugin.Aadl2Json;
+import com.collins.fmw.cyres.splat.Activator;
+import com.collins.fmw.cyres.splat.preferences.SplatPreferenceConstants;
+import com.collins.fmw.cyres.util.plugin.Filesystem;
+import com.collins.fmw.cyres.util.plugin.TraverseProject;
 
 public class SplatHandler extends AbstractHandler {
 
 	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
-
+	private final static String FOLDER_PACKAGE_DELIMITER = "_";
 
 	private MessageConsole findConsole(String name) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -63,7 +86,7 @@ public class SplatHandler extends AbstractHandler {
 			URI jsonURI = Aadl2Json.createJson();
 
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
-			String fullpath = file.getRawLocation().toOSString();
+			String jsonPath = file.getRawLocation().toOSString();
 
 			Bundle bundle = Platform.getBundle(bundleId);
 
@@ -74,16 +97,59 @@ public class SplatHandler extends AbstractHandler {
 			Runtime rt = Runtime.getRuntime();
 			rt.exec("chmod a+x " + splatPath);
 
-			String[] commands = { splatPath, fullpath };
+			// command line parameters
+			String assuranceLevel = Activator.getDefault().getPreferenceStore()
+					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
+			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
+				assuranceLevel = "cake";
+			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_HOL)) {
+				assuranceLevel = "hol";
+			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL)) {
+				assuranceLevel = "full";
+			} else {
+				assuranceLevel = "basic";
+			}
+			String checkProps = "";
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
+				checkProps = "-checkprops";
+			}
+			String outputDir = Activator.getDefault().getPreferenceStore()
+					.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY);
+			String intWidth = Integer.toString(
+					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
+			String optimize = "";
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
+				optimize = "optimize";
+			}
+			String endian = "LSB";
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
+				endian = "MSB";
+			}
+			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
+			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
+				encoding = "Unsigned";
+			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
+				encoding = "Sign_mag";
+			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
+				encoding = "ZigZag";
+			} else {
+				encoding = "Twos_comp";
+			}
+
+			String[] commands = { splatPath, assuranceLevel, checkProps, outputDir, intWidth, optimize, endian,
+					encoding, jsonPath };
 			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
 			Process proc = rt.exec(commands, environmentVars);
 
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-			MessageConsole console = findConsole("HOL Proof of Filter Claims");
+			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
-
+			String cmdLine = splatPath + " " + assuranceLevel + " " + (checkProps.isEmpty() ? "" : checkProps + " ")
+					+ outputDir + " " + intWidth + " " + (optimize.isEmpty() ? "" : optimize + " ") + endian + " "
+					+ encoding + " " + jsonPath + " LD_LIBRARY_PATH=" + splatDir;
+			out.println(cmdLine);
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			IWorkbenchPage page = window.getActivePage();
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;
@@ -94,7 +160,11 @@ public class SplatHandler extends AbstractHandler {
 			while ((s = stdErr.readLine()) != null) {
 				out.println(s);
 			}
-			out.println("Done with HOL proof of filter properties.");
+
+			// Insert the location of the source code into the filter component implementations in the model
+			insertSourceCodeLocation(xtextEditor);
+
+			out.println("Done running SPLAT");
 
 		} catch (Exception e) {
 			Dialog.showError("SPLAT", "SPLAT has encountered an error and was unable to complete.");
@@ -103,6 +173,122 @@ public class SplatHandler extends AbstractHandler {
 		}
 
 		return null;
+	}
+
+	private void insertSourceCodeLocation(XtextEditor currentEditor) {
+
+		// Look in the SPLAT output directory for filters (each will be in its own folder)
+		String outputDir = Activator.getDefault().getPreferenceStore()
+				.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY).replace("\\", "/") + "/";
+
+		// Get all the folders in the output directory
+		File dir = new File(outputDir);
+		String[] filterDirs = dir.list((current, name) -> new File(current, name).isDirectory());
+		Map<AadlPackage, List<String>> pkgMap = new HashMap<>();
+
+		for (String f : filterDirs) {
+			String qualifiedName = f.replaceFirst(FOLDER_PACKAGE_DELIMITER, "::");
+			String[] parts = qualifiedName.split("::");
+			AadlPackage aadlPackage = null;
+			for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
+				if (pkg.getName().equalsIgnoreCase(parts[0])) {
+					aadlPackage = pkg;
+					break;
+				}
+			}
+
+			if (aadlPackage == null || parts.length != 2) {
+				continue;
+			}
+
+			List<String> filters = new ArrayList<>();
+			if (pkgMap.containsKey(aadlPackage)) {
+				filters = pkgMap.get(aadlPackage);
+			}
+			filters.add(parts[1]);
+			pkgMap.put(aadlPackage, filters);
+		}
+
+		// Iterate through project packages
+		for (AadlPackage pkg : pkgMap.keySet()) {
+			IFile file = Filesystem.getFile(pkg.eResource().getURI());
+			XtextEditor editor = getEditor(file);
+			if (editor != null) {
+				editor.getDocument().modify(resource -> {
+					AadlPackage aadlPackage = (AadlPackage) resource.getContents().get(0);
+					for (ComponentImplementation ci : EcoreUtil2.getAllContentsOfType(aadlPackage,
+							ComponentImplementation.class)) {
+						if (pkgMap.get(pkg).contains(ci.getType().getName())) {
+							// Insert language property
+							String implLang = "c";
+							String assuranceLevel = Activator.getDefault().getPreferenceStore()
+									.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
+							if (!assuranceLevel.equalsIgnoreCase(SplatPreferenceConstants.ASSURANCE_LEVEL_BASIC)) {
+								implLang = "CakeML";
+							}
+							if (!CaseUtils.addCasePropertyAssociation("COMP_IMPL", implLang, ci)) {
+//								return;
+							}
+
+							// Insert source text property
+							String compName = ci.getType().getQualifiedName().replace("::", FOLDER_PACKAGE_DELIMITER);
+							String sourceText = outputDir
+									+ compName + "/" + compName;
+							if (implLang.equalsIgnoreCase("c")) {
+								sourceText += ".c";
+							} else {
+								sourceText += ".o";
+							}
+							Property sourceTextProp = GetProperties.lookupPropertyDefinition(ci,
+									ProgrammingProperties._NAME, ProgrammingProperties.SOURCE_TEXT);
+							StringLiteral sourceTextLit = Aadl2Factory.eINSTANCE.createStringLiteral();
+							sourceTextLit.setValue(sourceText);
+							List<StringLiteral> listVal = new ArrayList<>();
+							listVal.add(sourceTextLit);
+							ci.setPropertyValue(sourceTextProp, listVal);
+						}
+					}
+					return null;
+				});
+				closeEditor(editor, !editor.equals(currentEditor), true);
+			}
+		}
+
+	}
+
+	private XtextEditor getEditor(IFile file) {
+		IWorkbenchPage page = null;
+		IEditorPart part = null;
+
+		if (file.exists()) {
+			page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+			try {
+				part = page.openEditor(new FileEditorInput(file), desc.getId());
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (part == null) {
+			return null;
+		}
+
+		XtextEditor xedit = null;
+		xedit = (XtextEditor) part;
+
+		return xedit;
+	}
+
+	private void closeEditor(XtextEditor editor, boolean close, boolean save) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (save) {
+			page.saveEditor(editor, false);
+		}
+
+		if (close) {
+			page.closeEditor(editor, false);
+		}
 	}
 
 }

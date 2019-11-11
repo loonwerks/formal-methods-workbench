@@ -3,12 +3,14 @@ package com.collins.fmw.cyres.util.plugin;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
@@ -59,7 +61,9 @@ public class JsonUtil<T> {
 
 	public T readObject(File file) throws Exception {
 		try {
-			Gson gson = new Gson();
+//			Gson gson = new Gson();
+			Gson gson = new GsonBuilder()
+					.excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE).create();
 			JsonReader jsonReader = new JsonReader(new FileReader(file));
 			T data = gson.fromJson(jsonReader, this.cls);
 			jsonReader.close();

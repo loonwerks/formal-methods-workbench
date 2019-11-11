@@ -111,7 +111,7 @@ FunctionDefinition:
 
 DefinitionBody:
 	 {FunctionBody} ':' type=Type '=' expr=Expr
-|	 {ClaimBody} '<=' ('**'(claim+=ClaimText)+'**') (context+=ClaimContext)* (assumptions+=ClaimAssumption)* expr=Expr
+|	 {ClaimBody} '<=' ('**'(claim+=ClaimText)+'**') (context+=ClaimContext)* (assumptions+=ClaimAssumption)* (strategies+=ClaimStrategy)* expr=Expr
 ;
 
 ClaimContext:
@@ -120,6 +120,10 @@ ClaimContext:
 
 ClaimAssumption:
 	'assumption' name=ID ':' val=StringTerm
+;
+
+ClaimStrategy:
+	'strategy' name=ID ':' val=StringTerm
 ;
 
 ClaimText:

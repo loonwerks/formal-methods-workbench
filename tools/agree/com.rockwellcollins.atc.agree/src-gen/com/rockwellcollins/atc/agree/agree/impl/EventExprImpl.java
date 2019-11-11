@@ -4,16 +4,15 @@ package com.rockwellcollins.atc.agree.agree.impl;
 
 import com.rockwellcollins.atc.agree.agree.AgreePackage;
 import com.rockwellcollins.atc.agree.agree.EventExpr;
+import com.rockwellcollins.atc.agree.agree.Expr;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
-import org.osate.aadl2.NamedElement;
 
 /**
  * <!-- begin-user-doc -->
@@ -23,7 +22,7 @@ import org.osate.aadl2.NamedElement;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.EventExprImpl#getId <em>Id</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.agree.agree.impl.EventExprImpl#getPort <em>Port</em>}</li>
  * </ul>
  *
  * @generated
@@ -31,14 +30,14 @@ import org.osate.aadl2.NamedElement;
 public class EventExprImpl extends ExprImpl implements EventExpr
 {
   /**
-   * The cached value of the '{@link #getId() <em>Id</em>}' reference.
+   * The cached value of the '{@link #getPort() <em>Port</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getId()
+   * @see #getPort()
    * @generated
    * @ordered
    */
-  protected NamedElement id;
+  protected Expr port;
 
   /**
    * <!-- begin-user-doc -->
@@ -67,19 +66,9 @@ public class EventExprImpl extends ExprImpl implements EventExpr
    * @generated
    */
   @Override
-  public NamedElement getId()
+  public Expr getPort()
   {
-    if (id != null && ((EObject)id).eIsProxy())
-    {
-      InternalEObject oldId = (InternalEObject)id;
-      id = (NamedElement)eResolveProxy(oldId);
-      if (id != oldId)
-      {
-        if (eNotificationRequired())
-          eNotify(new ENotificationImpl(this, Notification.RESOLVE, AgreePackage.EVENT_EXPR__ID, oldId, id));
-      }
-    }
-    return id;
+    return port;
   }
 
   /**
@@ -87,9 +76,16 @@ public class EventExprImpl extends ExprImpl implements EventExpr
    * <!-- end-user-doc -->
    * @generated
    */
-  public NamedElement basicGetId()
+  public NotificationChain basicSetPort(Expr newPort, NotificationChain msgs)
   {
-    return id;
+    Expr oldPort = port;
+    port = newPort;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AgreePackage.EVENT_EXPR__PORT, oldPort, newPort);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
   }
 
   /**
@@ -98,12 +94,36 @@ public class EventExprImpl extends ExprImpl implements EventExpr
    * @generated
    */
   @Override
-  public void setId(NamedElement newId)
+  public void setPort(Expr newPort)
   {
-    NamedElement oldId = id;
-    id = newId;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.EVENT_EXPR__ID, oldId, id));
+    if (newPort != port)
+    {
+      NotificationChain msgs = null;
+      if (port != null)
+        msgs = ((InternalEObject)port).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AgreePackage.EVENT_EXPR__PORT, null, msgs);
+      if (newPort != null)
+        msgs = ((InternalEObject)newPort).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AgreePackage.EVENT_EXPR__PORT, null, msgs);
+      msgs = basicSetPort(newPort, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AgreePackage.EVENT_EXPR__PORT, newPort, newPort));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
+  {
+    switch (featureID)
+    {
+      case AgreePackage.EVENT_EXPR__PORT:
+        return basicSetPort(null, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
   }
 
   /**
@@ -116,9 +136,8 @@ public class EventExprImpl extends ExprImpl implements EventExpr
   {
     switch (featureID)
     {
-      case AgreePackage.EVENT_EXPR__ID:
-        if (resolve) return getId();
-        return basicGetId();
+      case AgreePackage.EVENT_EXPR__PORT:
+        return getPort();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -133,8 +152,8 @@ public class EventExprImpl extends ExprImpl implements EventExpr
   {
     switch (featureID)
     {
-      case AgreePackage.EVENT_EXPR__ID:
-        setId((NamedElement)newValue);
+      case AgreePackage.EVENT_EXPR__PORT:
+        setPort((Expr)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -150,8 +169,8 @@ public class EventExprImpl extends ExprImpl implements EventExpr
   {
     switch (featureID)
     {
-      case AgreePackage.EVENT_EXPR__ID:
-        setId((NamedElement)null);
+      case AgreePackage.EVENT_EXPR__PORT:
+        setPort((Expr)null);
         return;
     }
     super.eUnset(featureID);
@@ -167,8 +186,8 @@ public class EventExprImpl extends ExprImpl implements EventExpr
   {
     switch (featureID)
     {
-      case AgreePackage.EVENT_EXPR__ID:
-        return id != null;
+      case AgreePackage.EVENT_EXPR__PORT:
+        return port != null;
     }
     return super.eIsSet(featureID);
   }

@@ -74,6 +74,7 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
       case ResolutePackage.DEFINITION_BODY: return createDefinitionBody();
       case ResolutePackage.CLAIM_CONTEXT: return createClaimContext();
       case ResolutePackage.CLAIM_ASSUMPTION: return createClaimAssumption();
+      case ResolutePackage.CLAIM_STRATEGY: return createClaimStrategy();
       case ResolutePackage.CLAIM_TEXT: return createClaimText();
       case ResolutePackage.CLAIM_TEXT_VAR: return createClaimTextVar();
       case ResolutePackage.EXPR: return createExpr();
@@ -242,6 +243,18 @@ public class ResoluteFactoryImpl extends EFactoryImpl implements ResoluteFactory
   {
     ClaimAssumptionImpl claimAssumption = new ClaimAssumptionImpl();
     return claimAssumption;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public ClaimStrategy createClaimStrategy()
+  {
+    ClaimStrategyImpl claimStrategy = new ClaimStrategyImpl();
+    return claimStrategy;
   }
 
   /**

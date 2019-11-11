@@ -164,7 +164,7 @@ public class AgreeTranslate {
 	private JsonElement genEventExpr(EventExpr expr) {
 		JsonObject result = new JsonObject();
 		result.add("kind", new JsonPrimitive("EventExpr"));
-		result.add("id", new JsonPrimitive(expr.getId().getName()));
+		result.add("id", genExpr(expr.getPort()));
 		return result;
 	}
 

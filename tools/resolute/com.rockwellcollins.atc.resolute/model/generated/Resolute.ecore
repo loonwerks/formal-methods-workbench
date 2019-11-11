@@ -39,6 +39,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="val" eType="ecore:EClass platform:/resource/org.osate.aadl2/model/aadl2.ecore#//StringLiteral"
         containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ClaimStrategy">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="val" eType="ecore:EClass platform:/resource/org.osate.aadl2/model/aadl2.ecore#//StringLiteral"
+        containment="true"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ClaimText" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//Element"/>
   <eClassifiers xsi:type="ecore:EClass" name="ClaimTextVar"/>
   <eClassifiers xsi:type="ecore:EClass" name="Expr" eSuperTypes="platform:/resource/org.osate.aadl2/model/aadl2.ecore#//Element"/>
@@ -92,6 +97,8 @@
         eType="#//ClaimContext" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="assumptions" upperBound="-1"
         eType="#//ClaimAssumption" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="strategies" upperBound="-1"
+        eType="#//ClaimStrategy" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ClaimString" eSuperTypes="#//ClaimText">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="str" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>

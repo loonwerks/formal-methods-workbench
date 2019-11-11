@@ -53,6 +53,15 @@ public
 			-- Thread implementations must indicate location of source code or binary
 			error (threads_have_source())
 			
+			-- Ports must be in or out, but not both
+			error (unidirectional_ports())
+			
+			-- All processes must be bound to a processor
+			error (processes_bound())
+			
+			-- All ports should be connected
+			warning (ports_connected())
+			
 		}
 
 	**};
@@ -117,6 +126,18 @@ private
 			let conns : {connection} = {c for (c : connection) | (not is_event_data_port_connection(c)) and diff_proc_binding(c)};
 			forall(c : conns)(vp : virtual_processor) . lint_check(source_component(c), not is_bound_to(source_component(c), vp)) and lint_check(destination_component(c), not is_bound_to(destination_component(c), vp))
 						
+		unidirectional_ports() <=
+			** "Ports must be in or out, but not both" **
+			forall (f : feature) . lint_check(f, not (direction(f) = "in out"))
+		
+		processes_bound() <=
+			** "All processes must be bound to a processor" **
+			forall (p : process) . exists (proc : component) . (is_proc(proc) and lint_check(p, is_bound_to(p, proc)))
+			
+		ports_connected() <=
+			** "All ports should be connected" **
+			forall (p : port) . lint_check(p, length(connections(p)) > 0)
+			
 		diff_proc_binding(c : connection) : bool =
 			exists(p1 : component)(p2 : component) . is_proc(p1) and is_proc(p2) and is_bound_to(source_component(c), p1) and is_bound_to(destination_component(c), p2) and not (p1 = p2)
 			

@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.osate.aadl2.PortCategory;
 import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.architecture.handlers.AddMonitorHandler;
@@ -25,20 +24,24 @@ import com.collins.fmw.cyres.architecture.handlers.AddMonitorHandler;
 public class AddMonitorDialog extends TitleAreaDialog {
 
 	private Text txtMonitorImplementationName;
-	private Text txtMonitorImplementationLanguage;
-	private List<Button> btnAlertPortType = new ArrayList<>();
+	private Combo cboExpectedPort;
+	private Combo cboAlertPort;
+	private List<Button> btnDispatchProtocol = new ArrayList<>();
 	private Combo cboMonitorRequirement;
 	private Text txtAgreeProperty;
 
 	private String monitorImplementationName;
-	private String monitorImplementationLanguage;
-	private PortCategory alertPortType = null;
+	private String expectedPort = "";
+	private String alertPort = "";
+	private String dispatchProtocol = "";
 	private String monitorRequirement = "";
 	private String agreeProperty = "";
 
+	private List<String> inports = new ArrayList<>();
+	private List<String> outports = new ArrayList<>();
 	private List<String> requirements = new ArrayList<>();
 
-	private static final String DEFAULT_IMPL_LANGUAGE = "CakeML";
+	private static final String NO_PORT_SELECTED = "<No port selected>";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
 	public AddMonitorDialog(Shell parentShell) {
@@ -65,8 +68,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 		// Add monitor information fields
 		createMonitorImplementationNameField(container);
-		createImplementationLanguageField(container);
-		createAlertPortTypeField(container);
+		createExpectedPortField(container);
+		createAlertPortField(container);
+		createDispatchProtocolField(container);
 		createRequirementField(container);
 		createAgreeField(container);
 
@@ -89,53 +93,76 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		txtMonitorImplementationName.setText(AddMonitorHandler.MONITOR_IMPL_NAME);
 	}
 
+
 	/**
-	 * Creates the input text field for specifying the monitor implementation language
+	 * Creates the input field for specifying what to connect the 'expected' port to
 	 * @param container
 	 */
-	private void createImplementationLanguageField(Composite container) {
-		Label lblImplLangField = new Label(container, SWT.NONE);
-		lblImplLangField.setText("Monitor Implementation Language");
+	private void createExpectedPortField(Composite container) {
+		Label lblExpectedField = new Label(container, SWT.NONE);
+		lblExpectedField.setText("Expected port connection");
+		lblExpectedField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		txtMonitorImplementationLanguage = new Text(container, SWT.BORDER);
-		txtMonitorImplementationLanguage.setLayoutData(dataInfoField);
-		txtMonitorImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
+		cboExpectedPort = new Combo(container, SWT.BORDER);
+		cboExpectedPort.setLayoutData(dataInfoField);
+		cboExpectedPort.add(NO_PORT_SELECTED);
+		outports.forEach(p -> cboExpectedPort.add(p));
+		cboExpectedPort.setText(NO_PORT_SELECTED);
 	}
 
 	/**
-	 * Creates the input field for specifying the alert port type
+	 * Creates the input field for specifying what to connect the 'alert' port to
 	 * @param container
 	 */
-	private void createAlertPortTypeField(Composite container) {
+	private void createAlertPortField(Composite container) {
 		Label lblAlertField = new Label(container, SWT.NONE);
-		lblAlertField.setText("Alert port type");
+		lblAlertField.setText("Alert port connection");
 		lblAlertField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
+		GridData dataInfoField = new GridData();
+		dataInfoField.grabExcessHorizontalSpace = true;
+		dataInfoField.horizontalAlignment = GridData.FILL;
+		cboAlertPort = new Combo(container, SWT.BORDER);
+		cboAlertPort.setLayoutData(dataInfoField);
+		cboAlertPort.add(NO_PORT_SELECTED);
+		inports.forEach(p -> cboAlertPort.add(p));
+		cboAlertPort.setText(NO_PORT_SELECTED);
+	}
+
+	/**
+	 * Creates the input field for selecting the dispatch protocol
+	 * @param container
+	 */
+	private void createDispatchProtocolField(Composite container) {
+		Label lblDispatchProtocolField = new Label(container, SWT.NONE);
+		lblDispatchProtocolField.setText("Dispatch protocol");
+		lblDispatchProtocolField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
 		// Create a group to contain the log port options
-		Group alertGroup = new Group(container, SWT.NONE);
-		alertGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		alertGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+		Group protocolGroup = new Group(container, SWT.NONE);
+		protocolGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		protocolGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		btnAlertPortType.clear();
+		btnDispatchProtocol.clear();
 
-		Button btnEventAlertPort = new Button(alertGroup, SWT.RADIO);
-		btnEventAlertPort.setText("Event");
-		btnEventAlertPort.setSelection(true);
+		Button btnNoProtocol = new Button(protocolGroup, SWT.RADIO);
+		btnNoProtocol.setText("None");
+		btnNoProtocol.setSelection(true);
 
-		Button btnDataAlertPort = new Button(alertGroup, SWT.RADIO);
-		btnDataAlertPort.setText("Data");
-		btnDataAlertPort.setSelection(false);
+		Button btnPeriodic = new Button(protocolGroup, SWT.RADIO);
+		btnPeriodic.setText("Periodic");
+		btnPeriodic.setSelection(false);
 
-		Button btnEventDataAlertPort = new Button(alertGroup, SWT.RADIO);
-		btnEventDataAlertPort.setText("Event Data");
-		btnEventDataAlertPort.setSelection(false);
+		Button btnSporadic = new Button(protocolGroup, SWT.RADIO);
+		btnSporadic.setText("Sporadic");
+		btnSporadic.setSelection(false);
 
-		btnAlertPortType.add(btnDataAlertPort);
-		btnAlertPortType.add(btnEventAlertPort);
-		btnAlertPortType.add(btnEventDataAlertPort);
+		btnDispatchProtocol.add(btnNoProtocol);
+		btnDispatchProtocol.add(btnPeriodic);
+		btnDispatchProtocol.add(btnSporadic);
 
 	}
 
@@ -180,11 +207,27 @@ public class AddMonitorDialog extends TitleAreaDialog {
 	 */
 	private boolean saveInput() {
 		monitorImplementationName = txtMonitorImplementationName.getText();
-		monitorImplementationLanguage = txtMonitorImplementationLanguage.getText();
-		alertPortType = null;
-		for (int i = 0; i < btnAlertPortType.size(); i++) {
-			if (btnAlertPortType.get(i).getSelection()) {
-				alertPortType = PortCategory.get(i);
+		expectedPort = cboExpectedPort.getText();
+		if (expectedPort.equals(NO_PORT_SELECTED)) {
+			expectedPort = "";
+		} else if (!outports.contains(expectedPort)) {
+			Dialog.showError("Add Monitor", "Port " + expectedPort
+					+ " does not exist in the model.  Select a port from the list to connect the monitor's 'expected' port to, or choose "
+					+ NO_PORT_SELECTED + ".");
+			return false;
+		}
+		alertPort = cboAlertPort.getText();
+		if (alertPort.equals(NO_PORT_SELECTED)) {
+			alertPort = "";
+		} else if (!inports.contains(alertPort)) {
+			Dialog.showError("Add Monitor", "Port " + alertPort
+					+ " does not exist in the model.  Select a port from the list to connect the monitor's 'alert' port to, or choose "
+					+ NO_PORT_SELECTED + ".");
+			return false;
+		}
+		for (Button b : btnDispatchProtocol) {
+			if (b.getSelection() && !b.getText().equalsIgnoreCase("None")) {
+				dispatchProtocol = b.getText();
 				break;
 			}
 		}
@@ -192,8 +235,8 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		if (monitorRequirement.equals(NO_REQUIREMENT_SELECTED)) {
 			monitorRequirement = "";
 		} else if (!requirements.contains(monitorRequirement)) {
-			Dialog.showError("Add Filter",
-					"Filter requirement " + monitorRequirement
+			Dialog.showError("Add Monitor",
+					"Monitor requirement " + monitorRequirement
 							+ " does not exist in the model.  Select a requirement from the list, or choose "
 							+ NO_REQUIREMENT_SELECTED + ".");
 			return false;
@@ -215,12 +258,16 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		return monitorImplementationName;
 	}
 
-	public String getMonitorImplementationLanguage() {
-		return monitorImplementationLanguage;
+	public String getExpectedPort() {
+		return expectedPort;
 	}
 
-	public PortCategory getAlertPortType() {
-		return alertPortType;
+	public String getAlertPort() {
+		return alertPort;
+	}
+
+	public String getDispatchProtocol() {
+		return dispatchProtocol;
 	}
 
 	public String getAgreeProperty() {
@@ -229,6 +276,11 @@ public class AddMonitorDialog extends TitleAreaDialog {
 
 	public String getRequirement() {
 		return monitorRequirement;
+	}
+
+	public void setPorts(List<String> inports, List<String> outports) {
+		this.inports = inports;
+		this.outports = outports;
 	}
 
 	public void setRequirements(List<String> requirements) {
