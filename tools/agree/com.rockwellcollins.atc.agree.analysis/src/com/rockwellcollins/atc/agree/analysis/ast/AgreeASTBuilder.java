@@ -673,7 +673,11 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	private void gatherOutputsInputsAndTypes(List<AgreeVar> outputs, List<AgreeVar> inputs,
 			EList<FeatureInstance> features, List<AgreeStatement> assumptions, List<AgreeStatement> guarantees) {
 		for (FeatureInstance feature : features) {
-			featureToAgreeVars(outputs, inputs, feature, assumptions, guarantees);
+
+			if (feature.getIndex() <= 1) {
+				featureToAgreeVars(outputs, inputs, feature, assumptions, guarantees);
+
+			}
 		}
 
 	}
@@ -753,7 +757,8 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			return;
 		}
 
-		Type type = symbolTable.updateLustreTypeMap(AgreeTypeSystem.typeDefFromNE(dataClass));
+		AgreeTypeSystem.TypeDef td = AgreeTypeSystem.inferFromNamedElement(dataFeature);
+		Type type = symbolTable.updateLustreTypeMap(td);
 
 		if (type == null) {
 			// we do not reason about this type
@@ -767,7 +772,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 			inputs.add(agreeVar);
 			if (dataClass instanceof DataClassifier) {
 
-				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeTypeSystem.typeDefFromNE(dataClass));
+				List<Expr> constraints = getConstraintsFromTypeDef(name, td);
 				if (!constraints.isEmpty()) {
 					assumptions.add(getDataClassifierTypePredicate(feature.getName(), constraints, dataFeature));
 				}
@@ -776,7 +781,7 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 		case OUT:
 			outputs.add(agreeVar);
 			if (dataClass instanceof DataClassifier) {
-				List<Expr> constraints = getConstraintsFromTypeDef(name, AgreeTypeSystem.typeDefFromNE(dataClass));
+				List<Expr> constraints = getConstraintsFromTypeDef(name, td);
 				if (!constraints.isEmpty()) {
 					guarantees.add(getDataClassifierTypePredicate(feature.getName(), constraints, dataFeature));
 				}
@@ -1158,8 +1163,6 @@ public class AgreeASTBuilder extends AgreeSwitch<Expr> {
 	}
 
 	public VarDecl agreeVarFromArg(Arg arg, ComponentInstance compInst) {
-		// EGM: array-backend
-		// String typeStr = AgreeTypeUtils.getTypeName(arg.getType(), typeMap, globalTypes);
 		Type type = symbolTable.updateLustreTypeMap(AgreeTypeSystem.typeDefFromType(arg.getType()));
 		if (type != null) {
 			return new AgreeVar(arg.getName(), type, arg, compInst, null);

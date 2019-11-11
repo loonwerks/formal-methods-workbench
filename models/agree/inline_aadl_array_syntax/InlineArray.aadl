@@ -21,26 +21,31 @@ system A
 		Output: out data port Base_Types::Integer;
 		
 		OutputArray0: out data port Base_Types::Integer [3];
-		OutputArray1: out data port Base_Types::Integer {Data_Model::Data_Representation => Array;};
-
-		OutputArray2: out data port Base_Types::Integer {
+--
+		OutputArray1: out data port Base_Types::Integer {
 			Data_Model::Data_Representation => Array;
 			Data_Model::Dimension => (5);	
 		};
-		OutputArray3: out data port Base_Types::Integer {
+		OutputArray2: out data port Base_Types::Integer {
 			Data_Model::Data_Representation => Array;
 			Data_Model::Dimension => (Consts::ArrayLength);	
 		};
-		OutputArray4: out data port my_data.impl;
+		OutputArray3: out data port my_data.impl;
+		
+		
+		OutputArray_Missing_Bound: out data port Base_Types::Integer {Data_Model::Data_Representation => Array;};
 			
 	annex agree {** 
+		eq arr : int[3] = [| 0,0,0 |];
+		guarantee "arr" : forall q in arr, q = 0;
 			
-			
---		guarantee "Array0" : forall w in OutputArray0, w >= 0 or w < 0;
---		guarantee "Array1" : forall x in OutputArray1, x >= 0 or x < 0;
---		guarantee "Array2" : forall y in OutputArray2, y >= 0 or y < 0;
---		guarantee "Array3" : forall z in OutputArray3, z >= 0 or z < 0;
---		guarantee "Array4" : OutputArray4.number >=0 or OutputArray4.number < 0;
+		guarantee "Array0" : forall w in OutputArray0, w >= 0 or w < 0;
+		guarantee "Array1" : forall y in OutputArray1, y >= 0 or y < 0;
+		guarantee "Array2" : forall z in OutputArray2, z >= 0 or z < 0;
+		guarantee "Array3" : OutputArray3.number >=0 or OutputArray3.number < 0;
+		
+		
+--		guarantee "Array_OutputArray_Missing_Bound" : forall x in OutputArray1, x >= 0 or x < 0;
 
 	**};	
 end A ; 
