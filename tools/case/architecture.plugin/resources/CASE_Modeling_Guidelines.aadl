@@ -78,12 +78,12 @@ private
 			
 		dispatch_protocol_specified() <=
 			** "Threads should have the Dispatch_Protocol property specified" **
-			forall (t : thread) . lint_check(t, has_property(t, Dispatch_Protocol))
+			forall (t : thread) . lint_check(t, has_property(t, Thread_Properties::Dispatch_Protocol))
 			
 		valid_dispatch_protocol() <=
 			** "Threads can only specify a dispatch_protocol property of periodic or sporadic" **
-			forall (t : thread) . lint_check(t, has_property(t, Dispatch_Protocol) => 
-				(property(t, Dispatch_Protocol) = "Sporadic" or property(t, Dispatch_Protocol) = "Periodic"))
+			forall (t : thread) . lint_check(t, has_property(t, Thread_Properties::Dispatch_Protocol) => 
+				(property(t, Thread_Properties::Dispatch_Protocol) = "Sporadic" or property(t, Thread_Properties::Dispatch_Protocol) = "Periodic"))
 			
 		bounded_integers() <=
 			** "Integer types must be bounded (cannot use Base_Types::Integer)" **
@@ -103,19 +103,19 @@ private
 			
 		array_dimension() <=
 			** "Array dimensions must be specified" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Array") => has_property(d, Dimension))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Array") => has_property(d, Data_Model::Dimension))
 			
 		one_dimensional_arrays() <=
 			** "Arrays can only have one dimension" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Array") => (has_property(d, Dimension) and size(property(d, Dimension)) = 1))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Array") => (has_property(d, Data_Model::Dimension) and size(property(d, Data_Model::Dimension)) = 1))
 			
 		array_base_type() <=
 			** "The array base type should be specified" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Array") => has_property(d, Base_Type))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Array") => has_property(d, Data_Model::Base_Type))
 			
 		non_empty_enums() <=
 			** "Enumeration data components must be non-empty" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Enum") => (has_property(d, Enumerators) and size(property(d, Enumerators)) > 0))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Enum") => (has_property(d, Data_Model::Enumerators) and size(property(d, Data_Model::Enumerators)) > 0))
 			
 		unidirectional_connections() <=
 			** "Connections between thread components must be uni-directional" **
@@ -158,7 +158,7 @@ private
 			
 		threads_have_source() <=
 			** "Thread implementations must indicate location of source code or binary" **
-			forall (t : thread) . lint_check(t, has_property(t, Source_Text))
+			forall (t : thread) . lint_check(t, has_property(t, Programming_Properties::Source_Text))
 		
 	**};
 	
