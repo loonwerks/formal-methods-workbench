@@ -11,8 +11,8 @@ public
 	end CASE_MsgHeader;
 	data implementation CASE_MsgHeader.Impl
 		subcomponents
-			src: data Base_Types::Integer;
-			dst: data Base_Types::Integer;
+			src: data Base_Types::Integer_32;
+			dst: data Base_Types::Integer_32;
 			trusted: data Base_Types::Boolean;
 			HMAC: data Base_Types::Boolean;
 	end CASE_MsgHeader.Impl;
@@ -77,9 +77,9 @@ public
 	
 	data implementation CASE_AttestationCacheRecord.Impl
 		subcomponents
-			src: data Base_Types::Integer;
-			trusted: data Base_Types::Integer;
-			timeout: data Base_Types::Integer;
+			src: data Base_Types::Integer_32;
+			trusted: data Base_Types::Integer_32;
+			timeout: data Base_Types::Integer_32;
 	end CASE_AttestationCacheRecord.Impl;
 	
 	
@@ -144,7 +144,7 @@ public
 					new_cache;
 		tel;
 		
-		fun TRUSTED(src : Base_Types::Integer) : bool = 
+		fun TRUSTED(src : Base_Types::Integer_32) : bool = 
 			IN_CACHE(src) and PASS_ATTESTATION(src) and not IS_STALE(src);
 
 		const AM_FAIL : int = 0;
