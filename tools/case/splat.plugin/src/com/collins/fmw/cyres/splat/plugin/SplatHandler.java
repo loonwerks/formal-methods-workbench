@@ -153,7 +153,7 @@ public class SplatHandler extends AbstractHandler {
 
 //			String[] commands = { splatPath, assuranceLevel, checkProps, "-outdir", outputDir, "-intwidth", intWidth,
 //					optimize, "-endian", endian, "-encoding", encoding, jsonPath };
-			String[] commands = (String[]) cmds.toArray();
+			String[] commands = cmds.toArray(new String[cmds.size()]);
 			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
 			Process proc = rt.exec(commands, environmentVars);
