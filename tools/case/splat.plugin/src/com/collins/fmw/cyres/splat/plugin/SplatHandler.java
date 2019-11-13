@@ -113,27 +113,29 @@ public class SplatHandler extends AbstractHandler {
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
 				checkProps = "-checkprops";
 			}
-			String outputDir = Activator.getDefault().getPreferenceStore()
+			String outputDir = "-outdir " + Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY);
-			String intWidth = Integer.toString(
+			String intWidth = "-intwidth " + Integer.toString(
 					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
 			String optimize = "";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
 				optimize = "optimize";
 			}
-			String endian = "LSB";
+			String endian = "-endian ";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
-				endian = "MSB";
+				endian += "MSB";
+			} else {
+				endian += "LSB";
 			}
 			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
 			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
-				encoding = "Unsigned";
+				encoding = "-encoding Unsigned";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
-				encoding = "Sign_mag";
+				encoding = "-encoding Sign_mag";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
-				encoding = "ZigZag";
+				encoding = "-encoding ZigZag";
 			} else {
-				encoding = "Twos_comp";
+				encoding = "-encoding Twos_comp";
 			}
 
 			String[] commands = { splatPath, assuranceLevel, checkProps, outputDir, intWidth, optimize, endian,
