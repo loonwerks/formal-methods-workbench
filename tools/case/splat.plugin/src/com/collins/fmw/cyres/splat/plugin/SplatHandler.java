@@ -98,6 +98,8 @@ public class SplatHandler extends AbstractHandler {
 			rt.exec("chmod a+x " + splatPath);
 
 			// command line parameters
+			List<String> cmds = new ArrayList<>();
+			cmds.add(splatPath);
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
 			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
@@ -109,37 +111,49 @@ public class SplatHandler extends AbstractHandler {
 			} else {
 				assuranceLevel = "basic";
 			}
+			cmds.add(assuranceLevel);
 			String checkProps = "";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
 				checkProps = "-checkprops";
+				cmds.add("-checkprops");
 			}
-			String outputDir = "-outdir " + Activator.getDefault().getPreferenceStore()
+			String outputDir = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY);
-			String intWidth = "-intwidth " + Integer.toString(
+			cmds.add("-outdir");
+			cmds.add(outputDir);
+			String intWidth = Integer.toString(
 					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
+			cmds.add("-intwidth");
+			cmds.add(intWidth);
 			String optimize = "";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
 				optimize = "optimize";
+				cmds.add("optimize");
 			}
-			String endian = "-endian ";
+			String endian = "LSB";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
-				endian += "MSB";
-			} else {
-				endian += "LSB";
+				endian = "MSB";
 			}
+			cmds.add("-endian");
+			cmds.add(endian);
 			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
 			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
-				encoding = "-encoding Unsigned";
+				encoding = "Unsigned";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
-				encoding = "-encoding Sign_mag";
+				encoding = "Sign_mag";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
-				encoding = "-encoding ZigZag";
+				encoding = "ZigZag";
 			} else {
-				encoding = "-encoding Twos_comp";
+				encoding = "Twos_comp";
 			}
+			cmds.add("-encoding");
+			cmds.add(encoding);
 
-			String[] commands = { splatPath, assuranceLevel, checkProps, outputDir, intWidth, optimize, endian,
-					encoding, jsonPath };
+			cmds.add(jsonPath);
+
+//			String[] commands = { splatPath, assuranceLevel, checkProps, "-outdir", outputDir, "-intwidth", intWidth,
+//					optimize, "-endian", endian, "-encoding", encoding, jsonPath };
+			String[] commands = (String[]) cmds.toArray();
 			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
 			Process proc = rt.exec(commands, environmentVars);
