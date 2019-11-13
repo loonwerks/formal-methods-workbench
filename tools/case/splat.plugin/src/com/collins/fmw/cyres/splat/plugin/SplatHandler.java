@@ -99,60 +99,56 @@ public class SplatHandler extends AbstractHandler {
 
 			// command line parameters
 			List<String> cmds = new ArrayList<>();
+
 			cmds.add(splatPath);
+
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
 			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
-				assuranceLevel = "cake";
+				cmds.add("cake");
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_HOL)) {
-				assuranceLevel = "hol";
+				cmds.add("hol");
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL)) {
-				assuranceLevel = "full";
+				cmds.add("full");
 			} else {
-				assuranceLevel = "basic";
+				cmds.add("basic");
 			}
-			cmds.add(assuranceLevel);
-			String checkProps = "";
+
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
-				checkProps = "-checkprops";
 				cmds.add("-checkprops");
 			}
-			String outputDir = Activator.getDefault().getPreferenceStore()
-					.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY);
+
 			cmds.add("-outdir");
-			cmds.add(outputDir);
-			String intWidth = Integer.toString(
-					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
+			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
+
 			cmds.add("-intwidth");
-			cmds.add(intWidth);
-			String optimize = "";
+			cmds.add(Integer.toString(
+					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
-				optimize = "optimize";
 				cmds.add("optimize");
 			}
-			String endian = "LSB";
-			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
-				endian = "MSB";
-			}
+
 			cmds.add("-endian");
-			cmds.add(endian);
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
+				cmds.add("MSB");
+			} else {
+				cmds.add("LSB");
+			}
+
+			cmds.add("-encoding");
 			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
 			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
-				encoding = "Unsigned";
+				cmds.add("Unsigned");
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
-				encoding = "Sign_mag";
+				cmds.add("Sign_mag");
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
-				encoding = "ZigZag";
+				cmds.add("Zigzag");
 			} else {
-				encoding = "Twos_comp";
+				cmds.add("Twos_comp");
 			}
-			cmds.add("-encoding");
-			cmds.add(encoding);
 
 			cmds.add(jsonPath);
 
-//			String[] commands = { splatPath, assuranceLevel, checkProps, "-outdir", outputDir, "-intwidth", intWidth,
-//					optimize, "-endian", endian, "-encoding", encoding, jsonPath };
 			String[] commands = cmds.toArray(new String[cmds.size()]);
 			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
@@ -162,9 +158,11 @@ public class SplatHandler extends AbstractHandler {
 
 			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
-			String cmdLine = splatPath + " " + assuranceLevel + " " + (checkProps.isEmpty() ? "" : checkProps + " ")
-					+ outputDir + " " + intWidth + " " + (optimize.isEmpty() ? "" : optimize + " ") + endian + " "
-					+ encoding + " " + jsonPath + " LD_LIBRARY_PATH=" + splatDir;
+			String cmdLine = "";
+			for (String s : cmds) {
+				cmdLine += s + " ";
+			}
+			cmdLine += "LD_LIBRARY_PATH=" + splatDir;
 			out.println(cmdLine);
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			IWorkbenchPage page = window.getActivePage();
