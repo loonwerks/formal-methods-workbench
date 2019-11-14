@@ -11,7 +11,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.URIConverter;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.RollbackException;
 import org.eclipse.emf.transaction.TransactionalCommandStack;
@@ -31,7 +33,6 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.SystemType;
 import org.osate.aadl2.ThreadGroupType;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 public class EphemeralImplementationUtil {
 
@@ -114,7 +115,9 @@ public class EphemeralImplementationUtil {
 	@SuppressWarnings("unchecked")
 	public ComponentImplementation generateEphemeralCompImplFromType(ComponentType ct)
 			throws Exception {
-		Resource aadlResource = OsateResourceUtil.getResource(getEphemeralImplURI(ct));
+//		Resource aadlResource = OsateResourceUtil.getResource(getEphemeralImplURI(ct));
+		ResourceSet resourceSet = new ResourceSetImpl();
+		Resource aadlResource = resourceSet.getResource(getEphemeralImplURI(ct), true);
 		ephemeralResources.add(aadlResource);
 		List<ComponentImplementation> resultList;
 		ComponentImplementation result;
