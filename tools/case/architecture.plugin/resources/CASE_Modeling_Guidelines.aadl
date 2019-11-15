@@ -62,6 +62,9 @@ public
 			-- All ports should be connected
 			warning (ports_connected())
 			
+			-- Multiple incoming connections to a single port are not allowed
+			error (no_fan_in())
+			
 		}
 
 	**};
@@ -159,6 +162,10 @@ private
 		threads_have_source() <=
 			** "Thread implementations must indicate location of source code or binary" **
 			forall (t : thread) . lint_check(t, has_property(t, Programming_Properties::Source_Text))
+			
+		no_fan_in() <=
+			** "Multiple incoming connections to a single port are not allowed" **
+			forall (f : feature) . lint_check(f, (direction(f) = "in") => (size(connections(f)) <= 1))
 		
 	**};
 	
