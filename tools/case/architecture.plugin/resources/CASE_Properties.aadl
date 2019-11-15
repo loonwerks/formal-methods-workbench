@@ -31,15 +31,15 @@ property set CASE_Properties is
 	
 	-- BOUNDARY INDICATIONS
 	
-	-- BOUNDARY is depricated (see TRUST_BOUNDARY and SECURITY_PERIMETER)
-	BOUNDARY: list of enumeration(TRUSTED, SECURE, PHYSICAL, UNCONTROLLED) applies to (system, process, thread, thread group, device, bus, feature, connection, memory, abstract);
+	-- BOUNDARY is deprecated (see TRUST_BOUNDARY and SECURITY_PERIMETER)
+	BOUNDARY: list of enumeration(TRUSTED, SECURE, PHYSICAL, UNCONTROLLED) applies to (system, abstract, thread, thread group, process, sub program, sub program group, processor, virtual processor, memory, bus, virtual bus, device);
 	
 	--Apply the trust boundary at the edge a system, device, or process should treat as 
 	--having an untrusted system, device, or process interfacing to it.  A trust boundary
 	--may or may not align with the security perimeter.  The security perimeter defines
 	--the physical security boundaries of the system
-	TRUST_BOUNDARY: aadlboolean applies to (bus, feature, connection, memory);
-	SECURITY_PERIMETER: aadlboolean  applies to (bus, feature, connection);
+	TRUST_BOUNDARY: aadlboolean applies to (system, abstract, thread, thread group, process, sub program, sub program group, processor, virtual processor, memory, bus, virtual bus, device, data);
+	SECURITY_PERIMETER: aadlboolean applies to (system, abstract, thread, thread group, process, sub program, sub program group, processor, virtual processor, memory, bus, virtual bus, device, data);
 	
 	-- CIA
 	CONFIDENTIALITY: enumeration (HIGH, MEDIUM, LOW) applies to (system, process, thread, device, abstract, virtual processor);
