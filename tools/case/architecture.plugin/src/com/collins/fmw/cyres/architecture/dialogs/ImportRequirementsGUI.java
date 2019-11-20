@@ -70,8 +70,8 @@ public class ImportRequirementsGUI extends Dialog {
 
 		shlReqManager = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 
-		shlReqManager.setMinimumSize(new Point(1200, 400));
-		shlReqManager.setSize(1045, 450);
+		shlReqManager.setMinimumSize(1200, 400);
+		shlReqManager.setSize(1200, 400);
 		shlReqManager.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		shlReqManager.setText("Import Cyber Security Requirements");
 		shlReqManager.setLayout(new GridLayout(1, true));
@@ -89,6 +89,7 @@ public class ImportRequirementsGUI extends Dialog {
 		grpReqBrowser.setLayout(fl_grpReqBrowser);
 
 		ScrolledComposite reqBrowser = new ScrolledComposite(grpReqBrowser, SWT.BORDER);
+		reqBrowser.setMinWidth(553);
 		reqBrowser.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		reqBrowser.setExpandHorizontal(true);
 		reqBrowser.setExpandVertical(true);
@@ -113,7 +114,6 @@ public class ImportRequirementsGUI extends Dialog {
 		TableColumn tblclmnShortDesciption = new TableColumn(tblReqBrowser, SWT.LEFT);
 		tblclmnShortDesciption.setWidth(309);
 		tblclmnShortDesciption.setText("Short Desciption");
-		reqBrowser.setMinSize(new Point(600, 50));
 		reqBrowser.setContent(tblReqBrowser);
 
 		Group grpViewEditReq = new Group(cmpReqManager, SWT.NONE);
@@ -179,7 +179,7 @@ public class ImportRequirementsGUI extends Dialog {
 		lblDesc.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		lblDesc.setText("Descrption");
 
-		txtDesc = new Text(composite, SWT.BORDER | SWT.MULTI);
+		txtDesc = new Text(composite, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		txtDesc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 4));
 
 		new Label(composite, SWT.NONE);
@@ -201,7 +201,7 @@ public class ImportRequirementsGUI extends Dialog {
 		// lblReason.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblReason.setText("Reason for omission");
 
-		txtReason = new Text(composite, SWT.BORDER | SWT.MULTI);
+		txtReason = new Text(composite, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		txtReason.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 3));
 		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);
