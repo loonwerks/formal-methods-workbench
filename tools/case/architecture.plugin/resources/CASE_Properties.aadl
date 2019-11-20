@@ -1,7 +1,7 @@
 property set CASE_Properties is
 
 	-- CASE MODEL TRANSFORMATION TYPE
-	COMP_TYPE: enumeration (FILTER, ATTESTATION, MONITOR, ISOLATOR, COMM_DRIVER, SWITCH, SAFETY_CONTROLLER) applies to (system, process, thread, device, abstract, virtual processor);
+	COMP_TYPE: enumeration (FILTER, ATTESTATION, MONITOR, VIRTUAL_MACHINE, COMM_DRIVER, SWITCH, SAFETY_CONTROLLER) applies to (system, process, thread, device, abstract, virtual processor);
 	-- IMPLEMENTATION LANGUAGE OF THIS COMPONENT (eg CakeML)
 	COMP_IMPL: aadlstring applies to (system, process, thread, abstract);
 	-- ID OF THE AGREE CONTRACT THAT SPECIFIES THIS COMPONENT

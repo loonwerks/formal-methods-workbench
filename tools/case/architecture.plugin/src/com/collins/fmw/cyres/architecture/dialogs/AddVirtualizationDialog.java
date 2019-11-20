@@ -21,20 +21,20 @@ import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
 
-import com.collins.fmw.cyres.architecture.handlers.AddIsolatorHandler;
+import com.collins.fmw.cyres.architecture.handlers.AddVirtualizationHandler;
 
-public class AddIsolatorDialog extends TitleAreaDialog {
+public class AddVirtualizationDialog extends TitleAreaDialog {
 
 	private Text txtVirtualProcessorName;
 	private Text txtVirtualMachineOS;
 	private List<Button> btnCompSelectionType = new ArrayList<>();
 	private List<Button> btnComponents = new ArrayList<>();
-	private Combo cboIsolatorRequirement;
+	private Combo cboVirtualizationRequirement;
 
 	private String virtualProcessorName = "";
 	private String virtualMachineOS = "";
 	private List<String> components = new ArrayList<>();
-	private String isolatorRequirement = "";
+	private String virtualizationRequirement = "";
 
 	private Subcomponent component = null;
 	private List<String> requirements = new ArrayList<>();
@@ -42,7 +42,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	private static final String DEFAULT_OS = "Linux";
 	private static final String NO_REQUIREMENT_SELECTED = "<No requirement selected>";
 
-	public AddIsolatorDialog(Shell parentShell) {
+	public AddVirtualizationDialog(Shell parentShell) {
 		super(parentShell);
 		setHelpAvailable(false);
 	}
@@ -50,9 +50,9 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Add Isolator");
+		setTitle("Add Virtualization");
 		setMessage(
-				"Enter Isolator details.  You may optionally leave these fields empty and manually edit the AADL isolator component once it is added to the model.",
+				"Enter virtualization details.  You may optionally leave these fields empty and manually edit the AADL virtualization component once it is added to the model.",
 				IMessageProvider.NONE);
 	}
 
@@ -94,7 +94,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		dataInfoField.horizontalAlignment = SWT.FILL;
 		txtVirtualProcessorName = new Text(container, SWT.BORDER);
 		txtVirtualProcessorName.setLayoutData(dataInfoField);
-		txtVirtualProcessorName.setText(AddIsolatorHandler.VIRTUAL_PROCESSOR_IMPL_NAME);
+		txtVirtualProcessorName.setText(AddVirtualizationHandler.VIRTUAL_PROCESSOR_IMPL_NAME);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 	}
 
 	/**
-	 * Creates the field for specifying the components to isolate
+	 * Creates the field for specifying the components to virtualize
 	 * @param container
 	 */
 	private void createComponentSelectionField(Composite container) {
@@ -131,7 +131,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		}
 
 		Label lblComponentSelectionField = new Label(container, SWT.NONE);
-		lblComponentSelectionField.setText("Components to isolate");
+		lblComponentSelectionField.setText("Components in VM");
 		lblComponentSelectionField.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		// Create a container to hold options and checkboxes
@@ -184,7 +184,7 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 
 	/**
 	 * Creates the input field for selecting the resolute clause that drives
-	 * the addition of this isolator to the design
+	 * the addition of this virtualization to the design
 	 * @param container
 	 */
 	private void createRequirementField(Composite container) {
@@ -194,11 +194,11 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
 		dataInfoField.horizontalAlignment = GridData.FILL;
-		cboIsolatorRequirement = new Combo(container, SWT.BORDER);
-		cboIsolatorRequirement.setLayoutData(dataInfoField);
-		cboIsolatorRequirement.add(NO_REQUIREMENT_SELECTED);
-		requirements.forEach(r -> cboIsolatorRequirement.add(r));
-		cboIsolatorRequirement.setText(NO_REQUIREMENT_SELECTED);
+		cboVirtualizationRequirement = new Combo(container, SWT.BORDER);
+		cboVirtualizationRequirement.setLayoutData(dataInfoField);
+		cboVirtualizationRequirement.add(NO_REQUIREMENT_SELECTED);
+		requirements.forEach(r -> cboVirtualizationRequirement.add(r));
+		cboVirtualizationRequirement.setText(NO_REQUIREMENT_SELECTED);
 	}
 
 
@@ -242,12 +242,11 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 			}
 		}
 
-		isolatorRequirement = cboIsolatorRequirement.getText();
-		if (isolatorRequirement.equals(NO_REQUIREMENT_SELECTED)) {
-			isolatorRequirement = "";
-		} else if (!requirements.contains(isolatorRequirement)) {
-			Dialog.showError("Add Isolator",
-					"Isolator requirement " + isolatorRequirement
+		virtualizationRequirement = cboVirtualizationRequirement.getText();
+		if (virtualizationRequirement.equals(NO_REQUIREMENT_SELECTED)) {
+			virtualizationRequirement = "";
+		} else if (!requirements.contains(virtualizationRequirement)) {
+			Dialog.showError("Add Virtualization", "Virtualization requirement " + virtualizationRequirement
 							+ " does not exist in the model.  Select a requirement from the list, or choose "
 							+ NO_REQUIREMENT_SELECTED + ".");
 			return false;
@@ -264,12 +263,12 @@ public class AddIsolatorDialog extends TitleAreaDialog {
 		return virtualMachineOS;
 	}
 
-	public List<String> getIsolatedComponents() {
+	public List<String> getBoundComponents() {
 		return components;
 	}
 
 	public String getRequirement() {
-		return isolatorRequirement;
+		return virtualizationRequirement;
 	}
 
 	public void setSelectedComponent(Subcomponent component) {

@@ -44,23 +44,22 @@ import org.osate.ui.dialogs.Dialog;
 import org.osate.xtext.aadl2.properties.util.DeploymentProperties;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 
-import com.collins.fmw.cyres.architecture.dialogs.AddIsolatorDialog;
-import com.collins.fmw.cyres.architecture.requirements.AddIsolatorClaim;
-import com.collins.fmw.cyres.architecture.requirements.CyberRequirement;
+import com.collins.fmw.cyres.architecture.dialogs.AddVirtualizationDialog;
+import com.collins.fmw.cyres.architecture.requirements.AddVirtualizationClaim;
 import com.collins.fmw.cyres.architecture.requirements.RequirementsManager;
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.architecture.utils.ComponentCreateHelper;
 
-public class AddIsolatorHandler extends AadlHandler {
+public class AddVirtualizationHandler extends AadlHandler {
 
-	static final String VIRTUAL_PROCESSOR_TYPE_NAME = "CASE_Virtual_Processor";
-	public static final String VIRTUAL_PROCESSOR_IMPL_NAME = "VPROC";
+	static final String VIRTUAL_PROCESSOR_TYPE_NAME = "CASE_Virtual_Machine";
+	public static final String VIRTUAL_PROCESSOR_IMPL_NAME = "VM";
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String virtualProcessorName;
 	private String virtualMachineOS;
-	private List<String> isolatedComponents;
-	private String isolatorRequirement;
+	private List<String> boundComponents;
+	private String virtualizationRequirement;
 
 	@Override
 	protected void runCommand(URI uri) {
@@ -77,14 +76,14 @@ public class AddIsolatorHandler extends AadlHandler {
 				|| eObj instanceof ThreadGroupSubcomponent) {
 			sub = (Subcomponent) eObj;
 		} else {
-			Dialog.showError("Add Isolator",
-					"A process, thread, or thread group implementation subcomponent must be selected in order to add isolation.");
+			Dialog.showError("Add Virtualization",
+					"A process, thread, or thread group implementation subcomponent must be selected in order to add virtualization.");
 			return;
 		}
 
 		// Make sure subcomponent refers to a component implementation
 		if (sub.getComponentImplementation() == null) {
-			Dialog.showError("Add Isolator", "Selected subcomponent must be a component implementation.");
+			Dialog.showError("Add Virtualization", "Selected subcomponent must be a component implementation.");
 			return;
 		}
 
@@ -94,13 +93,13 @@ public class AddIsolatorHandler extends AadlHandler {
 		// TODO: Remove this restriction and present user with list of processors and virtual processors to choose from
 		// TODO: May need to look at Available_Processor_Bindings property to do this
 		if (processorBindings.isEmpty()) {
-			Dialog.showError("Add Isolator",
+			Dialog.showError("Add Virtualization",
 					"The selected component (or at least one of its subcomponents) must be bound to a processor or virtual processor.");
 			return;
 		}
 
 		// Open wizard to enter filter info
-		final AddIsolatorDialog wizard = new AddIsolatorDialog(
+		final AddVirtualizationDialog wizard = new AddVirtualizationDialog(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 
 		List<String> requirements = new ArrayList<>();
@@ -115,8 +114,8 @@ public class AddIsolatorHandler extends AadlHandler {
 			if (virtualProcessorName == "") {
 				virtualProcessorName = VIRTUAL_PROCESSOR_IMPL_NAME;
 			}
-			isolatedComponents = wizard.getIsolatedComponents();
-			isolatorRequirement = wizard.getRequirement();
+			boundComponents = wizard.getBoundComponents();
+			virtualizationRequirement = wizard.getRequirement();
 		} else {
 			return;
 		}
@@ -124,20 +123,20 @@ public class AddIsolatorHandler extends AadlHandler {
 		// create set of bound processors
 		Set<String> boundProcessors = new HashSet<>();
 		for (Map.Entry<String, Set<String>> entry : processorBindings.entrySet()) {
-			if (isolatedComponents.contains(entry.getKey())) {
+			if (boundComponents.contains(entry.getKey())) {
 				boundProcessors.addAll(entry.getValue());
 			}
 		}
 		// If specific subcomponents of the selected subcomponent aren't bound to a processor,
 		// but the selected subcomponent is, then the selected subcomponent's subcomponents will use
 		// the binding of their parent
-		if (boundProcessors.isEmpty() && !isolatedComponents.contains(sub.getName())
+		if (boundProcessors.isEmpty() && !boundComponents.contains(sub.getName())
 				&& processorBindings.get(sub.getName()) != null) {
 			boundProcessors.addAll(processorBindings.get(sub.getName()));
 		}
 		if (boundProcessors.isEmpty()) {
-			Dialog.showError("Add Isolator",
-					"The selected subcomponent(s) must already be bound to a processor in order to be isolated.");
+			Dialog.showError("Add Virtualization",
+					"The selected subcomponent(s) must already be bound to a processor in order to be virtualized.");
 			return;
 		}
 
@@ -162,7 +161,7 @@ public class AddIsolatorHandler extends AadlHandler {
 
 		// Get the active xtext editor so we can make modifications
 		final XtextEditor editor = EditorUtils.getActiveXtextEditor();
-		AddIsolatorClaim claim = null;
+		AddVirtualizationClaim claim = null;
 
 		if (editor != null) {
 			claim = editor.getDocument().modify(resource -> {
@@ -187,7 +186,7 @@ public class AddIsolatorHandler extends AadlHandler {
 
 				if (pkgSection == null) {
 					// Something went wrong
-					Dialog.showError("Add Isolator", "No public or private package sections found.");
+					Dialog.showError("Add Virtualization", "No public or private package sections found.");
 					return null;
 				}
 
@@ -213,7 +212,7 @@ public class AddIsolatorHandler extends AadlHandler {
 						pkgSection.getOwnedClassifiers().size() - 1);
 
 				// CASE::COMP_TYPE Property
-				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "ISOLATOR", vpType)) {
+				if (!CaseUtils.addCasePropertyAssociation("COMP_TYPE", "VIRTUAL_MACHINE", vpType)) {
 //					return;
 				}
 
@@ -247,7 +246,7 @@ public class AddIsolatorHandler extends AadlHandler {
 
 				// Bind the virtual processor to the processor(s)
 				// If a binding to a processor already exists, add virtual processor to Applies To
-				// Also remove isolated components from this processor binding
+				// Also remove virtualized components from this processor binding
 				boolean propertyAssociationFound = false;
 				for (PropertyAssociation pa : containingImpl.getOwnedPropertyAssociations()) {
 					// Find bindings to processors (there could be multiple)
@@ -256,7 +255,7 @@ public class AddIsolatorHandler extends AadlHandler {
 						for (PropertyExpression prop : listVal.getOwnedListElements()) {
 							if (prop instanceof ReferenceValue) {
 								ReferenceValue refVal = (ReferenceValue) prop;
-								// Check if the referenced processor was bound to an isolated component
+								// Check if the referenced processor was bound to an virtualized component
 								if (boundProcessors.contains(refVal.getPath().getNamedElement().getName())) {
 
 									// Add virtual processor subcomponent to Applies To
@@ -264,7 +263,7 @@ public class AddIsolatorHandler extends AadlHandler {
 									ContainmentPathElement cpe = cne.createPath();
 									cpe.setNamedElement(vpSub);
 
-									// Remove isolated components from this binding
+									// Remove virtualized components from this binding
 									Iterator<ContainedNamedElement> i = pa.getAppliesTos().iterator();
 									while (i.hasNext()) {
 										ContainedNamedElement containedNamedElement = i.next();
@@ -272,12 +271,12 @@ public class AddIsolatorHandler extends AadlHandler {
 										String appliesTo = containmentPathElement.getNamedElement().getQualifiedName();
 										// If an entire subcomponent (including its subcomponents) is selected, remove
 										// any of its subcomponent bindings to this processor
-										if (isolatedComponents.contains(appliesTo)) {
+										if (boundComponents.contains(appliesTo)) {
 											i.remove();
 										} else if (containmentPathElement.getPath() != null) {
 											containmentPathElement = containmentPathElement.getPath();
 											appliesTo += "." + containmentPathElement.getNamedElement().getName();
-											if (isolatedComponents.contains(appliesTo)) {
+											if (boundComponents.contains(appliesTo)) {
 												i.remove();
 											}
 										}
@@ -325,7 +324,7 @@ public class AddIsolatorHandler extends AadlHandler {
 						.createOwnedListElement(Aadl2Package.eINSTANCE.getReferenceValue());
 				ContainmentPathElement cpe = rv.createPath();
 				cpe.setNamedElement(vpSub);
-				for (String s : isolatedComponents) {
+				for (String s : boundComponents) {
 					ContainedNamedElement cne = pa.createAppliesTo();
 					cpe = cne.createPath();
 					cpe.setNamedElement(selectedSub);
@@ -340,20 +339,18 @@ public class AddIsolatorHandler extends AadlHandler {
 					}
 				}
 
-				// Add add_isolator claims to resolute prove statement, if applicable
-				if (!isolatorRequirement.isEmpty()) {
-					CyberRequirement req = RequirementsManager.getInstance().getRequirement(isolatorRequirement);
-//					return new AddIsolatorClaim(req.getContext(), isolatedComponents, vpSub);
-					return new AddIsolatorClaim(isolatedComponents, vpSub);
+				// Add add_virtualization claims to resolute prove statement, if applicable
+				if (!virtualizationRequirement.isEmpty()) {
+					return new AddVirtualizationClaim(boundComponents, vpSub);
 				}
 
 				return null;
 			});
 		}
 
-		// Add add_isolator claims to resolute prove statement, if applicable
+		// Add add_virtualization claims to resolute prove statement, if applicable
 		if (claim != null) {
-			RequirementsManager.getInstance().modifyRequirement(isolatorRequirement, claim);
+			RequirementsManager.getInstance().modifyRequirement(virtualizationRequirement, claim);
 		}
 
 	}
