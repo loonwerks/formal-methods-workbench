@@ -116,8 +116,8 @@ public class EphemeralImplementationUtil {
 	public ComponentImplementation generateEphemeralCompImplFromType(ComponentType ct)
 			throws Exception {
 //		Resource aadlResource = OsateResourceUtil.getResource(getEphemeralImplURI(ct));
-		ResourceSet resourceSet = new ResourceSetImpl();
-		Resource aadlResource = resourceSet.getResource(getEphemeralImplURI(ct), true);
+		Resource aadlResource = getResource(getEphemeralImplURI(ct));
+
 		ephemeralResources.add(aadlResource);
 		List<ComponentImplementation> resultList;
 		ComponentImplementation result;
@@ -163,6 +163,20 @@ public class EphemeralImplementationUtil {
 		result = resultList.get(0);
 
 		return result;
+	}
+
+	Resource getResource(URI uri) {
+		ResourceSet resourceSet = new ResourceSetImpl();
+		Resource resource = null;
+		try {
+			resource = resourceSet.getResource(uri, true);
+		} catch (RuntimeException e) {
+			resource = resourceSet.getResource(uri, false);
+			if (resource == null) {
+				resource = resourceSet.createResource(uri);
+			}
+		}
+		return resource;
 	}
 
 	/**
