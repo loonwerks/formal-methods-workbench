@@ -17,6 +17,7 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.ArraySize;
 import org.osate.aadl2.ArraySizeProperty;
+import org.osate.aadl2.ArrayableElement;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierType;
 import org.osate.aadl2.ClassifierValue;
@@ -930,30 +931,10 @@ public class AgreeTypeSystem {
 			return typeDefFromType(((Arg) ne).getType());
 
 		} else if (ne instanceof Subcomponent) {
-
-			Subcomponent sub = (Subcomponent) ne;
-			Classifier cl = sub.getClassifier();
-			List<ArrayDimension> dims = sub.getArrayDimensions();
-			TypeDef clsTypeDef = typeDefFromClassifier(cl);
-			if (dims.size() == 0) {
-				return clsTypeDef;
-			} else if (dims.size() == 1) {
-				long size = getArraySize(dims.get(0));
-				return new ArrayTypeDef(clsTypeDef, Math.toIntExact(size), Optional.empty());
-			}
+			return getTypeDefFromFeatureOrSubcomp(ne);
 
 		} else if (ne instanceof Feature) {
-
-			Classifier cl = ((Feature) ne).getClassifier();
-			List<ArrayDimension> dims = ((Feature) ne).getArrayDimensions();
-			TypeDef clsTypeDef = typeDefFromClassifier(cl);
-			if (dims.size() == 0) {
-				return clsTypeDef;
-			} else if (dims.size() == 1) {
-				long size = getArraySize(dims.get(0));
-				return new ArrayTypeDef(clsTypeDef, Math.toIntExact(size), Optional.empty());
-
-			}
+			return getTypeDefFromFeatureOrSubcomp(ne);
 
 		} else if (ne instanceof PropertyConstant) {
 			PropertyExpression pe = ((PropertyConstant) ne).getConstantValue();
@@ -963,6 +944,80 @@ public class AgreeTypeSystem {
 
 		return Prim.ErrorTypeDef;
 
+	}
+
+	private static TypeDef getTypeDefFromFeatureOrSubcomp(NamedElement ne) {
+
+		Classifier cl = null;
+		if (ne instanceof Feature) {
+			cl = ((Feature) ne).getClassifier();
+		} else if (ne instanceof Subcomponent) {
+			cl = ((Subcomponent) ne).getClassifier();
+		}
+		List<ArrayDimension> dims = null;
+		if (ne instanceof ArrayableElement) {
+			dims = ((ArrayableElement) ne).getArrayDimensions();
+		}
+
+		if (cl == null) {
+			return Prim.ErrorTypeDef;
+		}
+
+		TypeDef clsTypeDef = typeDefFromClassifier(cl);
+		if (dims == null || dims.size() == 0) {
+
+			boolean prop_isArray = false;
+			int prop_arraySize = 0;
+			List<PropertyAssociation> pas = null;
+
+			if (ne instanceof Feature) {
+				pas = ((Feature) ne).getOwnedPropertyAssociations();
+			} else if (ne instanceof Subcomponent) {
+				pas = ((Subcomponent) ne).getOwnedPropertyAssociations();
+			}
+
+			if (pas != null) {
+				for (PropertyAssociation pchoice : pas) {
+
+					Property p = pchoice.getProperty();
+
+					PropertyExpression v = pchoice.getOwnedValues().get(0).getOwnedValue();
+
+					String key = p.getQualifiedName();
+
+					if (key.equals("Data_Model::Data_Representation")) {
+						if (v instanceof NamedValue) {
+							AbstractNamedValue anv = ((NamedValue) v).getNamedValue();
+							if (anv instanceof EnumerationLiteral) {
+								EnumerationLiteral el = (EnumerationLiteral) anv;
+								prop_isArray = el.getName().equals("Array");
+							}
+						}
+
+					} else if (key.equals("Data_Model::Dimension")) {
+						if (v instanceof ListValue) {
+							ListValue l = (ListValue) v;
+							PropertyExpression pe = l.getOwnedListElements().get(0);
+							prop_arraySize = Math.toIntExact(intFromPropExp(pe).orElse((long) -1).longValue());
+
+						}
+					}
+				}
+			}
+
+			if (prop_isArray && prop_arraySize > 0) {
+				return new ArrayTypeDef(clsTypeDef, prop_arraySize, Optional.empty());
+			} else if (prop_isArray && prop_arraySize <= 0) {
+				return Prim.ErrorTypeDef;
+			} else {
+				return clsTypeDef;
+			}
+		} else if (dims.size() == 1) {
+			long size = getArraySize(dims.get(0));
+			return new ArrayTypeDef(clsTypeDef, Math.toIntExact(size), Optional.empty());
+
+		}
+		return Prim.ErrorTypeDef;
 	}
 
 	private static long getArraySize(ArrayDimension arrayDimension) {

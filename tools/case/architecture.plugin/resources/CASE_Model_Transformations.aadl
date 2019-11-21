@@ -11,8 +11,8 @@ public
 	end CASE_MsgHeader;
 	data implementation CASE_MsgHeader.Impl
 		subcomponents
-			src: data Base_Types::Integer;
-			dst: data Base_Types::Integer;
+			src: data Base_Types::Integer_32;
+			dst: data Base_Types::Integer_32;
 			trusted: data Base_Types::Boolean;
 			HMAC: data Base_Types::Boolean;
 	end CASE_MsgHeader.Impl;
@@ -77,9 +77,9 @@ public
 	
 	data implementation CASE_AttestationCacheRecord.Impl
 		subcomponents
-			src: data Base_Types::Integer;
-			trusted: data Base_Types::Integer;
-			timeout: data Base_Types::Integer;
+			src: data Base_Types::Integer_32;
+			trusted: data Base_Types::Integer_32;
+			timeout: data Base_Types::Integer_32;
 	end CASE_AttestationCacheRecord.Impl;
 	
 	
@@ -144,7 +144,7 @@ public
 					new_cache;
 		tel;
 		
-		fun TRUSTED(src : Base_Types::Integer) : bool = 
+		fun TRUSTED(src : Base_Types::Integer_32) : bool = 
 			IN_CACHE(src) and PASS_ATTESTATION(src) and not IS_STALE(src);
 
 		const AM_FAIL : int = 0;
@@ -328,10 +328,10 @@ public
 			** "Attestation Manager added for communications driver " comm_driver **
 			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager)			
 		
-		-- Top-level claim for proper insertion of an isolator
-		add_isolator(isolated_components : {component}, isolator : component) <=
-			** isolated_components " isolated in VM " isolator **
-			isolator_bound_to_processor(isolator) and components_bound_to_vm(isolated_components, isolator) and subcomponents_not_bound_to_other_processors(isolated_components, isolator)
+		-- Top-level claim for proper insertion of virtualization
+		add_virtualization(bound_components : {component}, virtual_machine : component) <=
+			** bound_components " contained in VM " virtual_machine **
+			vm_bound_to_processor(virtual_machine) and components_bound_to_vm(bound_components, virtual_machine) and subcomponents_not_bound_to_other_processors(bound_components, virtual_machine)
 		
 		-- Top-level claim for proper insertion of a monitor
 		add_monitor(comp_context : component, monitor : component) <=
@@ -464,31 +464,31 @@ public
 		is_comm_driver(c : component) : bool =
 			has_property(c, CASE_Properties::COMP_TYPE) and property(c, CASE_Properties::COMP_TYPE) = "COMM_DRIVER"
 	
-		-- Checks if the specified virtual processor is a CASE Isolator and is bound to a processor
-		isolator_bound_to_processor(isolator : component) <=
-			** isolator " is bound to a processor" **
-			is_isolator(isolator) and exists(p : processor) . is_bound_to(isolator, p)
+		-- Checks if the specified virtual processor is a CASE Virtualization and is bound to a processor
+		vm_bound_to_processor(virtual_machine : component) <=
+			** virtual_machine " is bound to a processor" **
+			is_virtual_processor(virtual_machine) and exists(p : processor) . is_bound_to(virtual_machine, p)
 			
-		-- Checks if specified component is a CASE isolator
-		is_isolator(c : component) : bool =
-			has_property(c, CASE_Properties::COMP_TYPE) and property(c, CASE_Properties::COMP_TYPE) = "ISOLATOR"
+		-- Checks if specified component is a CASE Virtual Machine
+		is_virtual_processor(c : component) : bool =
+			has_property(c, CASE_Properties::COMP_TYPE) and property(c, CASE_Properties::COMP_TYPE) = "VIRTUAL_MACHINE"
 		
-		-- Checks that bindings exist between specified isolated components and virtual processor
-		components_bound_to_vm(isolated_components : {component}, isolator : component) <=
-			** "Isolated components are bound to virtual processor " isolator **
-			forall (c : isolated_components) . check_vm_binding(c, isolator)
+		-- Checks that bindings exist between specified virtualized components and virtual processor
+		components_bound_to_vm(bound_components : {component}, virtual_machine : component) <=
+			** "Components are bound to virtual processor " virtual_machine **
+			forall (c : bound_components) . check_vm_binding(c, virtual_machine)
 			
 		-- Checks that the specified component is bound to the specified virtual processor
-		check_vm_binding(c : component, vm : component) <=
-			** "Component " c " is bound to virtual processor " vm **
-			is_bound_to(c, vm)
+		check_vm_binding(c : component, virtual_machine : component) <=
+			** "Component " c " is bound to virtual processor " virtual_machine **
+			is_bound_to(c, virtual_machine)
 		
-		-- Checks that subcomponents of specified isolated components are not bound to processors other than the 
+		-- Checks that subcomponents of specified virtualized components are not bound to processors other than the 
 		-- specified VM
-		subcomponents_not_bound_to_other_processors(isolated_components : {component}, isolator : component) <=
+		subcomponents_not_bound_to_other_processors(bound_components : {component}, virtual_machine : component) <=
 			** "Subcomponents are not bound to other processors" **
-			let subs : {component} = get_subcomponents(next_subcomponent(isolated_components));
-			forall (s : subs) . not exists (i : component) . (is_bound_to(s, i) and not (i = isolator))
+			let subs : {component} = get_subcomponents(next_subcomponent(bound_components));
+			forall (s : subs) . not exists (v : component) . (is_bound_to(s, v) and not (v = virtual_machine))
 			
 		-- Get set of descendants
 		get_subcomponents(curr : {component}) : {component} =
