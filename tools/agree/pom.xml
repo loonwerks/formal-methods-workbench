@@ -112,7 +112,7 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<feature id="com.collins.trustedsystems.jkind.feature" />
+								<feature id="com.collins.trustedsystems.jkindapi.feature" />
 								<feature id="com.collins.trustedsystems.z3.feature" />
 							</excludes>
 						</configuration>

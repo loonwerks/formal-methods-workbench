@@ -84,7 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          version="0.0.0"/>
 
    <includes
-         id="com.collins.trustedsystems.jkind.feature"
+         id="com.collins.trustedsystems.jkindapi.feature"
          version="0.0.0"/>
 
    <includes

@@ -1,18 +1,11 @@
 package com.rockwellcollins.atc.agree.analysis.preferences;
 
-import java.io.File;
-import java.net.URL;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.osgi.framework.Bundle;
 
 //import com.rockwellcollins.atc.z3.Z3Plugin;
 import com.collins.trustedsystems.z3.Z3Plugin;
 import com.rockwellcollins.atc.agree.analysis.Activator;
 
-import jkind.JKindException;
 import jkind.SolverOption;
 import jkind.api.JKindApi;
 import jkind.api.JRealizabilityApi;
@@ -132,14 +125,7 @@ public class PreferencesUtil {
 	}
 
 	public static String getJKindJar() {
-		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-		URL url = bundle.getEntry("dependencies/jkind.jar");
-		try {
-			URL fileUrl = FileLocator.toFileURL(url);
-			return new File(fileUrl.getPath()).toString();
-		} catch (Exception e) {
-			throw new JKindException("Unable to extract jkind.jar from plug-in", e);
-		}
+		return com.collins.trustedsystems.jkindapi.PluginUtil.getJKindJar();
 	}
 
 	private static Kind2Api getKind2Api() {
