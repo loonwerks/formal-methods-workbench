@@ -117,7 +117,9 @@ public class EphemeralImplementationUtil {
 			throws Exception {
 //		Resource aadlResource = OsateResourceUtil.getResource(getEphemeralImplURI(ct));
 		ResourceSet resourceSet = new ResourceSetImpl();
-		Resource aadlResource = resourceSet.getResource(getEphemeralImplURI(ct), true);
+		// Since getEphemeralImplURI() checks to see that the URI does not reference
+		// a resource that exists, we can directly create the resource.
+		Resource aadlResource = resourceSet.createResource(getEphemeralImplURI(ct));
 		ephemeralResources.add(aadlResource);
 		List<ComponentImplementation> resultList;
 		ComponentImplementation result;
