@@ -375,6 +375,16 @@
 			<layout>p2</layout>
 			<url>http://eclipse.py4j.org</url>
 		</repository>
+		<repository>
+			<id>sireum-hamr-plugin</id>
+			<layout>p2</layout>
+			<url>https://raw.githubusercontent.com/sireum/hamr-plugin-update-site/master/</url>
+		</repository>
+		<repository>
+			<id>sireum-osate-plugin</id>
+			<layout>p2</layout>
+			<url>https://raw.githubusercontent.com/sireum/osate-plugin-update-site/master/org.sireum.aadl.osate.update.site/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>

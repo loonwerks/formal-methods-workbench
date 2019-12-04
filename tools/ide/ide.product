@@ -42,6 +42,7 @@
       <feature id="com.collins.trustedsystems.z3.feature" version="4.7.1"/>
       <feature id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier"/>
       <feature id="com.rockwellcollins.atc.resolute.feature" version="2.4.0.qualifier"/>
+      <feature id="org.sireum.aadl.osate.hamr.feature" version="1.0.0.qualifier"/>
       <feature id="org.osate.core.feature"/>
       <feature id="org.osate.plugins.feature"/>
       <feature id="org.osate.xtext.aadl2.errormodel.feature" installMode="root"/>
