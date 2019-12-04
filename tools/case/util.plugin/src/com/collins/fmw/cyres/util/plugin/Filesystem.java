@@ -1,7 +1,10 @@
 package com.collins.fmw.cyres.util.plugin;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -42,6 +45,23 @@ public class Filesystem {
 
 	public static IFile getFile(URI f) {
 		return getRoot().getFile(new Path(f.toPlatformString(true)));
+	}
+
+	public static String readFile(IFile res) throws CoreException, IOException {
+		String contents = "";
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(res.getContents()));
+		String line = null;
+
+		while ((line = bufferedReader.readLine()) != null) {
+			contents += line + System.lineSeparator();
+		}
+		bufferedReader.close();
+
+		return contents;
+	}
+
+	public static void writeFile(IFile res, String contents) {
+		writeFile(res, contents.getBytes());
 	}
 
 	public static void writeFile(IFile res, byte[] contents) {
