@@ -131,7 +131,7 @@ private
 						
 		unidirectional_ports() <=
 			** "Ports must be in or out, but not both" **
-			forall (f : feature) . lint_check(f, not (direction(f) = "in out"))
+			forall (p : port) . lint_check(p, not (direction(p) = "in out"))
 		
 		processes_bound() <=
 			** "All processes must be bound to a processor" **
