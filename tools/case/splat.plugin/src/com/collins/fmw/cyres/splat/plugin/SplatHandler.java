@@ -159,10 +159,6 @@ public class SplatHandler extends AbstractHandler {
 				cmds.add("Twos_comp");
 			}
 
-			// Temporary flag to tell SPLAT to unbound numbers
-			// TODO: remove this when SPLAT has been updated to handle bounded ints
-			cmds.add("-preserve_model_nums");
-
 			cmds.add(jsonPath);
 
 			String[] commands = cmds.toArray(new String[cmds.size()]);
