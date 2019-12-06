@@ -86,16 +86,16 @@ public class SplatHandler extends AbstractHandler {
 			URI jsonURI = Aadl2Json.createJson();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
 
-			// Replace bounded numbers with unbounded equivalents
-			try {
-				String contents = Filesystem.readFile(file);
-				contents = contents.replaceAll("Base_Types::(Integer_|Unsigned_|Natural)\\d*", "Base_Types::Integer");
-				contents = contents.replaceAll("Base_Types::Float_\\d+", "Base_Types::Float");
-				Filesystem.writeFile(file, contents);
-			} catch (Exception e) {
-				Dialog.showWarning("SPLAT",
-						"Attempt to replace bounded numbers with their unbounded equivalents failed.  Check json file to ensure it does not contain bounded numbers.");
-			}
+//			// Replace bounded numbers with unbounded equivalents
+//			try {
+//				String contents = Filesystem.readFile(file);
+//				contents = contents.replaceAll("Base_Types::(Integer_|Unsigned_|Natural)\\d*", "Base_Types::Integer");
+//				contents = contents.replaceAll("Base_Types::Float_\\d+", "Base_Types::Float");
+//				Filesystem.writeFile(file, contents);
+//			} catch (Exception e) {
+//				Dialog.showWarning("SPLAT",
+//						"Attempt to replace bounded numbers with their unbounded equivalents failed.  Check json file to ensure it does not contain bounded numbers.");
+//			}
 
 
 			String jsonPath = file.getRawLocation().toOSString();
@@ -158,6 +158,10 @@ public class SplatHandler extends AbstractHandler {
 			} else {
 				cmds.add("Twos_comp");
 			}
+
+			// Temporary flag to tell SPLAT to unbound numbers
+			// TODO: remove this when SPLAT has been updated to handle bounded ints
+			cmds.add("-preserve_model_nums");
 
 			cmds.add(jsonPath);
 

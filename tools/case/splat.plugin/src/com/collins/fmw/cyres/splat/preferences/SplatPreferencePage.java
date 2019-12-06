@@ -46,16 +46,16 @@ public class SplatPreferencePage extends FieldEditorPreferencePage implements IW
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 3, 2));
 
 		// Integer width / optimize
-		addField(new IntegerWidthFieldEditor(SplatPreferenceConstants.INTEGER_WIDTH, "Integer Width",
+		addField(new IntegerWidthFieldEditor(SplatPreferenceConstants.INTEGER_WIDTH, "Integer width",
 				SplatPreferenceConstants.OPTIMIZE, "Optimize", getFieldEditorParent()));
 
 		// Endianess
-		addField(new RadioGroupFieldEditor(SplatPreferenceConstants.ENDIAN, "Endian", 2, new String[][] {
+		addField(new RadioGroupFieldEditor(SplatPreferenceConstants.ENDIAN, "Endianess", 2, new String[][] {
 				{ "Little", SplatPreferenceConstants.ENDIAN_LITTLE }, { "Big", SplatPreferenceConstants.ENDIAN_BIG } },
 				getFieldEditorParent(), true));
 
 		// Encoding
-		addField(new RadioGroupFieldEditor(SplatPreferenceConstants.ENCODING, "Encoding", 2,
+		addField(new RadioGroupFieldEditor(SplatPreferenceConstants.ENCODING, "Integer encoding", 2,
 				new String[][] { { "Unsigned", SplatPreferenceConstants.ENCODING_UNSIGNED },
 						{ "Two's Compliment", SplatPreferenceConstants.ENCODING_TWOS_COMP },
 						{ "Signed Magnitude", SplatPreferenceConstants.ENCODING_SIGN_MAG },
