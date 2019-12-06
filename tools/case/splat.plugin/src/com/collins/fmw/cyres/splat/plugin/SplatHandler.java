@@ -212,18 +212,18 @@ public class SplatHandler extends AbstractHandler {
 		String[] filterDirs = dir.list((current, name) -> new File(current, name).isDirectory());
 		Map<AadlPackage, List<String>> pkgMap = new HashMap<>();
 
-		for (String f : filterDirs) {
-			String qualifiedName = f.replaceFirst(FOLDER_PACKAGE_DELIMITER, "::");
-			String[] parts = qualifiedName.split("::");
+		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
 			AadlPackage aadlPackage = null;
-			for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
-				if (pkg.getName().equalsIgnoreCase(parts[0])) {
+			String filterName = null;
+			for (String f : filterDirs) {
+				if (f.startsWith(pkg.getName())) {
 					aadlPackage = pkg;
+					filterName = f.substring(pkg.getName().length() + 1);
 					break;
 				}
 			}
 
-			if (aadlPackage == null || parts.length != 2) {
+			if (aadlPackage == null || filterName == null) {
 				continue;
 			}
 
@@ -231,9 +231,11 @@ public class SplatHandler extends AbstractHandler {
 			if (pkgMap.containsKey(aadlPackage)) {
 				filters = pkgMap.get(aadlPackage);
 			}
-			filters.add(parts[1]);
+			filters.add(filterName);
 			pkgMap.put(aadlPackage, filters);
+
 		}
+
 
 		// Iterate through project packages
 		for (AadlPackage pkg : pkgMap.keySet()) {
