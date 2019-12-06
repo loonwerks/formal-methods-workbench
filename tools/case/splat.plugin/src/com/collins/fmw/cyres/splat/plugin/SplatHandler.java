@@ -39,6 +39,7 @@ import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
@@ -259,9 +260,7 @@ public class SplatHandler extends AbstractHandler {
 							}
 
 							// Insert source text property
-							String compName = ci.getType().getQualifiedName().replace("::", FOLDER_PACKAGE_DELIMITER);
-							String sourceText = outputDir
-									+ compName + "/" + compName;
+							String sourceText = outputDir + aadlPackage.getName() + "/" + ci.getType().getName();
 							if (implLang.equalsIgnoreCase("c")) {
 								sourceText += ".c";
 							} else {
@@ -269,11 +268,25 @@ public class SplatHandler extends AbstractHandler {
 							}
 							Property sourceTextProp = GetProperties.lookupPropertyDefinition(ci,
 									ProgrammingProperties._NAME, ProgrammingProperties.SOURCE_TEXT);
+
+							// Get any existing source text already in model
+							List<PropertyExpression> currentSource = ci.getPropertyValues(ProgrammingProperties._NAME,
+									ProgrammingProperties.SOURCE_TEXT);
+							List<StringLiteral> listVal = new ArrayList<>();
+							for (PropertyExpression pe : currentSource) {
+								if (pe instanceof StringLiteral) {
+									StringLiteral source = (StringLiteral) pe;
+									if (!source.getValue().equalsIgnoreCase(sourceText)) {
+										listVal.add(source);
+									}
+								}
+							}
+
 							StringLiteral sourceTextLit = Aadl2Factory.eINSTANCE.createStringLiteral();
 							sourceTextLit.setValue(sourceText);
-							List<StringLiteral> listVal = new ArrayList<>();
 							listVal.add(sourceTextLit);
 							ci.setPropertyValue(sourceTextProp, listVal);
+
 						}
 					}
 					return null;
