@@ -1,5 +1,7 @@
 package com.collins.fmw.cyres.splat.preferences;
 
+import java.io.File;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -28,5 +30,8 @@ public class SplatPreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(SplatPreferenceConstants.ENCODING_ZIGZAG, false);
 		store.setDefault(SplatPreferenceConstants.OUTPUT_DIRECTORY,
 				ResourcesPlugin.getWorkspace().getRoot().getLocation().toString());
+		store.setDefault(SplatPreferenceConstants.GENERATE_LOG, true);
+		store.setDefault(SplatPreferenceConstants.LOG_FILENAME,
+				ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + File.separator + "splat.log");
 	}
 }

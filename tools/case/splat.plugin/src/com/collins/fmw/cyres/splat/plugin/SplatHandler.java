@@ -2,8 +2,11 @@ package com.collins.fmw.cyres.splat.plugin;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,10 +191,21 @@ public class SplatHandler extends AbstractHandler {
 				out.println(s);
 			}
 
-			// Insert the location of the source code into the filter component implementations in the model
-			insertSourceCodeLocation(xtextEditor);
+			int exitVal = proc.waitFor();
+			if (exitVal == 0) {
 
-			out.println("Done running SPLAT");
+				// update log
+				if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.GENERATE_LOG)) {
+					updateLog();
+				}
+
+				// Insert the location of the source code into the filter component implementations in the model
+				insertSourceCodeLocation(xtextEditor);
+
+				out.println("SPLAT completed successfully.");
+			} else {
+				out.println("SPLAT has encountered an error and was unable to complete.");
+			}
 
 		} catch (Exception e) {
 			Dialog.showError("SPLAT", "SPLAT has encountered an error and was unable to complete.");
@@ -260,7 +274,8 @@ public class SplatHandler extends AbstractHandler {
 							}
 
 							// Insert source text property
-							String sourceText = outputDir + aadlPackage.getName() + "/" + ci.getType().getName();
+							String sourceText = outputDir + aadlPackage.getName() + FOLDER_PACKAGE_DELIMITER
+									+ ci.getType().getName() + "/" + ci.getType().getName();
 							if (implLang.equalsIgnoreCase("c")) {
 								sourceText += ".c";
 							} else {
@@ -330,6 +345,22 @@ public class SplatHandler extends AbstractHandler {
 		if (close) {
 			page.closeEditor(editor, false);
 		}
+	}
+
+	private void updateLog() {
+		Date date = new Date(System.currentTimeMillis());
+		String status = "SPLAT completed successfully on " + date + System.lineSeparator();
+		File file = new File(
+				Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.LOG_FILENAME));
+		FileWriter writer;
+		try {
+			writer = new FileWriter(file, true);
+			writer.write(status);
+			writer.close();
+		} catch (IOException e) {
+			Dialog.showWarning("SPLAT", "Unable to write to log file.");
+		}
+
 	}
 
 }

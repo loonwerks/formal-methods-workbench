@@ -467,10 +467,10 @@ public
 		-- Checks if the specified virtual processor is a CASE Virtualization and is bound to a processor
 		vm_bound_to_processor(virtual_machine : component) <=
 			** virtual_machine " is bound to a processor" **
-			is_virtual_processor(virtual_machine) and exists(p : processor) . is_bound_to(virtual_machine, p)
+			is_virtual_machine(virtual_machine) and exists(p : processor) . is_bound_to(virtual_machine, p)
 			
 		-- Checks if specified component is a CASE Virtual Machine
-		is_virtual_processor(c : component) : bool =
+		is_virtual_machine(c : component) : bool =
 			has_property(c, CASE_Properties::COMP_TYPE) and property(c, CASE_Properties::COMP_TYPE) = "VIRTUAL_MACHINE"
 		
 		-- Checks that bindings exist between specified virtualized components and virtual processor

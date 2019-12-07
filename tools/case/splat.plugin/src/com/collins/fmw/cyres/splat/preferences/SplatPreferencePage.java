@@ -1,18 +1,28 @@
 package com.collins.fmw.cyres.splat.preferences;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osate.ui.dialogs.Dialog;
 
 import com.collins.fmw.cyres.splat.Activator;
 
 public class SplatPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+	private BooleanFieldEditor splatLogFieldEditor = null;
+	private FileFieldEditor splatLogFileFieldEditor = null;
 
 	public SplatPreferencePage() {
 		super(GRID);
@@ -62,6 +72,75 @@ public class SplatPreferencePage extends FieldEditorPreferencePage implements IW
 						{ "ZigZag", SplatPreferenceConstants.ENCODING_ZIGZAG } },
 				getFieldEditorParent(), true));
 
+		splatLogFieldEditor = new BooleanFieldEditor(SplatPreferenceConstants.GENERATE_LOG, "Generate SPLAT run log",
+				getFieldEditorParent());
+		addField(splatLogFieldEditor);
+
+		splatLogFileFieldEditor = new FileFieldEditor(SplatPreferenceConstants.LOG_FILENAME, "SPLAT log filename:",
+				true, getFieldEditorParent()) {
+
+			@Override
+			protected String changePressed() {
+
+				FileDialog dlgSaveAs = new FileDialog(getShell(), SWT.SAVE | SWT.SHEET);
+				dlgSaveAs.setText("SPLAT log file");
+				if (!getTextControl().getText().isEmpty()) {
+					dlgSaveAs.setFileName(getTextControl().getText());
+				} else {
+					dlgSaveAs.setFileName("splat.log");
+				}
+				dlgSaveAs.setOverwrite(false);
+				dlgSaveAs.setFilterExtensions(new String[] { "*.log", "*.*" });
+				String fileName = dlgSaveAs.open();
+				if (fileName == null) {
+					return null;
+				} else {
+					fileName = fileName.trim();
+				}
+
+				// Create the file if it doesn't exist
+				try {
+					File file = new File(fileName);
+					file.createNewFile();
+				} catch (IOException e) {
+					Dialog.showError("SPLAT log file - Error", "A problem occurred while creating the file.");
+					return null;
+				}
+
+				return fileName;
+			}
+
+			@Override
+			protected boolean checkState() {
+				// Don't want to enforce proper path/filenaming
+				clearErrorMessage();
+				return true;
+			}
+		};
+		addField(splatLogFileFieldEditor);
+
+	}
+
+	private void configureEnabledFieldEditors() {
+		splatLogFileFieldEditor.setEnabled(splatLogFieldEditor.getBooleanValue(), getFieldEditorParent());
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		super.propertyChange(event);
+		configureEnabledFieldEditors();
+	}
+
+	@Override
+	protected void performDefaults() {
+		super.performDefaults();
+		configureEnabledFieldEditors();
+	}
+
+	@Override
+	protected void initialize() {
+		super.initialize();
+		configureEnabledFieldEditors();
 	}
 
 	@Override

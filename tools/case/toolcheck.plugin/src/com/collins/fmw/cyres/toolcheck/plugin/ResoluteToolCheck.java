@@ -18,6 +18,7 @@ import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.impl.AadlPackageImpl;
 import org.osate.aadl2.instance.impl.ComponentInstanceImpl;
 
+import com.collins.fmw.cyres.splat.preferences.SplatPreferenceConstants;
 import com.rockwellcollins.atc.resolute.analysis.execution.EvaluationContext;
 import com.rockwellcollins.atc.resolute.analysis.execution.ResoluteExternalAnalysis;
 import com.rockwellcollins.atc.resolute.analysis.execution.ResoluteFailException;
@@ -53,11 +54,15 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 
 		// Get the tool output file
 		String toolName = arg.getString().toLowerCase();
-		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
-				toolName + "OutputFileName", "", null);
+		String outputFileName = "";
+//		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
+//				toolName + "OutputFileName", "", null);
 
-		if (toolName.equalsIgnoreCase("APT")) {
-			return new BoolValue(true);
+		switch (toolName) {
+		case "splat":
+			outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.splat.plugin",
+					SplatPreferenceConstants.LOG_FILENAME, "", null);
+			break;
 		}
 
 		if (outputFileName.isEmpty()) {
