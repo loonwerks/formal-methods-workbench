@@ -81,7 +81,8 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		final long modelTimestamp = getModelTimestamp();
 
 		// Compare the model timestamp with the tool output timestamp
-		if (modelTimestamp <= outputFile.lastModified()) {
+		// Include a 5 second save lag for cases when the model and log file are updated at roughly the same time
+		if (modelTimestamp <= (outputFile.lastModified() + 5000)) {
 			return new BoolValue(true);
 		} else {
 			return new BoolValue(false);
