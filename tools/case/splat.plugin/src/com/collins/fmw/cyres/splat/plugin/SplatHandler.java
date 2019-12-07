@@ -194,13 +194,13 @@ public class SplatHandler extends AbstractHandler {
 			int exitVal = proc.waitFor();
 			if (exitVal == 0) {
 
+				// Insert the location of the source code into the filter component implementations in the model
+				insertSourceCodeLocation(xtextEditor);
+
 				// update log
 				if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.GENERATE_LOG)) {
 					updateLog();
 				}
-
-				// Insert the location of the source code into the filter component implementations in the model
-				insertSourceCodeLocation(xtextEditor);
 
 				out.println("SPLAT completed successfully.");
 			} else {
