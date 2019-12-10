@@ -163,6 +163,10 @@ public class SplatHandler extends AbstractHandler {
 				cmds.add("Twos_comp");
 			}
 
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.PRESERVE_MODEL_NUMS)) {
+				cmds.add("-preserve_model_nums");
+			}
+
 			cmds.add(jsonPath);
 
 			String[] commands = cmds.toArray(new String[cmds.size()]);

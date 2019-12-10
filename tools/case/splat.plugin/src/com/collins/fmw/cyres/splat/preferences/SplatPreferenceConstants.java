@@ -18,6 +18,7 @@ public class SplatPreferenceConstants {
 	public static final String ENCODING_TWOS_COMP = "splatEncodingTwosComp";
 	public static final String ENCODING_SIGN_MAG = "splatEncodingSignMag";
 	public static final String ENCODING_ZIGZAG = "splatEncodingZigZag";
+	public static final String PRESERVE_MODEL_NUMS = "splatPreserveModelNums";
 	public static final String OUTPUT_DIRECTORY = "splatOutputDirectory";
 	public static final String GENERATE_LOG = "splatGenerateLog";
 	public static final String LOG_FILENAME = "splatLogFilename";

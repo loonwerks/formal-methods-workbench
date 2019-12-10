@@ -326,7 +326,7 @@ public
 		-- Top-level claim for proper insertion of attestation manager
 		add_attestation_manager(comm_driver : component, attestation_manager : component) <=
 			** "Attestation Manager added for communications driver " comm_driver **
-			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager)			
+			attestation_manager_exists(comm_driver, attestation_manager) and attestation_manager_not_bypassed(comm_driver, attestation_manager)	and attestation_manager_implemented(attestation_manager)
 		
 		-- Top-level claim for proper insertion of virtualization
 		add_virtualization(bound_components : {component}, virtual_machine : component) <=
@@ -423,7 +423,7 @@ public
 		-- matches the AGREE contract
 		filter_proof_checked() <=
 			** "Filter proof checked" **
-			analysis("ToolCheck", "SPLAT")
+			is_seL4_component(comp) => analysis("ToolCheck", "SPLAT")
 						
 		-- Evidence that an attestation manager component exists for a given communication driver
 		attestation_manager_exists(comm_driver : component, attestation_manager : component) <=
@@ -442,6 +442,12 @@ public
 			let out_conns : {connection} = {conn for (conn : connections(comm_driver)) | source_component(conn) = comm_driver and not (destination_component(conn) = parent(comm_driver))};
 			forall(conn : out_conns) . destination_component(conn) = attestation_manager		
 			
+		-- This provides evidence that the attestation manager was correctly generated for the appropriate os
+	    -- and that the proof was emitted and checked.
+	    attestation_manager_implemented(attestation_manager : component) <=
+		    ** "Attestation Manager property implemented" **
+		   implementation_language_assurance(attestation_manager) and attestation_manager_proof_checked()
+			
 		-- This should connect to some evidence that the attestation manager was correctly generated
 	    -- and that the proof was emitted and checked.
 	    -- However, this funcionality has not yet been implemented
@@ -449,12 +455,11 @@ public
 		    ** "Attestation Manager property implemented by CakeML" **
 		    forall (c : component). is_attestation_manager(c)
 		       => has_property(c, CASE_Properties::COMP_IMPL) and property(c, CASE_Properties::COMP_IMPL) = "CAKEML"
-		       and attestation_manager_proof_checked()
+		       and attestation_manager_proof_checked(c)
 		       
 		-- Checks that a proof has been generated showing the attestation manager has been implemented correctly
-		attestation_manager_proof_checked() : bool =
-		true
---			analysis("ToolCheck", "SPLAT")
+		attestation_manager_proof_checked(comp : component) : bool =
+			is_seL4_component(comp) => analysis("ToolCheck", "Attestation")
 			
 		-- Checks if the specified component is an attestation manager
 		is_attestation_manager(c : component) : bool =

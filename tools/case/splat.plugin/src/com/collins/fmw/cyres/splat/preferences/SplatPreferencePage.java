@@ -21,6 +21,9 @@ import com.collins.fmw.cyres.splat.Activator;
 
 public class SplatPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+	private EnabledRadioGroupFieldEditor splatAssuranceLevelFieldEditor = null;
+	private BooleanFieldEditor splatCheckPropertiesFieldEditor = null;
+	private BooleanFieldEditor splatPreserveModelNums = null;
 	private BooleanFieldEditor splatLogFieldEditor = null;
 	private FileFieldEditor splatLogFileFieldEditor = null;
 
@@ -34,16 +37,29 @@ public class SplatPreferencePage extends FieldEditorPreferencePage implements IW
 		Label label = null; // separator
 
 		// Assurance level
-		addField(new RadioGroupFieldEditor(SplatPreferenceConstants.ASSURANCE_LEVEL, "Assurance level", 4,
+		splatAssuranceLevelFieldEditor = new EnabledRadioGroupFieldEditor(SplatPreferenceConstants.ASSURANCE_LEVEL,
+				"Assurance level", 4,
 				new String[][] { { "Basic", SplatPreferenceConstants.ASSURANCE_LEVEL_BASIC },
 						{ "CakeML", SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE },
 						{ "HOL", SplatPreferenceConstants.ASSURANCE_LEVEL_HOL },
 						{ "Full", SplatPreferenceConstants.ASSURANCE_LEVEL_FULL } },
-				getFieldEditorParent(), true));
+				new boolean[] { true, false, false, false }, getFieldEditorParent(), true) {
+		};
+		addField(splatAssuranceLevelFieldEditor);
+//		addField(new RadioGroupFieldEditor(SplatPreferenceConstants.ASSURANCE_LEVEL, "Assurance level", 4,
+//				new String[][] { { "Basic", SplatPreferenceConstants.ASSURANCE_LEVEL_BASIC },
+//						{ "CakeML", SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE },
+//						{ "HOL", SplatPreferenceConstants.ASSURANCE_LEVEL_HOL },
+//						{ "Full", SplatPreferenceConstants.ASSURANCE_LEVEL_FULL } },
+//				getFieldEditorParent(), true));
 
 		// Prove regexp properties
-		addField(new BooleanFieldEditor(SplatPreferenceConstants.CHECK_PROPERTIES, "Check properties",
-				getFieldEditorParent()));
+		splatCheckPropertiesFieldEditor = new BooleanFieldEditor(SplatPreferenceConstants.CHECK_PROPERTIES,
+				"Check properties", getFieldEditorParent());
+		splatCheckPropertiesFieldEditor.setEnabled(false, getFieldEditorParent());
+		addField(splatCheckPropertiesFieldEditor);
+//		addField(new BooleanFieldEditor(SplatPreferenceConstants.CHECK_PROPERTIES, "Check properties",
+//				getFieldEditorParent()));
 
 		label = new Label(getFieldEditorParent(), SWT.NONE);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
@@ -71,6 +87,10 @@ public class SplatPreferencePage extends FieldEditorPreferencePage implements IW
 						{ "Signed Magnitude", SplatPreferenceConstants.ENCODING_SIGN_MAG },
 						{ "ZigZag", SplatPreferenceConstants.ENCODING_ZIGZAG } },
 				getFieldEditorParent(), true));
+
+		// Preserve model nums
+		addField(new BooleanFieldEditor(SplatPreferenceConstants.PRESERVE_MODEL_NUMS, "Preserve bounded numeric types",
+				getFieldEditorParent()));
 
 		splatLogFieldEditor = new BooleanFieldEditor(SplatPreferenceConstants.GENERATE_LOG, "Generate SPLAT run log",
 				getFieldEditorParent());

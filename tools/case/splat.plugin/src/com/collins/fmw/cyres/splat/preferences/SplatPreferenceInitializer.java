@@ -28,6 +28,7 @@ public class SplatPreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(SplatPreferenceConstants.ENCODING_TWOS_COMP, true);
 		store.setDefault(SplatPreferenceConstants.ENCODING_SIGN_MAG, false);
 		store.setDefault(SplatPreferenceConstants.ENCODING_ZIGZAG, false);
+		store.setDefault(SplatPreferenceConstants.PRESERVE_MODEL_NUMS, false);
 		store.setDefault(SplatPreferenceConstants.OUTPUT_DIRECTORY,
 				ResourcesPlugin.getWorkspace().getRoot().getLocation().toString());
 		store.setDefault(SplatPreferenceConstants.GENERATE_LOG, true);
