@@ -413,7 +413,7 @@ public
 	    -- and that the proof was emitted and checked.
 	    filter_implemented(filter : component) <=
 		    ** "Filter property implemented" **
-		   implementation_language_assurance(filter) and filter_proof_checked()
+		   implementation_language_assurance(filter) and filter_proof_checked(filter)
 		       
 		-- Checks if the specified component is a filter
 		is_filter(c : component) : bool =
@@ -421,9 +421,9 @@ public
 			
 		-- Checks that a proof has been generated showing the filter regular expression
 		-- matches the AGREE contract
-		filter_proof_checked() <=
+		filter_proof_checked(filter : component) <=
 			** "Filter proof checked" **
-			is_seL4_component(comp) => analysis("ToolCheck", "SPLAT")
+			is_seL4_component(filter) => analysis("ToolCheck", "SPLAT")
 						
 		-- Evidence that an attestation manager component exists for a given communication driver
 		attestation_manager_exists(comm_driver : component, attestation_manager : component) <=
@@ -446,7 +446,7 @@ public
 	    -- and that the proof was emitted and checked.
 	    attestation_manager_implemented(attestation_manager : component) <=
 		    ** "Attestation Manager property implemented" **
-		   implementation_language_assurance(attestation_manager) and attestation_manager_proof_checked()
+		   implementation_language_assurance(attestation_manager) and attestation_manager_proof_checked(attestation_manager)
 			
 		-- This should connect to some evidence that the attestation manager was correctly generated
 	    -- and that the proof was emitted and checked.
