@@ -63,6 +63,10 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 			outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.splat.plugin",
 					SplatPreferenceConstants.LOG_FILENAME, "", null);
 			break;
+		case "attestation":
+			throw new ResoluteFailException(
+					"[ERROR] A high-assurance implementation of the Attestation Manager is not available.",
+					evalContext.getThisInstance());
 		}
 
 		if (outputFileName.isEmpty()) {

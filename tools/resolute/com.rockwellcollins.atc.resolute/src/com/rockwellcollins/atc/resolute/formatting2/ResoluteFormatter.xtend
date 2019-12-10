@@ -48,6 +48,7 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import java.util.List
 import com.rockwellcollins.atc.resolute.resolute.ClaimContext
 import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption
+import com.rockwellcollins.atc.resolute.resolute.CheckStatement
 
 class ResoluteFormatter extends PropertiesFormatter {
 	
@@ -285,6 +286,11 @@ class ResoluteFormatter extends PropertiesFormatter {
 	def dispatch void format(ProveStatement provestatement, extension IFormattableDocument document) {
 		provestatement.append[newLines=1];
 		formatExpr(provestatement.getExpr(), document);
+	}
+	
+	def dispatch void format(CheckStatement checkstatement, extension IFormattableDocument document) {
+		checkstatement.append[newLines=1];
+		formatExpr(checkstatement.getExpr(), document);
 	}
 	
 	def private void formatExpr(Expr expr, extension IFormattableDocument document) {

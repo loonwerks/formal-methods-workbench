@@ -114,7 +114,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 
 		// Add attestation manager information fields
 		createImplementationNameField(container);
-//		createImplementationLanguageField(container);
+		createImplementationLanguageField(container);
 		createCacheTimeoutField(container);
 		createCacheSizeField(container);
 		createDispatchProtocolField(container);
@@ -383,7 +383,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	 */
 	private boolean saveInput() {
 		implementationName = txtImplementationName.getText();
-//		implementationLanguage = txtImplementationLanguage.getText();
+		implementationLanguage = txtImplementationLanguage.getText();
 		cacheTimeout = txtCacheTimeout.getText();
 		cacheSize = cboCacheSize.getText();
 		for (Button b : btnDispatchProtocol) {
