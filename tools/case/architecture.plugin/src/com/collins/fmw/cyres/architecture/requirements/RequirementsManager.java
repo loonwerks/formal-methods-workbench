@@ -176,7 +176,6 @@ public class RequirementsManager {
 		if (req != null) {
 			insertClaim(req, claim);
 		}
-		reqDb.updateRequirement(req);
 	}
 
 	public void updateRequirements(List<CyberRequirement> updatedReqs) {
