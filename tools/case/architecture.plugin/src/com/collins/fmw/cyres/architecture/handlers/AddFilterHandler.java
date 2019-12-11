@@ -170,7 +170,6 @@ public class AddFilterHandler extends AadlHandler {
 					}
 				}
 			} catch (NullPointerException e) {
-				e.printStackTrace();
 				addFilterFound = false;
 			}
 
