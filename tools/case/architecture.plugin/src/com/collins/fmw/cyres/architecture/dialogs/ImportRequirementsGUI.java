@@ -70,8 +70,8 @@ public class ImportRequirementsGUI extends Dialog {
 
 		shlReqManager = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 
-		shlReqManager.setMinimumSize(new Point(1200, 400));
-		shlReqManager.setSize(1200, 450);
+		shlReqManager.setMinimumSize(1200, 400);
+		shlReqManager.setSize(1200, 400);
 		shlReqManager.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		shlReqManager.setText("Import Cyber Security Requirements");
 		shlReqManager.setLayout(new GridLayout(1, true));
@@ -88,12 +88,13 @@ public class ImportRequirementsGUI extends Dialog {
 		// fl_grpReqBrowser.marginHeight = 10;
 		grpReqBrowser.setLayout(fl_grpReqBrowser);
 
-		ScrolledComposite reqBrowser = new ScrolledComposite(grpReqBrowser, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		ScrolledComposite reqBrowser = new ScrolledComposite(grpReqBrowser, SWT.BORDER);
+		reqBrowser.setMinWidth(553);
 		reqBrowser.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		reqBrowser.setExpandHorizontal(true);
 		reqBrowser.setExpandVertical(true);
 
-		tblReqBrowser = new Table(reqBrowser, SWT.BORDER | SWT.FULL_SELECTION);
+		tblReqBrowser = new Table(reqBrowser, SWT.FULL_SELECTION);
 		tblReqBrowser.setHeaderBackground(SWTResourceManager.getColor(248, 248, 255));
 		tblReqBrowser.setLinesVisible(true);
 		tblReqBrowser.setHeaderVisible(true);
@@ -114,7 +115,6 @@ public class ImportRequirementsGUI extends Dialog {
 		tblclmnShortDesciption.setWidth(309);
 		tblclmnShortDesciption.setText("Short Desciption");
 		reqBrowser.setContent(tblReqBrowser);
-		reqBrowser.setMinSize(tblReqBrowser.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		Group grpViewEditReq = new Group(cmpReqManager, SWT.NONE);
 		grpViewEditReq.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
@@ -123,7 +123,7 @@ public class ImportRequirementsGUI extends Dialog {
 		grpViewEditReq.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		ScrolledComposite scrolledComposite = new ScrolledComposite(grpViewEditReq,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+				SWT.BORDER);
 		scrolledComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
@@ -153,7 +153,6 @@ public class ImportRequirementsGUI extends Dialog {
 		lblGenTool2.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
 
 		scrolledComposite.setContent(composite);
-		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		Label lblType = new Label(composite, SWT.CENTER);
 		lblType.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
@@ -164,7 +163,7 @@ public class ImportRequirementsGUI extends Dialog {
 		lblType2.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
 
 		scrolledComposite.setContent(composite);
-		scrolledComposite.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scrolledComposite.setMinSize(new Point(600, 50));
 
 		Label lblID = new Label(composite, SWT.CENTER);
 		lblID.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
@@ -180,7 +179,7 @@ public class ImportRequirementsGUI extends Dialog {
 		lblDesc.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		lblDesc.setText("Descrption");
 
-		txtDesc = new Text(composite, SWT.BORDER | SWT.MULTI);
+		txtDesc = new Text(composite, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		txtDesc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 4));
 
 		new Label(composite, SWT.NONE);
@@ -202,7 +201,7 @@ public class ImportRequirementsGUI extends Dialog {
 		// lblReason.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblReason.setText("Reason for omission");
 
-		txtReason = new Text(composite, SWT.BORDER | SWT.MULTI);
+		txtReason = new Text(composite, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		txtReason.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 3));
 		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);

@@ -23,6 +23,7 @@ import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataPort;
+import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EnumerationType;
 import org.osate.aadl2.EventDataPort;
@@ -337,9 +338,23 @@ public class ResoluteBuiltInFnCallEvaluator {
 		 * Primary type: component
 		 */
 		case "subcomponents": {
-			ComponentInstance ci = (ComponentInstance) args.get(0).getNamedElement();
-			SetValue sv = createSetValue(ci.getComponentInstances());
-			return sv;
+
+			if (args.get(0).getNamedElement() instanceof ComponentInstance) {
+				ComponentInstance ci = (ComponentInstance) args.get(0).getNamedElement();
+				SetValue sv = createSetValue(ci.getComponentInstances());
+				return sv;
+			} else if (args.get(0).getNamedElement() instanceof ComponentImplementation) {
+				ComponentImplementation ci = (ComponentImplementation) args.get(0).getNamedElement();
+				SetValue sv = createSetValue(ci.getOwnedSubcomponents());
+				return sv;
+			} else {
+				SetValue sv = createSetValue(Collections.emptyList());
+				return sv;
+			}
+
+//			ComponentInstance ci = (ComponentInstance) args.get(0).getNamedElement();
+//			SetValue sv = createSetValue(ci.getComponentInstances());
+//			return sv;
 		}
 
 		case "is_in_array": {
@@ -973,6 +988,9 @@ public class ResoluteBuiltInFnCallEvaluator {
 		} else if (ne instanceof ComponentInstance) {
 			ComponentInstance ci = (ComponentInstance) ne;
 			return ci.getComponentClassifier();
+		} else if (ne instanceof DataSubcomponent) {
+			DataSubcomponent ds = (DataSubcomponent) ne;
+			return ds.getComponentType();
 		}
 
 		return null;

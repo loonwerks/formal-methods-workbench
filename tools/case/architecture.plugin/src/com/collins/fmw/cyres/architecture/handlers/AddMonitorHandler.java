@@ -9,6 +9,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
+import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
@@ -16,17 +17,22 @@ import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponentType;
+import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.PrivatePackageSection;
+import org.osate.aadl2.Property;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Realization;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.xtext.aadl2.properties.util.ThreadProperties;
 
 import com.collins.fmw.cyres.architecture.dialogs.AddMonitorDialog;
 import com.collins.fmw.cyres.architecture.requirements.AddMonitorClaim;
@@ -45,6 +51,7 @@ public class AddMonitorHandler extends AadlHandler {
 	static final String CONNECTION_IMPL_NAME = "c";
 
 	private String monitorImplementationName;
+	private String dispatchProtocol;
 	private String expectedPort;
 	private String alertPort;
 	private String monitorRequirement;
@@ -85,6 +92,7 @@ public class AddMonitorHandler extends AadlHandler {
 			if (monitorImplementationName == "") {
 				monitorImplementationName = MONITOR_IMPL_NAME;
 			}
+			dispatchProtocol = wizard.getDispatchProtocol();
 			expectedPort = wizard.getExpectedPort();
 			alertPort = wizard.getAlertPort();
 			monitorRequirement = wizard.getRequirement();
@@ -292,6 +300,17 @@ public class AddMonitorHandler extends AadlHandler {
 ////						return;
 //				}
 //			}
+
+			// Dispatch protocol property
+			if (!dispatchProtocol.isEmpty() && compCategory == ComponentCategory.THREAD) {
+				Property dispatchProtocolProp = GetProperties.lookupPropertyDefinition(monitorImpl,
+						ThreadProperties._NAME, ThreadProperties.DISPATCH_PROTOCOL);
+				EnumerationLiteral dispatchProtocolLit = Aadl2Factory.eINSTANCE.createEnumerationLiteral();
+				dispatchProtocolLit.setName(dispatchProtocol);
+				NamedValue nv = Aadl2Factory.eINSTANCE.createNamedValue();
+				nv.setNamedValue(dispatchProtocolLit);
+				monitorImpl.setPropertyValue(dispatchProtocolProp, nv);
+			}
 
 			// Insert monitor subcomponent in containing component implementation
 			final Subcomponent monitorSubcomp = ComponentCreateHelper.createOwnedSubcomponent(containingImpl,

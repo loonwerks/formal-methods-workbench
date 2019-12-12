@@ -53,6 +53,18 @@ public
 			-- Thread implementations must indicate location of source code or binary
 			error (threads_have_source())
 			
+			-- Ports must be in or out, but not both
+			error (unidirectional_ports())
+			
+			-- All processes must be bound to a processor
+			error (processes_bound())
+			
+			-- All ports should be connected
+			warning (ports_connected())
+			
+			-- Multiple incoming connections to a single port are not allowed
+			error (no_fan_in())
+			
 		}
 
 	**};
@@ -69,20 +81,32 @@ private
 			
 		dispatch_protocol_specified() <=
 			** "Threads should have the Dispatch_Protocol property specified" **
-			forall (t : thread) . lint_check(t, has_property(t, Dispatch_Protocol))
+			forall (t : thread) . lint_check(t, has_property(t, Thread_Properties::Dispatch_Protocol))
 			
 		valid_dispatch_protocol() <=
 			** "Threads can only specify a dispatch_protocol property of periodic or sporadic" **
-			forall (t : thread) . lint_check(t, has_property(t, Dispatch_Protocol) => 
-				(property(t, Dispatch_Protocol) = "Sporadic" or property(t, Dispatch_Protocol) = "Periodic"))
+			forall (t : thread) . lint_check(t, has_property(t, Thread_Properties::Dispatch_Protocol) => 
+				(property(t, Thread_Properties::Dispatch_Protocol) = "Sporadic" or property(t, Thread_Properties::Dispatch_Protocol) = "Periodic"))
 			
 		bounded_integers() <=
 			** "Integer types must be bounded (cannot use Base_Types::Integer)" **
-			forall (a : aadl) . lint_check(a, has_type(a) => not (type(a) = Base_Types::Integer))
+			forall (a : aadl) . lint_check(a, has_type(a) => not contains_unbounded_nums(type(a), Base_Types::Integer))
 			
 		bounded_floats() <=
 			** "Float types must be bounded (cannot use Base_Types::Float)" **
-			forall (a : aadl) . lint_check(a, has_type(a) => not (type(a) = Base_Types::Float))
+			forall (a : aadl) . lint_check(a, has_type(a) => not contains_unbounded_nums(type(a), Base_Types::Float))
+			
+		contains_unbounded_nums(a : aadl, num_type : aadl) : bool = 
+			let all_data_types : {component} = get_all_data_types(subcomponents(a));
+			a = num_type or
+			exists (c : all_data_types) . (has_type(c) and (type(c) = num_type))
+			
+		get_all_data_types(curr : {component}) : {component} = 
+			let next : {component} = union(curr, {s for (c : curr) (s : subcomponents(c))});
+			if next = curr then 
+				curr
+			else
+				get_all_data_types(next)
 			
 		data_type_specified() <=
 			** "Data types should be specified on process, thread, and thread group ports" **
@@ -94,19 +118,19 @@ private
 			
 		array_dimension() <=
 			** "Array dimensions must be specified" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Array") => has_property(d, Dimension))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Array") => has_property(d, Data_Model::Dimension))
 			
 		one_dimensional_arrays() <=
 			** "Arrays can only have one dimension" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Array") => (has_property(d, Dimension) and size(property(d, Dimension)) = 1))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Array") => (has_property(d, Data_Model::Dimension) and size(property(d, Data_Model::Dimension)) = 1))
 			
 		array_base_type() <=
 			** "The array base type should be specified" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Array") => has_property(d, Base_Type))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Array") => has_property(d, Data_Model::Base_Type))
 			
 		non_empty_enums() <=
 			** "Enumeration data components must be non-empty" **
-			forall (d : data) . lint_check(d, (has_property(d, Data_Representation) and property(d, Data_Representation) = "Enum") => (has_property(d, Enumerators) and size(property(d, Enumerators)) > 0))
+			forall (d : data) . lint_check(d, (has_property(d, Data_Model::Data_Representation) and property(d, Data_Model::Data_Representation) = "Enum") => (has_property(d, Data_Model::Enumerators) and size(property(d, Data_Model::Enumerators)) > 0))
 			
 		unidirectional_connections() <=
 			** "Connections between thread components must be uni-directional" **
@@ -117,6 +141,18 @@ private
 			let conns : {connection} = {c for (c : connection) | (not is_event_data_port_connection(c)) and diff_proc_binding(c)};
 			forall(c : conns)(vp : virtual_processor) . lint_check(source_component(c), not is_bound_to(source_component(c), vp)) and lint_check(destination_component(c), not is_bound_to(destination_component(c), vp))
 						
+		unidirectional_ports() <=
+			** "Ports must be in or out, but not both" **
+			forall (p : port) . lint_check(p, not (direction(p) = "in out"))
+		
+		processes_bound() <=
+			** "All processes must be bound to a processor" **
+			forall (p : process) . exists (proc : component) . (is_proc(proc) and lint_check(p, is_bound_to(p, proc)))
+			
+		ports_connected() <=
+			** "All ports should be connected" **
+			forall (p : port) . lint_check(p, length(connections(p)) > 0)
+			
 		diff_proc_binding(c : connection) : bool =
 			exists(p1 : component)(p2 : component) . is_proc(p1) and is_proc(p2) and is_bound_to(source_component(c), p1) and is_bound_to(destination_component(c), p2) and not (p1 = p2)
 			
@@ -137,7 +173,11 @@ private
 			
 		threads_have_source() <=
 			** "Thread implementations must indicate location of source code or binary" **
-			forall (t : thread) . lint_check(t, has_property(t, Source_Text))
+			forall (t : thread) . lint_check(t, has_property(t, Programming_Properties::Source_Text))
+			
+		no_fan_in() <=
+			** "Multiple incoming connections to a single port are not allowed" **
+			forall (f : feature) . lint_check(f, (direction(f) = "in") => (size(connections(f)) <= 1))
 		
 	**};
 	

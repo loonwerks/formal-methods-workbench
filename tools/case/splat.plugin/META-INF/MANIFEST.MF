@@ -20,3 +20,4 @@ Import-Package: com.collins.fmw.cyres.architecture.utils,
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.collins.fmw.cyres.splat.Activator
+Export-Package: com.collins.fmw.cyres.splat.preferences

@@ -16,16 +16,6 @@
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.outline.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.outline.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
@@ -77,9 +67,9 @@
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-                        id="com.collins.fmw.cyres.menus.outline.resiliency.transformations.AddIsolator"
-                        label="Add Isolator..."
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddVirtualization"
+                        id="com.collins.fmw.cyres.menus.outline.resiliency.transformations.AddVirtualization"
+                        label="Add Virtualization..."
                         style="push">
                   </command>
                   <command
@@ -142,16 +132,6 @@
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.menubar.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.menubar.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
@@ -203,9 +183,9 @@
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-                        id="com.collins.fmw.cyres.menus.menubar.resiliency.transformations.AddIsolator"
-                        label="Add Isolator..."
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddVirtualization"
+                        id="com.collins.fmw.cyres.menus.menubar.resiliency.transformations.AddVirtualization"
+                        label="Add Virtualization..."
                         style="push">
                   </command>
                   <command
@@ -288,16 +268,6 @@
                      label="Generate Requirements">
                   <command
                         commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
-                        id="com.collins.fmw.cyres.menus.editor.requirements.generate.gearcase"
-                        label="GearCase"
-                        style="push">
-                     <parameter
-                           name="com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool"
-                           value="GearCase">
-                     </parameter>
-                  </command>
-                  <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.GenerateRequirements"
                         id="com.collins.fmw.cyres.menus.editor.requirements.generate.dcrypps"
                         label="DCRYPPS"
                         style="push">
@@ -349,9 +319,9 @@
                         style="push">
                   </command>
                   <command
-                        commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-                        id="com.collins.fmw.cyres.menus.editor.resiliency.transformations.AddIsolator"
-                        label="Add Isolator..."
+                        commandId="com.collins.fmw.cyres.architecture.commands.AddVirtualization"
+                        id="com.collins.fmw.cyres.menus.editor.resiliency.transformations.AddVirtualization"
+                        label="Add Virtualization..."
                         style="push">
                   </command>
                   <command
@@ -445,8 +415,8 @@
             name="Add Monitor">
       </command>
       <command
-            id="com.collins.fmw.cyres.architecture.commands.AddIsolator"
-            name="Add Isolator">
+            id="com.collins.fmw.cyres.architecture.commands.AddVirtualization"
+            name="Add Virtualization">
       </command>
       <command
             id="om.collins.fmw.cyres.architecture.commands.AddSimplex"
@@ -488,8 +458,8 @@
             commandId="com.collins.fmw.cyres.architecture.commands.AddFilter">
       </handler>
       <handler
-            class="com.collins.fmw.cyres.architecture.handlers.AddIsolatorHandler"
-            commandId="com.collins.fmw.cyres.architecture.commands.AddIsolator">
+            class="com.collins.fmw.cyres.architecture.handlers.AddVirtualizationHandler"
+            commandId="com.collins.fmw.cyres.architecture.commands.AddVirtualization">
       </handler>
       <handler
             class="com.collins.fmw.cyres.architecture.handlers.AddMonitorHandler"

@@ -113,6 +113,15 @@ public interface ResoluteFactory extends EFactory
   ClaimAssumption createClaimAssumption();
 
   /**
+   * Returns a new object of class '<em>Claim Strategy</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Claim Strategy</em>'.
+   * @generated
+   */
+  ClaimStrategy createClaimStrategy();
+
+  /**
    * Returns a new object of class '<em>Claim Text</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->

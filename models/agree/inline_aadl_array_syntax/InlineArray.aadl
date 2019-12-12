@@ -1,0 +1,72 @@
+package InlineArray
+public 
+   with Base_Types;
+   with Data_Model;
+   
+   
+data my_data
+end my_data;
+
+
+data implementation my_data.impl
+	subcomponents
+		contents: data Base_Types::Integer {Data_Model::Data_Representation => Array;};
+		number: data Base_Types::Integer;
+end my_data.impl;
+
+   
+system A
+	features
+		Input: in data port Base_Types::Integer;
+		Output: out data port Base_Types::Integer;
+		
+		OutputArray0: out data port Base_Types::Integer [3];
+--
+		OutputArray1: out data port Base_Types::Integer {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (5);	
+		};
+		OutputArray2: out data port Base_Types::Integer {
+			Data_Model::Data_Representation => Array;
+			Data_Model::Dimension => (Consts::ArrayLength);	
+		};
+		OutputArray3: out data port my_data.impl;
+		
+		
+		OutputArray_Missing_Bound: out data port Base_Types::Integer {Data_Model::Data_Representation => Array;};
+			
+	annex agree {** 
+		eq arr : int[3] = [| 0,0,0 |];
+		guarantee "arr" : forall q in arr, q = 0;
+			
+		guarantee "Array0" : forall w in OutputArray0, w >= 0 or w < 0;
+		guarantee "Array1" : forall y in OutputArray1, y >= 0 or y < 0;
+		guarantee "Array2" : forall z in OutputArray2, z >= 0 or z < 0;
+		guarantee "Array3" : OutputArray3.number >=0 or OutputArray3.number < 0;
+		
+		
+--		guarantee "Array_OutputArray_Missing_Bound" : forall x in OutputArray1, x >= 0 or x < 0;
+
+	**};	
+end A ; 
+
+system top_level
+	features
+		Input: in data port Base_Types::Integer;
+		Output: out data port Base_Types::Integer;
+	annex agree {** 
+	    
+	  eq mode : int;
+	**};	
+end top_level;
+
+system implementation top_level.Impl
+	subcomponents
+		A_sub : system A ;
+		
+	annex agree{**
+	**};
+	
+end top_level.Impl;
+	
+end InlineArray;

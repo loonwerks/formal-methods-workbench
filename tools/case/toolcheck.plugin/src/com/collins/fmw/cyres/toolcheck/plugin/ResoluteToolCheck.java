@@ -18,6 +18,7 @@ import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.impl.AadlPackageImpl;
 import org.osate.aadl2.instance.impl.ComponentInstanceImpl;
 
+import com.collins.fmw.cyres.splat.preferences.SplatPreferenceConstants;
 import com.rockwellcollins.atc.resolute.analysis.execution.EvaluationContext;
 import com.rockwellcollins.atc.resolute.analysis.execution.ResoluteExternalAnalysis;
 import com.rockwellcollins.atc.resolute.analysis.execution.ResoluteFailException;
@@ -52,9 +53,21 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		}
 
 		// Get the tool output file
-		String toolName = arg.getString().toLowerCase() + "OutputFileName";
-		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
-				toolName, "", null);
+		String toolName = arg.getString().toLowerCase();
+		String outputFileName = "";
+//		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
+//				toolName + "OutputFileName", "", null);
+
+		switch (toolName) {
+		case "splat":
+			outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.splat.plugin",
+					SplatPreferenceConstants.LOG_FILENAME, "", null);
+			break;
+		case "attestation":
+			throw new ResoluteFailException(
+					"[ERROR] A high-assurance implementation of the Attestation Manager is not available.",
+					evalContext.getThisInstance());
+		}
 
 		if (outputFileName.isEmpty()) {
 			throw new ResoluteFailException("[ERROR] ToolCheck could not determine the output file name of the "
@@ -72,7 +85,8 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		final long modelTimestamp = getModelTimestamp();
 
 		// Compare the model timestamp with the tool output timestamp
-		if (modelTimestamp <= outputFile.lastModified()) {
+		// Include a 5 second save lag for cases when the model and log file are updated at roughly the same time
+		if (modelTimestamp <= (outputFile.lastModified() + 5000)) {
 			return new BoolValue(true);
 		} else {
 			return new BoolValue(false);

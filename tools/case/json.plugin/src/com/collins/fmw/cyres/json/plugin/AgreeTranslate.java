@@ -316,7 +316,7 @@ public class AgreeTranslate {
 			AadlPackage pkg = (AadlPackage) Aadl2Json.getContainingModelUnit(ne);
 			result.add("packageName", new JsonPrimitive(pkg.getName()));
 		}
-		result.add("name", new JsonPrimitive(ne.getName()));
+		result.add("name", new JsonPrimitive(ne.getQualifiedName()));
 		return result;
 	}
 

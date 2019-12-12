@@ -1,0 +1,3 @@
+property set Consts is
+	ArrayLength : constant aadlinteger => 3;
+end Consts;

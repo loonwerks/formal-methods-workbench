@@ -874,6 +874,7 @@ public class ResoluteJavaValidator extends AbstractResoluteJavaValidator {
 
 			// Primary type: component
 		case "subcomponents":
+			expectedTypes.add(BaseType.AADL);
 			expectedTypes.add(BaseType.COMPONENT);
 			break;
 

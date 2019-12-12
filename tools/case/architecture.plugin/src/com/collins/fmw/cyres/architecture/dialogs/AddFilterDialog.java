@@ -20,12 +20,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataPort;
+import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.PortCategory;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.Subcomponent;
 import org.osate.ui.dialogs.Dialog;
+import org.osate.xtext.aadl2.properties.util.ThreadProperties;
 
 import com.collins.fmw.cyres.architecture.handlers.AddFilterHandler;
 
@@ -37,12 +41,14 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private Subcomponent compoundFilter = null;
 	private Text txtFilterImplementationName;
 //	private Text txtFilterImplementationLanguage;
+	private List<Button> btnDispatchProtocol = new ArrayList<>();
 	private List<Button> btnLogPortType = new ArrayList<>();
 	private Combo cboFilterRequirement;
 	private Text txtAgreeProperty;
 	private List<Button> btnPropagateGuarantees = new ArrayList<>();
 //	private String filterImplementationLanguage = "";
 	private String filterImplementationName = "";
+	private String filterDispatchProtocol = "";
 	private PortCategory logPortType = null;
 	private String filterRequirement = "";
 	private String agreeProperty = "";
@@ -86,6 +92,7 @@ public class AddFilterDialog extends TitleAreaDialog {
 		// Add filter information fields
 		createFilterImplementationNameField(container);
 //		createImplementationLanguageField(container);
+		createDispatchProtocolField(container);
 		createLogPortField(container);
 
 		createRequirementField(container);
@@ -151,6 +158,64 @@ public class AddFilterDialog extends TitleAreaDialog {
 //			txtFilterImplementationLanguage.setText(DEFAULT_IMPL_LANGUAGE);
 //		}
 //	}
+
+	/**
+	 * Creates the input field for selecting the dispatch protocol
+	 * @param container
+	 */
+	private void createDispatchProtocolField(Composite container) {
+		Label lblDispatchProtocolField = new Label(container, SWT.NONE);
+		lblDispatchProtocolField.setText("Dispatch protocol");
+		lblDispatchProtocolField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+		// Create a group to contain the log port options
+		Group protocolGroup = new Group(container, SWT.NONE);
+		protocolGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		protocolGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		btnDispatchProtocol.clear();
+
+		Button btnNoProtocol = new Button(protocolGroup, SWT.RADIO);
+		btnNoProtocol.setText("None");
+		btnNoProtocol.setSelection(true);
+
+		Button btnPeriodic = new Button(protocolGroup, SWT.RADIO);
+		btnPeriodic.setText("Periodic");
+		btnPeriodic.setSelection(false);
+
+		Button btnSporadic = new Button(protocolGroup, SWT.RADIO);
+		btnSporadic.setText("Sporadic");
+		btnSporadic.setSelection(false);
+
+		if (compoundFilter != null) {
+			List<PropertyExpression> protocol = compoundFilter.getPropertyValues(ThreadProperties._NAME,
+					ThreadProperties.DISPATCH_PROTOCOL);
+			if (!protocol.isEmpty()) {
+				NamedValue nv = (NamedValue) protocol.get(0);
+				EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+				String dispatchProtocol = el.getName();
+				if (dispatchProtocol.equalsIgnoreCase("Periodic")) {
+					btnNoProtocol.setSelection(false);
+					btnPeriodic.setSelection(true);
+				} else if (dispatchProtocol.equalsIgnoreCase("Sporadic")) {
+					btnNoProtocol.setSelection(false);
+					btnSporadic.setSelection(true);
+				} else {
+					btnNoProtocol.setSelection(true);
+				}
+			}
+
+			btnNoProtocol.setEnabled(false);
+			btnPeriodic.setEnabled(false);
+			btnSporadic.setEnabled(false);
+
+		}
+
+		btnDispatchProtocol.add(btnNoProtocol);
+		btnDispatchProtocol.add(btnPeriodic);
+		btnDispatchProtocol.add(btnSporadic);
+
+	}
 
 	/**
 	 * Creates the input field for specifying if the filter should contain
@@ -219,8 +284,8 @@ public class AddFilterDialog extends TitleAreaDialog {
 	 * @param container
 	 */
 	private void createRequirementField(Composite container) {
-		Label lblResoluteField = new Label(container, SWT.NONE);
-		lblResoluteField.setText("Requirement");
+		Label lblRequirementField = new Label(container, SWT.NONE);
+		lblRequirementField.setText("Requirement");
 
 		GridData dataInfoField = new GridData();
 		dataInfoField.grabExcessHorizontalSpace = true;
@@ -292,6 +357,13 @@ public class AddFilterDialog extends TitleAreaDialog {
 	private boolean saveInput() {
 //		filterImplementationLanguage = txtFilterImplementationLanguage.getText();
 		filterImplementationName = txtFilterImplementationName.getText();
+//		filterDispatchProtocol = cboDispatchProtocol.getText();
+		for (Button b : btnDispatchProtocol) {
+			if (b.getSelection() && !b.getText().equalsIgnoreCase("None")) {
+				filterDispatchProtocol = b.getText();
+				break;
+			}
+		}
 		logPortType = null;
 		for (int i = 0; i < btnLogPortType.size(); i++) {
 			if (btnLogPortType.get(i).getSelection()) {
@@ -357,6 +429,10 @@ public class AddFilterDialog extends TitleAreaDialog {
 //	public String getFilterImplementationLanguage() {
 //		return filterImplementationLanguage;
 //	}
+
+	public String getDispatchProtocol() {
+		return filterDispatchProtocol;
+	}
 
 	public PortCategory getLogPortType() {
 		return logPortType;

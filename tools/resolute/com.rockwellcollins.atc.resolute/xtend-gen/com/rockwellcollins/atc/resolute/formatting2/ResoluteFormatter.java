@@ -11,6 +11,7 @@ import com.rockwellcollins.atc.resolute.resolute.BinaryExpr;
 import com.rockwellcollins.atc.resolute.resolute.BoolExpr;
 import com.rockwellcollins.atc.resolute.resolute.BuiltInFnCallExpr;
 import com.rockwellcollins.atc.resolute.resolute.CastExpr;
+import com.rockwellcollins.atc.resolute.resolute.CheckStatement;
 import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ClaimContext;
@@ -483,6 +484,14 @@ public class ResoluteFormatter extends PropertiesFormatter {
     this.formatExpr(provestatement.getExpr(), document);
   }
   
+  protected void _format(final CheckStatement checkstatement, @Extension final IFormattableDocument document) {
+    final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
+      it.setNewLines(1);
+    };
+    document.<CheckStatement>append(checkstatement, _function);
+    this.formatExpr(checkstatement.getExpr(), document);
+  }
+  
   private void formatExpr(final Expr expr, @Extension final IFormattableDocument document) {
     final Procedure1<IHiddenRegionFormatter> _function = (IHiddenRegionFormatter it) -> {
       it.noSpace();
@@ -579,6 +588,9 @@ public class ResoluteFormatter extends PropertiesFormatter {
       return;
     } else if (resolutesubclause instanceof CastExpr) {
       _format((CastExpr)resolutesubclause, document);
+      return;
+    } else if (resolutesubclause instanceof CheckStatement) {
+      _format((CheckStatement)resolutesubclause, document);
       return;
     } else if (resolutesubclause instanceof ClaimBody) {
       _format((ClaimBody)resolutesubclause, document);

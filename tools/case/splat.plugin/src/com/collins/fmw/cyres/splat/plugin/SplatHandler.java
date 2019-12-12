@@ -2,8 +2,11 @@ package com.collins.fmw.cyres.splat.plugin;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +42,7 @@ import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
@@ -84,8 +88,20 @@ public class SplatHandler extends AbstractHandler {
 		try {
 
 			URI jsonURI = Aadl2Json.createJson();
-
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
+
+//			// Replace bounded numbers with unbounded equivalents
+//			try {
+//				String contents = Filesystem.readFile(file);
+//				contents = contents.replaceAll("Base_Types::(Integer_|Unsigned_|Natural)\\d*", "Base_Types::Integer");
+//				contents = contents.replaceAll("Base_Types::Float_\\d+", "Base_Types::Float");
+//				Filesystem.writeFile(file, contents);
+//			} catch (Exception e) {
+//				Dialog.showWarning("SPLAT",
+//						"Attempt to replace bounded numbers with their unbounded equivalents failed.  Check json file to ensure it does not contain bounded numbers.");
+//			}
+
+
 			String jsonPath = file.getRawLocation().toOSString();
 
 			Bundle bundle = Platform.getBundle(bundleId);
@@ -98,46 +114,62 @@ public class SplatHandler extends AbstractHandler {
 			rt.exec("chmod a+x " + splatPath);
 
 			// command line parameters
+			List<String> cmds = new ArrayList<>();
+
+			cmds.add(splatPath);
+
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
 			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
-				assuranceLevel = "cake";
+				cmds.add("cake");
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_HOL)) {
-				assuranceLevel = "hol";
+				cmds.add("hol");
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL)) {
-				assuranceLevel = "full";
+				cmds.add("full");
 			} else {
-				assuranceLevel = "basic";
-			}
-			String checkProps = "";
-			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
-				checkProps = "-checkprops";
-			}
-			String outputDir = Activator.getDefault().getPreferenceStore()
-					.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY);
-			String intWidth = Integer.toString(
-					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
-			String optimize = "";
-			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
-				optimize = "optimize";
-			}
-			String endian = "LSB";
-			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
-				endian = "MSB";
-			}
-			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
-			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
-				encoding = "Unsigned";
-			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
-				encoding = "Sign_mag";
-			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
-				encoding = "ZigZag";
-			} else {
-				encoding = "Twos_comp";
+				cmds.add("basic");
 			}
 
-			String[] commands = { splatPath, assuranceLevel, checkProps, outputDir, intWidth, optimize, endian,
-					encoding, jsonPath };
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
+				cmds.add("-checkprops");
+			}
+
+			cmds.add("-outdir");
+			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
+
+			cmds.add("-intwidth");
+			cmds.add(Integer.toString(
+					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
+				cmds.add("optimize");
+			}
+
+			cmds.add("-endian");
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
+				cmds.add("MSB");
+			} else {
+				cmds.add("LSB");
+			}
+
+			cmds.add("-encoding");
+			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
+			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
+				cmds.add("Unsigned");
+			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
+				cmds.add("Sign_mag");
+			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
+				cmds.add("Zigzag");
+			} else {
+				cmds.add("Twos_comp");
+			}
+
+			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.PRESERVE_MODEL_NUMS)) {
+				cmds.add("-preserve_model_nums");
+			}
+
+			cmds.add(jsonPath);
+
+			String[] commands = cmds.toArray(new String[cmds.size()]);
 			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
 			Process proc = rt.exec(commands, environmentVars);
@@ -146,9 +178,11 @@ public class SplatHandler extends AbstractHandler {
 
 			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
-			String cmdLine = splatPath + " " + assuranceLevel + " " + (checkProps.isEmpty() ? "" : checkProps + " ")
-					+ outputDir + " " + intWidth + " " + (optimize.isEmpty() ? "" : optimize + " ") + endian + " "
-					+ encoding + " " + jsonPath + " LD_LIBRARY_PATH=" + splatDir;
+			String cmdLine = "";
+			for (String s : cmds) {
+				cmdLine += s + " ";
+			}
+			cmdLine += "LD_LIBRARY_PATH=" + splatDir;
 			out.println(cmdLine);
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			IWorkbenchPage page = window.getActivePage();
@@ -161,10 +195,21 @@ public class SplatHandler extends AbstractHandler {
 				out.println(s);
 			}
 
-			// Insert the location of the source code into the filter component implementations in the model
-			insertSourceCodeLocation(xtextEditor);
+			int exitVal = proc.waitFor();
+			if (exitVal == 0) {
 
-			out.println("Done running SPLAT");
+				// Insert the location of the source code into the filter component implementations in the model
+				insertSourceCodeLocation(xtextEditor);
+
+				// update log
+				if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.GENERATE_LOG)) {
+					updateLog();
+				}
+
+				out.println("SPLAT completed successfully.");
+			} else {
+				out.println("SPLAT has encountered an error and was unable to complete.");
+			}
 
 		} catch (Exception e) {
 			Dialog.showError("SPLAT", "SPLAT has encountered an error and was unable to complete.");
@@ -186,18 +231,18 @@ public class SplatHandler extends AbstractHandler {
 		String[] filterDirs = dir.list((current, name) -> new File(current, name).isDirectory());
 		Map<AadlPackage, List<String>> pkgMap = new HashMap<>();
 
-		for (String f : filterDirs) {
-			String qualifiedName = f.replaceFirst(FOLDER_PACKAGE_DELIMITER, "::");
-			String[] parts = qualifiedName.split("::");
+		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
 			AadlPackage aadlPackage = null;
-			for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
-				if (pkg.getName().equalsIgnoreCase(parts[0])) {
+			String filterName = null;
+			for (String f : filterDirs) {
+				if (f.startsWith(pkg.getName())) {
 					aadlPackage = pkg;
+					filterName = f.substring(pkg.getName().length() + 1);
 					break;
 				}
 			}
 
-			if (aadlPackage == null || parts.length != 2) {
+			if (aadlPackage == null || filterName == null) {
 				continue;
 			}
 
@@ -205,9 +250,11 @@ public class SplatHandler extends AbstractHandler {
 			if (pkgMap.containsKey(aadlPackage)) {
 				filters = pkgMap.get(aadlPackage);
 			}
-			filters.add(parts[1]);
+			filters.add(filterName);
 			pkgMap.put(aadlPackage, filters);
+
 		}
+
 
 		// Iterate through project packages
 		for (AadlPackage pkg : pkgMap.keySet()) {
@@ -231,9 +278,8 @@ public class SplatHandler extends AbstractHandler {
 							}
 
 							// Insert source text property
-							String compName = ci.getType().getQualifiedName().replace("::", FOLDER_PACKAGE_DELIMITER);
-							String sourceText = outputDir
-									+ compName + "/" + compName;
+							String sourceText = outputDir + aadlPackage.getName() + FOLDER_PACKAGE_DELIMITER
+									+ ci.getType().getName() + "/" + ci.getType().getName();
 							if (implLang.equalsIgnoreCase("c")) {
 								sourceText += ".c";
 							} else {
@@ -241,11 +287,25 @@ public class SplatHandler extends AbstractHandler {
 							}
 							Property sourceTextProp = GetProperties.lookupPropertyDefinition(ci,
 									ProgrammingProperties._NAME, ProgrammingProperties.SOURCE_TEXT);
+
+							// Get any existing source text already in model
+							List<PropertyExpression> currentSource = ci.getPropertyValues(ProgrammingProperties._NAME,
+									ProgrammingProperties.SOURCE_TEXT);
+							List<StringLiteral> listVal = new ArrayList<>();
+							for (PropertyExpression pe : currentSource) {
+								if (pe instanceof StringLiteral) {
+									StringLiteral source = (StringLiteral) pe;
+									if (!source.getValue().equalsIgnoreCase(sourceText)) {
+										listVal.add(source);
+									}
+								}
+							}
+
 							StringLiteral sourceTextLit = Aadl2Factory.eINSTANCE.createStringLiteral();
 							sourceTextLit.setValue(sourceText);
-							List<StringLiteral> listVal = new ArrayList<>();
 							listVal.add(sourceTextLit);
 							ci.setPropertyValue(sourceTextProp, listVal);
+
 						}
 					}
 					return null;
@@ -289,6 +349,22 @@ public class SplatHandler extends AbstractHandler {
 		if (close) {
 			page.closeEditor(editor, false);
 		}
+	}
+
+	private void updateLog() {
+		Date date = new Date(System.currentTimeMillis());
+		String status = "SPLAT completed successfully on " + date + System.lineSeparator();
+		File file = new File(
+				Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.LOG_FILENAME));
+		FileWriter writer;
+		try {
+			writer = new FileWriter(file, true);
+			writer.write(status);
+			writer.close();
+		} catch (IOException e) {
+			Dialog.showWarning("SPLAT", "Unable to write to log file.");
+		}
+
 	}
 
 }

@@ -501,43 +501,47 @@ public class RequirementsManager {
 
 	protected List<JsonRequirementsFile> readInputFiles(String filename) {
 		List<JsonRequirementsFile> reqs = new ArrayList<>();
+		List<String> filenames = new ArrayList<String>();
+		String filterPath = null;
 
 		// If a filename was passed to this command, open the file.
 		// Otherwise, prompt the user for the file
 		if (filename == null || filename.isEmpty()) {
-
 			FileDialog dlgReqFile = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 					SWT.MULTI);
 			dlgReqFile.setText("Select requirements file to import.");
-
 			dlgReqFile.open();
-			String[] filenames = dlgReqFile.getFileNames();
-			String filterPath = dlgReqFile.getFilterPath();
-
-			for (String fn : filenames) {
-				File reqFile = new File(filterPath, fn);
-				if (!reqFile.exists()) {
-					Dialog.showError("File not found",
-							"Cannot find the requirements file " + reqFile.getAbsolutePath() + ".");
-					continue;
-				}
-				JsonRequirementsFile jsonFile = new JsonRequirementsFile();
-				if (!jsonFile.importFile(reqFile)) {
-					Dialog.showError("Problem with " + reqFile.getName(),
-							"Could not load cyber requirements file " + reqFile.getName() + ".");
-					continue;
-				}
-				// Alert user if there aren't any requirements to import
-				if (jsonFile.getRequirements().isEmpty()) {
-					Dialog.showError("No new requirements to import", reqFile.getName()
-							+ " does not contain any requirements that are not already present in this model.");
-					continue;
-				}
-				// Add the requirements in this file to the accumulated list of requirements
-				reqs.add(jsonFile);
+			for (String fn : dlgReqFile.getFileNames()) {
+				filenames.add(fn);
 			}
-
+			filterPath = dlgReqFile.getFilterPath();
+		} else {
+			filenames.add(filename);
 		}
+
+		for (String fn : filenames) {
+			File reqFile = new File(filterPath, fn);
+			if (!reqFile.exists()) {
+				Dialog.showError("File not found",
+						"Cannot find the requirements file " + reqFile.getAbsolutePath() + ".");
+				continue;
+			}
+			JsonRequirementsFile jsonFile = new JsonRequirementsFile();
+			if (!jsonFile.importFile(reqFile)) {
+				Dialog.showError("Problem with " + reqFile.getName(),
+						"Could not load cyber requirements file " + reqFile.getName() + ".");
+				continue;
+			}
+			// Alert user if there aren't any requirements to import
+			if (jsonFile.getRequirements().isEmpty()) {
+				Dialog.showError("No new requirements to import", reqFile.getName()
+						+ " does not contain any requirements that are not already present in this model.");
+				continue;
+			}
+			// Add the requirements in this file to the accumulated list of requirements
+			reqs.add(jsonFile);
+		}
+
 		return reqs;
 	}
 

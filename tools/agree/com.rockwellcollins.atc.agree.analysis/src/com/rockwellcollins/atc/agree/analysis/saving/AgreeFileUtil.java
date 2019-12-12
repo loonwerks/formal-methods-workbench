@@ -57,6 +57,10 @@ public class AgreeFileUtil {
 	 */
 	public static void printLog(JKindResult result, long timestamp, String hashcode) {
 
+		if (hashcode == null) {
+			return;
+		}
+
 		try {
 
 			// This class could be called concurrently from multiple threads
@@ -290,7 +294,9 @@ public class AgreeFileUtil {
 		// Get the file containing the component instance under evaluation
 		final Resource thisResource = root.eResource();
 		if (thisResource == null) {
-			throw new Exception("Could not generate hashcode because resource not found.");
+//			throw new Exception("Could not generate hashcode because resource not found.");
+			System.out.println("Could not generate hashcode because resource not found.");
+			return null;
 		}
 
 		// Get the hash for this resource, as well as all resources

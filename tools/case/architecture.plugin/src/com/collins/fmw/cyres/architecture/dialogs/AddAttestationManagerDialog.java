@@ -43,14 +43,16 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 	private Text txtImplementationLanguage;
 	private Text txtCacheTimeout;
 	private Combo cboCacheSize;
+	private List<Button> btnDispatchProtocol = new ArrayList<>();
 	private List<Button> btnLogPortType = new ArrayList<>();
 	private Combo cboRequirement;
 	private Button btnPropagateGuarantees;
 	private Text txtAgreeProperty;
 	private String implementationName;
-	private String implementationLanguage;
+	private String implementationLanguage = "";
 	private String cacheTimeout;
 	private String cacheSize;
+	private String dispatchProtocol = "";
 	private PortCategory logPortType = null;
 	private String requirement;
 	private boolean propagateGuarantees;
@@ -115,6 +117,7 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		createImplementationLanguageField(container);
 		createCacheTimeoutField(container);
 		createCacheSizeField(container);
+		createDispatchProtocolField(container);
 		createLogPortField(container);
 		createRequirementField(container);
 		if (attestationManager == null) {
@@ -217,6 +220,39 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 
 	}
 
+	/**
+	 * Creates the input field for selecting the dispatch protocol
+	 * @param container
+	 */
+	private void createDispatchProtocolField(Composite container) {
+		Label lblDispatchProtocolField = new Label(container, SWT.NONE);
+		lblDispatchProtocolField.setText("Dispatch protocol");
+		lblDispatchProtocolField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+		// Create a group to contain the log port options
+		Group protocolGroup = new Group(container, SWT.NONE);
+		protocolGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		protocolGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		btnDispatchProtocol.clear();
+
+		Button btnNoProtocol = new Button(protocolGroup, SWT.RADIO);
+		btnNoProtocol.setText("None");
+		btnNoProtocol.setSelection(true);
+
+		Button btnPeriodic = new Button(protocolGroup, SWT.RADIO);
+		btnPeriodic.setText("Periodic");
+		btnPeriodic.setSelection(false);
+
+		Button btnSporadic = new Button(protocolGroup, SWT.RADIO);
+		btnSporadic.setText("Sporadic");
+		btnSporadic.setSelection(false);
+
+		btnDispatchProtocol.add(btnNoProtocol);
+		btnDispatchProtocol.add(btnPeriodic);
+		btnDispatchProtocol.add(btnSporadic);
+
+	}
 
 	/**
 	 * Creates the input field for specifying if the attestation manager should contain
@@ -350,6 +386,12 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 		implementationLanguage = txtImplementationLanguage.getText();
 		cacheTimeout = txtCacheTimeout.getText();
 		cacheSize = cboCacheSize.getText();
+		for (Button b : btnDispatchProtocol) {
+			if (b.getSelection() && !b.getText().equalsIgnoreCase("None")) {
+				dispatchProtocol = b.getText();
+				break;
+			}
+		}
 		logPortType = null;
 		for (int i = 0; i < btnLogPortType.size(); i++) {
 			if (btnLogPortType.get(i).getSelection()) {
@@ -388,6 +430,10 @@ public class AddAttestationManagerDialog extends TitleAreaDialog {
 
 	public String getCacheSize() {
 		return cacheSize;
+	}
+
+	public String getDispatchProtocol() {
+		return dispatchProtocol;
 	}
 
 	public PortCategory getLogPortType() {

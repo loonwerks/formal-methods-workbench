@@ -5,6 +5,7 @@ package com.rockwellcollins.atc.resolute.resolute.impl;
 import com.rockwellcollins.atc.resolute.resolute.ClaimAssumption;
 import com.rockwellcollins.atc.resolute.resolute.ClaimBody;
 import com.rockwellcollins.atc.resolute.resolute.ClaimContext;
+import com.rockwellcollins.atc.resolute.resolute.ClaimStrategy;
 import com.rockwellcollins.atc.resolute.resolute.ClaimText;
 import com.rockwellcollins.atc.resolute.resolute.ResolutePackage;
 
@@ -31,6 +32,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link com.rockwellcollins.atc.resolute.resolute.impl.ClaimBodyImpl#getClaim <em>Claim</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.resolute.resolute.impl.ClaimBodyImpl#getContext <em>Context</em>}</li>
  *   <li>{@link com.rockwellcollins.atc.resolute.resolute.impl.ClaimBodyImpl#getAssumptions <em>Assumptions</em>}</li>
+ *   <li>{@link com.rockwellcollins.atc.resolute.resolute.impl.ClaimBodyImpl#getStrategies <em>Strategies</em>}</li>
  * </ul>
  *
  * @generated
@@ -66,6 +68,16 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
    * @ordered
    */
   protected EList<ClaimAssumption> assumptions;
+
+  /**
+   * The cached value of the '{@link #getStrategies() <em>Strategies</em>}' containment reference list.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getStrategies()
+   * @generated
+   * @ordered
+   */
+  protected EList<ClaimStrategy> strategies;
 
   /**
    * <!-- begin-user-doc -->
@@ -139,6 +151,21 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
    * @generated
    */
   @Override
+  public EList<ClaimStrategy> getStrategies()
+  {
+    if (strategies == null)
+    {
+      strategies = new EObjectContainmentEList<ClaimStrategy>(ClaimStrategy.class, this, ResolutePackage.CLAIM_BODY__STRATEGIES);
+    }
+    return strategies;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
     switch (featureID)
@@ -149,6 +176,8 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
         return ((InternalEList<?>)getContext()).basicRemove(otherEnd, msgs);
       case ResolutePackage.CLAIM_BODY__ASSUMPTIONS:
         return ((InternalEList<?>)getAssumptions()).basicRemove(otherEnd, msgs);
+      case ResolutePackage.CLAIM_BODY__STRATEGIES:
+        return ((InternalEList<?>)getStrategies()).basicRemove(otherEnd, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -169,6 +198,8 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
         return getContext();
       case ResolutePackage.CLAIM_BODY__ASSUMPTIONS:
         return getAssumptions();
+      case ResolutePackage.CLAIM_BODY__STRATEGIES:
+        return getStrategies();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -196,6 +227,10 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
         getAssumptions().clear();
         getAssumptions().addAll((Collection<? extends ClaimAssumption>)newValue);
         return;
+      case ResolutePackage.CLAIM_BODY__STRATEGIES:
+        getStrategies().clear();
+        getStrategies().addAll((Collection<? extends ClaimStrategy>)newValue);
+        return;
     }
     super.eSet(featureID, newValue);
   }
@@ -219,6 +254,9 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
       case ResolutePackage.CLAIM_BODY__ASSUMPTIONS:
         getAssumptions().clear();
         return;
+      case ResolutePackage.CLAIM_BODY__STRATEGIES:
+        getStrategies().clear();
+        return;
     }
     super.eUnset(featureID);
   }
@@ -239,6 +277,8 @@ public class ClaimBodyImpl extends DefinitionBodyImpl implements ClaimBody
         return context != null && !context.isEmpty();
       case ResolutePackage.CLAIM_BODY__ASSUMPTIONS:
         return assumptions != null && !assumptions.isEmpty();
+      case ResolutePackage.CLAIM_BODY__STRATEGIES:
+        return strategies != null && !strategies.isEmpty();
     }
     return super.eIsSet(featureID);
   }
