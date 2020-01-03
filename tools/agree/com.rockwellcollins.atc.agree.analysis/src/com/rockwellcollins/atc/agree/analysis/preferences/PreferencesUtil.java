@@ -135,7 +135,7 @@ public class PreferencesUtil {
 		URL url = bundle.getEntry("dependencies/jkind.jar");
 		try {
 			URL fileUrl = FileLocator.toFileURL(url);
-			return new File(fileUrl.getPath()).toString();
+			return new File(fileUrl.getPath()).getCanonicalPath();
 		} catch (Exception e) {
 			throw new JKindException("Unable to extract jkind.jar from plug-in", e);
 		}
