@@ -60,6 +60,8 @@ public class SplatHandler extends AbstractHandler {
 
 	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
 	private final static String FOLDER_PACKAGE_DELIMITER = "_";
+	private boolean isStarted = false;
+
 
 	private MessageConsole findConsole(String name) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -87,6 +89,7 @@ public class SplatHandler extends AbstractHandler {
 
 		try {
 
+			String dockerimage = "splatimgupdated ";
 			URI jsonURI = Aadl2Json.createJson();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
 
@@ -107,16 +110,24 @@ public class SplatHandler extends AbstractHandler {
 			Bundle bundle = Platform.getBundle(bundleId);
 
 			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
-			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
-					.getFile();
+//			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
+//					.getFile();
+			String splatPath = "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user";
 
 			Runtime rt = Runtime.getRuntime();
-			rt.exec("chmod a+x " + splatPath);
+//			rt.exec("chmod a+x " + splatPath);
+			Process dockerClientProcess = null;
+
 
 			// command line parameters
 			List<String> cmds = new ArrayList<>();
+			String commands = "";
 
+			cmds.add("docker run --rm -v");
 			cmds.add(splatPath);
+			commands += "docker run --rm -v ";
+			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
+			commands += dockerimage;
 
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
@@ -127,63 +138,88 @@ public class SplatHandler extends AbstractHandler {
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL)) {
 				cmds.add("full");
 			} else {
-				cmds.add("basic");
+//				cmds.add("basic");
+				System.out.println("basic");
 			}
 
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
 				cmds.add("-checkprops");
 			}
 
-			cmds.add("-outdir");
-			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
+//			cmds.add("-outdir");
+//			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
+//			cmds.add(":/user");
 
 			cmds.add("-intwidth");
+			commands += "-intwidth ";
 			cmds.add(Integer.toString(
 					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
+			commands += Integer.toString(
+					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
+			commands += " ";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
 				cmds.add("optimize");
 			}
 
-			cmds.add("-endian");
+			cmds.add("-endian ");
+			commands += "-endian ";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
 				cmds.add("MSB");
+				commands += "MSB ";
 			} else {
 				cmds.add("LSB");
+				commands += "LSB ";
 			}
 
 			cmds.add("-encoding");
+			commands += "-encoding ";
 			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
 			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
 				cmds.add("Unsigned");
+				commands += "Unsigned ";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
 				cmds.add("Sign_mag");
+				commands += "Sign_mag ";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
 				cmds.add("Zigzag");
+				commands += "Zigzag ";
 			} else {
 				cmds.add("Twos_comp");
+				commands += "Twos_comp ";
 			}
 
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.PRESERVE_MODEL_NUMS)) {
 				cmds.add("-preserve_model_nums");
+				commands += "-preserve_model_nums ";
 			}
 
-			cmds.add(jsonPath);
+//			cmds.add(jsonPath);
+			cmds.add("Producer_Consume.json");
+			commands += "Producer_Consumer.json";
 
-			String[] commands = cmds.toArray(new String[cmds.size()]);
-			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
+			System.out.println(commands);
+//			String[] commands = cmds.toArray(new String[cmds.size()]);
+//			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
 
-			Process proc = rt.exec(commands, environmentVars);
+//			Process proc = rt.exec(commands, environmentVars);
+//			String c = "docker run --rm -v C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user splatimg -intwidth 32 -endian LSB -encoding Twos_comp Producer_Consume.json";
+//			System.out.println(c);
+			dockerClientProcess = Runtime.getRuntime().exec(commands);
+//			isStarted = true;
+			BufferedReader stdErr = new BufferedReader(new InputStreamReader(dockerClientProcess.getErrorStream()));
+//			BufferedReader stdOut = new BufferedReader(new InputStreamReader(dockerClientProcess.getInputStream()));
 
-			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+//			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
-			String cmdLine = "";
-			for (String s : cmds) {
-				cmdLine += s + " ";
-			}
-			cmdLine += "LD_LIBRARY_PATH=" + splatDir;
-			out.println(cmdLine);
+//			String cmdLine = "";
+//			for (String s : cmds) {
+//				cmdLine += s + " ";
+//			}
+//			cmdLine += "LD_LIBRARY_PATH=" + splatDir;
+//			out.println(cmdLine);
+			out.println(commands);
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			IWorkbenchPage page = window.getActivePage();
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;
@@ -195,7 +231,8 @@ public class SplatHandler extends AbstractHandler {
 				out.println(s);
 			}
 
-			int exitVal = proc.waitFor();
+//			int exitVal = proc.waitFor();
+			int exitVal = dockerClientProcess.waitFor();
 			if (exitVal == 0) {
 
 				// Insert the location of the source code into the filter component implementations in the model
@@ -206,7 +243,7 @@ public class SplatHandler extends AbstractHandler {
 					updateLog();
 				}
 
-				out.println("SPLAT completed successfully.");
+				out.println("SPLAT completed successfully, GENIUS!.");
 			} else {
 				out.println("SPLAT has encountered an error and was unable to complete.");
 			}
@@ -216,9 +253,10 @@ public class SplatHandler extends AbstractHandler {
 			e.printStackTrace();
 			return null;
 		}
-
 		return null;
 	}
+
+
 
 	private void insertSourceCodeLocation(XtextEditor currentEditor) {
 
