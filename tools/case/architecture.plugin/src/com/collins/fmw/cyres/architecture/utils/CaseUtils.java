@@ -1,6 +1,7 @@
 package com.collins.fmw.cyres.architecture.utils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
@@ -322,7 +323,16 @@ public class CaseUtils {
 	public static AadlPackage getCaseRequirementsPackage() {
 		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
 			if (pkg.getName().equalsIgnoreCase(CASE_REQUIREMENTS_NAME)) {
-				return pkg;
+				// Make sure resource is refreshed
+				Resource r = pkg.eResource();
+				r.unload();
+				try {
+					r.load(null);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
+				return (AadlPackage) r.getContents().get(0);
 			}
 		}
 		// Cyber-security Requirements package not found.
