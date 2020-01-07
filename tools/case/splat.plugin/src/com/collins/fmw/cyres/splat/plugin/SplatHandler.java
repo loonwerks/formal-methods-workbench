@@ -89,6 +89,7 @@ public class SplatHandler extends AbstractHandler {
 
 		try {
 
+			// name of the splat image
 			String dockerimage = "splatimgupdated ";
 			URI jsonURI = Aadl2Json.createJson();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
