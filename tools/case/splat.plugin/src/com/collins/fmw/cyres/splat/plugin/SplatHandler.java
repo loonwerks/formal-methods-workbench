@@ -59,8 +59,6 @@ public class SplatHandler extends AbstractHandler {
 
 	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
 	private final static String FOLDER_PACKAGE_DELIMITER = "_";
-	private boolean isStarted = false;
-
 
 	private MessageConsole findConsole(String name) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -105,7 +103,7 @@ public class SplatHandler extends AbstractHandler {
 //						"Attempt to replace bounded numbers with their unbounded equivalents failed.  Check json file to ensure it does not contain bounded numbers.");
 //			}
 
-
+			// Prepare the volume mounting format for docker
 			String jsonPath = file.getRawLocation().toOSString();
 			String[] jsonPathArrayTemp = jsonPath.split(Pattern.quote(File.separator));
 			String[] jsonPathArrayNew = Arrays.copyOf(jsonPathArrayTemp, jsonPathArrayTemp.length - 1);
@@ -123,6 +121,8 @@ public class SplatHandler extends AbstractHandler {
 
 //			Runtime rt = Runtime.getRuntime();
 //			rt.exec("chmod a+x " + splatPath);
+
+			// Initialize a process and build the command for runtime exec method
 			Process dockerClientProcess = null;
 
 
@@ -137,6 +137,7 @@ public class SplatHandler extends AbstractHandler {
 //			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
 			commands += dockerimage;
 
+			// acquiring user preferences and setting them up accordingly for the exec command
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
 			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
