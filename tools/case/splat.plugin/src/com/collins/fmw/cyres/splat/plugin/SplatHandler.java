@@ -6,19 +6,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
@@ -47,7 +47,6 @@ import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.ProgrammingProperties;
-import org.osgi.framework.Bundle;
 
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.json.plugin.Aadl2Json;
@@ -108,96 +107,109 @@ public class SplatHandler extends AbstractHandler {
 
 
 			String jsonPath = file.getRawLocation().toOSString();
+			String[] jsonPathArrayTemp = jsonPath.split(Pattern.quote(File.separator));
+			String[] jsonPathArrayNew = Arrays.copyOf(jsonPathArrayTemp, jsonPathArrayTemp.length - 1);
+			String dockermountPath = String.join("/", jsonPathArrayNew);
+			dockermountPath += ":/user ";
+//			System.out.println(dockermountPath);
+//			System.out.println(jsonPathArrayTemp[jsonPathArrayTemp.length - 1]);
 
-			Bundle bundle = Platform.getBundle(bundleId);
+//			Bundle bundle = Platform.getBundle(bundleId);
 
-			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
+//			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
 //			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
 //					.getFile();
-			String splatPath = "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user";
+//			String splatPath = "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user";
 
-			Runtime rt = Runtime.getRuntime();
+//			Runtime rt = Runtime.getRuntime();
 //			rt.exec("chmod a+x " + splatPath);
 			Process dockerClientProcess = null;
 
 
 			// command line parameters
-			List<String> cmds = new ArrayList<>();
+//			List<String> cmds = new ArrayList<>();
 			String commands = "";
 
-			cmds.add("docker run --rm -v");
-			cmds.add(splatPath);
+//			cmds.add("docker run --rm -v");
+//			cmds.add(splatPath);
 			commands += "docker run --rm -v ";
-			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
+			commands += dockermountPath;
+//			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
 			commands += dockerimage;
 
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
 			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
-				cmds.add("cake");
+//				cmds.add("cake");
+				System.out.println("cake");
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_HOL)) {
-				cmds.add("hol");
+//				cmds.add("hol");
+				System.out.println("hol");
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL)) {
-				cmds.add("full");
+//				cmds.add("full");
+				System.out.println("full");
 			} else {
 //				cmds.add("basic");
 				System.out.println("basic");
 			}
 
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
-				cmds.add("-checkprops");
+//				cmds.add("-checkprops");
+				System.out.println("-checkprops");
 			}
 
 //			cmds.add("-outdir");
 //			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
 //			cmds.add(":/user");
 
-			cmds.add("-intwidth");
+//			cmds.add("-intwidth");
 			commands += "-intwidth ";
-			cmds.add(Integer.toString(
-					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
+//			cmds.add(Integer.toString(
+//					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
 			commands += Integer.toString(
 					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
 			commands += " ";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
-				cmds.add("optimize");
+//				cmds.add("optimize");
+				System.out.println("optimize");
 			}
 
-			cmds.add("-endian ");
+//			cmds.add("-endian ");
 			commands += "-endian ";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
-				cmds.add("MSB");
+//				cmds.add("MSB");
 				commands += "MSB ";
 			} else {
-				cmds.add("LSB");
+//				cmds.add("LSB");
 				commands += "LSB ";
 			}
 
-			cmds.add("-encoding");
+//			cmds.add("-encoding");
 			commands += "-encoding ";
 			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
 			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
-				cmds.add("Unsigned");
+//				cmds.add("Unsigned");
 				commands += "Unsigned ";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
-				cmds.add("Sign_mag");
+//				cmds.add("Sign_mag");
 				commands += "Sign_mag ";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
-				cmds.add("Zigzag");
+//				cmds.add("Zigzag");
 				commands += "Zigzag ";
 			} else {
-				cmds.add("Twos_comp");
+//				cmds.add("Twos_comp");
 				commands += "Twos_comp ";
 			}
 
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.PRESERVE_MODEL_NUMS)) {
-				cmds.add("-preserve_model_nums");
+//				cmds.add("-preserve_model_nums");
 				commands += "-preserve_model_nums ";
 			}
 
 //			cmds.add(jsonPath);
-			cmds.add("Producer_Consume.json");
-			commands += "Producer_Consumer.json";
+//			cmds.add("Producer_Consume.json");
+			commands += jsonPathArrayTemp[jsonPathArrayTemp.length - 1];
+//			commands += "Producer_Consumer.json";
 
 			System.out.println(commands);
 //			String[] commands = cmds.toArray(new String[cmds.size()]);
