@@ -23,6 +23,7 @@ before_install:
   - "./git-setup.sh"
 
 script:
+  - git clone --depth 1 https://github.com/loonwerks/AGREE.git tools/agree
   - pushd tools/agree
   - mvn clean verify
   - popd
