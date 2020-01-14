@@ -18,23 +18,7 @@
    </license>
 
    <includes
-         id="com.rockwellcollins.atc.agree.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="edu.uah.rsesc.aadlsimulator.agree.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="edu.uah.rsesc.aadlsimulator.feature"
-         version="0.0.0"/>
-
-   <includes
          id="com.rockwellcollins.atc.resolute.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="com.rockwellcollins.atc.tcg.feature"
          version="0.0.0"/>
 
    <includes
