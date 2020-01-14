@@ -45,3 +45,5 @@ target
 
 *.xtendbin
 *._trace
+
+tools/agree/
