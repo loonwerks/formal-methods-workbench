@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Toolcheck
+Bundle-Name: com.collins.trustedsystems.briefcase.toolcheck
 Bundle-SymbolicName: com.collins.trustedsystems.briefcase.toolcheck;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.collins.trustedsystems.briefcase.toolcheck.Activator
@@ -11,7 +11,7 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  com.rockwellcollins.atc.resolute,
  com.rockwellcollins.atc.resolute.analysis
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Automatic-Module-Name: com.collins.fmw.resolute.toolcheck
+Automatic-Module-Name: com.collins.trustedsystems.briefcase.toolcheck
 Bundle-ActivationPolicy: lazy
 Import-Package: com.collins.trustedsystems.briefcase.splat.preferences,
  org.eclipse.core.resources,

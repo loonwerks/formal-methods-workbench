@@ -5,22 +5,22 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.collins.fmw</groupId>
-		<artifactId>com.collins.fmw.aggregator</artifactId>
+		<groupId>com.collins.trustedsystems.fmw</groupId>
+		<artifactId>com.collins.trustedsystems.fmw.aggregator</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.collins.fmw.cyres</groupId>
-	<artifactId>com.collins.fmw.cyres.parent</artifactId>
+	<groupId>com.collins.trustedsystems.briefcase</groupId>
+	<artifactId>com.collins.trustedsystems.briefcase.parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>util.plugin</module>
-		<module>json.plugin</module>
-		<module>splat.plugin</module>
-		<module>architecture.plugin</module>
-		<module>toolcheck.plugin</module>
+		<module>briefcase</module>
+		<module>json</module>
+		<module>splat</module>
+		<module>staircase</module>
+		<module>toolcheck</module>
 		<module>feature</module>
 		<module>repository</module>
 	</modules>

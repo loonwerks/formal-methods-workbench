@@ -5,11 +5,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.collins.fmw</groupId>
-		<artifactId>com.collins.fmw.aggregator</artifactId>
+		<groupId>com.collins.trustedsystems.fmw</groupId>
+		<artifactId>com.collins.trustedsystems.fmw.aggregator</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>com.collins.fmw.aggregator.repository</artifactId>
+	<artifactId>com.collins.trustedsystems.fmw.aggregator.repository</artifactId>
 	<version>2.4.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 

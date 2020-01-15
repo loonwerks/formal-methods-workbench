@@ -58,7 +58,7 @@ import com.collins.trustedsystems.briefcase.util.TraverseProject;
 
 public class SplatHandler extends AbstractHandler {
 
-	static final String bundleId = "com.collins.fmw.cyres.splat.plugin";
+	static final String bundleId = "com.collins.trustedsystems.briefcase.splat.plugin";
 	private final static String FOLDER_PACKAGE_DELIMITER = "_";
 
 	private MessageConsole findConsole(String name) {

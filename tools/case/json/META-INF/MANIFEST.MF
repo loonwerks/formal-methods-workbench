@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: com.collins.trustedsystems.briefcase.json
 Bundle-SymbolicName: com.collins.trustedsystems.briefcase.json;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Automatic-Module-Name: com.collins.fmw.cyres.json.plugin
+Automatic-Module-Name: com.collins.trustedsystems.briefcase.json
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jface,
  org.osate.aadl2,

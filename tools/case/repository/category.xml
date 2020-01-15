@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature id="com.collins.fmw.cyres.feature">
-      <category name="fm.workbench"/>
+   <feature id="com.collins.trustedsystems.briefcase.feature">
+      <category name="case"/>
    </feature>
-   <feature id="com.collins.fmw.cyres.feature.source">
-      <category name="fm.workbench.source"/>
+   <feature id="com.collins.trustedsystems.briefcase.feature.source">
+      <category name="case.source"/>
    </feature>
-   <category-def name="fm.workbench" label="CASE (by Collins Aerospace)"/>
-   <category-def name="fm.workbench.source" label="CASE Source Code"/>
+   <category-def name="case" label="CASE (by Collins Aerospace)"/>
+   <category-def name="case.source" label="CASE Source Code"/>
 </site>

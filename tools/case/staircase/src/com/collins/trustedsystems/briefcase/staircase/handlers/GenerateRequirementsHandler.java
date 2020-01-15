@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 
 public class GenerateRequirementsHandler extends AadlHandler {
 
-	private final static String GENERATE_REQUIREMENTS_TOOL_COMMAND = "com.collins.fmw.cyres.architecture.commands.GenerateRequirements.tool";
+	private final static String GENERATE_REQUIREMENTS_TOOL_COMMAND = "com.collins.trustedsystems.briefcase.architecture.commands.GenerateRequirements.tool";
 
 	@Override
 	protected void runCommand(URI uri) {
@@ -74,7 +74,7 @@ public class GenerateRequirementsHandler extends AadlHandler {
 				try {
 					IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(this.executionEvent);
 					IHandlerService handlerService = window.getService(IHandlerService.class);
-					handlerService.executeCommand("com.collins.fmw.cyres.architecture.commands.ImportRequirements",
+					handlerService.executeCommand("com.collins.trustedsystems.briefcase.architecture.commands.ImportRequirements",
 							null);
 				} catch (Exception e) {
 					Dialog.showError("Generate Cyber Requirements", e.getMessage());

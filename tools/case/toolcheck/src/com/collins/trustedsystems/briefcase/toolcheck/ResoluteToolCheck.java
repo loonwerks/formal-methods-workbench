@@ -55,12 +55,12 @@ public class ResoluteToolCheck implements ResoluteExternalAnalysis {
 		// Get the tool output file
 		String toolName = arg.getString().toLowerCase();
 		String outputFileName = "";
-//		String outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.architecture.plugin",
+//		String outputFileName = Platform.getPreferencesService().getString("com.collins.trustedsystems.briefcase.architecture.plugin",
 //				toolName + "OutputFileName", "", null);
 
 		switch (toolName) {
 		case "splat":
-			outputFileName = Platform.getPreferencesService().getString("com.collins.fmw.cyres.splat.plugin",
+			outputFileName = Platform.getPreferencesService().getString("com.collins.trustedsystems.briefcase.splat.plugin",
 					SplatPreferenceConstants.LOG_FILENAME, "", null);
 			break;
 		case "attestation":

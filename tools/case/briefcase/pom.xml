@@ -5,12 +5,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.collins.fmw.cyres</groupId>
-		<artifactId>com.collins.fmw.cyres.parent</artifactId>
+		<groupId>com.collins.trustedsystems.briefcase</groupId>
+		<artifactId>com.collins.trustedsystems.briefcase.parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>com.collins.fmw.cyres.util.plugin</artifactId>
+	<groupId>com.collins.trustedsystems.briefcase</groupId>
+	<artifactId>com.collins.trustedsystems.briefcase</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>

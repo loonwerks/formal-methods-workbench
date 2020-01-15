@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: com.collins.trustedsystems.briefcase.splat
 Bundle-SymbolicName: com.collins.trustedsystems.briefcase.splat;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Automatic-Module-Name: com.collins.fmw.cyres.splat.plugin
+Automatic-Module-Name: com.collins.trustedsystems.briefcase.splat
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.osate.aadl2,
  org.eclipse.xtext.ui,

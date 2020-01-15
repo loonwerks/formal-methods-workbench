@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.collins.fmw.feature"
+      id="com.collins.trustedsystems.fmw.feature"
       label="Feature"
       version="1.0.0.qualifier"
       provider-name="Collins Aerospace">
@@ -38,7 +38,7 @@
          version="0.0.0"/>
 
    <includes
-         id="com.collins.fmw.cyres.feature"
+         id="com.collins.trustedsystems.briefcase.feature"
          version="0.0.0"/>
 
    <plugin

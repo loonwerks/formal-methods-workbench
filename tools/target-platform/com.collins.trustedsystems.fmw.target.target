@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.8"?>
-<target includeMode="feature" name="com.collins.fmw.target" sequenceNumber="20">
+<target includeMode="feature" name="com.collins.trustedsystems.fmw.target" sequenceNumber="20">
   <locations>
     <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
       <unit id="org.eclipse.birt.feature.group" version="0.0.0"/>
