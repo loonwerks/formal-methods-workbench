@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
+         <menu
+               id="com.collins.trustedsystems.briefcase.menus.outline.main"
+               label="CASE">
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.outline.requirements"
+                  label="Cyber Requirements">
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.outline.requirements.generate"
+                     label="Generate Requirements">
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.requirements.generate.dcrypps"
+                        label="DCRYPPS"
+                        style="push">
+                     <parameter
+                           name="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements.tool"
+                           value="DCRYPPS">
+                     </parameter>
+                  </command>
+               </menu>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ImportRequirements"
+                     id="com.collins.trustedsystems.briefcase.menus.outline.requirements.import"
+                     label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="com.collins.trustedsystems.briefcase.staircase.plugin.separator3"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ManageRequirements"
+                     id="com.collins.trustedsystems.briefcase.menus.outline.requirements.manage"
+                     label="Open Requirements Manager..."
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.outline.resiliency"
+                  label="Cyber Resiliency">
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ModelAnnotations"
+                     id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddAttestationManager"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddFilter"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddVirtualization"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations.AddVirtualization"
+                        label="Add Virtualization..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddMonitor"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="om.collins.trustedsystems.briefcase.staircase.commands.AddSimplex"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations.AddSimplex"
+                        label="Add Simplex Architecture"
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.seL4Transform"
+                        id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.transformations.seL4Transform"
+                        label="Transform for seL4 build"
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.outline.resiliency.synthesis"
+                     label="Synthesis Tools">
+               </menu>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.outline.component"
+                  label="Component Analysis">
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.SelectImplementation"
+                     id="com.collins.trustedsystems.briefcase.menus.outline.component.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.VerifyImplementation"
+                     id="com.collins.trustedsystems.briefcase.menus.outline.component.RunIvaldi"
+                     label="Run Ivaldi"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.outline.build"
+                  label="System Build">
+            </menu>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="com.collins.trustedsystems.briefcase.menus.menubar.main"
+               label="CASE">
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.menubar.requirements"
+                  label="Cyber Requirements">
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.requirements.generate"
+                     label="Generate Requirements">
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.requirements.generate.dcrypps"
+                        label="DCRYPPS"
+                        style="push">
+                     <parameter
+                           name="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements.tool"
+                           value="DCRYPPS">
+                     </parameter>
+                  </command>
+               </menu>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ImportRequirements"
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.requirements.import"
+                     label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="com.collins.trustedsystems.briefcase.staircase.plugin.separator1"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ManageRequirements"
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.requirements.manage"
+                     label="Open Requirements Manager..."
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency"
+                  label="Cyber Resiliency">
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ModelAnnotations"
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddAttestationManager"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddFilter"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddVirtualization"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations.AddVirtualization"
+                        label="Add Virtualization..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddMonitor"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="om.collins.trustedsystems.briefcase.staircase.commands.AddSimplex"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations.AddSimplex"
+                        label="Add Simplex staircase"
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.seL4Transform"
+                        id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.transformations.seL4Transform"
+                        label="Transform for seL4 build"
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.resiliency.synthesis"
+                     label="Synthesis Tools">
+               </menu>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.menubar.component"
+                  label="Component Analysis">
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.SelectImplementation"
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.component.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.VerifyImplementation"
+                     id="com.collins.trustedsystems.briefcase.menus.menubar.component.RunIvaldi"
+                     label="Run Ivaldi"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.menubar.build"
+                  label="System Build">
+            </menu>
+         </menu>
+      </menuContribution>
+      <!--
+      <menuContribution
+            locationURI="popup:org.osate.ge.editor.AgeDiagramEditor?after=additions">
+         <menu
+               label="CASE">
+            <command
+                  commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddFilter"
+                  id="com.collins.trustedsystems.briefcase.staircase.menus.AddFilter"
+                  label="Add Filter..."
+                  style="push">
+            </command>
+            <command
+                  commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddMonitor"
+                  id="com.collins.trustedsystems.briefcase.staircase.menus.AddMonitor"
+                  label="Add Monitor..."
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      -->
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextEditorContext?after=additions">
+         <menu
+               id="com.collins.trustedsystems.briefcase.menus.editor.main"
+               label="CASE">
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.editor.requirements"
+                  label="Cyber Requirements">
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.editor.requirements.generate"
+                     label="Generate Requirements">
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.requirements.generate.dcrypps"
+                        label="DCRYPPS"
+                        style="push">
+                     <parameter
+                           name="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements.tool"
+                           value="DCRYPPS">
+                     </parameter>
+                  </command>
+               </menu>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ImportRequirements"
+                     id="com.collins.trustedsystems.briefcase.menus.editor.requirements.import"
+                     label="Import Requirements..."
+                     style="push">
+               </command>
+               <separator
+                     name="com.collins.trustedsystems.briefcase.staircase.plugin.separator2"
+                     visible="true">
+               </separator>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ManageRequirements"
+                     id="com.collins.trustedsystems.briefcase.menus.editor.requirements.manage"
+                     label="Open Requirements Manager..."
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.editor.resiliency"
+                  label="Cyber Resiliency">
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.ModelAnnotations"
+                     id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.ModelAnnotations"
+                     label="Model Annotations..."
+                     style="push">
+               </command>
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations"
+                     label="Model Transformations">
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddAttestationManager"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations.AddAttestationManager"
+                        label="Add Attestation Manager..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddFilter"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations.AddFilter"
+                        label="Add Filter..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddVirtualization"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations.AddVirtualization"
+                        label="Add Virtualization..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddMonitor"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations.AddMonitor"
+                        label="Add Monitor..."
+                        style="push">
+                  </command>
+                  <command
+                        commandId="om.collins.trustedsystems.briefcase.staircase.commands.AddSimplex"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations.AddSimplex"
+                        label="Add Simplex staircase"
+                        style="push">
+                  </command>
+                  <command
+                        commandId="com.collins.trustedsystems.briefcase.staircase.commands.seL4Transform"
+                        id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.transformations.seL4Transform"
+                        label="Transform for seL4 build"
+                        style="push">
+                  </command>
+               </menu>
+               <menu
+                     id="com.collins.trustedsystems.briefcase.menus.editor.resiliency.synthesis"
+                     label="Synthesis Tools">
+               </menu>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.editor.component"
+                  label="Component Analysis">
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.SelectImplementation"
+                     id="com.collins.trustedsystems.briefcase.menus.editor.component.SelectImplementation"
+                     label="Select Implementation..."
+                     style="push">
+               </command>
+               <command
+                     commandId="com.collins.trustedsystems.briefcase.staircase.commands.VerifyImplementation"
+                     id="com.collins.trustedsystems.briefcase.menus.editor.component.RunIvaldi"
+                     label="Run Ivaldi"
+                     style="push">
+               </command>
+            </menu>
+            <menu
+                  id="com.collins.trustedsystems.briefcase.menus.editor.build"
+                  label="System Build">
+            </menu>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="touch.toolbar"
+               label="Touch">
+            <command
+                  commandId="com.collins.trustedsystems.briefcase.staircase.commands.Touch"
+                  label="Touch">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements"
+            name="Generate Requirements">
+         <commandParameter
+               id="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements.tool"
+               name="Tool"
+               optional="true">
+         </commandParameter>
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.ImportRequirements"
+            name="Import Requirements">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.ManageRequirements"
+            name="Open Requirements Manager">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.AddAttestationManager"
+            name="Add Attestation Manager">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.AddFilter"
+            name="Add Filter">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.AddMonitor"
+            name="Add Monitor">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.AddVirtualization"
+            name="Add Virtualization">
+      </command>
+      <command
+            id="om.collins.trustedsystems.briefcase.staircase.commands.AddSimplex"
+            name="Add Simplex Architecture">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.seL4Transform"
+            name="Transform for sel4 build">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.ModelAnnotations"
+            name="Model Annotations">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.SelectImplementation"
+            name="Select Implementation">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.VerifyImplementation"
+            name="Verify Implementation">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.FilterChecker"
+            name="Filter Checker">
+      </command>
+      <command
+            id="com.collins.trustedsystems.briefcase.staircase.commands.Touch"
+            name="Touch">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.AddAttestationManagerHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddAttestationManager">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.AddFilterHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddFilter">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.AddVirtualizationHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddVirtualization">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.AddMonitorHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.AddMonitor">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.AddSimplexHandler"
+            commandId="om.collins.trustedsystems.briefcase.staircase.commands.AddSimplex">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.ModelAnnotationsHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.ModelAnnotations">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.SelectImplementationHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.SelectImplementation">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.VerifyLegacyImplementationHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.VerifyImplementation">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.ImportRequirementsHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.ManageRequirements">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.ImportRequirementsHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.ImportRequirements">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.GenerateRequirementsHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.GenerateRequirements">
+      </handler>
+      <handler
+            class="com.collins.trustedsystems.briefcase.staircase.handlers.TouchHandler"
+            commandId="com.collins.trustedsystems.briefcase.staircase.commands.Touch">
+      </handler>
+   </extension>
+   <extension
+         point="org.osate.pluginsupport.aadlcontribution">
+      <aadlcontribution
+            file="resources/CASE_Properties.aadl"
+            id="com.collins.trustedsystems.briefcase.staircase.aadlcontribution.casepropset">
+      </aadlcontribution>
+      <aadlcontribution
+            file="resources/CASE_Model_Transformations.aadl"
+            id="com.collins.trustedsystems.briefcase.staircase.aadlcontribution.casemodeltransformations">
+      </aadlcontribution>
+   </extension>
+
+</plugin>

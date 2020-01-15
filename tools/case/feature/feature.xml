@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.collins.fmw.cyres.feature"
+      id="com.collins.trustedsystems.briefcase.feature"
       label="Feature"
       version="1.0.0.qualifier"
       provider-name="ROCKWELLCOLLINS">
@@ -18,35 +18,35 @@
    </license>
 
    <plugin
-         id="com.collins.fmw.cyres.splat.plugin"
+         id="com.collins.trustedsystems.briefcase.splat"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.collins.fmw.cyres.util.plugin"
+         id="com.collins.trustedsystems.briefcase"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.collins.fmw.cyres.architecture.plugin"
+         id="com.collins.trustedsystems.briefcase.staircase"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.collins.fmw.cyres.toolcheck.plugin"
+         id="com.collins.trustedsystems.briefcase.toolcheck"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.collins.fmw.cyres.json.plugin"
+         id="com.collins.trustedsystems.briefcase.json"
          download-size="0"
          install-size="0"
          version="0.0.0"

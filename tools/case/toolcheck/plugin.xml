@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.rockwellcollins.atc.resolute.analysis.external.resoluteExternalAnalysis">
+      <externalAnalysis
+            analysisClass="com.collins.trustedsystems.briefcase.toolcheck.ResoluteToolCheck"
+            name="ToolCheck"
+            typeClass="com.collins.trustedsystems.briefcase.toolcheck.ResoluteToolCheckType">
+      </externalAnalysis>
+   </extension>
+
+</plugin>
