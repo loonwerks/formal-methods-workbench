@@ -69,9 +69,19 @@ git clone https://github.com/loonwerks/formal-methods-workbench.git
 
 ### Building the plugins and IDE product
 
+Presently, the formal methods workbench is contained in three repositories.  This repository contains the Briefcase plugins and the top-level product build.  The AGREE tool, AADL simulator and test case generator are now contained in the [AGREE](https://github.com/loonwerks/AGREE.git) repository and the Resolute assurance case tool in the [Resolute](https://github.com/loonwerks/Resolute.git) repository.  Ordinarily, one would include AGREE and Resolute as dependencies accessed via P2 repositories included through the Tycho/Maven build.  However, we do not (yet) have these AGREE and Resolute available through a publicly-accessible P2 repository.  Thus, these must be still be included via building them on the local filesystem. Steps are given below.
+
 Once **mvn** is using the right JDK, change to the *formal-methods-workbench/tools* directory and build the plugins and IDE:
 ```
 $ cd formal-methods-workbench/tools
+$ git clone --depth 1 https://github.com/loonwerks/AGREE.git agree
+$ pushd agree
+$ mvn clean verify
+$ popd
+$ git clone --depth 1 https://github.com/loonwerks/Resolute.git resolute
+$ pushd resolute
+$ mvn clean verify
+$ popd
 $ mvn clean verify
 ```
 

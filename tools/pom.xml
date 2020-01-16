@@ -34,8 +34,6 @@
 	<modules>
 		<module>aadl2sexp</module>
 		<module>case</module>
-		<module>tcg</module>
-		<module>simulator</module>
 		<module>feature</module>
 		<module>repository</module>
 		<module>target-platform</module>

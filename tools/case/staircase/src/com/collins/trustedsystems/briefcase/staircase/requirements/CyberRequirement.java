@@ -11,6 +11,8 @@ import java.util.ListIterator;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -1055,15 +1057,33 @@ public class CyberRequirement {
 			compImplName += "." + parts[1];
 		}
 
-		for (AadlPackage pkg : TraverseProject.getPackagesInProject(TraverseProject.getCurrentProject())) {
-			if (pkg.getName().equalsIgnoreCase(pkgName)) {
-				for (Classifier c : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {
-					if (c.getQualifiedName().equalsIgnoreCase(compImplName)) {
-						classifier = c;
-						break;
-					}
+		List<IProject> projects = new ArrayList<IProject>();
+		projects.add(TraverseProject.getCurrentProject());
+		try {
+			for (IProject proj : TraverseProject.getCurrentProject().getReferencedProjects()) {
+				if (proj.isOpen()) {
+					projects.add(proj);
+				} else {
+					System.err.println(
+							"Referenced project (" + proj.getName() + ") is not open. This may cause an error.");
 				}
-				break;
+			}
+		} catch (CoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		for (IProject proj : projects) {
+			for (AadlPackage pkg : TraverseProject.getPackagesInProject(proj)) {
+				if (pkg.getName().equalsIgnoreCase(pkgName)) {
+					for (Classifier c : EcoreUtil2.getAllContentsOfType(pkg, Classifier.class)) {
+						if (c.getQualifiedName().equalsIgnoreCase(compImplName)) {
+							classifier = c;
+							break;
+						}
+					}
+					break;
+				}
 			}
 		}
 
