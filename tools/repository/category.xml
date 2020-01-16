@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/com.collins.fmw.feature_1.0.0.qualifier.jar" id="com.collins.fmw.feature" version="1.0.0.qualifier">
+   <feature url="features/com.collins.trustedsystems.fmw.feature_1.0.0.qualifier.jar" id="com.collins.trustedsystems.fmw.feature" version="1.0.0.qualifier">
       <category name="fm.workbench.aggregate"/>
    </feature>
    <category-def name="fm.workbench.aggregate" label="Formal Methods Workbench"/>
