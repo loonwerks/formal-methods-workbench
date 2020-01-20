@@ -148,17 +148,22 @@ public class SplatHandler extends AbstractHandler {
 			while ((s1 = stdInp.readLine()) != null) {
 				List<String> tempList = new ArrayList<String>(Arrays.asList(s1.split(" ")));
 				tempList.removeAll(Arrays.asList(""));
-				for (String item : tempList) {
-					if (item.equals(dockerImage)) {
-						imageExists = true;
-						break;
-					}
-				}
-				if (imageExists) {
+				System.out.println(tempList.get(0));
+				if (tempList.get(0).equals(dockerImage)) {
+					imageExists = true;
 					break;
 				}
-				System.out.println(s1);
-				System.out.println(tempList);
+//				for (String item : tempList) {
+//					if (item.equals(dockerImage)) {
+//						imageExists = true;
+//						break;
+//					}
+//				}
+//				if (imageExists) {
+//					break;
+//				}
+//				System.out.println(s1);
+//				System.out.println(tempList);
 			}
 
 			// If the required image does not exist in the local machine then load the image
