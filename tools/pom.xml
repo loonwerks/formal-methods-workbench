@@ -381,7 +381,7 @@
 		<repository>
 			<id>resolute-plugin</id>
 			<layout>p2</layout>
-			<url>file:../../resolute/repository/target/repository/</url>
+			<url>file:resolute/repository/target/repository/</url>
 		</repository>
 		<repository>
 			<id>sireum-hamr-plugin</id>
