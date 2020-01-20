@@ -376,12 +376,12 @@
 		<repository>
 			<id>agree-plugin</id>
 			<layout>p2</layout>
-			<url>file:agree/repository/target/repository/</url>
+			<url>https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/</url>
 		</repository>
 		<repository>
 			<id>resolute-plugin</id>
 			<layout>p2</layout>
-			<url>file:resolute/repository/target/repository/</url>
+			<url>file:../../resolute/repository/target/repository/</url>
 		</repository>
 		<repository>
 			<id>sireum-hamr-plugin</id>
