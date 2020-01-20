@@ -87,7 +87,7 @@ public class SplatHandler extends AbstractHandler {
 		try {
 
 			// name of the splat image
-			String dockerimage = "splatimgupdated";
+			String dockerImage = "splatimgupdated";
 
 			URI jsonURI = Aadl2Json.createJson();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
@@ -104,12 +104,12 @@ public class SplatHandler extends AbstractHandler {
 //			}
 
 			// Prepare the volume mounting format for docker
-			int image_exists = 0;
+			boolean imageExists = false;
 			String jsonPath = file.getRawLocation().toOSString();
 			String[] jsonPathArrayTemp = jsonPath.split(Pattern.quote(File.separator));
 			String[] jsonPathArrayNew = Arrays.copyOf(jsonPathArrayTemp, jsonPathArrayTemp.length - 1);
-			String dockermountPath = String.join("/", jsonPathArrayNew);
-			dockermountPath += ":/user ";
+			String dockerMountPath = String.join("/", jsonPathArrayNew);
+			dockerMountPath += ":/user ";
 //			System.out.println(dockermountPath);
 //			System.out.println(jsonPathArrayTemp[jsonPathArrayTemp.length - 1]);
 
@@ -123,10 +123,10 @@ public class SplatHandler extends AbstractHandler {
 //			Runtime rt = Runtime.getRuntime();
 //			rt.exec("chmod a+x " + splatPath);
 
-			// Initialize a process and build the command for runtime exec method
+			// Initialize processes and build the command for runtime exec method to perform docker run
 			Process dockerClientProcess = null;
 			Process dockerLoadImage = null;
-			Process dockerListImage = null;
+			Process dockerListImages = null;
 
 			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
@@ -136,41 +136,39 @@ public class SplatHandler extends AbstractHandler {
 			IConsoleView view = (IConsoleView) page.showView(id);
 			String s = null;
 
+			// List the available docker images in the local machine and check if the required image exists
+
 			String listDockerImage = "docker image ls";
-			dockerListImage = Runtime.getRuntime().exec(listDockerImage);
-			BufferedReader stdin_inspect = new BufferedReader(
-					new InputStreamReader(dockerListImage.getInputStream()));
+			dockerListImages = Runtime.getRuntime().exec(listDockerImage);
+			BufferedReader stdInp = new BufferedReader(new InputStreamReader(dockerListImages.getInputStream()));
 			String s1 = null;
 //			dockerListImage.waitFor();
 //			int ret_Code = dockerListImage.exitValue();
 //			System.out.println("Inspect return code: " + ret_Code);
-			while ((s1 = stdin_inspect.readLine()) != null) {
-				List<String> temp_list = new ArrayList<String>(Arrays.asList(s1.split(" ")));
-				temp_list.removeAll(Arrays.asList(""));
-				for (String item : temp_list) {
-					if (item.equals("splatimgupdated")) {
-						image_exists = 1;
+			while ((s1 = stdInp.readLine()) != null) {
+				List<String> tempList = new ArrayList<String>(Arrays.asList(s1.split(" ")));
+				tempList.removeAll(Arrays.asList(""));
+				for (String item : tempList) {
+					if (item.equals(dockerImage)) {
+						imageExists = true;
 						break;
 					}
 				}
-				if (image_exists == 1) {
+				if (imageExists) {
 					break;
 				}
 				System.out.println(s1);
-				System.out.println(temp_list);
+				System.out.println(tempList);
 			}
 
+			// If the required image does not exist in the local machine then load the image
 
-			if (image_exists == 0) {
-				System.out.println("Loading docker image: " + dockerimage);
+			if (!imageExists) {
+				System.out.println("Loading docker image: " + dockerImage);
 				String loadDockerImage = "docker load -i " + "C:/docker_images/splat_image.tar";
 
 				dockerLoadImage = Runtime.getRuntime().exec(loadDockerImage);
-
 				BufferedReader stdErr1 = new BufferedReader(new InputStreamReader(dockerLoadImage.getErrorStream()));
-//			BufferedReader stdOut = new BufferedReader(new InputStreamReader(dockerClientProcess.getInputStream()));
-
-//			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 				console = findConsole("SPLAT");
 				out = console.newMessageStream();
@@ -185,19 +183,20 @@ public class SplatHandler extends AbstractHandler {
 					out.println(s);
 				}
 			} else {
-				System.out.println("Image " + dockerimage + " is already loaded");
+				System.out.println("Image " + dockerImage + " is already loaded");
 			}
 
-			// command line parameters
+			// build the docker run command
+
 //			List<String> cmds = new ArrayList<>();
 			String commands = "";
 
 //			cmds.add("docker run --rm -v");
 //			cmds.add(splatPath);
 			commands += "docker run --rm -v ";
-			commands += dockermountPath;
+			commands += dockerMountPath;
 //			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
-			commands += dockerimage;
+			commands += dockerImage;
 			commands += " ";
 
 			// acquiring user preferences and setting them up accordingly for the exec command
@@ -283,11 +282,7 @@ public class SplatHandler extends AbstractHandler {
 //			String c = "docker run --rm -v C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user splatimg -intwidth 32 -endian LSB -encoding Twos_comp Producer_Consume.json";
 //			System.out.println(c);
 			dockerClientProcess = Runtime.getRuntime().exec(commands);
-//			isStarted = true;
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(dockerClientProcess.getErrorStream()));
-//			BufferedReader stdOut = new BufferedReader(new InputStreamReader(dockerClientProcess.getInputStream()));
-
-//			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 			console = findConsole("SPLAT");
 			out = console.newMessageStream();
