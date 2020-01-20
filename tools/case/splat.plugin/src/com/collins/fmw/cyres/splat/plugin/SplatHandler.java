@@ -87,7 +87,7 @@ public class SplatHandler extends AbstractHandler {
 		try {
 
 			// name of the splat image
-			String dockerimage = "splatimgupdated ";
+			String dockerimage = "splatimgupdated";
 
 			URI jsonURI = Aadl2Json.createJson();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
@@ -104,6 +104,7 @@ public class SplatHandler extends AbstractHandler {
 //			}
 
 			// Prepare the volume mounting format for docker
+			int image_exists = 0;
 			String jsonPath = file.getRawLocation().toOSString();
 			String[] jsonPathArrayTemp = jsonPath.split(Pattern.quote(File.separator));
 			String[] jsonPathArrayNew = Arrays.copyOf(jsonPathArrayTemp, jsonPathArrayTemp.length - 1);
@@ -124,7 +125,68 @@ public class SplatHandler extends AbstractHandler {
 
 			// Initialize a process and build the command for runtime exec method
 			Process dockerClientProcess = null;
+			Process dockerLoadImage = null;
+			Process dockerListImage = null;
 
+			MessageConsole console = findConsole("SPLAT");
+			MessageConsoleStream out = console.newMessageStream();
+			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+			IWorkbenchPage page = window.getActivePage();
+			String id = IConsoleConstants.ID_CONSOLE_VIEW;
+			IConsoleView view = (IConsoleView) page.showView(id);
+			String s = null;
+
+			String listDockerImage = "docker image ls";
+			dockerListImage = Runtime.getRuntime().exec(listDockerImage);
+			BufferedReader stdin_inspect = new BufferedReader(
+					new InputStreamReader(dockerListImage.getInputStream()));
+			String s1 = null;
+//			dockerListImage.waitFor();
+//			int ret_Code = dockerListImage.exitValue();
+//			System.out.println("Inspect return code: " + ret_Code);
+			while ((s1 = stdin_inspect.readLine()) != null) {
+				List<String> temp_list = new ArrayList<String>(Arrays.asList(s1.split(" ")));
+				temp_list.removeAll(Arrays.asList(""));
+				for (String item : temp_list) {
+					if (item.equals("splatimgupdated")) {
+						image_exists = 1;
+						break;
+					}
+				}
+				if (image_exists == 1) {
+					break;
+				}
+				System.out.println(s1);
+				System.out.println(temp_list);
+			}
+
+
+			if (image_exists == 0) {
+				System.out.println("Loading docker image: " + dockerimage);
+				String loadDockerImage = "docker load -i " + "C:/docker_images/splat_image.tar";
+
+				dockerLoadImage = Runtime.getRuntime().exec(loadDockerImage);
+
+				BufferedReader stdErr1 = new BufferedReader(new InputStreamReader(dockerLoadImage.getErrorStream()));
+//			BufferedReader stdOut = new BufferedReader(new InputStreamReader(dockerClientProcess.getInputStream()));
+
+//			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+				console = findConsole("SPLAT");
+				out = console.newMessageStream();
+				window = HandlerUtil.getActiveWorkbenchWindow(event);
+				page = window.getActivePage();
+				id = IConsoleConstants.ID_CONSOLE_VIEW;
+				view = (IConsoleView) page.showView(id);
+				view.display(console);
+
+				s = null;
+				while ((s = stdErr1.readLine()) != null) {
+					out.println(s);
+				}
+			} else {
+				System.out.println("Image " + dockerimage + " is already loaded");
+			}
 
 			// command line parameters
 //			List<String> cmds = new ArrayList<>();
@@ -136,6 +198,7 @@ public class SplatHandler extends AbstractHandler {
 			commands += dockermountPath;
 //			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
 			commands += dockerimage;
+			commands += " ";
 
 			// acquiring user preferences and setting them up accordingly for the exec command
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
@@ -210,7 +273,7 @@ public class SplatHandler extends AbstractHandler {
 //			cmds.add(jsonPath);
 //			cmds.add("Producer_Consume.json");
 			commands += jsonPathArrayTemp[jsonPathArrayTemp.length - 1];
-//			commands += "Producer_Consumer.json";
+//			commands += "Producer_Consume.json";
 
 			System.out.println(commands);
 //			String[] commands = cmds.toArray(new String[cmds.size()]);
@@ -226,8 +289,8 @@ public class SplatHandler extends AbstractHandler {
 
 //			BufferedReader stdErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-			MessageConsole console = findConsole("SPLAT");
-			MessageConsoleStream out = console.newMessageStream();
+			console = findConsole("SPLAT");
+			out = console.newMessageStream();
 //			String cmdLine = "";
 //			for (String s : cmds) {
 //				cmdLine += s + " ";
@@ -235,13 +298,13 @@ public class SplatHandler extends AbstractHandler {
 //			cmdLine += "LD_LIBRARY_PATH=" + splatDir;
 //			out.println(cmdLine);
 			out.println(commands);
-			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-			IWorkbenchPage page = window.getActivePage();
-			String id = IConsoleConstants.ID_CONSOLE_VIEW;
-			IConsoleView view = (IConsoleView) page.showView(id);
+			window = HandlerUtil.getActiveWorkbenchWindow(event);
+			page = window.getActivePage();
+			id = IConsoleConstants.ID_CONSOLE_VIEW;
+			view = (IConsoleView) page.showView(id);
 			view.display(console);
 
-			String s = null;
+			s = null;
 			while ((s = stdErr.readLine()) != null) {
 				out.println(s);
 			}
