@@ -23,10 +23,6 @@ before_install:
   - "./git-setup.sh"
 
 script:
-  - git clone --depth 1 https://github.com/loonwerks/Resolute.git tools/resolute
-  - pushd tools/resolute
-  - mvn clean verify
-  - popd
   - pushd tools
   - mvn clean verify
   - popd
