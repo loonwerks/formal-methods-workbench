@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -56,6 +57,13 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		setMessage(
 				"Enter Monitor details.  You may optionally leave these fields empty and manually edit the AADL monitor component once it is added to the model.",
 				IMessageProvider.NONE);
+	}
+
+	@Override
+	protected Point getInitialSize() {
+		final Point size = super.getInitialSize();
+		size.y += convertHeightInCharsToPixels(1);
+		return size;
 	}
 
 	@Override
