@@ -18,7 +18,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
@@ -47,6 +49,7 @@ import org.osate.aadl2.StringLiteral;
 import org.osate.ui.dialogs.Dialog;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 import org.osate.xtext.aadl2.properties.util.ProgrammingProperties;
+import org.osgi.framework.Bundle;
 
 import com.collins.fmw.cyres.architecture.utils.CaseUtils;
 import com.collins.fmw.cyres.json.plugin.Aadl2Json;
@@ -113,12 +116,15 @@ public class SplatHandler extends AbstractHandler {
 //			System.out.println(dockermountPath);
 //			System.out.println(jsonPathArrayTemp[jsonPathArrayTemp.length - 1]);
 
-//			Bundle bundle = Platform.getBundle(bundleId);
-
+			Bundle bundle = Platform.getBundle(bundleId);
 //			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
-//			String splatPath = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null)))
-//					.getFile();
-//			String splatPath = "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user";
+//			String splatPath = (FileLocator
+//					.toFileURL(FileLocator.find(bundle, new Path("resources/splat_image.tar"), null))).getFile();
+			java.net.URI splatImageURI = (FileLocator
+					.toFileURL(FileLocator.find(bundle, new Path("resources/splat_image.tar"), null))).toURI();
+			String splatPath = splatImageURI.normalize().getPath();
+			String splatImagePath = splatPath.substring(1, splatPath.length());
+			System.out.println("Location of docker image: " + splatImagePath);
 
 //			Runtime rt = Runtime.getRuntime();
 //			rt.exec("chmod a+x " + splatPath);
@@ -142,36 +148,23 @@ public class SplatHandler extends AbstractHandler {
 			dockerListImages = Runtime.getRuntime().exec(listDockerImage);
 			BufferedReader stdInp = new BufferedReader(new InputStreamReader(dockerListImages.getInputStream()));
 			String s1 = null;
-//			dockerListImage.waitFor();
-//			int ret_Code = dockerListImage.exitValue();
-//			System.out.println("Inspect return code: " + ret_Code);
+
 			while ((s1 = stdInp.readLine()) != null) {
 				List<String> tempList = new ArrayList<String>(Arrays.asList(s1.split(" ")));
 				tempList.removeAll(Arrays.asList(""));
-				System.out.println(tempList.get(0));
+//				System.out.println(tempList.get(0));
 				if (tempList.get(0).equals(dockerImage)) {
 					imageExists = true;
 					break;
 				}
-//				for (String item : tempList) {
-//					if (item.equals(dockerImage)) {
-//						imageExists = true;
-//						break;
-//					}
-//				}
-//				if (imageExists) {
-//					break;
-//				}
-//				System.out.println(s1);
-//				System.out.println(tempList);
 			}
 
 			// If the required image does not exist in the local machine then load the image
 
 			if (!imageExists) {
-				System.out.println("Loading docker image: " + dockerImage);
-				String loadDockerImage = "docker load -i " + "C:/docker_images/splat_image.tar";
-
+				System.out.println("Loading docker image ''" + dockerImage + "'' for SPLAT");
+//				String loadDockerImage = "docker load -i " + "C:/docker_images/splat_image.tar";
+				String loadDockerImage = "docker load -i " + splatImagePath;
 				dockerLoadImage = Runtime.getRuntime().exec(loadDockerImage);
 				BufferedReader stdErr1 = new BufferedReader(new InputStreamReader(dockerLoadImage.getErrorStream()));
 
@@ -188,7 +181,7 @@ public class SplatHandler extends AbstractHandler {
 					out.println(s);
 				}
 			} else {
-				System.out.println("Image " + dockerImage + " is already loaded");
+				System.out.println("SPLAT image ''" + dockerImage + "'' is already loaded");
 			}
 
 			// build the docker run command
@@ -275,7 +268,6 @@ public class SplatHandler extends AbstractHandler {
 			}
 
 //			cmds.add(jsonPath);
-//			cmds.add("Producer_Consume.json");
 			commands += jsonPathArrayTemp[jsonPathArrayTemp.length - 1];
 //			commands += "Producer_Consume.json";
 
