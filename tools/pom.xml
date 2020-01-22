@@ -374,14 +374,9 @@
 			<url>http://eclipse.py4j.org</url>
 		</repository>
 		<repository>
-			<id>agree-plugin</id>
+			<id>fmw-plugin</id>
 			<layout>p2</layout>
-			<url>https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/</url>
-		</repository>
-		<repository>
-			<id>resolute-plugin</id>
-			<layout>p2</layout>
-			<url>https://raw.githubusercontent.com/loonwerks/Resolute-Updates/master/</url>
+			<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/</url>
 		</repository>
 		<repository>
 			<id>sireum-hamr-plugin</id>
