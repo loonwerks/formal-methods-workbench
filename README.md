@@ -1,6 +1,16 @@
 # Formal Methods Workbench 
 
-The [Formal Methods Workbench](https://github.com/loonwerks/formal-methods-workbench.git) is a collection of standalone tools and [OSATE2](http://osate.org/) plugins for reasoning about safety and security properties of information models.
+The [Formal Methods Workbench](https://github.com/loonwerks/formal-methods-workbench.git) is the aggregation of standalone tools and [OSATE2](http://osate.org/) plugins for reasoning about safety and security properties of information models.
+
+The following plugins are compose Formal Methods Workbench:
+
+* [OSATE](https://osate.org)
+* [BriefCASE](https://github.com/loonwerks/BriefCase.git)
+* [HAMR](https://github.com/sireum/hamr-codegen.git)
+* [AGREE](https://github.com/loonwerks/AGREE.git)
+* [Resolute](https://github.com/loonwerks/Resolute.git)
+* [JKind](https://github.com/loonwerks/jkind-plugin.git)
+* [Z3](https://github.com/loonwerks/z3-plugin.git)
 
 ## Building and Installing the OSATE2 Plugins
 
@@ -74,115 +84,12 @@ Presently, the formal methods workbench is contained in three repositories.  Thi
 Once **mvn** is using the right JDK, change to the *formal-methods-workbench/tools* directory and build the plugins and IDE:
 ```
 $ cd formal-methods-workbench/tools
-$ git clone --depth 1 https://github.com/loonwerks/AGREE.git agree
-$ pushd agree
-$ mvn clean verify
-$ popd
-$ git clone --depth 1 https://github.com/loonwerks/Resolute.git resolute
-$ pushd resolute
-$ mvn clean verify
-$ popd
 $ mvn clean verify
 ```
 
 Although there are several warnings in the build, there should not be any errors.
 
 The build process packages the formal methods workbench plugins as individual P2 repositories and as a complete integrated development environment product.  The IDE product includes OSATE with all of the individual plugins pre-installed.  Compressed archives for Linux, Windows and MacOSX may be found in the *formal-methods-workbench/tools/ide/target/products* directory.
-
-### Adding the Plugins to OSATE2
-
-Install the plugins to [OSATE2](http://osate.org/).
-The build creates the plugin bundles for key tools in the `formal-methods-workbench/tools` subdirectory.  Each of the following plugins can be added to [OSATE2](http://osate.org/):
-
-   * Resolute: architectural assurance builder tool for AADL
-   * AADL Simulator
-   * CASE: ???
-   * AGREE: assume-guarantee-style model checker for AADL models
-   * Z3-plugin: Microsoft Z3-Prover packaged as an Eclipse plugin
-
-The Z3-plugin may be installed by:
-
-   1. Download the [Z3-plugin archive](https://github.com/loonwerks/z3-plugin/releases/download/4.7.1/com.collins.trustedsystems.z3.repository-4.7.1.zip) and save to a directory of your choice.
-   1. Select *Help --> Install New Software...* and click **Add** in the dialogue.
-   2. State the name and then click **Archive...**
-   3. In the finder window, navigate to the appropriate directory to install the Z3-plugin
-   4. Click **Add**, select the products to install, and then follow the dialogues.
-
-After starting [OSATE2](http://osate.org/), the general process for each tool is
-
-   1. Select *Help --> Install New Software...* and click **Add** in the dialogue.
-   2. State the name and then click **Archive...**
-   3. In the finder window, navigate to the appropriate directory to install the matching plugin:
-
-      * **Resolute**: /formal-methods-workbench/tools/resolute/repository/target/com.collins.fmw.resolute.repository-1.0.0-SNAPSHOT.zip
-      * **AADL Simulator**: /formal-methods-workbench/tools/simulator/repository/target/com.collins.fmw.aadlsimulator.repository-1.0.0-SNAPSHOT.zip
-      * **CASE**: /formal-methods-workbench/tools/case/repository/target/com.collins.fmw.cyres.repository-0.0.0.zip
-      * **AGREE**: /formal-methods-workbench/tools/agree/repository/target/com.rockwellcollins.atc.agree.repository-2.4.0-SNAPSHOT.zip 
-
-   4. Click **Add**, select the products to install, and then follow the dialogues.
-
-## Testing the plugins
-
-What needs to go here?
-
-## Source Code Organization
-The code is organized as a hierarchy of modules that may be built individually.
-Each module has its own configunartion file pom.xml. 
-If a module depends on building a submodule, it specifies the location of the submodules in its pom.xml file.
-It also typically contains the submodule source code in a subdirectory as well.
-The exception is for submodules that are from external repos, such as smaccm and ostate2.
-```
-formal-methods-workbench
-|- com.collins.fmw.cyres
-|  |- json.plugin
-|  |  `- pom.xml
-|  |
-|  |- architecture.plugin
-|  |  `- pom.xml
-|  |
-|  |- feature
-|  |  `- pom.xml
-|  |
-|  |- repository
-|  |  `- pom.xml
-|  |
-|  |- splat.plugin
-|  |  `- pom.xml
-|  |
-|  |- toolcheck.plugin
-|  |  `- pom.xml
-|  |
-|  `- util.plugin
-|     `- pom.xml
-|   
-|- com.collins.fmw.ide
-|  `- pom.xml
-|   
-|- com.collins.fmw.json
-|  `- pom.xml
-|   
-`- pom.xml
-```
-
-## Running the tests
-
-TODO: Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-TODO: Explain what these tests test and why
-
-```
-TODO: Give an example
-```
-
-### And coding style tests
-
-TODO: Explain what these tests test and why
-
-```
-TODO: Give an example
-```
 
 ## Continuous Integration / Continuous Deployment
 
@@ -200,7 +107,7 @@ Presently direct contributions to this repository are limited to members of the 
 
 ## Versioning
 
-As the Formal Methods Workbench is still in the early stages of development and not all planned plugins have yet been integrated, the current version is 1.0.0-SNAPSHOT.  It is likely that an official release will be made for the next tool evaluation under the DARPA CASE program.
+As the Formal Methods Workbench is still in the early stages of development and not all planned plugins have yet been integrated, the current version is 0.1.0-SNAPSHOT.  It is likely that an official release will be made for the next tool evaluation under the DARPA CASE program.
 
 The various plugins immediately composed in this repository presently track their version numbers with that of the aggregate IDE.  Dependency plugins such as AGREE and Resolute maintain their own version number scheme.
 
