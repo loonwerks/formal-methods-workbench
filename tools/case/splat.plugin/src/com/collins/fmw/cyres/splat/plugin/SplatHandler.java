@@ -5,13 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -89,11 +90,9 @@ public class SplatHandler extends AbstractHandler {
 
 		try {
 
-			// name of the splat image
-			String dockerImage = "splatimgupdated";
-
 			URI jsonURI = Aadl2Json.createJson();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jsonURI.toPlatformString(true)));
+			String jsonPath = file.getRawLocation().toOSString();
 
 //			// Replace bounded numbers with unbounded equivalents
 //			try {
@@ -106,33 +105,13 @@ public class SplatHandler extends AbstractHandler {
 //						"Attempt to replace bounded numbers with their unbounded equivalents failed.  Check json file to ensure it does not contain bounded numbers.");
 //			}
 
-			// Prepare the volume mounting format for docker
-			boolean imageExists = false;
-			String jsonPath = file.getRawLocation().toOSString();
-			String[] jsonPathArrayTemp = jsonPath.split(Pattern.quote(File.separator));
-			String[] jsonPathArrayNew = Arrays.copyOf(jsonPathArrayTemp, jsonPathArrayTemp.length - 1);
-			String dockerMountPath = String.join("/", jsonPathArrayNew);
-			dockerMountPath += ":/user ";
-//			System.out.println(dockermountPath);
-//			System.out.println(jsonPathArrayTemp[jsonPathArrayTemp.length - 1]);
-
 			Bundle bundle = Platform.getBundle(bundleId);
-//			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
-//			String splatPath = (FileLocator
-//					.toFileURL(FileLocator.find(bundle, new Path("resources/splat_image.tar"), null))).getFile();
-			java.net.URI splatImageURI = (FileLocator
-					.toFileURL(FileLocator.find(bundle, new Path("resources/splat_image.tar"), null))).toURI();
-			String splatPath = splatImageURI.normalize().getPath();
-			String splatImagePath = splatPath.substring(1, splatPath.length());
-			System.out.println("Location of docker image: " + splatImagePath);
+			String splatDir = (FileLocator.toFileURL(FileLocator.find(bundle, new Path("resources"), null))).getFile();
+			String splatPath = (FileLocator
+					.toFileURL(FileLocator.find(bundle, new Path("resources/splat"), null))).getFile();
 
-//			Runtime rt = Runtime.getRuntime();
-//			rt.exec("chmod a+x " + splatPath);
-
-			// Initialize processes and build the command for runtime exec method to perform docker run
-			Process dockerClientProcess = null;
-			Process dockerLoadImage = null;
-			Process dockerListImages = null;
+			// Initialize process and other objects
+			Process ClientProcess = null;
 
 			MessageConsole console = findConsole("SPLAT");
 			MessageConsoleStream out = console.newMessageStream();
@@ -142,154 +121,211 @@ public class SplatHandler extends AbstractHandler {
 			IConsoleView view = (IConsoleView) page.showView(id);
 			String s = null;
 
-			// List the available docker images in the local machine and check if the required image exists
-
-			String listDockerImage = "docker image ls";
-			dockerListImages = Runtime.getRuntime().exec(listDockerImage);
-			BufferedReader stdInp = new BufferedReader(new InputStreamReader(dockerListImages.getInputStream()));
-			String s1 = null;
-
-			while ((s1 = stdInp.readLine()) != null) {
-				List<String> tempList = new ArrayList<String>(Arrays.asList(s1.split(" ")));
-				tempList.removeAll(Arrays.asList(""));
-//				System.out.println(tempList.get(0));
-				if (tempList.get(0).equals(dockerImage)) {
-					imageExists = true;
-					break;
-				}
-			}
-
-			// If the required image does not exist in the local machine then load the image
-
-			if (!imageExists) {
-				System.out.println("Loading docker image ''" + dockerImage + "'' for SPLAT");
-//				String loadDockerImage = "docker load -i " + "C:/docker_images/splat_image.tar";
-				String loadDockerImage = "docker load -i " + splatImagePath;
-				dockerLoadImage = Runtime.getRuntime().exec(loadDockerImage);
-				BufferedReader stdErr1 = new BufferedReader(new InputStreamReader(dockerLoadImage.getErrorStream()));
-
-				console = findConsole("SPLAT");
-				out = console.newMessageStream();
-				window = HandlerUtil.getActiveWorkbenchWindow(event);
-				page = window.getActivePage();
-				id = IConsoleConstants.ID_CONSOLE_VIEW;
-				view = (IConsoleView) page.showView(id);
-				view.display(console);
-
-				s = null;
-				while ((s = stdErr1.readLine()) != null) {
-					out.println(s);
-				}
-			} else {
-				System.out.println("SPLAT image ''" + dockerImage + "'' is already loaded");
-			}
-
-			// build the docker run command
-
-//			List<String> cmds = new ArrayList<>();
+			// command line parameters
+			List<String> cmds = new ArrayList<>();
 			String commands = "";
-
-//			cmds.add("docker run --rm -v");
-//			cmds.add(splatPath);
-			commands += "docker run --rm -v ";
-			commands += dockerMountPath;
-//			commands += "C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user ";
-			commands += dockerImage;
-			commands += " ";
+			String subCommands = "";
 
 			// acquiring user preferences and setting them up accordingly for the exec command
+			cmds.add(splatPath);
 			String assuranceLevel = Activator.getDefault().getPreferenceStore()
 					.getString(SplatPreferenceConstants.ASSURANCE_LEVEL);
 			if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_CAKE)) {
-//				cmds.add("cake");
-				System.out.println("cake");
+				cmds.add("cake");
+				subCommands += "cake ";
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_HOL)) {
-//				cmds.add("hol");
-				System.out.println("hol");
+				cmds.add("hol");
+				subCommands += "hol ";
 			} else if (assuranceLevel.equals(SplatPreferenceConstants.ASSURANCE_LEVEL_FULL)) {
-//				cmds.add("full");
-				System.out.println("full");
+				cmds.add("full");
+				subCommands += "full ";
 			} else {
-//				cmds.add("basic");
-				System.out.println("basic");
+				cmds.add("basic");
+				subCommands += "basic ";
 			}
 
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.CHECK_PROPERTIES)) {
-//				cmds.add("-checkprops");
-				System.out.println("-checkprops");
+				cmds.add("-checkprops");
+				subCommands += "-checkprops ";
 			}
 
-//			cmds.add("-outdir");
-//			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
-//			cmds.add(":/user");
+			cmds.add("-outdir");
+			cmds.add(Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.OUTPUT_DIRECTORY));
 
-//			cmds.add("-intwidth");
-			commands += "-intwidth ";
-//			cmds.add(Integer.toString(
-//					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
-			commands += Integer.toString(
+			cmds.add("-intwidth");
+			subCommands += "-intwidth ";
+			cmds.add(Integer.toString(
+					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH)));
+			subCommands += Integer.toString(
 					Activator.getDefault().getPreferenceStore().getInt(SplatPreferenceConstants.INTEGER_WIDTH));
-			commands += " ";
+			subCommands += " ";
+
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.OPTIMIZE)) {
-//				cmds.add("optimize");
-				System.out.println("optimize");
+				cmds.add("optimize");
+				subCommands += "optimize ";
 			}
 
-//			cmds.add("-endian ");
-			commands += "-endian ";
+			cmds.add("-endian ");
+			subCommands += "-endian ";
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.ENDIAN_BIG)) {
-//				cmds.add("MSB");
-				commands += "MSB ";
+				cmds.add("MSB");
+				subCommands += "MSB ";
 			} else {
-//				cmds.add("LSB");
-				commands += "LSB ";
+				cmds.add("LSB");
+				subCommands += "LSB ";
 			}
 
-//			cmds.add("-encoding");
-			commands += "-encoding ";
+			cmds.add("-encoding");
+			subCommands += "-encoding ";
 			String encoding = Activator.getDefault().getPreferenceStore().getString(SplatPreferenceConstants.ENCODING);
 			if (encoding.equals(SplatPreferenceConstants.ENCODING_UNSIGNED)) {
-//				cmds.add("Unsigned");
-				commands += "Unsigned ";
+				cmds.add("Unsigned");
+				subCommands += "Unsigned ";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_SIGN_MAG)) {
-//				cmds.add("Sign_mag");
-				commands += "Sign_mag ";
+				cmds.add("Sign_mag");
+				subCommands += "Sign_mag ";
 			} else if (encoding.equals(SplatPreferenceConstants.ENCODING_ZIGZAG)) {
-//				cmds.add("Zigzag");
-				commands += "Zigzag ";
+				cmds.add("Zigzag");
+				subCommands += "Zigzag ";
 			} else {
-//				cmds.add("Twos_comp");
-				commands += "Twos_comp ";
+				cmds.add("Twos_comp");
+				subCommands += "Twos_comp ";
 			}
 
 			if (Activator.getDefault().getPreferenceStore().getBoolean(SplatPreferenceConstants.PRESERVE_MODEL_NUMS)) {
-//				cmds.add("-preserve_model_nums");
-				commands += "-preserve_model_nums ";
+				cmds.add("-preserve_model_nums");
+				subCommands += "-preserve_model_nums ";
 			}
 
-//			cmds.add(jsonPath);
-			commands += jsonPathArrayTemp[jsonPathArrayTemp.length - 1];
-//			commands += "Producer_Consume.json";
+			// Check if docker image tar file exists
+			URL tarFileExists = FileLocator.find(bundle, new Path("resources/splat_image.tar"), null);
 
-			System.out.println(commands);
-//			String[] commands = cmds.toArray(new String[cmds.size()]);
-//			String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
+			// Run SPLAT inside docker container
+			if (tarFileExists != null) {
 
-//			Process proc = rt.exec(commands, environmentVars);
-//			String c = "docker run --rm -v C:/Users/shasan1/git/CASE/TA2/Model_Transformations/Filter/Simple_Example/Transformed_Model/json-generated:/user splatimg -intwidth 32 -endian LSB -encoding Twos_comp Producer_Consume.json";
-//			System.out.println(c);
-			dockerClientProcess = Runtime.getRuntime().exec(commands);
-			BufferedReader stdErr = new BufferedReader(new InputStreamReader(dockerClientProcess.getErrorStream()));
+				Process dockerLoadImage = null;
+				Process dockerListImages = null;
+
+				// name of the splat image
+				String dockerImage = "splatimgupdated";
+				System.out.println(
+						"_________________________________________________________________________________________________________________");
+				System.out.println("Running SPLAT inside docker container");
+				System.out.println(
+						"_________________________________________________________________________________________________________________");
+
+				// Prepare the volume mounting format for docker
+				boolean imageExists = false;
+//				String jsonDir = ResourcesPlugin.getWorkspace().getRoot()
+//						.getFile(new Path(jsonURI.trimSegments(1).toPlatformString(true))).getRawLocation().toOSString()
+//						.replace("\\", "/");
+				String jsonFileName = jsonURI.lastSegment();
+//				String[] jsonPathArrayTemp = jsonPath.split(Pattern.quote(File.separator));
+//				String[] jsonPathArrayNew = Arrays.copyOf(jsonPathArrayTemp, jsonPathArrayTemp.length - 1);
+//				String dockerMountPath = jsonDir + ":/user ";
+//				dockerMountPath += ":/user ";
+
+				java.net.URI splatImageURI = (FileLocator
+						.toFileURL(FileLocator.find(bundle, new Path("resources/splat_image.tar"), null))).toURI();
+				String splatTarFilePath = splatImageURI.normalize().getPath();
+				String splatImagePath = splatTarFilePath.substring(1, splatTarFilePath.length());
+				System.out.println("Location of docker image: " + splatImagePath);
+
+				// Copy json file to user specified directory
+				File sourceFile = new File(jsonPath);
+				File destFile = new File(Activator.getDefault().getPreferenceStore()
+						.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY) + "/" + jsonFileName);
+				if (!destFile.exists()) {
+					Files.copy(sourceFile.toPath(), destFile.toPath());
+				}
+
+				// List the available docker images in the local machine and check if the required image exists
+				String listDockerImage = "docker image ls";
+				dockerListImages = Runtime.getRuntime().exec(listDockerImage);
+				BufferedReader stdInp = new BufferedReader(new InputStreamReader(dockerListImages.getInputStream()));
+				String s1 = null;
+
+				while ((s1 = stdInp.readLine()) != null) {
+					List<String> tempList = new ArrayList<String>(Arrays.asList(s1.split(" ")));
+					tempList.removeAll(Arrays.asList(""));
+//					System.out.println(tempList.get(0));
+					if (tempList.get(0).equals(dockerImage)) {
+						imageExists = true;
+						break;
+					}
+				}
+
+				// If the required image does not exist in the local machine then load the image
+				if (!imageExists) {
+					System.out.println("Loading docker image ''" + dockerImage + "'' for SPLAT");
+					String loadDockerImage = "docker load -i " + splatImagePath;
+					dockerLoadImage = Runtime.getRuntime().exec(loadDockerImage);
+					BufferedReader stdErr1 = new BufferedReader(
+							new InputStreamReader(dockerLoadImage.getErrorStream()));
+
+					console = findConsole("SPLAT");
+					out = console.newMessageStream();
+					window = HandlerUtil.getActiveWorkbenchWindow(event);
+					page = window.getActivePage();
+					id = IConsoleConstants.ID_CONSOLE_VIEW;
+					view = (IConsoleView) page.showView(id);
+					view.display(console);
+
+					s = null;
+					while ((s = stdErr1.readLine()) != null) {
+						out.println(s);
+					}
+				} else {
+					System.out.println("SPLAT image ''" + dockerImage + "'' is already loaded");
+				}
+
+				// build the docker run command
+				commands += "docker run --rm -v ";
+//				commands += dockerMountPath;
+				commands += Activator.getDefault().getPreferenceStore()
+						.getString(SplatPreferenceConstants.OUTPUT_DIRECTORY) + ":/user ";
+				commands += dockerImage;
+				commands += " ";
+				commands += subCommands;
+//				commands += jsonPathArrayTemp[jsonPathArrayTemp.length - 1];
+				commands += jsonFileName;
+				System.out.println(commands);
+				ClientProcess = Runtime.getRuntime().exec(commands);
+				ClientProcess.waitFor();
+				destFile.delete();
+			}
+
+			// Run SPLAT in LINUX environment
+			else {
+
+				System.out.println("Running SPLAT in LINUX environment");
+				Runtime rt = Runtime.getRuntime();
+				rt.exec("chmod a+x " + splatPath);
+
+				cmds.add(jsonPath);
+				String[] subCmds = cmds.toArray(new String[cmds.size()]);
+				String[] environmentVars = { "LD_LIBRARY_PATH=" + splatDir };
+				ClientProcess = Runtime.getRuntime().exec(subCmds, environmentVars);
+			}
+
+			BufferedReader stdErr = new BufferedReader(new InputStreamReader(ClientProcess.getErrorStream()));
 
 			console = findConsole("SPLAT");
 			out = console.newMessageStream();
-//			String cmdLine = "";
-//			for (String s : cmds) {
-//				cmdLine += s + " ";
-//			}
-//			cmdLine += "LD_LIBRARY_PATH=" + splatDir;
-//			out.println(cmdLine);
-			out.println(commands);
+
+			if (tarFileExists == null) {
+				String cmdLine = "";
+				for (String st : cmds) {
+					cmdLine += st + " ";
+				}
+				cmdLine += "LD_LIBRARY_PATH=" + splatDir;
+				out.println(cmdLine);
+				System.out.println("SPLAT binary exists");
+			}
+			else {
+				out.println(commands);
+			}
+
 			window = HandlerUtil.getActiveWorkbenchWindow(event);
 			page = window.getActivePage();
 			id = IConsoleConstants.ID_CONSOLE_VIEW;
@@ -301,8 +337,7 @@ public class SplatHandler extends AbstractHandler {
 				out.println(s);
 			}
 
-//			int exitVal = proc.waitFor();
-			int exitVal = dockerClientProcess.waitFor();
+			int exitVal = ClientProcess.waitFor();
 			if (exitVal == 0) {
 
 				// Insert the location of the source code into the filter component implementations in the model
