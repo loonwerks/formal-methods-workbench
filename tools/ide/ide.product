@@ -38,11 +38,11 @@
    </plugins>
 
    <features>
-      <feature id="com.collins.trustedsystems.briefcase.feature" version="0.1.0.qualifier"/>
+      <feature id="com.collins.trustedsystems.briefcase.feature" version="0.1.0.qualifier" installMode="root"/>
       <feature id="com.collins.trustedsystems.z3.feature" version="4.7.1"/>
-      <feature id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier"/>
-      <feature id="com.rockwellcollins.atc.resolute.feature" version="2.4.0.qualifier"/>
-      <feature id="org.sireum.aadl.osate.hamr.feature"/>
+      <feature id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier" installMode="root"/>
+      <feature id="com.rockwellcollins.atc.resolute.feature" version="2.4.0.qualifier" installMode="root"/>
+      <feature id="org.sireum.aadl.osate.hamr.feature" installMode="root"/>
       <feature id="org.osate.core.feature"/>
       <feature id="org.osate.plugins.feature"/>
       <feature id="org.osate.xtext.aadl2.errormodel.feature" installMode="root"/>
