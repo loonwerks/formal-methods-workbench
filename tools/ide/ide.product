@@ -38,10 +38,10 @@
    </plugins>
 
    <features>
-      <feature id="com.collins.trustedsystems.briefcase.feature" version="0.1.0.qualifier" installMode="root"/>
+      <feature id="com.collins.trustedsystems.briefcase.feature" installMode="root"/>
       <feature id="com.collins.trustedsystems.z3.feature" version="4.7.1"/>
-      <feature id="com.rockwellcollins.atc.agree.feature" version="2.4.0.qualifier" installMode="root"/>
-      <feature id="com.rockwellcollins.atc.resolute.feature" version="2.4.0.qualifier" installMode="root"/>
+      <feature id="com.rockwellcollins.atc.agree.feature" installMode="root"/>
+      <feature id="com.rockwellcollins.atc.resolute.feature" installMode="root"/>
       <feature id="org.sireum.aadl.osate.hamr.feature" installMode="root"/>
       <feature id="org.osate.core.feature"/>
       <feature id="org.osate.plugins.feature"/>
@@ -52,20 +52,19 @@
       <feature id="org.osate.ocarina.feature" installMode="root"/>
       <feature id="org.osate.alisa.workbench.sdk" installMode="root"/>
       <feature id="org.eclipse.xsemantics.runtime.feature"/>
-      <feature id="org.eclipse.birt"/>
       <feature id="org.eclipse.egit"/>
       <feature id="org.eclipse.equinox.executable"/>
       <feature id="org.eclipse.equinox.p2.discovery.feature"/>
       <feature id="org.eclipse.platform"/>
-      <feature id="org.eclipse.rcp"/>
       <feature id="org.eclipse.graphiti.export.feature"/>
       <feature id="org.eclipse.sirius.runtime.ide.ui"/>
+      <feature id="org.eclipse.elk.feature"/>
+      <feature id="org.eclipse.elk.algorithms.feature"/>
       <feature id="org.eclipse.ease.feature"/>
       <feature id="org.eclipse.ease.lang.python.py4j.feature"/>
       <feature id="org.eclipse.ease.lang.scriptarchive.feature"/>
       <feature id="org.eclipse.ease.lang.unittest.feature"/>
       <feature id="org.eclipse.ease.modules.feature"/>
-      <feature id="org.eclipse.ease.modules.modeling.feature"/>
       <feature id="org.eclipse.ease.ui.feature"/>
       <feature id="org.py4j.feature"/>
    </features>
@@ -81,17 +80,9 @@
    </configurations>
 
    <repositories>
-      <repository location="file:///${buildDirectory}/agree/repository/target/repository/" enabled="true" />
-      <repository location="file:///${buildDirectory}/resolute/repository/target/repository/" enabled="true" />
       <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
-      <repository location="http://download.eclipse.org/eclipse/updates/4.10" enabled="true" />
-      <repository location="http://download.eclipse.org/releases/2018-12" enabled="true" />
-      <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
-      <repository location="http://download.eclipse.org/eclipse/updates/4.10" enabled="true" />
-      <repository location="http://download.eclipse.org/releases/2018-12" enabled="true" />
-      <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
-      <repository location="http://download.eclipse.org/eclipse/updates/4.10" enabled="true" />
-      <repository location="http://download.eclipse.org/releases/2018-12" enabled="true" />
+      <repository location="http://download.eclipse.org/eclipse/updates/4.14" enabled="true" />
+      <repository location="http://download.eclipse.org/releases/2019-12" enabled="true" />
       <repository location="http://eclipse.py4j.org" enabled="true" />
    </repositories>
 
