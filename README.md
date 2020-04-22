@@ -2,7 +2,7 @@
 
 The [Formal Methods Workbench](https://github.com/loonwerks/formal-methods-workbench.git) is the aggregation of standalone tools and [OSATE2](http://osate.org/) plugins for reasoning about safety and security properties of information models.
 
-The following plugins are compose Formal Methods Workbench:
+The following plugins compose the Formal Methods Workbench:
 
 * [OSATE](https://osate.org)
 * [BriefCASE](https://github.com/loonwerks/BriefCase.git)
