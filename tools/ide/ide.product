@@ -41,6 +41,7 @@
       <feature id="com.collins.trustedsystems.briefcase.feature" installMode="root"/>
       <feature id="com.collins.trustedsystems.z3.feature" version="4.7.1"/>
       <feature id="com.rockwellcollins.atc.agree.feature" installMode="root"/>
+      <feature id="com.rockwellcollins.atc.tcg.feature" installMode="root"/>
       <feature id="com.rockwellcollins.atc.resolute.feature" installMode="root"/>
       <feature id="org.sireum.aadl.osate.hamr.feature" installMode="root"/>
       <feature id="org.osate.core.feature"/>
