@@ -12,9 +12,6 @@
    <feature id="org.osate.xtext.aadl2.errormodel.feature">
       <category name="osate2"/>
    </feature>
-   <feature id="org.osate.ocarina.feature">
-      <category name="osate2"/>
-   </feature>
    <feature id="org.osate.ba.feature">
       <category name="osate2"/>
    </feature>
@@ -38,7 +35,7 @@
          OSATE
       </description>
    </category-def>
-   <category-def name="alisa" label="ALISA Requirements Specification and Verification"/>
+   <category-def name="osate2" label="OSATE AADL Integrated Dev Environment"/>
    <category-def name="fmworkbench" label="Resolute/AGREE (by Rockwell Collins)"/>
    <category-def name="darpacase" label="darpacase"/>
 </site>
