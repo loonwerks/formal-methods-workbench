@@ -19,27 +19,31 @@
 
    <includes
          id="com.rockwellcollins.atc.agree.feature"
-         version="2.4.2"/>
+         version="0.0.0"/>
 
    <includes
          id="edu.uah.rsesc.aadlsimulator.agree.feature"
-         version="2.4.2"/>
+         version="0.0.0"/>
 
    <includes
          id="edu.uah.rsesc.aadlsimulator.feature"
-         version="2.4.2"/>
+         version="0.0.0"/>
+
+   <includes
+         id="edu.umn.cs.crisys.safety.feature"
+         version="0.0.0"/>
 
    <includes
          id="com.rockwellcollins.atc.resolute.feature"
-         version="2.4.2"/>
+         version="0.0.0"/>
 
    <includes
          id="com.rockwellcollins.atc.tcg.feature"
-         version="2.4.2"/>
+         version="0.0.0"/>
 
    <includes
          id="com.collins.trustedsystems.briefcase.feature"
-         version="0.2.1"/>
+         version="0.0.0"/>
 
    <plugin
          id="com.rockwellcollins.atc.aadl2sexp"
