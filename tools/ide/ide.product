@@ -43,6 +43,7 @@
       <feature id="com.rockwellcollins.atc.agree.feature" installMode="root"/>
       <feature id="com.rockwellcollins.atc.tcg.feature" installMode="root"/>
       <feature id="com.rockwellcollins.atc.resolute.feature" installMode="root"/>
+      <feature id="edu.umn.cs.crisys.safety.feature" installMode="root"/>
       <feature id="org.sireum.aadl.osate.hamr.feature" installMode="root"/>
       <feature id="org.osate.core.feature"/>
       <feature id="org.osate.plugins.feature"/>
