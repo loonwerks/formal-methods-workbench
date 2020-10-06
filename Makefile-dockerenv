@@ -1,0 +1,45 @@
+#! /usr/bin/make
+
+# Extra vars
+DOCKER_BUILD ?= docker build
+DOCKER_FLAGS ?= --force-rm=true
+ifndef EXEC
+	EXEC := bash
+	DOCKER_RUN_FLAGS += -it
+endif
+
+# Volumes
+DOCKER_VOLUME_HOME ?= $(shell whoami)-home
+
+# Interactive images
+HOST_DIR ?= $(shell pwd)
+USER_IMG := user_agree_build-$(shell whoami)
+EXTRA_DOCKER_RUN_ARGS := -u $(shell id -u):$(shell id -g)
+
+.PHONY: user
+user: build_user user_run
+
+.PHONY:
+build_user:
+	$(DOCKER_BUILD) $(DOCKER_FLAGS) \
+		--build-arg=UNAME=$(shell whoami) \
+		--build-arg=UID=$(shell id -u) \
+		--build-arg=GID=$(shell id -g) \
+		--build-arg=GROUP=$(shell id -gn) \
+		-f Dockerfile \
+		-t $(USER_IMG) \
+		.
+
+.PHONY: user_run
+user_run:
+	docker run \
+		$(DOCKER_RUN_FLAGS) \
+		--hostname in-container \
+		--rm \
+		$(EXTRA_DOCKER_RUN_ARGS) \
+		--group-add sudo \
+		-v $(HOST_DIR):/host:z \
+		-v $(DOCKER_VOLUME_HOME):/home/$(shell whoami) \
+		-v /etc/localtime:/etc/localtime:ro \
+		$(USER_IMG) $(EXEC)
+
