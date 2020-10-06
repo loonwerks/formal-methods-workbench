@@ -81,6 +81,7 @@
    </configurations>
 
    <repositories>
+      <repository location="http://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/" enabled="true" />
       <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
       <repository location="http://download.eclipse.org/eclipse/updates/4.14" enabled="true" />
       <repository location="http://download.eclipse.org/releases/2019-12" enabled="true" />
