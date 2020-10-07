@@ -49,9 +49,7 @@
       <feature id="org.osate.plugins.feature"/>
       <feature id="org.osate.xtext.aadl2.errormodel.feature" installMode="root"/>
       <feature id="org.osate.ge.feature" installMode="root"/>
-      <feature id="org.osate.ba.feature" installMode="root"/>
       <feature id="org.osate.utils.feature" installMode="root"/>
-      <feature id="org.osate.alisa.workbench.sdk" installMode="root"/>
       <feature id="org.eclipse.xsemantics.runtime.feature"/>
       <feature id="org.eclipse.egit"/>
       <feature id="org.eclipse.equinox.executable"/>
@@ -83,8 +81,8 @@
    <repositories>
       <repository location="http://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/" enabled="true" />
       <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
-      <repository location="http://download.eclipse.org/eclipse/updates/4.14" enabled="true" />
-      <repository location="http://download.eclipse.org/releases/2019-12" enabled="true" />
+      <repository location="http://download.eclipse.org/eclipse/updates/4.17" enabled="true" />
+      <repository location="http://download.eclipse.org/releases/2020-03" enabled="true" />
       <repository location="http://eclipse.py4j.org" enabled="true" />
    </repositories>
 
