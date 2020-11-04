@@ -65,6 +65,8 @@
       <feature id="com.collins.trustedsystems.z3.feature" version="4.7.1"/>
       <feature id="com.rockwellcollins.atc.agree.feature" installMode="root"/>
       <feature id="com.rockwellcollins.atc.tcg.feature" installMode="root"/>
+      <feature id="edu.uah.rsesc.aadlsimulator.feature" installMode="root"/>
+      <feature id="edu.uah.rsesc.aadlsimulator.agree.feature" installMode="root"/>
       <feature id="com.rockwellcollins.atc.resolute.feature" installMode="root"/>
       <feature id="edu.umn.cs.crisys.safety.feature" installMode="root"/>
       <feature id="org.sireum.aadl.osate.hamr.feature" installMode="root"/>
@@ -106,11 +108,21 @@
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <property name="org.eclipse.update.reconcile" value="false" />
       <property name="preferenceCustomization" value="plugin_customization.ini" />
+      <property name="org.eclipse.update.reconcile" value="false" />
    </configurations>
 
    <repositories>
+      <repository location="http://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/" enabled="true" />
+      <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.8.0/updates/" enabled="true" />
+      <repository location="http://download.eclipse.org/eclipse/updates/4.17" enabled="true" />
+      <repository location="http://download.eclipse.org/releases/2020-03" enabled="true" />
+      <repository location="http://eclipse.py4j.org" enabled="true" />
+      <repository location="http://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/" enabled="true" />
+      <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.8.0/updates/" enabled="true" />
+      <repository location="http://download.eclipse.org/eclipse/updates/4.17" enabled="true" />
+      <repository location="http://download.eclipse.org/releases/2020-03" enabled="true" />
+      <repository location="http://eclipse.py4j.org" enabled="true" />
       <repository location="http://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/" enabled="true" />
       <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.8.0/updates/" enabled="true" />
       <repository location="http://download.eclipse.org/eclipse/updates/4.17" enabled="true" />
