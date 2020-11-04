@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.collins.trustedsystems.fmw.feature"
-      label="Feature"
+      label="Formal Methods Workbench for OSATE2"
       version="1.0.0.qualifier"
       provider-name="Collins Aerospace">
 
@@ -44,6 +44,16 @@
    <includes
          id="com.collins.trustedsystems.briefcase.feature"
          version="0.0.0"/>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.osate.aadl2" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext" version="2.4.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.ui" version="2.4.2" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.instantiation" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.ui" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="com.rockwellcollins.atc.aadl2sexp"
