@@ -2,7 +2,7 @@
 <feature
       id="com.collins.trustedsystems.fmw.feature"
       label="Formal Methods Workbench for OSATE2"
-      version="2.4.0.qualifier"
+      version="2.4.0"
       provider-name="Collins Aerospace">
 
    <description url="http://www.example.com/description">
