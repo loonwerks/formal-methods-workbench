@@ -27,7 +27,7 @@ before_install:
 
 script:
   - pushd tools
-  - mvn clean verify
+  - mvn -P fmw-snapshot-repos clean verify
   - popd
 
 before_deploy:

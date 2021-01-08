@@ -61,6 +61,16 @@
 				<module>update-site</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>fmw-snapshot-repos</id>
+			<repositories>
+				<repository>
+					<id>fmw-plugin</id>
+					<layout>p2</layout>
+					<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/snapshots/</url>
+				</repository>
+			</repositories>
+		</profile>
 	</profiles>
 
 	<build>
@@ -374,7 +384,7 @@
 		<repository>
 			<id>fmw-plugin</id>
 			<layout>p2</layout>
-			<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/</url>
+			<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/releases/</url>
 		</repository>
 		<repository>
 			<id>sireum-hamr-plugin</id>
