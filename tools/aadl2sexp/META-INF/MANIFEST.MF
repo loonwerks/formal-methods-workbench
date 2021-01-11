@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: aadl2sexp
 Bundle-SymbolicName: com.rockwellcollins.atc.aadl2sexp; singleton:=true
-Bundle-Version: 2.4.1.qualifier
+Bundle-Version: 2.4.1
 Bundle-Activator: com.rockwellcollins.atc.aadl2sexp.Activator
 Bundle-Vendor: Rockwell Collins, Inc.
 Require-Bundle: org.eclipse.ui,
