@@ -34,6 +34,7 @@
    <vm>
    </vm>
 
+
    <plugins>
    </plugins>
 
@@ -66,6 +67,9 @@
       <feature id="org.eclipse.ease.modules.feature"/>
       <feature id="org.eclipse.ease.ui.feature"/>
       <feature id="org.py4j.feature"/>
+      <feature id="org.eclipse.rcp" installMode="root"/>
+      <feature id="org.eclipse.emf.ecore" installMode="root"/>
+      <feature id="org.eclipse.emf.common" installMode="root"/>
    </features>
 
    <configurations>
@@ -74,16 +78,23 @@
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <property name="org.eclipse.update.reconcile" value="false" />
       <property name="preferenceCustomization" value="plugin_customization.ini" />
+      <property name="org.eclipse.update.reconcile" value="false" />
    </configurations>
 
    <repositories>
       <repository location="http://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/" enabled="true" />
-      <repository location="http://osate-build.sei.cmu.edu/download/osate/testing/updates/" enabled="true" />
+      <repository location="http://osate-build.sei.cmu.edu/download/osate/stable/2.9.0/updates/" enabled="true" />
       <repository location="http://download.eclipse.org/eclipse/updates/4.17" enabled="true" />
-      <repository location="http://download.eclipse.org/releases/2020-03" enabled="true" />
+      <repository location="http://download.eclipse.org/releases/2020-06" enabled="true" />
       <repository location="http://eclipse.py4j.org" enabled="true" />
    </repositories>
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
 
 </product>
