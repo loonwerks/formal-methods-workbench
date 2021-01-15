@@ -100,13 +100,5 @@
       <unit id="org.yakindu.base.xtext.utils.jface" version="0.0.0"/>
       <repository location="http://updates.yakindu.com/statecharts/releases/3.5.9"/>
     </location>
-	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-		<unit id="org.osate.core.feature.feature.group" version="0.0.0"/>
-		<unit id="org.osate.ge.feature.feature.group" version="0.0.0"/>
-		<unit id="org.osate.plugins.feature.feature.group" version="0.0.0"/>
-		<unit id="org.osate.utils.feature.feature.group" version="0.0.0"/>
-		<unit id="org.osate.xtext.aadl2.errormodel.feature.feature.group" version="0.0.0"/>
-		<repository location="https://osate-build.sei.cmu.edu/download/osate/testing/updates/"/>
-	</location>
   </locations>
 </target>

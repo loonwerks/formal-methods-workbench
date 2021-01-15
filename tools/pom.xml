@@ -346,6 +346,11 @@
 			<url>${eclipse.mirror}/releases/2020-06/</url>
 		</repository>
 		<repository>
+			<id>Osate2</id>
+			<layout>p2</layout>
+			<url>https://osate-build.sei.cmu.edu/download/osate/stable/2.9.0/updates/</url>
+		</repository>
+		<repository>
 			<id>Xsemantics</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/xsemantics/milestones/</url>
@@ -383,6 +388,17 @@
 		</repository>
 	</repositories>
 	<pluginRepositories>
+		<pluginRepository>
+			<id>Osate2</id>
+			<name>OSATE2 plugins</name>
+			<url>https://osate-build.sei.cmu.edu/download/osate/stable/2.9.0/updates/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
 		<pluginRepository>
 			<id>codehaus-snapshots</id>
 			<name>disable dead 'Codehaus Snapshots' repository, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478</name>
