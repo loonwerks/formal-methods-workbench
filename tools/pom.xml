@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.collins.trustedsystems.fmw</groupId>
 	<artifactId>com.collins.trustedsystems.fmw.aggregator</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>2.4.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -60,6 +57,16 @@
 			<modules>
 				<module>update-site</module>
 			</modules>
+		</profile>
+		<profile>
+			<id>fmw-snapshot-repos</id>
+			<repositories>
+				<repository>
+					<id>fmw-plugin</id>
+					<layout>p2</layout>
+					<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/snapshots/</url>
+				</repository>
+			</repositories>
 		</profile>
 	</profiles>
 
@@ -125,7 +132,7 @@
 						<artifact>
 							<groupId>com.collins.trustedsystems.fmw</groupId>
 							<artifactId>com.collins.trustedsystems.fmw.target</artifactId>
-							<version>2.4.0-SNAPSHOT</version>
+							<version>${project.parent.version}</version>
 						</artifact>
 					</target>
 					<environments>
@@ -374,7 +381,7 @@
 		<repository>
 			<id>fmw-plugin</id>
 			<layout>p2</layout>
-			<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/</url>
+			<url>https://raw.githubusercontent.com/loonwerks/formal-methods-workbench-updates/master/releases/</url>
 		</repository>
 		<repository>
 			<id>sireum-hamr-plugin</id>
