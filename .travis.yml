@@ -1,5 +1,5 @@
 sudo: false
-dist: xenial
+dist: bionic
 services:
   - xvfb
 language: java
@@ -26,6 +26,7 @@ branches:
 
 before_install:
   - pip3 install --user --upgrade pip
+  - pip3 install --user testresources
   - pip3 install --user --upgrade setuptools
   - pip3 install --user GitPython github3.py
   - "./git-setup.sh"
