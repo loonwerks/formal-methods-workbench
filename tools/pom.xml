@@ -27,6 +27,7 @@
 		<module>feature</module>
 		<module>repository</module>
 		<module>target-platform</module>
+		<module>branding</module>
 		<module>ide</module>
 	</modules>
 

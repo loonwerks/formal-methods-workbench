@@ -1,14 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: com.collins.trustedsystems.fmw.branding
-Bundle-SymbolicName: com.collins.trustedsystems.fmw.branding;singleton:=true
-Bundle-Version: 1.0.0.qualifier
-Automatic-Module-Name: com.collins.trustedsystems.fmw.branding
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.collins.trustedsystems.fmw.branding; singleton:=true
+Bundle-Version: 2.4.2.qualifier
 Bundle-ClassPath: .
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: com.collins.trustedsystems.fmw.branding.AadlPlugin
+Bundle-Vendor: Collins Aerospace
 Bundle-Localization: plugin
 Export-Package: com.collins.trustedsystems.fmw.branding
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.17.0,4.0.0)",
  org.eclipse.ui;bundle-version="[3.115.0,4.0.0)"
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: com.collins.trustedsystems.fmw.branding

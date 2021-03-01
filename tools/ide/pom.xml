@@ -14,7 +14,7 @@
 	<name>FMW RCP Product</name>
 
 	<properties>
-		<product.id>com.collins.trustedsystems.fmw.ide</product.id>
+		<product.id>fmide</product.id>
 	</properties>
 
 	<build>
@@ -72,6 +72,20 @@
 						</product>
 					</products>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>attach-p2-metadata</id>
+						<phase>package</phase>
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
