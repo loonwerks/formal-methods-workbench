@@ -4,7 +4,6 @@
       label="Formal Methods Workbench for OSATE2"
       version="2.4.2.qualifier"
       provider-name="Collins Aerospace"
-      plugin="com.collins.trustedsystems.fmw.branding"
       application="org.eclipse.ui.ide.workbench">
    <install-handler/>
 
@@ -126,13 +125,6 @@
       <import plugin="org.eclipse.ui.navigator" version="3.7.300" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.commons.core" version="3.24.2" match="greaterOrEqual"/>
    </requires>
-
-   <plugin
-         id="com.collins.trustedsystems.fmw.branding"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="com.rockwellcollins.atc.aadl2sexp"
